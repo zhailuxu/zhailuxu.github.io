@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 数学小练习 🌸</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #ffe0f0 0%, #f0e0ff 50%, #e0f0ff 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    color: #c2185b;
+    text-shadow: 2px 2px 4px rgba(194,24,91,0.2);
+    margin-bottom: 8px;
+  }
+  .header p { color: #888; font-size: 0.95rem; }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn-new    { background: linear-gradient(135deg, #f06292, #e91e8c); color: #fff; }
+  .btn-check  { background: linear-gradient(135deg, #7c4dff, #ab47bc); color: #fff; }
+  .btn-show   { background: linear-gradient(135deg, #26c6da, #00acc1); color: #fff; }
+
+  /* 计时器 */
+  .timer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #555;
+  }
+  #timer-display {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #e91e8c;
+    min-width: 64px;
+    text-align: center;
+  }
+  .btn-timer {
+    padding: 6px 16px;
+    border: 2px solid #e91e8c;
+    border-radius: 16px;
+    background: #fff;
+    color: #e91e8c;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-timer:hover { background: #fce4ec; }
+
+  .score-bar {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 20px;
+    min-height: 28px;
+  }
+  .score-bar span { font-weight: 700; color: #c2185b; }
+
+  /* 版块 */
+  .section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(194,24,91,0.08);
+  }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #f06292, #ab47bc);
+    display: inline-block;
+    padding: 4px 18px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* 口算题网格 */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .calc-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #333;
+    background: #fce4ec;
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .calc-item .num { color: #c2185b; }
+  .calc-item .op  { color: #7c4dff; font-size: 1.2rem; }
+  .answer-input {
+    width: 52px;
+    border: none;
+    border-bottom: 2.5px solid #f06292;
+    background: transparent;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    outline: none;
+    padding: 2px 4px;
+  }
+  .answer-input:focus { border-bottom-color: #7c4dff; }
+  .answer-input.correct { border-bottom-color: #43a047; color: #2e7d32; }
+  .answer-input.wrong   { border-bottom-color: #e53935; color: #c62828; background: #ffebee; border-radius: 4px; }
+  .eq-op { width: 36px !important; }
+  .eq-op-sel {
+    width: 52px !important;
+    padding: 2px 4px;
+    border: none;
+    border-bottom: 2.5px solid #f06292;
+    background: transparent;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #7c4dff;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .eq-op-sel:focus { border-bottom-color: #7c4dff; }
+  .eq-op-sel.correct { border-bottom-color: #43a047; color: #2e7d32; }
+  .eq-op-sel.wrong   { border-bottom-color: #e53935; color: #c62828; background: #ffebee; border-radius: 4px; }
+  .count-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  .count-select {
+    padding: 4px 10px;
+    border: 1.5px solid #f48fb1;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 0.9rem;
+    color: #c2185b;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+  .count-select:focus { border-color: #ab47bc; }
+
+  /* 看图列算式 */
+  .pic-list { display: flex; flex-direction: column; gap: 18px; }
+  .pic-item {
+    background: #e8f5e9;
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .pic-item .q-num { font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+  .pic-scene {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+  }
+  .pic-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .pic-emojis {
+    font-size: 1.4rem;
+    line-height: 1.5;
+    letter-spacing: 2px;
+    max-width: 200px;
+    word-break: break-all;
+  }
+  .pic-emojis .crossed {
+    opacity: 0.3;
+    text-decoration: line-through;
+  }
+  .pic-count {
+    font-size: 0.85rem;
+    color: #555;
+    background: #fff;
+    border-radius: 8px;
+    padding: 1px 8px;
+  }
+  .pic-op-label {
+    font-size: 1.6rem;
+    color: #7c4dff;
+    font-weight: 700;
+  }
+  .pic-formula {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    flex-wrap: wrap;
+  }
+  .pic-formula .answer-input { width: 52px; font-size: 1.2rem; }
+  .pic-op-text { color: #7c4dff; font-size: 1.3rem; }
+
+  /* 应用题 */
+  .word-list { display: flex; flex-direction: column; gap: 16px; }
+  .word-item {
+    background: #f3e5f5;
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .word-item .q-num {
+    font-weight: 700;
+    color: #7c4dff;
+    margin-bottom: 6px;
+  }
+  .word-item .q-text {
+    font-size: 1.05rem;
+    color: #333;
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .word-item .q-text .highlight { color: #e91e8c; font-weight: 700; }
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: #555;
+    flex-wrap: wrap;
+  }
+  .answer-row .answer-input { width: 64px; font-size: 1rem; }
+
+  /* 结果弹窗 */
+  .result-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .result-overlay.show { display: flex; }
+  .result-box {
+    background: #fff;
+    border-radius: 28px;
+    padding: 36px 40px;
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 8px 40px rgba(194,24,91,0.25);
+    animation: popIn 0.3s ease;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .result-emoji { font-size: 3.5rem; margin-bottom: 12px; }
+  .result-score { font-size: 2rem; font-weight: 800; color: #c2185b; margin-bottom: 8px; }
+  .result-msg   { font-size: 1.1rem; color: #555; margin-bottom: 20px; line-height: 1.5; }
+  .result-close {
+    padding: 10px 32px;
+    background: linear-gradient(135deg, #f06292, #e91e8c);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* 烟花粒子 */
+  .confetti {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    animation: fall linear forwards;
+    z-index: 200;
+    pointer-events: none;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* 比大小下拉 */
+  .cmp-select {
+    width: 52px !important;
+    padding: 2px 4px;
+    border: none;
+    border-bottom: 2.5px solid #f06292;
+    background: transparent;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #7c4dff;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .cmp-select:focus { border-bottom-color: #7c4dff; }
+  .cmp-select.correct { border-bottom-color: #43a047; color: #2e7d32; }
+  .cmp-select.wrong   { border-bottom-color: #e53935; color: #c62828; }
+
+  /* 数列 */
+  .seq-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #e8eaf6;
+    border-radius: 12px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .seq-num {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #3949ab;
+    min-width: 28px;
+    text-align: center;
+  }
+  .seq-comma { color: #9e9e9e; font-size: 1rem; }
+  .seq-inp { width: 52px !important; }
+
+  /* 认钟表 */
+  .clock-list { display: flex; flex-direction: column; gap: 14px; }
+  .clock-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #fff3e0;
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .clock-right { display: flex; flex-direction: column; }
+
+  /* 数人民币 */
+  .rmb-list { display: flex; flex-direction: column; gap: 14px; }
+  .rmb-item {
+    background: #e3f2fd;
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .rmb-bills { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .rmb-chip {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  /* 不等式求最值 */
+  .ineq-item { background: #ede7f6 !important; flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+  .ineq-expr { color: #6a1b9a; font-size: 1.1rem; font-weight: 700; white-space: nowrap; }
+  .ineq-ask  { color: #555; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌸 数学小练习 🌸</h1>
+  <p>一年级 · 随机出题 · 点"交卷"看得分</p>
+</div>
+
+<div class="controls">
+  <button class="btn btn-new"   onclick="generate()">🎲 换一套题</button>
+  <button class="btn btn-check" onclick="checkAll()">✅ 交卷</button>
+  <button class="btn btn-show"  onclick="showAnswers()">💡 查看答案</button>
+</div>
+
+<div class="timer-bar">
+  ⏱ 用时：<span id="timer-display">00:00</span>
+  <button class="btn-timer" id="timer-btn" onclick="toggleTimer()">开始计时</button>
+</div>
+
+<div class="score-bar" id="score-bar"></div>
+
+<!-- 第一关 -->
+<div class="section">
+  <div class="section-title">🍭 第一关 · 20以内口算</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-20" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="8">8题</option>
+      <option value="10" selected>10题</option>
+      <option value="12">12题</option>
+      <option value="16">16题</option>
+      <option value="20">20题</option>
+    </select>
+    <span>（进位/退位各占25%）</span>
+  </div>
+  <div class="calc-grid" id="grid-20"></div>
+</div>
+
+<!-- 第二关 -->
+<div class="section">
+  <div class="section-title">🌈 第二关 · 100以内口算</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-100" class="count-select" onchange="generate()">
+      <option value="8">8题</option>
+      <option value="12">12题</option>
+      <option value="16">16题</option>
+      <option value="20" selected>20题</option>
+      <option value="24">24题</option>
+      <option value="28">28题</option>
+    </select>
+    <span>（进位/退位各占25%）</span>
+  </div>
+  <div class="calc-grid" id="grid-100"></div>
+</div>
+
+<!-- 第三关 -->
+<div class="section">
+  <div class="section-title">🦋 第三关 · 看图列算式</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-pic" class="count-select" onchange="generate()">
+      <option value="2">2题</option>
+      <option value="4" selected>4题</option>
+      <option value="6">6题</option>
+      <option value="8">8题</option>
+    </select>
+  </div>
+  <div class="pic-list" id="pic-list"></div>
+</div>
+
+<!-- 第四关 -->
+<div class="section">
+  <div class="section-title">🐰 第四关 · 应用题</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-word" class="count-select" onchange="generate()">
+      <option value="2">2题</option>
+      <option value="4" selected>4题</option>
+      <option value="6">6题</option>
+    </select>
+  </div>
+  <div class="word-list" id="word-list"></div>
+</div>
+
+<!-- 第五关 -->
+<div class="section">
+  <div class="section-title">🔢 第五关 · 填空运算</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-blank" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6" selected>6题</option>
+      <option value="8">8题</option>
+      <option value="10">10题</option>
+      <option value="12">12题</option>
+    </select>
+    <span>（加法/减法各占50%）</span>
+  </div>
+  <div class="calc-grid" id="grid-blank"></div>
+</div>
+
+<!-- 第六关 -->
+<div class="section">
+  <div class="section-title">⚖️ 第六关 · 比大小</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-cmp" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6">6题</option>
+      <option value="8" selected>8题</option>
+      <option value="10">10题</option>
+      <option value="12">12题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="cmp-grid"></div>
+</div>
+
+<!-- 第七关 -->
+<div class="section">
+  <div class="section-title">📈 第七关 · 数列找规律</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-seq" class="count-select" onchange="generate()">
+      <option value="4" selected>4题</option>
+      <option value="8">8题</option>
+      <option value="12">12题</option>
+      <option value="16">16题</option>
+    </select>
+  </div>
+  <div id="seq-list"></div>
+</div>
+
+<!-- 第八关 -->
+<div class="section">
+  <div class="section-title">🕐 第八关 · 认钟表</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-clock" class="count-select" onchange="generate()">
+      <option value="2">2题</option>
+      <option value="4" selected>4题</option>
+      <option value="6">6题</option>
+      <option value="8">8题</option>
+    </select>
+  </div>
+  <div class="clock-list" id="clock-list"></div>
+</div>
+
+<!-- 第九关 -->
+<div class="section">
+  <div class="section-title">💰 第九关 · 数人民币</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-rmb" class="count-select" onchange="generate()">
+      <option value="2">2题</option>
+      <option value="4" selected>4题</option>
+      <option value="6">6题</option>
+    </select>
+  </div>
+  <div class="rmb-list" id="rmb-list"></div>
+</div>
+
+<!-- 第十关 -->
+<div class="section">
+  <div class="section-title">🔟 第十关 · 10的分解</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-decomp" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6">6题</option>
+      <option value="8" selected>8题</option>
+      <option value="10">10题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="decomp-grid"></div>
+</div>
+
+
+<!-- 第十一关 -->
+<div class="section">
+  <div class="section-title">🎯 第十一关 · 不等式求最值</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-ineq" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6" selected>6题</option>
+      <option value="8">8题</option>
+      <option value="10">10题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="ineq-grid"></div>
+</div>
+
+<!-- 结果弹窗 -->
+<div class="result-overlay" id="result-overlay" onclick="this.classList.remove('show')">
+  <div class="result-box" onclick="event.stopPropagation()">
+    <div class="result-emoji" id="result-emoji"></div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-msg"   id="result-msg"></div>
+    <button class="result-close" onclick="document.getElementById('result-overlay').classList.remove('show')">继续练习 💪</button>
+  </div>
+</div>
+
+<script>
+// ─── 工具函数 ─────────────────────────────────────────
+const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+
+// 判断加法是否进位
+function hasCarry(a, b) {
+  return (a % 10) + (b % 10) >= 10;
+}
+// 判断减法是否借位
+function hasBorrow(a, b) {
+  return (a % 10) < (b % 10);
+}
+// 正整数的十进制位数，用于设置输入框 maxlen
+const digitLen = n => String(Math.abs(n || 0)).length;
+
+// 将 n 道题按 25%×4 均匀分配，余数补给前几种类型
+// 返回 [进位加, 不进位加, 退位减, 不退位减] 的数量
+function distribute(n) {
+  const base = Math.floor(n / 4), r = n % 4;
+  return [base + (r > 0 ? 1 : 0), base + (r > 1 ? 1 : 0),
+          base + (r > 2 ? 1 : 0), base];
+}
+
+// ─── 题目数据 ─────────────────────────────────────────
+let problems = [];   // { id, type, a, op, b, ans, points }
+let picProblems = [];
+let wordProblems = [];
+let blankProblems = [];   // 填空运算
+let cmpProblems = [];     // 比大小
+let seqProblems = [];     // 数列
+let clockProblems = [];
+let rmbProblems = [];
+let decompProblems = [];
+let ineqProblems = [];
+
+// 看图题场景库
+const picScenes = [
+  // 加法：两组合并
+  { op: '+', icon: '🌸', label: '朵花' },
+  { op: '+', icon: '⭐', label: '颗星星' },
+  { op: '+', icon: '🍬', label: '颗糖' },
+  { op: '+', icon: '🎈', label: '个气球' },
+  { op: '+', icon: '🐠', label: '条鱼' },
+  { op: '+', icon: '🍎', label: '个苹果' },
+  // 减法：去掉一部分
+  { op: '-', icon: '🍓', label: '颗草莓' },
+  { op: '-', icon: '🦋', label: '只蝴蝶' },
+  { op: '-', icon: '🐣', label: '只小鸡' },
+  { op: '-', icon: '🌈', label: '朵云' },
+  { op: '-', icon: '🍡', label: '串糖葫芦' },
+  { op: '-', icon: '🐰', label: '只兔子' },
+];
+
+// 应用题模板（每题含 a/op/b/ans，不在界面显示算式，由小朋友自己填写）
+const wordTemplates = [
+  {
+    gen() {
+      const a = rand(5, 15), b = rand(2, 8), total = a + b;
+      const items = ['🌷','🌸','🍓','🍬','🎈','⭐','🐠','🦋'];
+      const item = items[rand(0, items.length-1)];
+      return {
+        text: `花篮里有 <span class="highlight">${a}</span> 朵 ${item}，小美又摘来 <span class="highlight">${b}</span> 朵。<br>一共有多少朵？`,
+        a, op: '+', b, ans: total, unit: '朵'
+      };
+    }
+  },
+  {
+    gen() {
+      const total = rand(12, 20), eat = rand(3, 8), left = total - eat;
+      const foods = ['🍓草莓','🍬糖果','🍎苹果','🍇葡萄'];
+      const food = foods[rand(0, foods.length-1)];
+      return {
+        text: `盘子里有 <span class="highlight">${total}</span> 颗${food}，小猫吃了 <span class="highlight">${eat}</span> 颗。<br>还剩多少颗？`,
+        a: total, op: '-', b: eat, ans: left, unit: '颗'
+      };
+    }
+  },
+  {
+    gen() {
+      const small = rand(5, 12), diff = rand(2, 7), big = small + diff;
+      const names = [['小花','小雨'],['小红','小明'],['豆豆','圆圆'],['小鱼','小熊']];
+      const [n1, n2] = names[rand(0, names.length-1)];
+      return {
+        text: `${n1}有贴纸 <span class="highlight">${small}</span> 张，${n2}有贴纸 <span class="highlight">${big}</span> 张。<br>${n2}比${n1}多几张？`,
+        a: big, op: '-', b: small, ans: diff, unit: '张'
+      };
+    }
+  },
+  {
+    gen() {
+      const gold = rand(5, 12), more = rand(2, 8), flower = gold + more;
+      return {
+        text: `🐠 鱼缸里有金鱼 <span class="highlight">${gold}</span> 条，花鱼比金鱼多 <span class="highlight">${more}</span> 条。<br>花鱼有几条？`,
+        a: gold, op: '+', b: more, ans: flower, unit: '条'
+      };
+    }
+  },
+  {
+    gen() {
+      const total = rand(12, 20), give = rand(3, 8), left = total - give;
+      const names = ['小明','小花','豆豆','小雨','圆圆'];
+      const name = names[rand(0, names.length-1)];
+      return {
+        text: `${name}有 <span class="highlight">${total}</span> 张贴纸，借给小朋友 <span class="highlight">${give}</span> 张。<br>还剩多少张？`,
+        a: total, op: '-', b: give, ans: left, unit: '张'
+      };
+    }
+  },
+  {
+    gen() {
+      const duck = rand(8, 15), less = rand(2, 6), chick = duck - less;
+      return {
+        text: `🐣 鸭子有 <span class="highlight">${duck}</span> 只，小鸡比鸭子少 <span class="highlight">${less}</span> 只。<br>小鸡有多少只？`,
+        a: duck, op: '-', b: less, ans: chick, unit: '只'
+      };
+    }
+  }
+];
+
+// ─── 生成题目 ─────────────────────────────────────────
+function generate() {
+  problems = [];
+  wordProblems = [];
+  blankProblems = [];
+  cmpProblems = [];
+  seqProblems = [];
+  clockProblems = [];
+  rmbProblems = [];
+  decompProblems = [];
+  ineqProblems = [];
+  document.getElementById('score-bar').textContent = '';
+
+  // 清除所有输入框和运算符下拉框的状态
+  document.querySelectorAll('.answer-input').forEach(el => {
+    el.classList.remove('correct', 'wrong');
+    el.removeAttribute('disabled');
+    el.value = '';
+  });
+  document.querySelectorAll('.eq-op-sel').forEach(sel => {
+    sel.classList.remove('correct', 'wrong');
+    sel.removeAttribute('disabled');
+    sel.value = '';
+  });
+
+  // —— 读取下拉框出题数量，按 25%×4 分配
+  const n20  = parseInt(document.getElementById('sel-20').value);
+  const n100 = parseInt(document.getElementById('sel-100').value);
+  const [q20ca, q20pa, q20bs, q20ps] = distribute(n20);
+  const [q100ca, q100pa, q100bs, q100ps] = distribute(n100);
+
+  // —— 20以内
+  const seen20 = new Set();
+  while (problems.filter(p => p.type === 'add20').length < q20ca) {
+    const a = rand(4, 14), b = rand(2, 10);
+    const key = `${a}+${b}`;
+    if (a + b <= 20 && hasCarry(a, b) && !seen20.has(key)) {
+      seen20.add(key);
+      problems.push({ id: `add20_${problems.length}`, type: 'add20', a, op: '＋', b, ans: a + b, points: 2 });
+    }
+  }
+  while (problems.filter(p => p.type === 'plain20a').length < q20pa) {
+    const a = rand(1, 12), b = rand(1, 8);
+    const key = `${a}+${b}`;
+    if (a + b <= 20 && !hasCarry(a, b) && a + b >= 2 && !seen20.has(key)) {
+      seen20.add(key);
+      problems.push({ id: `plain20a_${problems.length}`, type: 'plain20a', a, op: '＋', b, ans: a + b, points: 2 });
+    }
+  }
+  while (problems.filter(p => p.type === 'sub20').length < q20bs) {
+    const a = rand(11, 20), b = rand(2, 9);
+    const key = `${a}-${b}`;
+    if (a - b >= 1 && hasBorrow(a, b) && !seen20.has(key)) {
+      seen20.add(key);
+      problems.push({ id: `sub20_${problems.length}`, type: 'sub20', a, op: '－', b, ans: a - b, points: 2 });
+    }
+  }
+  while (problems.filter(p => p.type === 'plain20s').length < q20ps) {
+    const a = rand(5, 20), b = rand(1, 8);
+    const key = `${a}-${b}`;
+    if (a > b && !hasBorrow(a, b) && a - b >= 1 && !seen20.has(key)) {
+      seen20.add(key);
+      problems.push({ id: `plain20s_${problems.length}`, type: 'plain20s', a, op: '－', b, ans: a - b, points: 2 });
+    }
+  }
+
+  // —— 100以内
+  const seen100 = new Set();
+  while (problems.filter(p => p.type === 'carry100').length < q100ca) {
+    const a = rand(25, 75), b = rand(8, 30);
+    const key = `${a}+${b}`;
+    if (a + b <= 99 && hasCarry(a, b) && !seen100.has(key)) {
+      seen100.add(key);
+      problems.push({ id: `carry100_${problems.length}`, type: 'carry100', a, op: '＋', b, ans: a + b, points: 3 });
+    }
+  }
+  while (problems.filter(p => p.type === 'easy100').length < q100pa) {
+    const a = rand(20, 70), b = rand(10, 25);
+    const key = `${a}+${b}`;
+    if (a + b <= 99 && !hasCarry(a, b) && !seen100.has(key)) {
+      seen100.add(key);
+      problems.push({ id: `easy100_${problems.length}`, type: 'easy100', a, op: '＋', b, ans: a + b, points: 2 });
+    }
+  }
+  while (problems.filter(p => p.type === 'borrow100').length < q100bs) {
+    const a = rand(30, 90), b = rand(8, 30);
+    const key = `${a}-${b}`;
+    if (a > b && hasBorrow(a, b) && !seen100.has(key)) {
+      seen100.add(key);
+      problems.push({ id: `borrow100_${problems.length}`, type: 'borrow100', a, op: '－', b, ans: a - b, points: 3 });
+    }
+  }
+  while (problems.filter(p => p.type === 'easy100s').length < q100ps) {
+    const a = rand(40, 90), b = rand(10, 25);
+    const key = `${a}-${b}`;
+    if (a > b && !hasBorrow(a, b) && !seen100.has(key)) {
+      seen100.add(key);
+      problems.push({ id: `easy100s_${problems.length}`, type: 'easy100s', a, op: '－', b, ans: a - b, points: 2 });
+    }
+  }
+
+  // —— 看图列算式
+  picProblems = [];
+  const nPic = parseInt(document.getElementById('sel-pic').value);
+  const sceneIdx = shuffle([...Array(picScenes.length).keys()]).slice(0, nPic);
+  sceneIdx.forEach((si, i) => {
+    const scene = picScenes[si];
+    if (scene.op === '+') {
+      const a = rand(3, 10), b = rand(2, 8);
+      picProblems.push({ id: `pic_${i}`, num: i+1, op: '+', a, b, ans: a+b,
+        icon: scene.icon, label: scene.label, points: 4 });
+    } else {
+      const total = rand(8, 15), sub = rand(2, 6);
+      picProblems.push({ id: `pic_${i}`, num: i+1, op: '-', a: total, b: sub, ans: total-sub,
+        icon: scene.icon, label: scene.label, points: 4 });
+    }
+  });
+
+  // —— 应用题（从模板随机选，不超过6个模板数量时不重复）
+  const nWord = parseInt(document.getElementById('sel-word').value);
+  const tplIdx = shuffle([0,1,2,3,4,5]).slice(0, nWord);
+  tplIdx.forEach((ti, i) => {
+    const tpl = wordTemplates[ti].gen();
+    wordProblems.push({ id: `word_${i}`, num: i + 1, ...tpl, points: 5 });
+  });
+
+  renderCalc();
+  renderPic();
+  renderWord();
+  genBlank();
+  genCmp();
+  genSeq();
+  renderBlank();
+  renderCmp();
+  renderSeq();
+  genClock();
+  genRmb();
+  genDecomp();
+  genIneq();
+  renderClock();
+  renderRmb();
+  renderDecomp();
+  renderIneq();
+  resetTimer();
+}
+
+
+// ─── 第五~七关：生成函数 ──────────────────────────────
+function genBlank() {
+  blankProblems = [];
+  const n = parseInt(document.getElementById('sel-blank').value);
+  const half = Math.floor(n / 2);
+  // 加法 half 道，减法 (n - half) 道，各自前一半20以内、后一半100以内
+  const targets = [
+    ...Array(half).fill('+'),
+    ...Array(n - half).fill('-'),
+  ];
+  // 打乱顺序，让加减混排
+  for (let i = targets.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [targets[i], targets[j]] = [targets[j], targets[i]];
+  }
+  const seen = new Set();
+  let addCount = 0, subCount = 0;
+  for (const op of targets) {
+    // 前一半同类型用20以内，后一半用100以内
+    const sameOpCount = op === '+' ? addCount : subCount;
+    const is100 = sameOpCount >= Math.ceil((op === '+' ? half : n - half) / 2);
+    let a, b, c;
+    let attempts = 0;
+    while (attempts++ < 500) {
+      if (op === '+') {
+        a = rand(is100 ? 20 : 3, is100 ? 70 : 12);
+        b = rand(is100 ? 10 : 2, is100 ? 25 : 9);
+        c = a + b;
+        if (is100 && c > 99) continue;
+        if (!is100 && c > 20) continue;
+      } else {
+        c = rand(is100 ? 20 : 5, is100 ? 80 : 15);
+        b = rand(is100 ? 8 : 2, is100 ? Math.min(30, c - 1) : Math.min(8, c - 1));
+        a = c + b;
+        if (is100 && a > 99) continue;
+      }
+      const key = `${op}${a}${b}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const missing = Math.random() < 0.5 ? 'a' : 'b';
+      const ans = missing === 'a' ? a : b;
+      blankProblems.push({ id: `blank_${blankProblems.length}`, missing, a, op, b, ans, c, points: 3 });
+      if (op === '+') addCount++; else subCount++;
+      break;
+    }
+  }
+}
+
+function genCmp() {
+  cmpProblems = [];
+  const n = parseInt(document.getElementById('sel-cmp').value);
+  const eqCount = Math.max(1, Math.floor(n / 4)); // 约25%等号题
+  const seen = new Set();
+  while (cmpProblems.length < n) {
+    const left  = rand(1, 99);
+    const useEq = cmpProblems.length < eqCount; // 前若干道含等号
+    const right = useEq ? left : rand(1, 99);
+    if (!useEq && left === right) continue;
+    const key = `${left}_${right}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const ans = left > right ? '>' : left < right ? '<' : '=';
+    cmpProblems.push({ id: `cmp_${cmpProblems.length}`, left, right, ans, points: 2 });
+  }
+  // 打乱，让等号题不固定在前面
+  for (let i = cmpProblems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cmpProblems[i], cmpProblems[j]] = [cmpProblems[j], cmpProblems[i]];
+  }
+}
+
+function genSeq() {
+  seqProblems = [];
+  const n = parseInt(document.getElementById('sel-seq').value);
+  const steps = [1, 2, 5, 10];
+  while (seqProblems.length < n) {
+    const step = steps[seqProblems.length % 4]; // 四种步长循环
+    const start = rand(1, step === 1 ? 10 : step === 2 ? 10 : step === 5 ? 10 : 5);
+    const nums = [start, start+step, start+2*step, start+3*step, start+4*step];
+    const blankIdx = rand(1, 3);
+    const ans = nums[blankIdx];
+    seqProblems.push({ id: `seq_${seqProblems.length}`, nums, blankIdx, step, ans, points: 3 });
+  }
+}
+
+// ─── 第五~七关：渲染函数 ──────────────────────────────
+function renderBlank() {
+  const grid = document.getElementById('grid-blank');
+  grid.innerHTML = '';
+  blankProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    const opSym = p.op === '+' ? '＋' : '－';
+    let html;
+    if (p.missing === 'a') {
+      html = `
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}" placeholder="□" data-maxlen="${digitLen(p.ans)}" style="width:46px">
+        <span class="op">${opSym}</span>
+        <span class="num">${p.b}</span>
+        <span style="color:#999">＝</span>
+        <span class="num">${p.c}</span>`;
+    } else {
+      html = `
+        <span class="num">${p.a}</span>
+        <span class="op">${opSym}</span>
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}" placeholder="□" data-maxlen="${digitLen(p.ans)}" style="width:46px">
+        <span style="color:#999">＝</span>
+        <span class="num">${p.c}</span>`;
+    }
+    div.innerHTML = html;
+    grid.appendChild(div);
+  });
+}
+
+function renderCmp() {
+  const grid = document.getElementById('cmp-grid');
+  grid.innerHTML = '';
+  cmpProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    div.innerHTML = `
+      <span class="num">${p.left}</span>
+      <select class="cmp-select answer-input" id="inp_${p.id}">
+        <option value="">?</option>
+        <option value=">">&gt;</option>
+        <option value="<">&lt;</option>
+        <option value="=">=</option>
+      </select>
+      <span class="num">${p.right}</span>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderSeq() {
+  const list = document.getElementById('seq-list');
+  list.innerHTML = '';
+  seqProblems.forEach((p, qi) => {
+    const div = document.createElement('div');
+    div.className = 'seq-item';
+    const parts = p.nums.map((n, i) => {
+      if (i === p.blankIdx) {
+        return `<input class="answer-input seq-inp" type="number" inputmode="numeric"
+                       id="inp_${p.id}" placeholder="□" data-maxlen="${digitLen(p.ans)}">`;
+      }
+      return `<span class="seq-num">${n}</span>`;
+    });
+    div.innerHTML = `
+      <span class="q-num" style="min-width:60px">第${qi+1}题</span>
+      ${parts.join('<span class="seq-comma">，</span>')}
+      <span style="color:#aaa;margin-left:8px">（步长${p.step}）</span>`;
+    list.appendChild(div);
+  });
+}
+
+
+// ─── 第八~十关：生成函数 ──────────────────────────────
+function genClock() {
+  clockProblems = [];
+  const n = parseInt(document.getElementById('sel-clock').value);
+  const used = new Set();
+  while (clockProblems.length < n) {
+    const hour = rand(1, 12);
+    const minute = Math.random() < 0.5 ? 0 : 30;
+    const key = `${hour}:${minute}`;
+    if (used.has(key)) continue;
+    used.add(key);
+    const ansText = minute === 0 ? `${hour}时` : `${hour}时半`;
+    const distractors = new Set();
+    for (const d of [-2, -1, 1, 2]) {
+      const h = ((hour - 1 + d + 12) % 12) + 1;
+      const txt = minute === 0 ? `${h}时` : `${h}时半`;
+      if (txt !== ansText) distractors.add(txt);
+    }
+    while (distractors.size < 3) {
+      const h = rand(1, 12);
+      const m = Math.random() < 0.5 ? 0 : 30;
+      const txt = m === 0 ? `${h}时` : `${h}时半`;
+      if (txt !== ansText) distractors.add(txt);
+    }
+    const options = shuffle([ansText, ...[...distractors].slice(0, 3)]);
+    clockProblems.push({ id: `clock_${clockProblems.length}`, hour, minute, ansText, options, points: 3 });
+  }
+}
+
+function genRmb() {
+  rmbProblems = [];
+  const n = parseInt(document.getElementById('sel-rmb').value);
+  // value 以"分"为单位，避免浮点
+  const allDenoms = [
+    { value: 10,  label: '1角', color: '#66bb6a' },
+    { value: 50,  label: '5角', color: '#26a69a' },
+    { value: 100, label: '1元', color: '#ffcc02' },
+    { value: 200, label: '2元', color: '#ff9800' },
+    { value: 500, label: '5元', color: '#4caf50' },
+  ];
+  const seen = new Set();
+  let attempts = 0;
+  while (rmbProblems.length < n && attempts < n * 400) {
+    attempts++;
+    const numTypes = rand(2, 3);
+    const chosen = shuffle([...allDenoms]).slice(0, numTypes);
+    const bills = chosen.map(d => ({ ...d, count: rand(1, d.value >= 500 ? 1 : d.value >= 100 ? 2 : 3) }));
+    const totalFen = bills.reduce((s, b) => s + b.value * b.count, 0);
+    const totalYuan = Math.floor(totalFen / 100);
+    const totalJiao = Math.floor((totalFen % 100) / 10);
+    // 范围 1元～10元，且必须有角（更有教育意义）
+    if (totalFen < 120 || totalFen > 1000 || totalJiao === 0) continue;
+    const key = bills.map(b => `${b.label}×${b.count}`).sort().join(',');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    rmbProblems.push({ id: `rmb_${rmbProblems.length}`, bills, totalFen, totalYuan, totalJiao, points: 3 });
+  }
+}
+
+function genDecomp() {
+  decompProblems = [];
+  const n = parseInt(document.getElementById('sel-decomp').value);
+  const knowns = shuffle([1,2,3,4,5,6,7,8,9]);
+  for (let i = 0; i < n; i++) {
+    const known = knowns[i % 9];
+    const missing = Math.random() < 0.5 ? 'right' : 'left';
+    const ans = 10 - known;
+    decompProblems.push({ id: `decomp_${decompProblems.length}`, known, missing, ans, points: 2 });
+  }
+}
+
+// ─── 第八~十关：渲染函数 ──────────────────────────────
+function renderClock() {
+  const list = document.getElementById('clock-list');
+  list.innerHTML = '';
+  clockProblems.forEach((p, qi) => {
+    const cx = 50, cy = 50;
+    const hourAngle = (p.hour % 12) * 30 + p.minute * 0.5;
+    const minAngle = p.minute * 6;
+    const toXY = (angle, len) => {
+      const a = angle * Math.PI / 180;
+      return { x: (cx + len * Math.sin(a)).toFixed(1), y: (cy - len * Math.cos(a)).toFixed(1) };
+    };
+    const hEnd = toXY(hourAngle, 22);
+    const mEnd = toXY(minAngle, 32);
+    let ticks = '';
+    for (let i = 0; i < 12; i++) {
+      const inner = toXY(i * 30, 36);
+      const outer = toXY(i * 30, 41);
+      ticks += `<line x1="${inner.x}" y1="${inner.y}" x2="${outer.x}" y2="${outer.y}" stroke="#999" stroke-width="1.5"/>`;
+    }
+    const numDefs = [
+      { n: 12, ...toXY(0, 28) },
+      { n: 3,  ...toXY(90, 28) },
+      { n: 6,  ...toXY(180, 28) },
+      { n: 9,  ...toXY(270, 28) },
+    ];
+    const nums = numDefs.map(nd => `<text x="${nd.x}" y="${nd.y}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#555" font-weight="600">${nd.n}</text>`).join('');
+    const svg = `<svg viewBox="0 0 100 100" width="110" height="110" style="flex-shrink:0">
+      <circle cx="50" cy="50" r="44" fill="#fff" stroke="#e0e0e0" stroke-width="2"/>
+      ${ticks}${nums}
+      <line x1="50" y1="50" x2="${hEnd.x}" y2="${hEnd.y}" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+      <line x1="50" y1="50" x2="${mEnd.x}" y2="${mEnd.y}" stroke="#e91e8c" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="3" fill="#333"/>
+    </svg>`;
+    const opts = p.options.map(o => `<option value="${o}">${o}</option>`).join('');
+    const div = document.createElement('div');
+    div.className = 'clock-item';
+    div.innerHTML = `
+      ${svg}
+      <div class="clock-right">
+        <div class="q-num" style="color:#e91e8c;font-weight:700">第${qi+1}题（${p.points}分）</div>
+        <div style="margin-top:8px;font-size:1rem;color:#555">现在是几时？</div>
+        <select class="cmp-select answer-input" id="inp_${p.id}" style="margin-top:8px;width:80px!important">
+          <option value="">选择</option>
+          ${opts}
+        </select>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function renderRmb() {
+  const list = document.getElementById('rmb-list');
+  list.innerHTML = '';
+  rmbProblems.forEach((p, qi) => {
+    const billsHtml = p.bills.map(b =>
+      Array(b.count).fill(0).map(() =>
+        `<span class="rmb-chip" style="background:${b.color}">${b.label}</span>`
+      ).join('')
+    ).join('');
+    const div = document.createElement('div');
+    div.className = 'rmb-item';
+    div.innerHTML = `
+      <div class="q-num" style="color:#2196f3;font-weight:700;margin-bottom:8px">第${qi+1}题（${p.points}分）</div>
+      <div class="rmb-bills">${billsHtml}</div>
+      <div class="answer-row" style="margin-top:12px">
+        一共是
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}" placeholder="?" data-maxlen="${digitLen(p.totalYuan)}" style="width:46px">
+        元
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}_jiao" placeholder="?" data-maxlen="1" style="width:40px">
+        角
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function renderDecomp() {
+  const grid = document.getElementById('decomp-grid');
+  grid.innerHTML = '';
+  decompProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    let html;
+    if (p.missing === 'right') {
+      html = `<span class="num">10</span>
+              <span style="color:#999">＝</span>
+              <span class="num">${p.known}</span>
+              <span class="op">＋</span>
+              <input class="answer-input" type="number" inputmode="numeric"
+                     id="inp_${p.id}" placeholder="□" data-maxlen="1" style="width:46px">`;
+    } else {
+      html = `<span class="num">10</span>
+              <span style="color:#999">＝</span>
+              <input class="answer-input" type="number" inputmode="numeric"
+                     id="inp_${p.id}" placeholder="□" data-maxlen="1" style="width:46px">
+              <span class="op">＋</span>
+              <span class="num">${p.known}</span>`;
+    }
+    div.innerHTML = html;
+    grid.appendChild(div);
+  });
+}
+
+// ─── 第十一关：不等式求最值 ───────────────────────────────
+function genIneq() {
+  ineqProblems = [];
+  const n = parseInt(document.getElementById('sel-ineq').value);
+  const types = ['add_lt', 'add_gt', 'sub_lt', 'sub_gt'];
+  const seen = new Set();
+  let attempts = 0;
+
+  while (ineqProblems.length < n && attempts < n * 200) {
+    attempts++;
+    const type = types[ineqProblems.length % types.length];
+    let expr, askMax, ans;
+
+    if (type === 'add_lt') {
+      // a + x < c → x 最大 = gap-1
+      const a = rand(2, 14), gap = rand(2, 8);
+      const c = a + gap;
+      if (c > 20) continue;
+      expr = `${a} ＋ x ＜ ${c}`; askMax = true; ans = gap - 1;
+    } else if (type === 'add_gt') {
+      // a + x > c → x 最小 = gap+1
+      const a = rand(1, 12), gap = rand(0, 6);
+      const c = a + gap;
+      if (c > 18) continue;
+      expr = `${a} ＋ x ＞ ${c}`; askMax = false; ans = gap + 1;
+    } else if (type === 'sub_lt') {
+      // x - a < c → x 最大 = c+a-1
+      const a = rand(1, 8), c = rand(2, 8);
+      ans = c + a - 1;
+      if (ans > 18) continue;
+      expr = `x － ${a} ＜ ${c}`; askMax = true;
+    } else {
+      // x - a > c → x 最小 = c+a+1
+      const a = rand(1, 7), c = rand(0, 6);
+      ans = c + a + 1;
+      if (ans > 18) continue;
+      expr = `x － ${a} ＞ ${c}`; askMax = false;
+    }
+
+    if (ans < 1 || seen.has(expr)) continue;
+    seen.add(expr);
+    ineqProblems.push({ id: `ineq_${ineqProblems.length}`, expr, askMax, ans, points: 3 });
+  }
+}
+
+function renderIneq() {
+  const grid = document.getElementById('ineq-grid');
+  grid.innerHTML = '';
+  ineqProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item ineq-item';
+    div.innerHTML = `
+      <span class="ineq-expr">${p.expr}</span>
+      <span class="ineq-ask">，x ${p.askMax ? '最大' : '最小'}是</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}" placeholder="□" data-maxlen="${digitLen(p.ans)}">
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ─── 渲染 ─────────────────────────────────────────────
+function renderPic() {
+  const list = document.getElementById('pic-list');
+  list.innerHTML = '';
+  picProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'pic-item';
+
+    // 生成 emoji 字符串
+    const allEmojis = p.icon.repeat(p.a);
+    let sceneHTML;
+
+    if (p.op === '+') {
+      // 加法：左组 a 个，右组 b 个，合在一起
+      const leftEmojis = p.icon.repeat(p.a);
+      const rightEmojis = p.icon.repeat(p.b);
+      sceneHTML = `
+        <div class="pic-group">
+          <div class="pic-emojis">${leftEmojis}</div>
+          <div class="pic-count">（${p.a}${p.label}）</div>
+        </div>
+        <div class="pic-op-label">＋</div>
+        <div class="pic-group">
+          <div class="pic-emojis">${rightEmojis}</div>
+          <div class="pic-count">（${p.b}${p.label}）</div>
+        </div>
+        <div class="pic-op-label">＝</div>
+        <div class="pic-group">
+          <div class="pic-emojis">${p.icon.repeat(p.ans)}</div>
+          <div class="pic-count">（合在一起）</div>
+        </div>
+      `;
+    } else {
+      // 减法：总共 a 个，划掉 b 个
+      const keepEmojis = p.icon.repeat(p.ans);
+      const crossEmojis = `<span class="crossed">${p.icon.repeat(p.b)}</span>`;
+      sceneHTML = `
+        <div class="pic-group">
+          <div class="pic-emojis">${keepEmojis}${crossEmojis}</div>
+          <div class="pic-count">共${p.a}个，划掉${p.b}个</div>
+        </div>
+      `;
+    }
+
+    const opSymbol = p.op === '+' ? '＋' : '－';
+    div.innerHTML = `
+      <div class="q-num">第 ${p.num} 题（${p.points}分）</div>
+      <div class="pic-scene">${sceneHTML}</div>
+      <div class="pic-formula">
+        列算式：
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}_a" placeholder="?" style="width:46px" data-maxlen="${digitLen(p.a)}">
+        <span class="pic-op-text">${opSymbol}</span>
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}_b" placeholder="?" style="width:46px" data-maxlen="${digitLen(p.b)}">
+        <span style="color:#999">＝</span>
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}" placeholder="?" style="width:52px" data-maxlen="${digitLen(p.ans)}">
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function renderCalc() {
+  const grid20  = document.getElementById('grid-20');
+  const grid100 = document.getElementById('grid-100');
+  grid20.innerHTML = '';
+  grid100.innerHTML = '';
+
+  problems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    div.innerHTML = `
+      <span class="num">${p.a}</span>
+      <span class="op">${p.op}</span>
+      <span class="num">${p.b}</span>
+      <span style="color:#999">＝</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}" autocomplete="off" placeholder="?" data-maxlen="${digitLen(p.ans)}">
+    `;
+    if (['add20','plain20a','sub20','plain20s'].includes(p.type)) {
+      grid20.appendChild(div);
+    } else {
+      grid100.appendChild(div);
+    }
+  });
+}
+
+function renderWord() {
+  const list = document.getElementById('word-list');
+  list.innerHTML = '';
+  wordProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'word-item';
+    div.innerHTML = `
+      <div class="q-num">第 ${p.num} 题（${p.points}分）</div>
+      <div class="q-text">${p.text}</div>
+      <div class="answer-row">
+        算式：
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}_a" autocomplete="off" placeholder="?" style="width:46px" data-maxlen="${digitLen(p.a)}">
+        <select class="answer-input eq-op-sel" id="inp_${p.id}_op">
+          <option value="">±</option>
+          <option value="+">＋</option>
+          <option value="-">－</option>
+        </select>
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}_b" autocomplete="off" placeholder="?" style="width:46px" data-maxlen="${digitLen(p.b)}">
+        <span style="color:#999">＝</span>
+        <input class="answer-input" type="number" inputmode="numeric"
+               id="inp_${p.id}" autocomplete="off" placeholder="?" data-maxlen="${digitLen(p.ans)}">
+        （${p.unit}）
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// 规范化运算符输入：接受 +/＋/加 → '+'，-/－/减 → '-'
+function normalizeOp(raw) {
+  const s = (raw || '').trim();
+  if (s === '+' || s === '＋' || s === '加') return '+';
+  if (s === '-' || s === '－' || s === '减') return '-';
+  return s;
+}
+
+// ─── 交卷 ─────────────────────────────────────────────
+function checkAll() {
+  let got = 0, total = 0;
+
+  // 口算题（只有答案输入框）
+  problems.forEach(p => {
+    total += p.points;
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    const val = parseInt(inp.value);
+    inp.classList.remove('correct', 'wrong');
+    if (!isNaN(val) && val === p.ans) {
+      inp.classList.add('correct');
+      got += p.points;
+    } else if (inp.value !== '') {
+      inp.classList.add('wrong');
+    }
+  });
+
+  // 看图题：批改 a、b、答案三格（各占 1/3 分值）
+  picProblems.forEach(p => {
+    total += p.points;
+    const inpA   = document.getElementById(`inp_${p.id}_a`);
+    const inpB   = document.getElementById(`inp_${p.id}_b`);
+    const inpAns = document.getElementById(`inp_${p.id}`);
+    [inpA, inpB, inpAns].forEach(el => el && el.classList.remove('correct', 'wrong'));
+
+    const va = parseInt(inpA?.value), vb = parseInt(inpB?.value), vans = parseInt(inpAns?.value);
+    const aOk   = va   === p.a;
+    const bOk   = vb   === p.b;
+    const ansOk = vans === p.ans;
+
+    if (inpA)   inpA.classList.add(aOk   ? 'correct' : (inpA.value   !== '' ? 'wrong' : ''));
+    if (inpB)   inpB.classList.add(bOk   ? 'correct' : (inpB.value   !== '' ? 'wrong' : ''));
+    if (inpAns) inpAns.classList.add(ansOk ? 'correct' : (inpAns.value !== '' ? 'wrong' : ''));
+
+    const correct = [aOk, bOk, ansOk].filter(Boolean).length;
+    got += Math.floor(p.points * correct / 3);
+  });
+
+  // 应用题：批改自填算式（a/op/b/ans），答对得 3 分，算式全对再得 2 分
+  wordProblems.forEach(p => {
+    total += p.points;
+    const inpA   = document.getElementById(`inp_${p.id}_a`);
+    const inpOp  = document.getElementById(`inp_${p.id}_op`);
+    const inpB   = document.getElementById(`inp_${p.id}_b`);
+    const inpAns = document.getElementById(`inp_${p.id}`);
+    [inpA, inpOp, inpB, inpAns].forEach(el => el && el.classList.remove('correct', 'wrong'));
+
+    const va   = parseInt(inpA?.value);
+    const vop  = inpOp?.value || '';   // select.value 直接是 '+' 或 '-' 或 ''
+    const vb   = parseInt(inpB?.value);
+    const vans = parseInt(inpAns?.value);
+
+    const ansOk = vans === p.ans;
+    const opOk  = vop === p.op;
+    // 加法允许交换律：a+b 或 b+a 均正确
+    const formulaOk = opOk && (
+      p.op === '+' ? ((va === p.a && vb === p.b) || (va === p.b && vb === p.a))
+                   : (va === p.a && vb === p.b)
+    );
+
+    if (inpAns) inpAns.classList.add(ansOk ? 'correct' : (inpAns.value !== '' ? 'wrong' : ''));
+    if (inpA)   inpA.classList.add((va === p.a || (p.op==='+' && va === p.b)) ? 'correct' : (inpA.value !== '' ? 'wrong' : ''));
+    if (inpOp)  inpOp.classList.add(opOk ? 'correct' : (vop !== '' ? 'wrong' : ''));
+    if (inpB)   inpB.classList.add((vb === p.b || (p.op==='+' && vb === p.a)) ? 'correct' : (inpB.value !== '' ? 'wrong' : ''));
+
+    if (ansOk) got += 3;
+    if (formulaOk) got += 2;
+  });
+
+  // 填空运算、比大小、数列
+  [...blankProblems, ...cmpProblems, ...seqProblems].forEach(p => {
+    total += p.points;
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.classList.remove('correct', 'wrong');
+    const val = inp.tagName === 'SELECT' ? inp.value : parseInt(inp.value);
+    const correct = inp.tagName === 'SELECT' ? val === p.ans : val === p.ans;
+    if (correct) {
+      inp.classList.add('correct');
+      got += p.points;
+    } else if (inp.value !== '') {
+      inp.classList.add('wrong');
+    }
+  });
+
+  // 认钟表：select value 与 ansText 对比
+  clockProblems.forEach(p => {
+    total += p.points;
+    const sel = document.getElementById(`inp_${p.id}`);
+    if (!sel) return;
+    sel.classList.remove('correct', 'wrong');
+    if (sel.value === p.ansText) {
+      sel.classList.add('correct');
+      got += p.points;
+    } else if (sel.value !== '') {
+      sel.classList.add('wrong');
+    }
+  });
+
+  // 数人民币（元 + 角 两格都对才得分）
+  rmbProblems.forEach(p => {
+    total += p.points;
+    const yuanInp = document.getElementById(`inp_${p.id}`);
+    const jiaoInp = document.getElementById(`inp_${p.id}_jiao`);
+    if (!yuanInp || !jiaoInp) return;
+    [yuanInp, jiaoInp].forEach(el => el.classList.remove('correct', 'wrong'));
+    const vYuan = parseInt(yuanInp.value);
+    const vJiao = parseInt(jiaoInp.value);
+    const bothFilled = yuanInp.value !== '' && jiaoInp.value !== '';
+    if (!isNaN(vYuan) && !isNaN(vJiao) && vYuan === p.totalYuan && vJiao === p.totalJiao) {
+      yuanInp.classList.add('correct'); jiaoInp.classList.add('correct'); got += p.points;
+    } else if (bothFilled) {
+      yuanInp.classList.add('wrong'); jiaoInp.classList.add('wrong');
+    }
+  });
+
+  // 10的分解
+  decompProblems.forEach(p => {
+    total += p.points;
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.classList.remove('correct', 'wrong');
+    const val = parseInt(inp.value);
+    if (!isNaN(val) && val === p.ans) {
+      inp.classList.add('correct'); got += p.points;
+    } else if (inp.value !== '') {
+      inp.classList.add('wrong');
+    }
+  });
+
+  // 不等式求最值
+  ineqProblems.forEach(p => {
+    total += p.points;
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.classList.remove('correct', 'wrong');
+    const val = parseInt(inp.value);
+    if (!isNaN(val) && val === p.ans) {
+      inp.classList.add('correct'); got += p.points;
+    } else if (inp.value !== '') {
+      inp.classList.add('wrong');
+    }
+  });
+
+  // 计算已答题数（以答案框是否填写为准）
+  const allForCount = [...problems, ...picProblems, ...wordProblems, ...blankProblems, ...cmpProblems, ...seqProblems, ...clockProblems, ...rmbProblems, ...decompProblems, ...ineqProblems];
+  const filled = allForCount.filter(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    return inp && inp.value !== '';
+  }).length;
+  const totalCount = problems.length + picProblems.length + wordProblems.length + blankProblems.length + cmpProblems.length + seqProblems.length + clockProblems.length + rmbProblems.length + decompProblems.length + ineqProblems.length;
+
+  const pct = Math.round(got / total * 100);
+  document.getElementById('score-bar').innerHTML =
+    `得分：<span>${got} / ${total}</span>（共 ${totalCount} 题，已答 ${filled} 题）`;
+
+  stopTimer();
+  showResult(got, total, pct);
+}
+
+function showResult(got, total, pct) {
+  let emoji, msg;
+  if (pct >= 95)      { emoji = '🏆'; msg = '满分小天才！你太厉害啦！✨'; }
+  else if (pct >= 85) { emoji = '🥇'; msg = '好棒棒！继续加油哦！💪'; }
+  else if (pct >= 70) { emoji = '🥈'; msg = '不错！再练练，你可以的！🌟'; }
+  else if (pct >= 55) { emoji = '🥉'; msg = '加油！多练几遍会越来越好！🌈'; }
+  else                { emoji = '💪'; msg = '没关系，再来一次！你能行！🐣'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-score').textContent = `${got} 分 / ${total} 分`;
+  document.getElementById('result-msg').innerHTML = `正确率 ${pct}%<br>${msg}`;
+  document.getElementById('result-overlay').classList.add('show');
+
+  if (pct >= 85) launchConfetti();
+}
+
+// ─── 查看答案 ─────────────────────────────────────────
+function showAnswers() {
+  // 口算题
+  problems.forEach(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.value = p.ans;
+    inp.classList.remove('correct', 'wrong');
+    inp.classList.add('correct');
+    inp.disabled = true;
+  });
+  // 看图题
+  picProblems.forEach(p => {
+    [
+      { id: `inp_${p.id}_a`, val: p.a },
+      { id: `inp_${p.id}_b`, val: p.b },
+      { id: `inp_${p.id}`,   val: p.ans },
+    ].forEach(({ id, val }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = val;
+      el.classList.remove('correct', 'wrong');
+      el.classList.add('correct');
+      el.disabled = true;
+    });
+  });
+  // 应用题：填写算式 + 答案（运算符是 select，单独处理）
+  wordProblems.forEach(p => {
+    [
+      { id: `inp_${p.id}_a`, val: p.a },
+      { id: `inp_${p.id}_b`, val: p.b },
+      { id: `inp_${p.id}`,   val: p.ans },
+    ].forEach(({ id, val }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = val;
+      el.classList.remove('correct', 'wrong');
+      el.classList.add('correct');
+      el.disabled = true;
+    });
+    // 运算符 select
+    const sel = document.getElementById(`inp_${p.id}_op`);
+    if (sel) {
+      sel.value = p.op;          // '+' 或 '-'，与 option value 一致
+      sel.classList.remove('correct', 'wrong');
+      sel.classList.add('correct');
+      sel.disabled = true;
+    }
+  });
+  // 填空运算、比大小、数列：每题只有一个输入框
+  [...blankProblems, ...cmpProblems, ...seqProblems].forEach(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.value = p.ans;
+    inp.classList.remove('correct', 'wrong');
+    inp.classList.add('correct');
+    inp.disabled = true;
+  });
+  // 认钟表
+  clockProblems.forEach(p => {
+    const sel = document.getElementById(`inp_${p.id}`);
+    if (!sel) return;
+    sel.value = p.ansText;
+    sel.classList.remove('correct','wrong');
+    sel.classList.add('correct');
+    sel.disabled = true;
+  });
+  // 数人民币
+  rmbProblems.forEach(p => {
+    const yuanInp = document.getElementById(`inp_${p.id}`);
+    const jiaoInp = document.getElementById(`inp_${p.id}_jiao`);
+    [{ el: yuanInp, val: p.totalYuan }, { el: jiaoInp, val: p.totalJiao }].forEach(({ el, val }) => {
+      if (!el) return;
+      el.value = val;
+      el.classList.remove('correct','wrong');
+      el.classList.add('correct');
+      el.disabled = true;
+    });
+  });
+  // 10的分解
+  decompProblems.forEach(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.value = p.ans;
+    inp.classList.remove('correct','wrong');
+    inp.classList.add('correct');
+    inp.disabled = true;
+  });
+  // 不等式求最值
+  ineqProblems.forEach(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.value = p.ans;
+    inp.classList.remove('correct','wrong');
+    inp.classList.add('correct');
+    inp.disabled = true;
+  });
+  document.getElementById('score-bar').innerHTML = '已显示答案，点「换一套题」重新练习！';
+}
+
+// ─── 计时器 ─────────────────────────────────────────
+let timerSec = 0, timerInterval = null, timerRunning = false;
+
+function toggleTimer() {
+  if (timerRunning) {
+    stopTimer();
+    document.getElementById('timer-btn').textContent = '继续计时';
+  } else {
+    startTimer();
+    document.getElementById('timer-btn').textContent = '暂停';
+  }
+}
+function startTimer() {
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerSec++;
+    const m = String(Math.floor(timerSec / 60)).padStart(2, '0');
+    const s = String(timerSec % 60).padStart(2, '0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+  }, 1000);
+}
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('timer-btn').textContent = '开始计时';
+}
+function resetTimer() {
+  stopTimer();
+  timerSec = 0;
+  document.getElementById('timer-display').textContent = '00:00';
+  document.getElementById('timer-btn').textContent = '开始计时';
+}
+
+// ─── 烟花 ─────────────────────────────────────────────
+function launchConfetti() {
+  const colors = ['#f06292','#ab47bc','#7c4dff','#26c6da','#ffca28','#66bb6a'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.cssText = `
+        left: ${rand(10, 90)}vw;
+        top: -10px;
+        background: ${colors[rand(0, colors.length-1)]};
+        width: ${rand(6, 12)}px;
+        height: ${rand(6, 12)}px;
+        animation-duration: ${rand(15, 30) / 10}s;
+        animation-delay: ${rand(0, 8) / 10}s;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 30);
+  }
+}
+
+// ─── 自动跳格：满位跳 + Enter 跳 ────────────────────────
+function jumpToNext(el) {
+  const inputs = [...document.querySelectorAll('.answer-input:not([disabled])')];
+  const idx = inputs.indexOf(el);
+  if (idx >= 0 && idx < inputs.length - 1) {
+    inputs[idx + 1].focus();
+    inputs[idx + 1].select();
+  } else if (idx === inputs.length - 1) {
+    checkAll();
+  }
+}
+
+// 填满设定位数时自动跳到下一格
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (!el.classList.contains('answer-input') || el.disabled) return;
+  const maxlen = parseInt(el.dataset.maxlen || '0');
+  if (maxlen > 0 && el.value.length >= maxlen) jumpToNext(el);
+});
+
+// Enter 键手动跳格
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') jumpToNext(document.activeElement);
+});
+
+// ─── 初始化 ───────────────────────────────────────────
+generate();
+</script>
+</body>
+</html>
