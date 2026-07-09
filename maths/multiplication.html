@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九九乘法口诀</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg, #fff9c4 0%, #f3e5f5 50%, #e3f2fd 100%);
+  min-height: 100vh; padding: 20px 14px;
+}
+.container { max-width: 860px; margin: 0 auto; }
+
+/* ── 标题 ── */
+.header { text-align: center; margin-bottom: 18px; }
+.header h1 { font-size: 2rem; color: #4a148c; text-shadow: 1px 2px 0 rgba(74,20,140,.2); letter-spacing: 4px; }
+.header p  { font-size: .88rem; color: #9e9e9e; margin-top: 4px; }
+
+/* ── Tab ── */
+.tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.tab-btn {
+  border: none; border-radius: 20px; padding: 9px 22px; font-size: 1rem;
+  font-weight: bold; cursor: pointer; transition: all .2s;
+  background: rgba(255,255,255,.65); color: #666;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.tab-btn.active { background: #4a148c; color: #fff; box-shadow: 0 4px 14px rgba(74,20,140,.35); }
+
+/* ── 通用卡片 ── */
+.card-panel {
+  background: rgba(255,255,255,.88);
+  border-radius: 20px; padding: 20px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.10);
+  margin-bottom: 18px;
+}
+.hidden { display: none !important; }
+.btn {
+  border: none; border-radius: 12px; padding: 9px 22px;
+  font-size: .95rem; font-weight: bold; cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  box-shadow: 0 3px 10px rgba(0,0,0,.12);
+}
+.btn:active { transform: scale(.96); }
+.btn-primary { background: linear-gradient(135deg,#9c27b0,#4a148c); color:#fff; }
+.btn-green   { background: linear-gradient(135deg,#43e97b,#1b5e20); color:#fff; }
+.btn-orange  { background: linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-gray    { background: #e0e0e0; color: #555; }
+
+/* ══════════════════════════════════════
+   TAB 1 — 口诀表
+══════════════════════════════════════ */
+.table-hint { text-align:center; color:#aaa; font-size:.82rem; margin-bottom:12px; }
+
+/* 行颜色主题 */
+.row-colors {
+  --r1:#e3f2fd; --r2:#e8f5e9; --r3:#fff8e1; --r4:#fce4ec;
+  --r5:#f3e5f5; --r6:#e0f2f1; --r7:#fff3e0; --r8:#e8eaf6; --r9:#fafafa;
+}
+.table-section { margin-bottom: 16px; }
+.table-row-label {
+  font-size: .85rem; font-weight: bold; color: #666;
+  margin-bottom: 7px; padding-left: 4px;
+}
+.formula-row { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.formula-cell {
+  border-radius: 12px; padding: 8px 10px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: 2px solid transparent; transition: all .18s;
+  min-width: 78px; text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.formula-cell:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 5px 16px rgba(0,0,0,.16); border-color: #9c27b0; }
+.formula-cell.active { border-color: #9c27b0; box-shadow: 0 0 0 3px rgba(156,39,176,.25); }
+.fc-formula { font-size: .95rem; font-weight: bold; color: #333; white-space: nowrap; }
+.fc-eq { font-size: .72rem; color: #888; }
+
+.speak-row {
+  display: flex; justify-content: flex-end;
+  margin-bottom: 4px; margin-top: -4px;
+}
+.speak-btn {
+  border: none; background: none; cursor: pointer;
+  font-size: .78rem; color: #9c27b0; padding: 2px 6px;
+  border-radius: 8px; transition: background .15s;
+}
+.speak-btn:hover { background: #f3e5f5; }
+
+/* ══════════════════════════════════════
+   TAB 2 — 背诵
+══════════════════════════════════════ */
+.memo-nav {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 18px;
+}
+.memo-row-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ce93d8;
+  background: #fff; color: #6a1b9a; font-size: 1rem; font-weight: bold;
+  cursor: pointer; transition: all .2s;
+}
+.memo-row-btn.selected { background: #9c27b0; color: #fff; border-color: #9c27b0; }
+.memo-row-btn.mastered { background: #c8e6c9; border-color: #66bb6a; color: #2e7d32; }
+
+.memo-cards { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 16px; }
+.memo-card {
+  width: 130px; height: 100px; perspective: 600px; cursor: pointer;
+}
+.memo-card-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .45s;
+}
+.memo-card.flipped .memo-card-inner { transform: rotateY(180deg); }
+.memo-card-front, .memo-card-back {
+  position: absolute; width: 100%; height: 100%;
+  backface-visibility: hidden; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.12);
+}
+.memo-card-front {
+  background: linear-gradient(135deg, #ce93d8, #9c27b0);
+  color: #fff;
+}
+.memo-card-back {
+  background: linear-gradient(135deg, #fff9c4, #fff176);
+  color: #333;
+  transform: rotateY(180deg);
+}
+.mc-q    { font-size: 1.1rem; font-weight: bold; }
+.mc-hint { font-size: .72rem; opacity: .75; }
+.mc-formula { font-size: 1.05rem; font-weight: bold; color: #4a148c; }
+.mc-eq      { font-size: .85rem; color: #555; }
+.mc-tap     { font-size: .7rem; color: #ce93d8; }
+
+.memo-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.memo-progress {
+  text-align: center; font-size: .85rem; color: #888; margin-top: 10px;
+}
+.prog-dots { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+.prog-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #e0e0e0; transition: background .3s;
+}
+.prog-dot.known   { background: #66bb6a; }
+.prog-dot.unknown { background: #ef9a9a; }
+
+/* ══════════════════════════════════════
+   TAB 3 — 测验
+══════════════════════════════════════ */
+.quiz-setup { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; align-items: center; }
+.quiz-setup label { font-size: .9rem; color: #555; }
+.quiz-setup select {
+  border: 2px solid #ce93d8; border-radius: 10px; padding: 5px 10px;
+  font-size: .9rem; color: #333; background: #fff; outline: none; cursor: pointer;
+}
+.quiz-setup select:focus { border-color: #9c27b0; }
+
+.quiz-board { display: none; }
+.quiz-board.active { display: block; }
+
+.quiz-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+}
+.quiz-score { font-size: 1rem; font-weight: bold; color: #4a148c; }
+.quiz-timer-display {
+  font-size: 1rem; font-weight: bold; color: #f57c00;
+  background: #fff3e0; border-radius: 10px; padding: 4px 14px;
+}
+.quiz-progress-bar {
+  background: #e0e0e0; border-radius: 99px; height: 8px; margin-bottom: 20px; overflow: hidden;
+}
+.quiz-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#ce93d8,#9c27b0); transition: width .3s; }
+
+.question-box { text-align: center; margin-bottom: 22px; }
+.q-formula-hint { font-size: 1rem; color: #9c27b0; margin-bottom: 4px; min-height: 1.4em; }
+.q-equation { font-size: 3rem; font-weight: bold; color: #333; letter-spacing: 6px; }
+.q-input-row { display: flex; justify-content: center; gap: 10px; margin-top: 16px; }
+.q-input {
+  width: 90px; height: 60px; border: 3px solid #ce93d8; border-radius: 14px;
+  text-align: center; font-size: 2rem; font-weight: bold; color: #333;
+  background: #fafafa; outline: none; transition: border-color .2s;
+  -moz-appearance: textfield;
+}
+.q-input::-webkit-inner-spin-button,
+.q-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.q-input:focus { border-color: #9c27b0; background: #fce4ec; }
+.q-input.correct { border-color: #43a047; background: #e8f5e9; color: #2e7d32; }
+.q-input.wrong   { border-color: #e53935; background: #ffebee; color: #c62828; }
+
+.q-feedback {
+  min-height: 36px; text-align: center; font-size: 1.1rem; font-weight: bold;
+  margin-bottom: 10px; transition: opacity .2s;
+}
+.q-feedback.show-ok   { color: #2e7d32; }
+.q-feedback.show-fail { color: #c62828; }
+
+/* 结果面板 */
+.quiz-result { display: none; text-align: center; }
+.quiz-result.show { display: block; }
+.result-score-big { font-size: 3rem; font-weight: bold; color: #9c27b0; }
+.result-msg { font-size: 1.2rem; color: #555; margin: 8px 0 18px; }
+.wrong-review { text-align: left; margin-top: 14px; }
+.wr-title { font-size: .9rem; font-weight: bold; color: #c62828; margin-bottom: 8px; }
+.wr-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.wr-item {
+  background: #ffebee; border: 1.5px solid #ffcdd2;
+  border-radius: 9px; padding: 6px 12px; font-size: .9rem;
+}
+.wr-item .wr-correct { color: #2e7d32; font-weight: bold; }
+
+/* ── 烟花 ── */
+#confetti { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
+
+/* ── 计算 Toast ── */
+#mathToast {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px 22px;
+  box-shadow: 0 8px 32px rgba(74,20,140,.22);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .22s, transform .22s;
+  z-index: 10000;
+  min-width: 230px;
+  max-width: 92vw;
+  border-top: 4px solid #9c27b0;
+}
+#mathToast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast-formula { font-size: 1.25rem; font-weight: bold; color: #4a148c; margin-bottom: 4px; }
+.toast-eq      { font-size: 1rem;   color: #555; margin-bottom: 8px; }
+.toast-dots    { font-size: .95rem; letter-spacing: 4px; color: #9c27b0; line-height: 1.7; margin-bottom: 8px; }
+.toast-add     { font-size: .9rem;  color: #666; }
+.toast-add b   { color: #e53935; }
+
+@media(max-width:480px){
+  .header h1 { font-size:1.6rem; }
+  .formula-cell { min-width:64px; padding:6px 7px; }
+  .fc-formula { font-size:.83rem; }
+  .q-equation { font-size:2.2rem; }
+  .memo-card { width:110px; height:90px; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="mathToast"></div>
+<div class="container">
+
+<div class="header">
+  <h1>🌟 九九乘法口诀 🌟</h1>
+  <p>点击口诀可以朗读 · 三种模式全面掌握</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('table')">📊 口诀表</button>
+  <button class="tab-btn" onclick="switchTab('memo')">📖 背诵</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">✏️ 测验</button>
+</div>
+
+<!-- ══ TAB 1: 口诀表 ══ -->
+<div id="tab-table">
+  <p class="table-hint">点击任意口诀听朗读 · 点击「朗读本行」听整行</p>
+  <div class="card-panel row-colors" id="formulaTableContainer"></div>
+</div>
+
+<!-- ══ TAB 2: 背诵 ══ -->
+<div id="tab-memo" class="hidden">
+  <div class="card-panel">
+    <p style="text-align:center;color:#888;font-size:.85rem;margin-bottom:12px">选择要背的段，翻转卡片看答案，点击「记住了」追踪进度</p>
+    <div class="memo-nav" id="memoNav"></div>
+    <div class="memo-cards" id="memoCards"></div>
+    <div class="memo-actions" id="memoActions"></div>
+    <div class="memo-progress" id="memoProgress"></div>
+    <div class="prog-dots" id="progDots"></div>
+  </div>
+</div>
+
+<!-- ══ TAB 3: 测验 ══ -->
+<div id="tab-quiz" class="hidden">
+  <div class="card-panel">
+    <!-- 设置 -->
+    <div id="quizSetupArea">
+      <div class="quiz-setup">
+        <div>
+          <label>范围：</label>
+          <select id="quizRange">
+            <option value="5">1～5 段</option>
+            <option value="9" selected>1～9 段（全部）</option>
+          </select>
+        </div>
+        <div>
+          <label>题数：</label>
+          <select id="quizCount">
+            <option value="10" selected>10 题</option>
+            <option value="20">20 题</option>
+            <option value="45">全部 45 题</option>
+          </select>
+        </div>
+        <div>
+          <label>限时：</label>
+          <select id="quizTimer">
+            <option value="0">不限时</option>
+            <option value="5">每题 5 秒</option>
+            <option value="8" selected>每题 8 秒</option>
+            <option value="15">每题 15 秒</option>
+            <option value="60">每题 60 秒</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="startQuiz()">🚀 开始测验</button>
+      </div>
+    </div>
+
+    <!-- 答题 -->
+    <div class="quiz-board" id="quizBoard">
+      <div class="quiz-header">
+        <span class="quiz-score" id="quizScore">✅ 0 &nbsp; ❌ 0</span>
+        <span class="quiz-score" id="quizQNum">第 1 / 10 题</span>
+        <span class="quiz-timer-display" id="quizTimerDisp" style="display:none">⏱ 8s</span>
+      </div>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgFill" style="width:0%"></div></div>
+
+      <div class="question-box">
+        <div class="q-formula-hint" id="qFormulaHint"></div>
+        <div class="q-equation" id="qEquation">? × ? = ?</div>
+        <div class="q-input-row">
+          <input class="q-input" id="qInput" type="number" inputmode="numeric" placeholder="?" autocomplete="off"
+            oninput="autoCheck(this)">
+        </div>
+        <div class="q-feedback" id="qFeedback"></div>
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div class="quiz-result" id="quizResult">
+      <div class="result-score-big" id="resultBig"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="wrong-review" id="wrongReview"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
+        <button class="btn btn-primary" onclick="startQuiz()">再来一次</button>
+        <button class="btn btn-gray"    onclick="resetQuiz()">重新设置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ══════════════════════════════════════
+//  数据
+// ══════════════════════════════════════
+const CN = ['','一','二','三','四','五','六','七','八','九'];
+
+function makeFormula(a, b) {
+  const r = a * b;
+  let rs;
+  if (r < 10) {
+    rs = '得' + CN[r];
+  } else {
+    const tens = Math.floor(r / 10), ones = r % 10;
+    rs = CN[tens] + '十' + (ones ? CN[ones] : '');
+  }
+  return CN[a] + CN[b] + rs;
+}
+
+// 全部 45 条：较小因数在前（传统口诀行序：b 为行，a <= b）
+const ALL = [];
+for (let b = 1; b <= 9; b++)
+  for (let a = 1; a <= b; a++)
+    ALL.push({ a, b, result: a*b, formula: makeFormula(a,b) });
+
+// 按行分组（行 = 较大的因数 b）
+const ROWS = {};
+for (let i = 1; i <= 9; i++) ROWS[i] = ALL.filter(x => x.b === i);
+
+// 行颜色
+const ROW_COLORS = [
+  '#e3f2fd','#e8f5e9','#fff8e1','#fce4ec',
+  '#f3e5f5','#e0f2f1','#fff3e0','#e8eaf6','#f5f5f5'
+];
+
+// ══════════════════════════════════════
+//  计算 Toast
+// ══════════════════════════════════════
+let _toastTimer = null;
+
+function showMathToast(item) {
+  const { a, b, result, formula } = item;
+
+  // 点阵：每行 b 个圆点，共 a 行
+  const colors = ['🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','🔶'];
+  const dot = colors[(a - 1) % colors.length];
+  const rows = Array.from({length: a}, () => (dot + ' ').repeat(b).trim()).join('<br>');
+  const dotsHtml = `<div class="toast-dots">${rows}</div>`;
+
+  // 加法展开：a 个 b 相加
+  const addStr = Array(a).fill(b).join(' + ');
+
+  // 文字描述
+  const CN = ['','一','二','三','四','五','六','七','八','九'];
+  const desc = `${CN[a]}个${b}相加`;
+
+  document.getElementById('mathToast').innerHTML = `
+    <div class="toast-formula">${formula}</div>
+    <div class="toast-eq">${a} × ${b} = ${result}</div>
+    ${dotsHtml}
+    <div class="toast-add">${desc}：${addStr} = <b>${result}</b></div>
+  `;
+
+  const el = document.getElementById('mathToast');
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ══════════════════════════════════════
+//  语音
+// ══════════════════════════════════════
+// 提前缓存中文语音，避免 getVoices() 在 Chrome 首次调用返回空数组
+let _zhVoice = null;
+if (window.speechSynthesis) {
+  const _loadVoices = () => {
+    const vs = speechSynthesis.getVoices();
+    _zhVoice = vs.find(v => /zh[-_](CN|TW|HK)/i.test(v.lang))
+            || vs.find(v => /zh/i.test(v.lang)) || null;
+  };
+  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+  _loadVoices();
+}
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
+    else { u.lang = 'zh-CN'; }
+    u.rate = 0.82; u.pitch = 1.1;
+    window.speechSynthesis.speak(u);
+  }, 50);
+}
+
+// ══════════════════════════════════════
+//  Tab 切换
+// ══════════════════════════════════════
+function switchTab(name) {
+  ['table','memo','quiz'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+    document.querySelectorAll('.tab-btn')[['table','memo','quiz'].indexOf(t)]
+      .classList.toggle('active', t === name);
+  });
+  if (name === 'memo' && !memoInited) initMemo();
+}
+
+// ══════════════════════════════════════
+//  TAB 1 — 口诀表
+// ══════════════════════════════════════
+function buildTable() {
+  const wrap = document.getElementById('formulaTableContainer');
+  for (let b = 1; b <= 9; b++) {
+    const section = document.createElement('div');
+    section.className = 'table-section';
+    const color = ROW_COLORS[b - 1];
+
+    // 朗读本行按钮
+    const speakRow = document.createElement('div');
+    speakRow.className = 'speak-row';
+    speakRow.innerHTML = `<button class="speak-btn" onclick="speakRow(${b})">🔊 朗读第 ${b} 行</button>`;
+    section.appendChild(speakRow);
+
+    const label = document.createElement('div');
+    label.className = 'table-row-label';
+    label.textContent = `${CN[b]} 的口诀（${b} × 1～${b}）`;
+    section.appendChild(label);
+
+    const row = document.createElement('div');
+    row.className = 'formula-row';
+    ROWS[b].forEach(item => {
+      const cell = document.createElement('div');
+      cell.className = 'formula-cell';
+      cell.style.background = color;
+      cell.dataset.formula = item.formula;
+      cell.innerHTML = `<div class="fc-formula">${item.formula}</div><div class="fc-eq">${item.a}×${item.b}=${item.result}</div>`;
+      cell.addEventListener('click', () => {
+        document.querySelectorAll('.formula-cell.active').forEach(c => c.classList.remove('active'));
+        cell.classList.add('active');
+        speak(item.formula);
+        showMathToast(item);
+        setTimeout(() => cell.classList.remove('active'), 1200);
+      });
+      row.appendChild(cell);
+    });
+    section.appendChild(row);
+    wrap.appendChild(section);
+  }
+}
+
+function speakRow(b) {
+  const texts = ROWS[b].map(x => x.formula);
+  let i = 0;
+  function next() {
+    if (i >= texts.length) return;
+    window.speechSynthesis.cancel();
+    setTimeout(() => {
+      const u = new SpeechSynthesisUtterance(texts[i++]);
+      if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
+      else { u.lang = 'zh-CN'; }
+      u.rate = 0.78; u.pitch = 1.1;
+      u.onend = () => setTimeout(next, 150);
+      window.speechSynthesis.speak(u);
+    }, 50);
+  }
+  next();
+}
+
+// ══════════════════════════════════════
+//  TAB 2 — 背诵
+// ══════════════════════════════════════
+let memoInited = false;
+let memoRow = 1;
+const memoKnown = {}; // key = "a×b", value = true/false
+const MEMO_KEY = 'multiMemo_v1';
+
+function loadMemo() {
+  try { Object.assign(memoKnown, JSON.parse(localStorage.getItem(MEMO_KEY)) || {}); } catch(e) {}
+}
+function saveMemo() {
+  try { localStorage.setItem(MEMO_KEY, JSON.stringify(memoKnown)); } catch(e) {}
+}
+
+function initMemo() {
+  memoInited = true;
+  loadMemo();
+  buildMemoNav();
+  showMemoRow(1);
+}
+
+function buildMemoNav() {
+  const nav = document.getElementById('memoNav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= 9; i++) {
+    const all = ROWS[i];
+    const knownCount = all.filter(x => memoKnown[`${x.a}×${x.b}`]).length;
+    const mastered = knownCount === all.length;
+    const btn = document.createElement('button');
+    btn.className = 'memo-row-btn' + (i === memoRow ? ' selected' : '') + (mastered ? ' mastered' : '');
+    btn.textContent = CN[i];
+    btn.title = `第 ${i} 段：${knownCount}/${all.length} 已掌握`;
+    btn.onclick = () => showMemoRow(i);
+    nav.appendChild(btn);
+  }
+}
+
+function showMemoRow(row) {
+  memoRow = row;
+  buildMemoNav();
+
+  const items = ROWS[row];
+  const cards = document.getElementById('memoCards');
+  cards.innerHTML = '';
+  items.forEach(item => {
+    const key = `${item.a}×${item.b}`;
+    const card = document.createElement('div');
+    card.className = 'memo-card';
+    card.id = 'mc-' + key;
+    card.innerHTML = `
+      <div class="memo-card-inner">
+        <div class="memo-card-front">
+          <div class="mc-q">${item.a} × ${item.b} = ?</div>
+          <div class="mc-tap">点击翻转</div>
+        </div>
+        <div class="memo-card-back">
+          <div class="mc-formula">${item.formula}</div>
+          <div class="mc-eq">${item.a} × ${item.b} = ${item.result}</div>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) speak(item.formula);
+    });
+    cards.appendChild(card);
+  });
+
+  // 操作按钮
+  const acts = document.getElementById('memoActions');
+  acts.innerHTML = `
+    <button class="btn btn-green" onclick="markAllKnown(${row})">✅ 全部记住了</button>
+    <button class="btn btn-orange" onclick="markAllUnknown(${row})">🔁 重新练习</button>
+    <button class="btn btn-gray" onclick="speakRow(${row})">🔊 朗读本段</button>
+  `;
+  updateMemoProgress(row);
+}
+
+function markAllKnown(row) {
+  ROWS[row].forEach(x => { memoKnown[`${x.a}×${x.b}`] = true; });
+  saveMemo(); updateMemoProgress(row); buildMemoNav();
+}
+function markAllUnknown(row) {
+  ROWS[row].forEach(x => { delete memoKnown[`${x.a}×${x.b}`]; });
+  saveMemo(); updateMemoProgress(row); buildMemoNav();
+  document.querySelectorAll('#memoCards .memo-card').forEach(c => c.classList.remove('flipped'));
+}
+
+function updateMemoProgress(row) {
+  const items = ROWS[row];
+  const known = items.filter(x => memoKnown[`${x.a}×${x.b}`]).length;
+  const total = ALL.length;
+  const totalKnown = ALL.filter(x => memoKnown[`${x.a}×${x.b}`]).length;
+
+  document.getElementById('memoProgress').textContent =
+    `第 ${CN[row]} 段：${known}/${items.length} 已掌握 · 全部：${totalKnown}/${total}`;
+
+  const dots = document.getElementById('progDots');
+  dots.innerHTML = ALL.map(x => {
+    const cls = memoKnown[`${x.a}×${x.b}`] ? 'known' : 'unknown';
+    return `<div class="prog-dot ${cls}" title="${x.formula}"></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  TAB 3 — 测验
+// ══════════════════════════════════════
+let quizList = [], quizIdx = 0, quizCorrect = 0, quizWrong = [];
+let quizTimerInterval = null, quizTimerLeft = 0, quizTimerSec = 0;
+let quizAnswered = false;
+
+function buildQuizList() {
+  const range = parseInt(document.getElementById('quizRange').value);
+  const count = parseInt(document.getElementById('quizCount').value);
+  const pool = ALL.filter(x => x.b <= range);
+  const shuffled = [...pool].sort(() => Math.random() - .5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+function startQuiz() {
+  quizList = buildQuizList();
+  quizIdx = 0; quizCorrect = 0; quizWrong = [];
+  quizTimerSec = parseInt(document.getElementById('quizTimer').value);
+
+  document.getElementById('quizSetupArea').style.display = 'none';
+  document.getElementById('quizBoard').classList.add('active');
+  document.getElementById('quizResult').classList.remove('show');
+
+  const timerDisp = document.getElementById('quizTimerDisp');
+  timerDisp.style.display = quizTimerSec > 0 ? '' : 'none';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  if (quizIdx >= quizList.length) { endQuiz(); return; }
+  quizAnswered = false;
+
+  const item = quizList[quizIdx];
+  const total = quizList.length;
+
+  document.getElementById('qEquation').textContent = `${item.a} × ${item.b} = ?`;
+  document.getElementById('qFormulaHint').textContent = '';
+  document.getElementById('qFeedback').textContent = '';
+  document.getElementById('qFeedback').className = 'q-feedback';
+
+  const inp = document.getElementById('qInput');
+  inp.value = ''; inp.className = 'q-input'; inp.disabled = false;
+  inp.focus();
+  setTimeout(() => inp.focus(), 80);
+
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizList.slice(0,quizIdx).length - quizCorrect}`;
+  document.getElementById('quizQNum').textContent = `第 ${quizIdx+1} / ${total} 题`;
+  document.getElementById('quizProgFill').style.width = (quizIdx / total * 100) + '%';
+
+  // 计时器
+  clearInterval(quizTimerInterval);
+  if (quizTimerSec > 0) {
+    quizTimerLeft = quizTimerSec;
+    updateTimerDisp();
+    quizTimerInterval = setInterval(() => {
+      quizTimerLeft--;
+      updateTimerDisp();
+      if (quizTimerLeft <= 0) { clearInterval(quizTimerInterval); timeOut(); }
+    }, 1000);
+  }
+}
+
+function updateTimerDisp() {
+  const d = document.getElementById('quizTimerDisp');
+  d.textContent = `⏱ ${quizTimerLeft}s`;
+  const warnAt = Math.max(3, Math.floor(quizTimerSec * 0.2));
+  d.style.color = quizTimerLeft <= warnAt ? '#d32f2f' : '#f57c00';
+}
+
+function timeOut() {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const item = quizList[quizIdx];
+  document.getElementById('qInput').disabled = true;
+  document.getElementById('qInput').classList.add('wrong');
+  const fb = document.getElementById('qFeedback');
+  fb.textContent = `⏰ 超时！答案是 ${item.result}（${item.formula}）`;
+  fb.className = 'q-feedback show-fail';
+  document.getElementById('qFormulaHint').textContent = item.formula;
+  quizWrong.push(item);
+  setTimeout(nextQuestion, 1600);
+}
+
+function autoCheck(inp) {
+  if (quizAnswered) return;
+  const val = inp.value.trim();
+  if (val === '') return;
+  const expected = quizList[quizIdx]?.result ?? 0;
+  // 当输入位数 >= 正确答案位数时自动提交
+  if (val.length >= String(expected).length) checkAnswer();
+}
+
+function checkAnswer() {
+  if (quizAnswered) return;
+  const inp = document.getElementById('qInput');
+  const val = inp.value.trim();
+  if (val === '') return;
+  quizAnswered = true;
+  clearInterval(quizTimerInterval);
+
+  const item = quizList[quizIdx];
+  const userAns = parseInt(val);
+  const ok = userAns === item.result;
+  const fb = document.getElementById('qFeedback');
+  document.getElementById('qFormulaHint').textContent = item.formula;
+
+  if (ok) {
+    quizCorrect++;
+    inp.classList.add('correct');
+    fb.textContent = `✅ 正确！${item.formula}`;
+    fb.className = 'q-feedback show-ok';
+    playOk();
+  } else {
+    inp.classList.add('wrong');
+    fb.textContent = `❌ 答案是 ${item.result}（${item.formula}）`;
+    fb.className = 'q-feedback show-fail';
+    quizWrong.push(item);
+    playFail();
+  }
+  inp.disabled = true;
+  speak(item.formula);
+
+  setTimeout(nextQuestion, ok ? 900 : 1600);
+}
+
+function nextQuestion() { quizIdx++; showQuestion(); }
+
+function endQuiz() {
+  clearInterval(quizTimerInterval);
+  document.getElementById('quizBoard').classList.remove('active');
+  const result = document.getElementById('quizResult');
+  result.classList.add('show');
+
+  const total = quizList.length;
+  const pct = Math.round(quizCorrect / total * 100);
+  document.getElementById('resultBig').textContent = `${quizCorrect} / ${total} （${pct}%）`;
+
+  const msgs = [[100,'🏆 满分！太厉害了！'],[90,'🌟 非常优秀！'],[80,'😊 做得不错！'],[60,'💪 继续努力！'],[0,'📚 多多练习！']];
+  document.getElementById('resultMsg').textContent = msgs.find(([t]) => pct >= t)[1];
+
+  const wr = document.getElementById('wrongReview');
+  if (quizWrong.length) {
+    wr.innerHTML = `<div class="wr-title">❌ 以下 ${quizWrong.length} 道需要复习：</div>
+      <div class="wr-list">${quizWrong.map(x =>
+        `<div class="wr-item">${x.a}×${x.b}=<span class="wr-correct">${x.result}</span><br><small>${x.formula}</small></div>`
+      ).join('')}</div>`;
+  } else {
+    wr.innerHTML = '<div style="color:#2e7d32;text-align:center;font-size:1.1rem;margin-top:8px">🎉 全部答对！太棒了！</div>';
+  }
+
+  document.getElementById('quizProgFill').style.width = '100%';
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizWrong.length}`;
+
+  if (pct >= 90) setTimeout(launchConfetti, 300);
+}
+
+function resetQuiz() {
+  clearInterval(quizTimerInterval);
+  document.getElementById('quizSetupArea').style.display = '';
+  document.getElementById('quizBoard').classList.remove('active');
+  document.getElementById('quizResult').classList.remove('show');
+}
+
+// ══════════════════════════════════════
+//  音效
+// ══════════════════════════════════════
+let aCtx = null;
+function getACtx() { if(!aCtx) aCtx=new(window.AudioContext||window.webkitAudioContext)(); if(aCtx.state==='suspended') aCtx.resume(); return aCtx; }
+function tone(f,d,type='sine',v=.25){
+  try{const c=getACtx(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.type=type;
+  o.frequency.setValueAtTime(f,c.currentTime);
+  g.gain.setValueAtTime(v,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);
+  o.start();o.stop(c.currentTime+d);}catch(e){}
+}
+function playOk(){ tone(523,.1); setTimeout(()=>tone(659,.15),90); }
+function playFail(){ tone(220,.2,'sawtooth',.18); }
+
+// ══════════════════════════════════════
+//  烟花
+// ══════════════════════════════════════
+function launchConfetti() {
+  const cv=document.getElementById('confetti'),ctx=cv.getContext('2d');
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const cols=['#f39c12','#e74c3c','#9b59b6','#3498db','#2ecc71','#e91e63','#ff5722'];
+  const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const ps=Array.from({length:130},()=>({
+    x:Math.random()*cv.width, y:Math.random()*cv.height-cv.height,
+    w:rand(6,13), h:rand(4,8), color:cols[rand(0,cols.length-1)],
+    vx:(Math.random()-.5)*3, vy:rand(2,6),
+    angle:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.2, op:1
+  }));
+  let frame=0;
+  (function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let alive=0;
+    ps.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.angle+=p.spin; p.op=Math.max(0,1-frame/130);
+      if(p.y<cv.height+20)alive++;
+      ctx.save(); ctx.globalAlpha=p.op; ctx.translate(p.x,p.y); ctx.rotate(p.angle);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    frame++;
+    if(alive>0&&frame<160)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+// ══════════════════════════════════════
+//  初始化
+// ══════════════════════════════════════
+buildTable();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+</body>
+</html>

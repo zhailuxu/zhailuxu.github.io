@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数字乐园 1-100</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#fff9e6 0%,#ffe8f7 55%,#e8f4ff 100%);
+  min-height: 100vh; padding: 14px 10px;
+}
+.container { max-width: 720px; margin: 0 auto; }
+
+.header { text-align:center; margin-bottom:16px; }
+.header h1 {
+  font-size:2.2rem; color:#e91e63; letter-spacing:4px;
+  text-shadow:2px 3px 0 #f8bbd0, 4px 6px 0 rgba(0,0,0,.06);
+}
+.header p { font-size:.84rem; color:#aaa; margin-top:4px; }
+
+/* ── Tabs ── */
+.tabs { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.tab-btn {
+  padding:9px 18px; border:none; border-radius:22px;
+  font-size:.95rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.75); color:#777;
+  box-shadow:0 2px 8px rgba(0,0,0,.1); transition:all .2s;
+}
+.tab-btn.on { background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff; box-shadow:0 4px 14px rgba(233,30,99,.4); }
+
+/* ── Card ── */
+.card {
+  background:rgba(255,255,255,.92); border-radius:22px;
+  padding:18px 16px; box-shadow:0 4px 20px rgba(0,0,0,.1);
+  margin-bottom:14px;
+}
+
+/* ── Number Grid ── */
+.num-grid {
+  display:grid; grid-template-columns:repeat(10,1fr);
+  gap:4px;
+}
+.ng-cell {
+  aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+  border-radius:9px; font-size:1.05rem; font-weight:bold;
+  cursor:pointer; user-select:none; color:#fff;
+  box-shadow:0 2px 5px rgba(0,0,0,.13);
+  transition:transform .15s, box-shadow .15s;
+}
+.ng-cell:hover  { transform:scale(1.15); box-shadow:0 4px 12px rgba(0,0,0,.22); z-index:1; }
+.ng-cell.picked { transform:scale(1.22); box-shadow:0 0 0 3px #fff,0 0 0 6px #e91e63; z-index:2; }
+/* decade gradients */
+.d1 { background:linear-gradient(135deg,#ef9a9a,#e53935); }
+.d2 { background:linear-gradient(135deg,#ffcc80,#e65100); }
+.d3 { background:linear-gradient(135deg,#fff176,#f9a825); color:#555!important; }
+.d4 { background:linear-gradient(135deg,#a5d6a7,#2e7d32); }
+.d5 { background:linear-gradient(135deg,#80cbc4,#00796b); }
+.d6 { background:linear-gradient(135deg,#81d4fa,#0277bd); }
+.d7 { background:linear-gradient(135deg,#9fa8da,#283593); }
+.d8 { background:linear-gradient(135deg,#ce93d8,#6a1b9a); }
+.d9 { background:linear-gradient(135deg,#f48fb1,#880e4f); }
+.d10{ background:linear-gradient(135deg,#b0bec5,#37474f); }
+
+/* ── Zoom Panel ── */
+.zoom-panel {
+  background:linear-gradient(135deg,#fff9e6,#ffe8f7);
+  border-radius:20px; padding:20px 16px; margin-bottom:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+  display:none; animation:zoomIn .3s ease-out;
+}
+.zoom-panel.show { display:block; }
+.zoom-big  { font-size:5.5rem; font-weight:bold; color:#e91e63; line-height:1; text-align:center; }
+.zoom-cn   { font-size:2rem; color:#555; text-align:center; margin:6px 0 14px; }
+.zoom-blocks { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-bottom:14px; }
+.blk-ten { width:26px; height:26px; background:#e53935; border-radius:5px; display:inline-block; }
+.blk-one { width:19px; height:19px; background:#ff9800; border-radius:4px; display:inline-block; }
+.blk-label { width:100%; text-align:center; font-size:.8rem; color:#aaa; margin-top:4px; }
+.zoom-nav { display:flex; gap:10px; justify-content:center; }
+.znav { padding:9px 22px; border:none; border-radius:18px; font-size:1rem; font-weight:bold;
+  cursor:pointer; background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff;
+  box-shadow:0 3px 10px rgba(233,30,99,.3); transition:transform .1s; }
+.znav:active { transform:scale(.94); }
+
+/* ── Counting Game ── */
+.lv-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.lv-btn {
+  padding:7px 16px; border:2.5px solid #f48fb1; border-radius:16px;
+  background:#fff; color:#e91e63; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.lv-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
+
+.obj-area {
+  min-height:110px; display:flex; flex-wrap:wrap;
+  gap:3px; justify-content:center; align-items:center;
+  background:#fff9e6; border-radius:14px; padding:10px;
+  margin-bottom:14px; font-size:1.7rem; line-height:1.3;
+}
+.obj-area span { display:inline-block; animation:popIn .2s ease-out; }
+
+.choices4 {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; margin-bottom:10px;
+}
+.choice-btn {
+  padding:16px 10px; border:none; border-radius:16px;
+  font-size:2.2rem; font-weight:bold; cursor:pointer;
+  background:linear-gradient(135deg,#e8f5e9,#c8e6c9); color:#2e7d32;
+  box-shadow:0 3px 10px rgba(0,0,0,.1); transition:all .15s;
+}
+.choice-btn:hover { transform:scale(1.05); }
+.choice-btn.ok   { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; animation:celebrate .4s ease; }
+.choice-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
+
+/* ── Find Number Game ── */
+.fm-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.fm-btn {
+  padding:6px 14px; border:2px solid #9fa8da; border-radius:14px;
+  background:#fff; color:#3f51b5; font-size:.86rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.fm-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
+
+.find-q  { text-align:center; font-size:1.4rem; color:#555; margin-bottom:6px; min-height:38px; }
+.find-t  { text-align:center; font-size:4rem; font-weight:bold; color:#e91e63;
+  text-shadow:2px 3px 0 #f8bbd0; margin-bottom:14px; line-height:1.15; }
+
+.find-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:10px; margin-bottom:12px;
+}
+.find-btn {
+  padding:16px 8px; border:none; border-radius:16px;
+  font-size:1.5rem; font-weight:bold; cursor:pointer;
+  background:linear-gradient(135deg,#e3f2fd,#bbdefb); color:#1565c0;
+  box-shadow:0 3px 10px rgba(0,0,0,.1); transition:all .15s;
+}
+.find-btn:hover { transform:scale(1.06); }
+.find-btn.ok   { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; animation:celebrate .4s ease; }
+.find-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
+
+/* ── Auto Play ── */
+.auto-num {
+  font-size:7rem; font-weight:bold; text-align:center; line-height:1;
+  margin:10px 0 6px; transition:transform .18s, color .18s;
+  color:#e91e63; text-shadow:3px 4px 0 #f8bbd0, 6px 8px 0 rgba(0,0,0,.07);
+}
+.auto-cn { font-size:2.2rem; color:#888; text-align:center; margin-bottom:14px; }
+.auto-bar-wrap { background:#ffe0eb; border-radius:8px; height:12px; overflow:hidden; margin-bottom:14px; }
+.auto-bar { height:100%; background:linear-gradient(90deg,#ff80ab,#e91e63); border-radius:8px; transition:width .3s; }
+
+/* ── Buttons ── */
+.btn {
+  border:none; border-radius:14px; padding:10px 22px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,.12); transition:transform .1s;
+}
+.btn:active { transform:scale(.94); }
+.btn-pink   { background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff; }
+.btn-green  { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; }
+.btn-blue   { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-orange { background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-gray   { background:#e0e0e0; color:#555; }
+.sp-btn {
+  padding:3px 12px; border:1.5px solid #ccc; border-radius:10px;
+  background:#fff; color:#555; font-size:.8rem; cursor:pointer; margin-left:4px;
+}
+.sp-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
+
+/* ── Shared feedback ── */
+.fb { text-align:center; font-size:1.15rem; font-weight:bold; min-height:34px; margin-bottom:8px; }
+.fb.ok   { color:#2e7d32; }
+.fb.fail { color:#e53935; }
+.score   { text-align:center; color:#aaa; font-size:.88rem; }
+
+.row-ctrl { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.hidden { display:none !important; }
+
+@keyframes zoomIn    { from{opacity:0;transform:scale(.82)} to{opacity:1;transform:scale(1)} }
+@keyframes popIn     { from{opacity:0;transform:scale(.5)}  to{opacity:1;transform:scale(1)} }
+@keyframes celebrate { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 75%{transform:scale(.94)} 100%{transform:scale(1)} }
+@keyframes shake     { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px)} 75%{transform:translateX(9px)} }
+@keyframes numPop    { 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
+
+@media(max-width:400px){
+  .ng-cell { font-size:.82rem; border-radius:7px; }
+  .auto-num { font-size:5.5rem; }
+  .choice-btn { font-size:1.8rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#e91e63">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🔢 数字乐园</h1>
+  <p>认识 1 到 100，快来玩吧！</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" id="tab1" onclick="switchTab(1)">🔢 认数字</button>
+  <button class="tab-btn"    id="tab2" onclick="switchTab(2)">🍎 数一数</button>
+  <button class="tab-btn"    id="tab3" onclick="switchTab(3)">🎯 找数字</button>
+  <button class="tab-btn"    id="tab4" onclick="switchTab(4)">🎵 跟我数</button>
+  <button class="tab-btn"    id="tab5" onclick="switchTab(5)">✍️ 写数字</button>
+  <button class="tab-btn"    id="tab6" onclick="switchTab(6)">⚖️ 比大小</button>
+  <button class="tab-btn"    id="tab7" onclick="switchTab(7)">🔗 数字接龙</button>
+</div>
+
+<!-- ══ Tab 1 ══ -->
+<div id="p1">
+  <div class="zoom-panel" id="zoomPanel">
+    <div class="zoom-big"  id="zN">7</div>
+    <div class="zoom-cn"   id="zCN">七</div>
+    <div class="zoom-blocks" id="zBlk"></div>
+    <div class="zoom-nav">
+      <button class="znav" onclick="zoomMove(-1)">◀ 上一个</button>
+      <button class="znav" onclick="zoomMove(1)">下一个 ▶</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="num-grid" id="numGrid"></div>
+  </div>
+</div>
+
+<!-- ══ Tab 2 ══ -->
+<div id="p2" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="lv-btn on" data-lv="10" onclick="setLv(10,this)">1-10（简单）</button>
+      <button class="lv-btn"    data-lv="20" onclick="setLv(20,this)">1-20（中等）</button>
+      <button class="lv-btn"    data-lv="30" onclick="setLv(30,this)">1-30（挑战）</button>
+    </div>
+    <div class="obj-area" id="objArea"></div>
+    <div class="choices4" id="cntChoices"></div>
+    <div class="fb" id="cntFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCount()">换一题 🔄</button>
+    </div>
+    <div class="score" id="cntScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 3 ══ -->
+<div id="p3" class="hidden">
+  <div class="card">
+    <div class="fm-row">
+      <button class="fm-btn on" data-m="num2cn" onclick="setFM('num2cn',this)">数字 → 名字</button>
+      <button class="fm-btn"    data-m="cn2num" onclick="setFM('cn2num',this)">名字 → 数字</button>
+      <button class="fm-btn"    data-m="next"   onclick="setFM('next',this)">下一个是几？</button>
+      <button class="fm-btn"    data-m="prev"   onclick="setFM('prev',this)">上一个是几？</button>
+    </div>
+    <div class="find-q" id="findQ"></div>
+    <div class="find-t" id="findT"></div>
+    <div class="find-grid" id="findGrid"></div>
+    <div class="fb" id="findFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue" onclick="genFind()">换一题 🔄</button>
+    </div>
+    <div class="score" id="findScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 4 ══ -->
+<div id="p4" class="hidden">
+  <div class="card">
+    <div class="auto-num" id="autoNum">1</div>
+    <div class="auto-cn"  id="autoCN">一</div>
+    <div class="auto-bar-wrap"><div class="auto-bar" id="autoBar" style="width:1%"></div></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink"   id="autoBtn" onclick="toggleAuto()">▶ 开始数数</button>
+      <button class="btn btn-gray"   onclick="autoReset()">↺ 从 1 开始</button>
+    </div>
+    <div class="row-ctrl">
+      <button class="btn btn-orange" onclick="autoStep(-1)">◀ 上一个</button>
+      <button class="btn btn-blue"   onclick="autoStep(1)">下一个 ▶</button>
+    </div>
+    <div style="text-align:center;color:#aaa;font-size:.82rem;margin-bottom:6px">
+      速度：
+      <button class="sp-btn on" data-sp="1300" onclick="setAutoSp(1300,this)">慢</button>
+      <button class="sp-btn"    data-sp="750"  onclick="setAutoSp(750,this)">正常</button>
+      <button class="sp-btn"    data-sp="380"  onclick="setAutoSp(380,this)">快</button>
+    </div>
+  </div>
+</div>
+
+
+<style>
+/* ── 写数字 ── */
+.dig-btn{width:48px;height:48px;border:2px solid #ddd;border-radius:12px;
+  font-size:1.4rem;font-weight:bold;cursor:pointer;background:#f8f8ff;color:#555;transition:all .15s;}
+.dig-btn.on{background:linear-gradient(135deg,#f48fb1,#e91e63);color:#fff;border-color:#e91e63;}
+.pen-btn{width:34px;height:34px;border-radius:50%;border:3px solid transparent;
+  cursor:pointer;transition:transform .15s;display:inline-block;}
+.pen-btn.on{border-color:#222;transform:scale(1.25);}
+.trace-wrap{position:relative;width:min(280px,100%);margin:0 auto 14px;aspect-ratio:1;
+  border-radius:14px;background:#fff9e6;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+#guideCanvas,#traceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:14px;}
+#traceCanvas{touch-action:none;cursor:crosshair;}
+/* ── 比大小 ── */
+.cmp-display{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px;}
+.cmp-n{font-size:4.2rem;font-weight:bold;transition:font-size .3s,color .3s;}
+.cmp-sign{font-size:3rem;color:#aaa;min-width:48px;text-align:center;transition:color .3s;}
+.cmp-btn{width:68px;height:68px;border:none;border-radius:16px;font-size:2.2rem;
+  font-weight:bold;cursor:pointer;
+  background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:#1565c0;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);transition:all .15s;}
+.cmp-btn:hover{transform:scale(1.08);}
+.cmp-btn:active{transform:scale(.93);}
+/* ── 数字接龙 ── */
+.seq-row{display:flex;gap:6px;justify-content:center;align-items:center;
+  flex-wrap:wrap;margin-bottom:16px;}
+.seq-n{width:50px;height:50px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:bold;background:#e3f2fd;border-radius:10px;color:#1565c0;}
+.seq-blank{width:50px;height:50px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:bold;background:#fff9c4;border-radius:10px;color:#f57c00;
+  border:2.5px dashed #ff9800;}
+.seq-blank.ok{background:#c8e6c9;color:#2e7d32;border:2.5px solid #2e7d32;}
+.seq-sep{font-size:1.2rem;color:#bbb;}
+</style>
+
+<!-- ══ Tab 5: 写数字 ══ -->
+<div id="p5" class="hidden">
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center" id="digBtns">
+      <!-- built by JS -->
+    </div>
+  </div>
+  <div class="card">
+    <div class="trace-wrap">
+      <canvas id="guideCanvas" width="280" height="280"></canvas>
+      <canvas id="traceCanvas" width="280" height="280"></canvas>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+      <button class="pen-btn on" data-c="#e91e63" style="background:#e91e63" onclick="setPen('#e91e63',this)"></button>
+      <button class="pen-btn"    data-c="#1565c0" style="background:#1565c0" onclick="setPen('#1565c0',this)"></button>
+      <button class="pen-btn"    data-c="#2e7d32" style="background:#2e7d32" onclick="setPen('#2e7d32',this)"></button>
+      <button class="pen-btn"    data-c="#e65100" style="background:#e65100" onclick="setPen('#e65100',this)"></button>
+      <button class="pen-btn"    data-c="#222"    style="background:#222"    onclick="setPen('#222',this)"></button>
+    </div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue"   onclick="showHint()">💡 笔顺提示</button>
+      <button class="btn btn-gray"   onclick="clearTrace()">🗑️ 清除</button>
+      <button class="btn btn-pink"   onclick="speak(numCN(traceDigit))">🔊 读数字</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Tab 6: 比大小 ══ -->
+<div id="p6" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="lv-btn on" data-cl="1" onclick="setCmpLv(1,this)">1-10（简单）</button>
+      <button class="lv-btn"    data-cl="2" onclick="setCmpLv(2,this)">1-50（中等）</button>
+      <button class="lv-btn"    data-cl="3" onclick="setCmpLv(3,this)">1-100（挑战）</button>
+    </div>
+    <div class="cmp-display">
+      <div class="cmp-n" id="cmpA" style="color:#e91e63">?</div>
+      <div class="cmp-sign" id="cmpSign">?</div>
+      <div class="cmp-n" id="cmpB" style="color:#1565c0">?</div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:14px">
+      <button class="cmp-btn" onclick="checkCmp('&lt;')">&lt;</button>
+      <button class="cmp-btn" onclick="checkCmp('=')">=</button>
+      <button class="cmp-btn" onclick="checkCmp('&gt;')">&gt;</button>
+    </div>
+    <div class="fb" id="cmpFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCmp()">换一题 🔄</button>
+    </div>
+    <div class="score" id="cmpScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 7: 数字接龙 ══ -->
+<div id="p7" class="hidden">
+  <div class="card">
+    <div class="lv-row" id="seqStepBtns">
+      <button class="lv-btn on" data-s="1"  onclick="setSeqStep(1,this)">按 1 数</button>
+      <button class="lv-btn"    data-s="2"  onclick="setSeqStep(2,this)">按 2 数</button>
+      <button class="lv-btn"    data-s="5"  onclick="setSeqStep(5,this)">按 5 数</button>
+      <button class="lv-btn"    data-s="10" onclick="setSeqStep(10,this)">按 10 数</button>
+    </div>
+    <div class="seq-row" id="seqRow"></div>
+    <div class="choices4" id="seqChoices"></div>
+    <div class="fb" id="seqFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genSeq()">换一题 🔄</button>
+    </div>
+    <div class="score" id="seqScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+</div>
+<script>
+// ─── Utils ───
+const EMOJIS = ['🍎','🐱','⭐','🦋','🍭','🌸','🐠','🎈','🍓','🐸',
+                '🐣','🦊','🍊','🌈','🐧','🍇','🦄','🐞','🍕','🎀'];
+
+function numCN(n) {
+  const d = ['','一','二','三','四','五','六','七','八','九','十'];
+  if (n <= 10) return d[n];
+  if (n < 20)  return '十' + (n > 10 ? d[n % 10] : '');
+  const t = Math.floor(n/10), r = n%10;
+  return d[t] + '十' + (r ? d[r] : '');
+}
+
+function ri(lo,hi){ return Math.floor(Math.random()*(hi-lo+1))+lo; }
+
+function shuffle(a) {
+  for (let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function genChoices(correct, lo, hi, n) {
+  const s = new Set([correct]);
+  for (let t=0; s.size<n && t<600; t++) s.add(ri(lo,hi));
+  return shuffle([...s]).slice(0,n);
+}
+
+// ─── Tab 1 — Grid ───
+let zNum = 1;
+
+function decCls(n){
+  if(n<=10) return 'd1';
+  if(n<=20) return 'd2';
+  if(n<=30) return 'd3';
+  if(n<=40) return 'd4';
+  if(n<=50) return 'd5';
+  if(n<=60) return 'd6';
+  if(n<=70) return 'd7';
+  if(n<=80) return 'd8';
+  if(n<=90) return 'd9';
+  return 'd10';
+}
+
+function buildGrid() {
+  let h='';
+  for(let i=1;i<=100;i++)
+    h+=`<div class="ng-cell ${decCls(i)}" id="ngc-${i}" onclick="zoomTo(${i})">${i}</div>`;
+  document.getElementById('numGrid').innerHTML=h;
+}
+
+function zoomTo(n) {
+  zNum=n;
+  document.querySelectorAll('.ng-cell').forEach(c=>c.classList.remove('picked'));
+  document.getElementById(`ngc-${n}`).classList.add('picked');
+
+  document.getElementById('zN').textContent=n;
+  document.getElementById('zCN').textContent=numCN(n);
+
+  const tens=Math.floor(n/10), ones=n%10;
+  let blk='';
+  if(tens) blk+=`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">`;
+  for(let i=0;i<tens;i++) blk+='<span class="blk-ten"></span>';
+  if(tens) blk+='</div>';
+  if(ones) {
+    blk+=`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:${tens?6:0}px">`;
+    for(let i=0;i<ones;i++) blk+='<span class="blk-one"></span>';
+    blk+='</div>';
+  }
+  if(tens&&ones) blk+=`<div class="blk-label">红色=十，橙色=个</div>`;
+  document.getElementById('zBlk').innerHTML=blk||'<span style="color:#ccc;font-size:.85rem">零（没有单独的块）</span>';
+
+  const panel=document.getElementById('zoomPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  speak(numCN(n));
+  tone(280+n*1.2,.14);
+}
+
+function zoomMove(d){ zoomTo(Math.max(1,Math.min(100,zNum+d))); }
+
+// ─── Tab 2 — Count ───
+let cntLv=10, cntAns=0, cntOk=0, cntBad=0, cntDone=false;
+
+function setLv(lv,btn){
+  cntLv=lv;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genCount();
+}
+
+function genCount(){
+  cntDone=false;
+  cntAns=ri(1,cntLv);
+  const em=EMOJIS[ri(0,EMOJIS.length-1)];
+  let h='';
+  for(let i=0;i<cntAns;i++) h+=`<span style="animation-delay:${i*25}ms">${em}</span>`;
+  document.getElementById('objArea').innerHTML=h;
+
+  const ch=genChoices(cntAns,1,cntLv,4);
+  const g=document.getElementById('cntChoices');
+  g.innerHTML='';
+  ch.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='choice-btn'; b.textContent=c;
+    b.onclick=()=>checkCount(c,b);
+    g.appendChild(b);
+  });
+  setFb('cntFb','','');
+}
+
+function checkCount(val,btn){
+  if(cntDone)return; cntDone=true;
+  if(val===cntAns){
+    cntOk++; btn.classList.add('ok');
+    setFb('cntFb','ok',`✅ 真棒！是 ${cntAns} 个！`);
+    speak(`${numCN(cntAns)}，真棒`); chime(); setTimeout(genCount,1600);
+  } else {
+    cntBad++; btn.classList.add('fail');
+    setFb('cntFb','fail','🔢 再数数看！');
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>{ btn.classList.remove('fail'); cntDone=false; setFb('cntFb','',''); },900);
+  }
+  document.getElementById('cntScore').textContent=`✅ ${cntOk}  ❌ ${cntBad}`;
+}
+
+// ─── Tab 3 — Find ───
+let fm='num2cn', findOk=0, findBad=0, findDone=false;
+
+function setFM(m,btn){
+  fm=m;
+  document.querySelectorAll('.fm-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genFind();
+}
+
+function genFind(){
+  findDone=false;
+  setFb('findFb','','');
+
+  if(fm==='num2cn'){
+    const n=ri(1,100);
+    document.getElementById('findQ').textContent='这个数字叫什么名字？';
+    document.getElementById('findT').textContent=n;
+    const ch=genChoices(n,1,100,6);
+    buildFindGrid(ch, v=>v===n, v=>numCN(v));
+    setTimeout(()=>speak(numCN(n)),300);
+  } else if(fm==='cn2num'){
+    const n=ri(1,100);
+    document.getElementById('findQ').textContent='找到这个数字！';
+    document.getElementById('findT').textContent=numCN(n);
+    const ch=genChoices(n,1,100,6);
+    buildFindGrid(ch, v=>v===n, v=>v);
+    setTimeout(()=>speak(numCN(n)),300);
+  } else if(fm==='next'){
+    const n=ri(1,99);
+    const ans=n+1;
+    document.getElementById('findQ').textContent=`${n} 的下一个是几？`;
+    document.getElementById('findT').textContent=n;
+    const ch=genChoices(ans,Math.max(1,n-3),Math.min(100,n+5),6);
+    buildFindGrid(ch, v=>v===ans, v=>v);
+    setTimeout(()=>speak(`${numCN(n)}，下一个是几？`),300);
+  } else {
+    const n=ri(2,100);
+    const ans=n-1;
+    document.getElementById('findQ').textContent=`${n} 的上一个是几？`;
+    document.getElementById('findT').textContent=n;
+    const ch=genChoices(ans,Math.max(1,n-5),Math.min(100,n+3),6);
+    buildFindGrid(ch, v=>v===ans, v=>v);
+    setTimeout(()=>speak(`${numCN(n)}，上一个是几？`),300);
+  }
+}
+
+function buildFindGrid(choices, isOk, display){
+  const g=document.getElementById('findGrid');
+  g.innerHTML='';
+  choices.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='find-btn'; b.textContent=display(c);
+    b.onclick=()=>checkFind(isOk(c),b);
+    g.appendChild(b);
+  });
+}
+
+function checkFind(ok,btn){
+  if(findDone)return; findDone=true;
+  if(ok){
+    findOk++; btn.classList.add('ok');
+    setFb('findFb','ok','✅ 答对啦！太棒了！');
+    speak('答对了，太棒了'); chime(); setTimeout(genFind,1500);
+  } else {
+    findBad++; btn.classList.add('fail');
+    setFb('findFb','fail','❌ 再想想看！');
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>{ btn.classList.remove('fail'); findDone=false; setFb('findFb','',''); },900);
+  }
+  document.getElementById('findScore').textContent=`✅ ${findOk}  ❌ ${findBad}`;
+}
+
+// ─── Tab 4 — Auto ───
+let autoN=1, autoPlaying=false, autoTimer=null, autoSp=1300;
+
+function showAutoN(n){
+  const el=document.getElementById('autoNum');
+  el.textContent=n;
+  el.style.animation='none';
+  // Force reflow
+  void el.offsetWidth;
+  el.style.animation='numPop .3s ease-out';
+  el.style.color=`hsl(${n*3.6},75%,50%)`;
+  document.getElementById('autoCN').textContent=numCN(n);
+  document.getElementById('autoBar').style.width=`${n}%`;
+}
+
+function toggleAuto(){
+  if(autoPlaying){
+    autoPlaying=false; clearTimeout(autoTimer);
+    document.getElementById('autoBtn').textContent='▶ 继续';
+  } else {
+    if(autoN>=100) autoReset();
+    autoPlaying=true;
+    document.getElementById('autoBtn').textContent='⏸ 暂停';
+    autoNext();
+  }
+}
+
+function autoNext(){
+  if(!autoPlaying)return;
+  showAutoN(autoN);
+  speak(numCN(autoN), autoSp<500 ? 1.3 : 0.88);
+  tone(262+autoN*1.15,.12);
+  if(autoN>=100){ autoPlaying=false; document.getElementById('autoBtn').textContent='▶ 开始数数'; return; }
+  autoN++;
+  autoTimer=setTimeout(autoNext,autoSp);
+}
+
+function autoReset(){
+  autoPlaying=false; clearTimeout(autoTimer); autoN=1;
+  document.getElementById('autoBtn').textContent='▶ 开始数数';
+  showAutoN(1);
+}
+
+function autoStep(d){
+  clearTimeout(autoTimer); autoPlaying=false;
+  document.getElementById('autoBtn').textContent='▶ 继续';
+  autoN=Math.max(1,Math.min(100,autoN+d));
+  showAutoN(autoN); speak(numCN(autoN)); tone(262+autoN*1.15,.12);
+}
+
+function setAutoSp(sp,btn){
+  autoSp=sp;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ─── Tab 5: 写数字 ───
+let traceDigit=1, penColor='#e91e63', traceInited=false, isDrawing=false;
+let hintTimer=null;
+
+function mkArc(cx,cy,rx,ry,a0,a1,n=20){
+  return Array.from({length:n+1},(_,i)=>{
+    const a=a0+(a1-a0)*i/n;
+    return [cx+rx*Math.cos(a),cy+ry*Math.sin(a)];
+  });
+}
+const _P=Math.PI;
+const DSTROKES={
+  // 0: 椭圆
+  0:[mkArc(.5,.5,.36,.44,-_P/2,_P*1.5,48)],
+  // 1: 撇 + 竖
+  1:[[[.34,.22],[.5,.10]],[[.5,.10],[.5,.90]]],
+  // 2: 弧 → 斜下 → 底横
+  2:[[
+    [.18,.30],[.20,.15],[.40,.07],[.62,.10],[.78,.24],
+    [.78,.40],[.62,.54],[.40,.68],[.20,.90],[.80,.90]
+  ]],
+  // 3: 上弧 + 下弧，开口向右
+  3:[[
+    [.22,.18],[.38,.08],[.62,.08],[.78,.20],
+    [.82,.34],[.74,.46],[.54,.50],
+    [.74,.54],[.84,.68],[.80,.82],
+    [.62,.92],[.38,.94],[.20,.84]
+  ]],
+  // 4: 斜线 + 横线 + 竖线
+  4:[[[.64,.08],[.08,.68]],[[.06,.68],[.92,.68]],[[.64,.08],[.64,.92]]],
+  // 5: 横 + 竖 + 右弧
+  5:[
+    [[.76,.10],[.20,.10]],
+    [[.20,.10],[.20,.50]],
+    [[.20,.50],[.22,.44],[.45,.40],[.68,.46],
+     [.82,.60],[.80,.76],[.62,.90],[.40,.93],[.18,.84]]
+  ],
+  // 6: 从右上大弯下来，底部闭合圆
+  6:[[
+    [.68,.12],[.50,.06],[.26,.12],[.12,.30],
+    [.08,.52],[.14,.70],[.28,.84],[.50,.92],
+    [.74,.88],[.86,.70],[.84,.54],[.70,.42],
+    [.48,.40],[.26,.50],[.20,.66]
+  ]],
+  // 7: 横 + 斜
+  7:[[[.12,.10],[.88,.10]],[[.88,.10],[.35,.90]]],
+  // 8: 上椭圆 + 下椭圆
+  8:[
+    [[.50,.08],[.72,.12],[.84,.26],[.82,.42],[.68,.50],
+     [.50,.52],[.32,.50],[.18,.42],[.16,.26],[.28,.12],[.50,.08]],
+    [[.50,.52],[.72,.56],[.86,.70],[.84,.84],[.68,.92],
+     [.50,.94],[.32,.92],[.16,.84],[.14,.70],[.28,.56],[.50,.52]]
+  ],
+  // 9: 先画圆（从右侧起），再画尾
+  9:[[
+    [.78,.34],[.80,.20],[.68,.08],[.50,.06],
+    [.28,.10],[.16,.26],[.16,.44],[.28,.58],
+    [.48,.64],[.68,.60],[.80,.46],[.80,.34],
+    [.80,.55],[.76,.72],[.62,.88],[.42,.94]
+  ]]
+};
+
+function initTraceTab(){
+  if(traceInited)return; traceInited=true;
+  // Build digit picker buttons
+  const wrap=document.getElementById('digBtns');
+  for(let d=0;d<=9;d++){
+    const b=document.createElement('button');
+    b.className='dig-btn'; b.textContent=d; b.dataset.d=d;
+    b.onclick=()=>selectDigit(d); wrap.appendChild(b);
+  }
+  const tc=document.getElementById('traceCanvas');
+  let lastX=0,lastY=0;
+  function xy(e){
+    const r=tc.getBoundingClientRect();
+    return [(e.clientX-r.left)*280/r.width,(e.clientY-r.top)*280/r.height];
+  }
+  tc.addEventListener('pointerdown',e=>{
+    isDrawing=true; tc.setPointerCapture(e.pointerId);
+    [lastX,lastY]=xy(e);
+    const ctx=tc.getContext('2d');
+    ctx.beginPath(); ctx.moveTo(lastX,lastY);
+  });
+  tc.addEventListener('pointermove',e=>{
+    if(!isDrawing)return;
+    const [x,y]=xy(e);
+    const ctx=tc.getContext('2d');
+    ctx.strokeStyle=penColor; ctx.lineWidth=18; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+    lastX=x; lastY=y;
+  });
+  tc.addEventListener('pointerup',()=>isDrawing=false);
+  tc.addEventListener('pointercancel',()=>isDrawing=false);
+  selectDigit(1);
+}
+
+function selectDigit(d){
+  traceDigit=d;
+  document.querySelectorAll('.dig-btn').forEach(b=>b.classList.toggle('on',+b.dataset.d===d));
+  drawGuide(); clearTrace(); speak(numCN(d));
+}
+
+function drawGuide(){
+  const S=280,gc=document.getElementById('guideCanvas');
+  const ctx=gc.getContext('2d');
+  ctx.clearRect(0,0,S,S);
+  ctx.strokeStyle='rgba(255,155,185,0.5)'; ctx.lineWidth=30;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  DSTROKES[traceDigit].forEach(sk=>{
+    if(sk.length<2)return;
+    ctx.beginPath(); ctx.moveTo(sk[0][0]*S,sk[0][1]*S);
+    for(let i=1;i<sk.length;i++) ctx.lineTo(sk[i][0]*S,sk[i][1]*S);
+    ctx.stroke();
+  });
+}
+
+function clearTrace(){
+  clearTimeout(hintTimer);
+  document.getElementById('traceCanvas').getContext('2d').clearRect(0,0,280,280);
+}
+
+function setPen(c,btn){
+  penColor=c;
+  document.querySelectorAll('.pen-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function showHint(){
+  clearTrace();
+  const S=280,tc=document.getElementById('traceCanvas'),ctx=tc.getContext('2d');
+  const allPts=[];
+  DSTROKES[traceDigit].forEach(sk=>sk.forEach((pt,i)=>allPts.push({pt,ns:i===0})));
+  let idx=0;
+  ctx.strokeStyle='#1565c0'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.lineJoin='round';
+  function step(){
+    if(idx>=allPts.length)return;
+    const{pt,ns}=allPts[idx];
+    const px=pt[0]*S,py=pt[1]*S;
+    if(ns){ctx.beginPath();ctx.moveTo(px,py);}
+    else{ctx.lineTo(px,py);ctx.stroke();ctx.beginPath();ctx.moveTo(px,py);}
+    ctx.save();ctx.fillStyle='rgba(255,23,68,.85)';
+    ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();ctx.restore();
+    idx++; hintTimer=setTimeout(step,28);
+  }
+  step();
+}
+
+// ─── Tab 6: 比大小 ───
+let cmpLv=1, cmpOk=0, cmpBad=0, cmpDone=false, cmpA=0, cmpB=0;
+
+function setCmpLv(lv,btn){
+  cmpLv=lv;
+  document.querySelectorAll('[data-cl]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); genCmp();
+}
+
+function genCmp(){
+  cmpDone=false;
+  const max=cmpLv===1?10:cmpLv===2?50:100;
+  cmpA=ri(1,max);
+  cmpB=Math.random()<0.15?cmpA:ri(1,max);
+  document.getElementById('cmpA').textContent=cmpA;
+  document.getElementById('cmpB').textContent=cmpB;
+  document.getElementById('cmpSign').textContent='?';
+  document.getElementById('cmpSign').style.color='#aaa';
+  document.getElementById('cmpA').style.fontSize='4.2rem';
+  document.getElementById('cmpB').style.fontSize='4.2rem';
+  document.getElementById('cmpA').style.color='#e91e63';
+  document.getElementById('cmpB').style.color='#1565c0';
+  setFb('cmpFb','','');
+  setTimeout(()=>speak(`${numCN(cmpA)}和${numCN(cmpB)}，哪个大？`),200);
+}
+
+function checkCmp(sign){
+  if(cmpDone)return; cmpDone=true;
+  const correct=cmpA<cmpB?'<':cmpA>cmpB?'>':'=';
+  const ok=sign===correct;
+  const se=document.getElementById('cmpSign');
+  se.textContent=sign; se.style.color=ok?'#2e7d32':'#e53935';
+  if(ok){
+    cmpOk++;
+    if(cmpA>cmpB){document.getElementById('cmpA').style.fontSize='5.5rem';}
+    else if(cmpB>cmpA){document.getElementById('cmpB').style.fontSize='5.5rem';}
+    setFb('cmpFb','ok','✅ 答对啦！');
+    speak('答对了，真棒'); chime(); setTimeout(genCmp,1600);
+  } else {
+    cmpBad++;
+    setFb('cmpFb','fail',`❌ 正确是 ${cmpA} ${correct} ${cmpB}`);
+    speak(`不对，正确答案是${numCN(cmpA)}${correct==='>'?'大于':'小于等于'}${numCN(cmpB)}`);
+    tone(200,.2,'sawtooth'); setTimeout(()=>{cmpDone=false;genCmp();},2000);
+  }
+  document.getElementById('cmpScore').textContent=`✅ ${cmpOk}  ❌ ${cmpBad}`;
+}
+
+// ─── Tab 7: 数字接龙 ───
+let seqStep=1, seqOk=0, seqBad=0, seqDone=false, seqAns=0;
+const SEQ_CFG={1:{max:20},2:{max:40},5:{max:50},10:{max:100}};
+
+function setSeqStep(s,btn){
+  seqStep=s;
+  document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); genSeq();
+}
+
+function genSeq(){
+  seqDone=false;
+  const cfg=SEQ_CFG[seqStep]||{max:20};
+  const maxStart=Math.max(1, cfg.max - seqStep*4);
+  const start=ri(1,maxStart);
+  const seq=Array.from({length:5},(_,i)=>start+i*seqStep);
+  const blankIdx=ri(0,4);
+  seqAns=seq[blankIdx];
+
+  const row=document.getElementById('seqRow');
+  let seqHtml='';
+  seq.forEach((n,i)=>{
+    if(i>0) seqHtml+=`<div class="seq-sep">→</div>`;
+    if(i===blankIdx) seqHtml+=`<div class="seq-blank" id="seqBlank">?</div>`;
+    else seqHtml+=`<div class="seq-n">${n}</div>`;
+  });
+  row.innerHTML=seqHtml;
+
+  const lo=Math.max(1,seqAns-seqStep*2), hi=Math.min(cfg.max+seqStep*2,seqAns+seqStep*2);
+  const choices=genChoices(seqAns,lo,hi,4);
+  const g=document.getElementById('seqChoices');
+  g.innerHTML='';
+  choices.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='choice-btn'; b.textContent=c;
+    b.onclick=()=>checkSeq(c,b); g.appendChild(b);
+  });
+  setFb('seqFb','','');
+  // Speak the sequence with blank as "空"
+  const txt=seq.map((n,i)=>i===blankIdx?'空':numCN(n)).join('，');
+  setTimeout(()=>speak(txt),300);
+}
+
+function checkSeq(val,btn){
+  if(seqDone)return; seqDone=true;
+  const blank=document.getElementById('seqBlank');
+  if(val===seqAns){
+    seqOk++; btn.classList.add('ok');
+    if(blank){blank.textContent=val;blank.classList.add('ok');}
+    setFb('seqFb','ok',`✅ 正确！是 ${numCN(seqAns)}！`);
+    speak(`${numCN(seqAns)}，真棒`); chime(); setTimeout(genSeq,1600);
+  } else {
+    seqBad++; btn.classList.add('fail');
+    setFb('seqFb','fail','❌ 再想想！');
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>{btn.classList.remove('fail');seqDone=false;setFb('seqFb','','');},900);
+  }
+  document.getElementById('seqScore').textContent=`✅ ${seqOk}  ❌ ${seqBad}`;
+}
+
+// ─── Tab switch ───
+function pauseAll(){
+  // 停自动数数
+  if(autoPlaying){ autoPlaying=false; clearTimeout(autoTimer); document.getElementById('autoBtn').textContent='▶ 继续'; }
+  // 停笔顺动画
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  // 停语音
+  if(window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function switchTab(n){
+  pauseAll();
+  for(let i=1;i<=7;i++){
+    document.getElementById(`p${i}`).classList.toggle('hidden',i!==n);
+    document.getElementById(`tab${i}`).classList.toggle('on',i===n);
+  }
+  if(n===2) genCount();
+  if(n===3) genFind();
+  if(n===4) showAutoN(autoN);
+  if(n===5) initTraceTab();
+  if(n===6) genCmp();
+  if(n===7) genSeq();
+}
+
+// ─── Helpers ───
+function setFb(id,cls,txt){
+  const el=document.getElementById(id);
+  el.className='fb'+(cls?' '+cls:'');
+  el.textContent=txt;
+}
+
+// ─── Audio ───
+let _ac=null;
+function tone(f,d,t='sine',v=.2){
+  try{
+    if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended')_ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g);g.connect(_ac.destination);
+    o.type=t;o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start();o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+function chime(){
+  tone(523,.1); setTimeout(()=>tone(659,.12),110); setTimeout(()=>tone(784,.18),240);
+}
+
+// ─── Speech ───
+let _voices=[], _voiceReady=false;
+function _loadVoices(){
+  _voices=speechSynthesis.getVoices();
+  _voiceReady=true;
+}
+if(window.speechSynthesis){
+  _loadVoices();
+  speechSynthesis.onvoiceschanged=_loadVoices;
+}
+function speak(text, rate){
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN';
+  u.rate=rate||0.88;
+  u.pitch=1.1;
+  // 优先选中文声音
+  const zhVoice=_voices.find(v=>v.lang.startsWith('zh'));
+  if(zhVoice) u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+
+// ─── Init ───
+buildGrid();
+genCount();
+genFind();
+showAutoN(1);
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+</body>
+</html>
