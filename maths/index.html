@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>趣味学习乐园 — 小学数学英语</title>
+<meta name="description" content="专为小学生设计的互动学习游戏，包含乘法口诀、进位加减法、除法、认识时钟、英语字母等趣味练习。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(145deg,#e0f7fa 0%,#f3e5f5 45%,#fff9c4 100%);
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+}
+
+/* ─ Header ─ */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo { font-size: 3.2rem; margin-bottom: 6px; }
+.header h1 {
+  font-size: 2rem;
+  color: #4a148c;
+  text-shadow: 2px 3px 0 #ce93d8, 4px 6px 0 rgba(0,0,0,.08);
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+}
+.header p { color: #888; font-size: .9rem; }
+
+/* ─ Grid ─ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ─ Card ─ */
+.card {
+  background: rgba(255,255,255,.88);
+  border-radius: 22px;
+  padding: 26px 22px 22px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.10);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform .18s, box-shadow .18s;
+  border-top: 5px solid transparent;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.16);
+}
+.card-icon { font-size: 2.6rem; }
+.card-title {
+  font-size: 1.22rem;
+  font-weight: bold;
+  color: #222;
+}
+.card-desc {
+  font-size: .87rem;
+  color: #777;
+  line-height: 1.55;
+  flex: 1;
+}
+.card-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: .76rem;
+  font-weight: bold;
+  color: #fff;
+  align-self: flex-start;
+}
+
+/* colors per card */
+.c1 { border-top-color: #7e57c2; }
+.c1 .card-tag { background: #7e57c2; }
+.c2 { border-top-color: #43a047; }
+.c2 .card-tag { background: #43a047; }
+.c3 { border-top-color: #e53935; }
+.c3 .card-tag { background: #e53935; }
+.c4 { border-top-color: #f57c00; }
+.c4 .card-tag { background: #f57c00; }
+.c5 { border-top-color: #00838f; }
+.c5 .card-tag { background: #00838f; }
+.c6 { border-top-color: #1565c0; }
+.c6 .card-tag { background: #1565c0; }
+.c7 { border-top-color: #ad1457; }
+.c7 .card-tag { background: #ad1457; }
+.c8 { border-top-color: #2e7d32; }
+.c8 .card-tag { background: #2e7d32; }
+.c9 { border-top-color: #6a1b9a; }
+.c9 .card-tag { background: #6a1b9a; }
+.c10{ border-top-color: #00796b; }
+.c10 .card-tag{ background: #00796b; }
+.c11{ border-top-color: #558b2f; }
+.c11 .card-tag{ background: #558b2f; }
+
+/* ─ Footer ─ */
+.footer {
+  text-align: center;
+  margin-top: 36px;
+  color: #bbb;
+  font-size: .8rem;
+}
+
+/* ─ Filter bar ─ */
+.filter-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:8px 20px;border:2px solid #ce93d8;border-radius:20px;background:#fff;color:#4a148c;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .18s;}
+.filter-btn:hover{background:#f3e5f5;}
+.filter-btn.on{background:#4a148c;color:#fff;border-color:#4a148c;}
+
+@media (max-width: 380px) {
+  .header h1 { font-size: 1.5rem; }
+  .logo { font-size: 2.4rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🏫</div>
+  <h1>趣味学习乐园</h1>
+  <p>点击卡片，开始今天的练习吧！</p>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn on" data-filter="all" onclick="filterGrade(this)">全部</button>
+  <button class="filter-btn" data-filter="12" onclick="filterGrade(this)">一二年级</button>
+  <button class="filter-btn" data-filter="3" onclick="filterGrade(this)">三年级</button>
+  <button class="filter-btn" data-filter="45" onclick="filterGrade(this)">四五年级</button>
+</div>
+
+<div class="grid">
+
+  <a class="card c1" href="multiplication.html" data-grades="1,2,3">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">九九乘法口诀</div>
+    <div class="card-desc">动画展示计算原理，点击格子看点阵图解，限时闯关测试记忆。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c2" href="carry.html" data-grades="1,2,3">
+    <div class="card-icon">🧮</div>
+    <div class="card-title">进位加减法</div>
+    <div class="card-desc">逐步动画演示进位与退位过程，配有中文旁白，自动播放或手动翻步。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c3" href="division.html" data-grades="2,3,4">
+    <div class="card-icon">➗</div>
+    <div class="card-title">除法速算训练</div>
+    <div class="card-desc">从简单整除到带余数除法，限时闯关、连击奖励，边玩边练。</div>
+    <span class="card-tag">二～四年级</span>
+  </a>
+
+  <a class="card c4" href="math1.html" data-grades="1,2,3">
+    <div class="card-icon">📝</div>
+    <div class="card-title">综合数学练习</div>
+    <div class="card-desc">加减乘除混合练习，自定义范围与难度，记录成绩与连击。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c5" href="clock.html" data-grades="1,2">
+    <div class="card-icon">🕐</div>
+    <div class="card-title">认识时钟</div>
+    <div class="card-desc">互动时钟拨针练习，学会看时针、分针和秒针，整点与半点。</div>
+    <span class="card-tag">一～二年级</span>
+  </a>
+
+  <a class="card c6" href="math_drill.html" data-grades="1,2">
+    <div class="card-icon">🌸</div>
+    <div class="card-title">数学小练习</div>
+    <div class="card-desc">趣味题目闯关，图文并茂，适合课后巩固，每次随机出题。</div>
+    <span class="card-tag">一～二年级</span>
+  </a>
+
+  <a class="card c7" href="english.html" data-grades="1,2,3">
+    <div class="card-icon">🔤</div>
+    <div class="card-title">英语字母与单词</div>
+    <div class="card-desc">字母认读、单词拼写游戏，有趣动画，轻松入门小学英语。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c10" href="direction.html" data-grades="2,3,4">
+    <div class="card-icon">🧭</div>
+    <div class="card-title">方向认识</div>
+    <div class="card-desc">交互指南针学东南西北，格子地图判断相对方向，路线跟踪练习走几步到哪里。</div>
+    <span class="card-tag">二～四年级</span>
+  </a>
+
+  <a class="card c9" href="mixed.html" data-grades="2,3,4,5">
+    <div class="card-icon">⚙️</div>
+    <div class="card-title">混合运算</div>
+    <div class="card-desc">加减乘除 + 括号，分步高亮演示运算顺序，练习自动出题，测验4选1。</div>
+    <span class="card-tag">二～五年级</span>
+  </a>
+
+  <a class="card c8" href="placevalue.html" data-grades="1,2,3">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">数位认知</div>
+    <div class="card-desc">动画拆解个位、十位、百位，看数字如何由方块组成，演示+练习+测验三合一。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card" href="shapes.html" data-grades="1,2,3,4" style="border-top-color:#e65100">
+    <div class="card-icon">🔷</div>
+    <div class="card-title">图形认识</div>
+    <div class="card-desc">正方形/长方形/三角形/圆/梯形/平行四边形，SVG描边动画+属性对比，看图选名+特征问答。</div>
+    <span class="card-tag" style="background:#e65100">一～四年级</span>
+  </a>
+
+  <a class="card" href="length.html" data-grades="2,3,4" style="border-top-color:#1b5e20">
+    <div class="card-icon">📏</div>
+    <div class="card-title">长度认识</div>
+    <div class="card-desc">毫米/厘米/分米/米/千米，换算填空+生活估算+直尺读数，单位换算不再错。</div>
+    <span class="card-tag" style="background:#1b5e20">二～四年级</span>
+  </a>
+
+  <a class="card" href="hanzi.html" data-grades="1,2,3,4,5,6" style="border-top-color:#e91e63">
+    <div class="card-icon">📖</div>
+    <div class="card-title">趣味汉字</div>
+    <div class="card-desc">从独体字到复杂字，3000常用汉字分关卡学习，含拼音、笔画、例词，闪卡+测验双模式。</div>
+    <span class="card-tag" style="background:#e91e63">一～六年级</span>
+  </a>
+
+  <a class="card" href="decimal_intro.html" data-grades="4" style="border-top-color:#3949ab">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">小数认识</div>
+    <div class="card-desc">把1分成10份或100份，数轴+方块直观感受0.1和0.01，含大小比较。</div>
+    <span class="card-tag" style="background:#3949ab">四年级</span>
+  </a>
+
+  <a class="card" href="fraction.html" data-grades="3" style="border-top-color:#ad1457">
+    <div class="card-icon">🍕</div>
+    <div class="card-title">分数初步认识</div>
+    <div class="card-desc">饼图和方块切分演示，拖动分子分母看变化，看图写分数测验。</div>
+    <span class="card-tag" style="background:#ad1457">三年级</span>
+  </a>
+
+  <a class="card" href="perimeter.html" data-grades="3" style="border-top-color:#2e7d32">
+    <div class="card-icon">📐</div>
+    <div class="card-title">周长计算</div>
+    <div class="card-desc">动画演示围一圈，滑块拖动长宽实时算周长，长方形与正方形公式对比。</div>
+    <span class="card-tag" style="background:#2e7d32">三年级</span>
+  </a>
+
+  <a class="card" href="area.html" data-grades="3" style="border-top-color:#1565c0">
+    <div class="card-icon">🟦</div>
+    <div class="card-title">面积认识</div>
+    <div class="card-desc">点格子数面积，逐步推导长×宽公式，网格上直观感受面积大小。</div>
+    <span class="card-tag" style="background:#1565c0">三年级</span>
+  </a>
+
+  <a class="card" href="time_calc.html" data-grades="3" style="border-top-color:#00695c">
+    <div class="card-icon">⏱️</div>
+    <div class="card-title">时间计算</div>
+    <div class="card-desc">双时钟拨针计算经过时间，24小时制对照表，经过时间练习题。</div>
+    <span class="card-tag" style="background:#00695c">三年级</span>
+  </a>
+
+  <a class="card" href="multiply2d.html" data-grades="3" style="border-top-color:#e65100">
+    <div class="card-icon">✖️</div>
+    <div class="card-title">两位数乘法竖式</div>
+    <div class="card-desc">逐步高亮演示进位过程，两位数×一位数和两位数×两位数两种模式。</div>
+    <span class="card-tag" style="background:#e65100">三年级</span>
+  </a>
+
+  <a class="card" href="barchart.html" data-grades="3" style="border-top-color:#283593">
+    <div class="card-icon">📊</div>
+    <div class="card-title">条形统计图</div>
+    <div class="card-desc">拖动柱子设数值，自动统计最多最少，读图回答问题，多种生活场景。</div>
+    <span class="card-tag" style="background:#283593">三年级</span>
+  </a>
+
+  <a class="card" href="numbers.html" data-grades="0,1" style="border-top-color:#e91e63">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">数字乐园 1-100</div>
+    <div class="card-desc">点格子认数字+汉语名称，数苹果练计数，找数字/上下一个游戏，跟我数彩虹动画四合一。</div>
+    <span class="card-tag" style="background:#e91e63">幼儿园～一年级</span>
+  </a>
+
+  <a class="card c11" href="decimal.html" data-grades="3,4">
+    <div class="card-icon">🔟</div>
+    <div class="card-title">小数加减法</div>
+    <div class="card-desc">竖式对齐小数点动画，逐位演示进位与退位，支持一位/两位/混合小数练习。</div>
+    <span class="card-tag">三～四年级</span>
+  </a>
+
+</div>
+
+<script src="feedback.js"></script>
+
+<div class="footer">
+  <p>🌈 快乐学习，每天进步一点点</p>
+</div>
+
+<script>
+function filterGrade(btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const g=btn.dataset.filter;
+  document.querySelectorAll('.card').forEach(card=>{
+    if(g==='all'){card.style.display='';return;}
+    const gr=card.dataset.grades||'';
+    const show=g==='12'?/[012]/.test(gr):g==='3'?/3/.test(gr):/[45]/.test(gr);
+    card.style.display=show?'':'none';
+  });
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

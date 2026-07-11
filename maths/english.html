@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小学英语游戏 — 字母与单词</title>
+<meta name="description" content="小学英语在线游戏：26字母认读、单词配图选择、拼写闯关，三种模式边玩边学。">
+<style>
+:root {
+  --teal:       #0D5C63;
+  --teal-mid:   #1A8A94;
+  --teal-light: #E0F5F7;
+  --gold:       #FFD166;
+  --gold-dark:  #C08B10;
+  --mint:       #06D6A0;
+  --coral:      #EF476F;
+  --bg:         #F4FEFF;
+  --card:       #FFFFFF;
+  --text:       #0A3D42;
+  --muted:      #5B8A8E;
+  --border:     #B8DDE0;
+  --shadow:     0 2px 16px rgba(13,92,99,.09), 0 0 0 1px rgba(13,92,99,.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 60%, rgba(13,92,99,.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(255,209,102,.07) 0%, transparent 45%);
+  min-height: 100vh;
+  padding: 22px 14px 50px;
+  color: var(--text);
+}
+
+.container { max-width: 900px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+/* ── Header ── */
+.header { text-align: center; margin-bottom: 24px; }
+.header h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem; font-weight: 700; color: var(--teal);
+  letter-spacing: .5px; text-wrap: balance;
+}
+.header p { font-size: .84rem; color: var(--muted); margin-top: 6px; letter-spacing: .3px; }
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+.tab-btn {
+  border: 2px solid var(--border); border-radius: 99px; padding: 8px 22px;
+  font-size: .88rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: var(--card); color: var(--muted); transition: all .18s;
+}
+.tab-btn:hover { border-color: var(--teal-mid); color: var(--teal); }
+.tab-btn.active {
+  background: var(--teal); color: var(--gold); border-color: var(--teal);
+  box-shadow: 0 4px 14px rgba(13,92,99,.28);
+}
+
+/* ── Card panel ── */
+.card-panel {
+  background: var(--card); border-radius: 20px;
+  padding: 22px 18px; box-shadow: var(--shadow); margin-bottom: 18px;
+}
+
+/* ── Buttons ── */
+.btn {
+  border: none; border-radius: 12px; padding: 9px 22px;
+  font-size: .88rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: transform .12s, box-shadow .12s;
+}
+.btn:active { transform: scale(.96); }
+.btn-teal  { background: var(--teal); color: var(--gold); box-shadow: 0 3px 10px rgba(13,92,99,.22); }
+.btn-ghost { background: transparent; color: var(--muted); border: 2px solid var(--border); }
+.btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* ── Progress bar ── */
+.prog-bar { background: var(--teal-light); border-radius: 99px; height: 6px; margin-bottom: 16px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal-mid), var(--teal)); transition: width .3s; }
+
+/* ── HUD ── */
+.hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.hud-score  { font-size: .92rem; font-weight: 800; color: var(--teal); }
+.hud-streak {
+  font-size: .8rem; font-weight: 700; color: var(--gold-dark);
+  background: #FFF8E1; border: 1.5px solid #FFDE82;
+  border-radius: 99px; padding: 3px 12px;
+}
+
+/* ══════════════════════════════════════
+   TAB 1 — ALPHABET
+══════════════════════════════════════ */
+.alpha-toolbar { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+
+.alpha-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+
+.alpha-card {
+  border-radius: 13px; padding: 10px 6px 9px;
+  text-align: center; cursor: pointer;
+  border: 2px solid var(--border); background: var(--card);
+  transition: all .18s; position: relative; overflow: hidden;
+}
+.alpha-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .22s;
+}
+.alpha-card:hover { border-color: var(--teal-mid); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(13,92,99,.14); }
+.alpha-card:hover::after, .alpha-card.active::after { transform: scaleX(1); }
+.alpha-card.active { border-color: var(--teal); background: var(--teal-light); }
+
+.ac-upper { font-family: Georgia, serif; font-size: 2rem; font-weight: 700; color: var(--teal); line-height: 1.05; }
+.ac-lower { font-family: Georgia, serif; font-size: .9rem; color: var(--teal-mid); margin-bottom: 5px; }
+.ac-emoji { font-size: 1.3rem; line-height: 1; margin-bottom: 2px; }
+.ac-word  { font-size: .6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .7px; }
+
+.alpha-preview {
+  background: var(--teal-light); border-radius: 16px;
+  padding: 20px 16px; text-align: center;
+  border: 1.5px solid var(--border);
+  min-height: 110px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 5px;
+}
+.ap-letter { font-family: Georgia, serif; font-size: 4rem; font-weight: 700; color: var(--teal); line-height: 1; display: block; }
+.ap-emoji  { font-size: 1.9rem; display: block; }
+.ap-word   { font-family: Georgia, serif; font-size: 1.15rem; font-weight: 700; color: var(--teal); letter-spacing: 2px; display: block; }
+.ap-cn     { font-size: .84rem; color: var(--muted); display: block; }
+.ap-hint   { font-size: .84rem; color: var(--muted); }
+
+/* ══════════════════════════════════════
+   TAB 2 — WORD MATCH
+══════════════════════════════════════ */
+.cat-bar { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
+.cat-btn {
+  border: 2px solid var(--border); border-radius: 99px; padding: 5px 14px;
+  font-size: .78rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: var(--card); color: var(--muted); transition: all .15s;
+}
+.cat-btn:hover { border-color: var(--teal-mid); color: var(--teal); }
+.cat-btn.active { background: var(--teal); color: var(--gold); border-color: var(--teal); }
+
+.match-stage { text-align: center; margin-bottom: 20px; }
+.match-emoji { font-size: 6rem; line-height: 1; display: block; margin-bottom: 6px; }
+.match-cn    { font-size: .88rem; color: var(--muted); font-weight: 600; }
+
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 460px; margin: 0 auto 14px; }
+.choice-btn {
+  border: 2px solid var(--border); border-radius: 14px;
+  padding: 14px 10px; cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.1rem; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text); background: var(--card); transition: all .15s;
+}
+.choice-btn:hover { border-color: var(--teal-mid); background: var(--teal-light); color: var(--teal); }
+.choice-btn.correct { background: #E5FBF4; border-color: var(--mint); color: #056449; }
+.choice-btn.wrong   { background: #FEECF0; border-color: var(--coral); color: #9B1836; }
+
+.match-fb { text-align: center; min-height: 30px; font-size: .95rem; font-weight: 700; margin-top: 4px; }
+.fb-ok   { color: var(--mint); }
+.fb-fail { color: var(--coral); }
+
+/* ══════════════════════════════════════
+   TAB 3 — SPELLING
+══════════════════════════════════════ */
+.spell-stage { text-align: center; margin-bottom: 20px; }
+.spell-emoji { font-size: 5rem; line-height: 1; display: block; margin-bottom: 6px; }
+.spell-cn    { font-size: .86rem; color: var(--muted); font-weight: 600; margin-bottom: 18px; }
+
+.spell-slots { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
+.spell-slot {
+  width: 44px; height: 52px; border-radius: 10px;
+  border: 2.5px solid var(--border); background: #F6FCFD;
+  display: flex; align-items: center; justify-content: center;
+  font-family: Georgia, serif; font-size: 1.5rem; font-weight: 700; color: var(--teal);
+  transition: all .18s;
+}
+.spell-slot.filled  { border-color: var(--teal-mid); background: var(--teal-light); }
+.spell-slot.correct { border-color: var(--mint); background: #E5FBF4; color: #056449; }
+.spell-slot.wrong   { border-color: var(--coral); background: #FEECF0; color: #9B1836; }
+
+.spell-letters { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+.letter-btn {
+  width: 44px; height: 44px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--card);
+  font-family: Georgia, serif; font-size: 1.25rem; font-weight: 700;
+  color: var(--teal); cursor: pointer; text-transform: uppercase;
+  transition: all .15s;
+}
+.letter-btn:hover {
+  border-color: var(--teal); background: var(--teal-light);
+  transform: translateY(-2px); box-shadow: 0 4px 10px rgba(13,92,99,.14);
+}
+.letter-btn:disabled { opacity: .25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.spell-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.spell-fb { text-align: center; min-height: 30px; font-size: .95rem; font-weight: 700; margin-top: 12px; }
+
+/* TAB 4 — FILL-IN */
+.fill-stage  { text-align: center; margin-bottom: 20px; }
+.fill-emoji  { font-size: 4rem; line-height: 1; display: block; margin-bottom: 12px; }
+.fill-sentence {
+  font-family: Georgia, serif;
+  font-size: 1.4rem; font-weight: 700; color: var(--text);
+  line-height: 2.4; margin-bottom: 6px;
+}
+.fill-blank {
+  display: inline-block; min-width: 90px;
+  border-bottom: 3px solid var(--teal); background: var(--teal-light);
+  border-radius: 5px; padding: 1px 10px; margin: 0 3px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.1rem; font-weight: 900; color: var(--teal);
+  vertical-align: middle; letter-spacing: 1px; transition: all .2s;
+}
+.fill-blank.correct { border-color: var(--mint); background: #E5FBF4; color: #056449; }
+.fill-blank.wrong   { border-color: var(--coral); background: #FEECF0; color: #9B1836; }
+.fill-cn { font-size: .84rem; color: var(--muted); font-weight: 600; }
+@media (max-width: 480px) { .fill-sentence { font-size: 1.15rem; } }
+
+/* ── Speed bar ── */
+.speed-bar {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  margin-bottom: 18px; flex-wrap: wrap;
+}
+.speed-label { font-size: .82rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.speed-value {
+  font-size: .76rem; font-weight: 800; color: var(--teal);
+  background: var(--teal-light); border-radius: 99px;
+  padding: 2px 10px; border: 1.5px solid var(--border); white-space: nowrap;
+}
+input[type=range].speed-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 150px; height: 5px; border-radius: 99px;
+  background: linear-gradient(90deg, var(--teal) var(--pct, 38%), var(--border) var(--pct, 38%));
+  cursor: pointer; outline: none;
+}
+input[type=range].speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--teal); border: 2.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(13,92,99,.3); cursor: pointer;
+}
+input[type=range].speed-slider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--teal); border: 2.5px solid #fff; cursor: pointer;
+}
+
+/* ── Category select ── */
+.cat-select {
+  border: 2px solid var(--border); border-radius: 10px; padding: 5px 12px;
+  font-size: .8rem; font-weight: 700; color: var(--text);
+  background: var(--card); cursor: pointer; font-family: inherit;
+}
+.cat-select:focus { outline: 2px solid var(--gold); border-color: var(--teal); }
+
+/* ── Confetti ── */
+#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+/* ── Animations ── */
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(.6) rotate(-6deg); }
+  70%  { transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%  { transform: translateX(-7px); }
+  75%  { transform: translateX(7px); }
+}
+.pop-in { animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both; }
+.shake  { animation: shake .28s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-in, .shake, .alpha-card, .choice-btn, .letter-btn { animation: none; transition: none; }
+}
+
+@media (max-width: 480px) {
+  .header h1   { font-size: 1.55rem; }
+  .alpha-grid  { grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 6px; }
+  .ac-upper    { font-size: 1.65rem; }
+  .match-emoji { font-size: 5rem; }
+  .choice-btn  { font-size: .95rem; padding: 12px 8px; }
+  .spell-slot  { width: 38px; height: 46px; font-size: 1.3rem; }
+  .letter-btn  { width: 38px; height: 38px; font-size: 1.1rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="container">
+
+<div class="header">
+  <h1>English Playground</h1>
+  <p>字母认读 · 单词配图 · 拼写闯关 — 边玩边学英语</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('alpha')">🔤 字母表</button>
+  <button class="tab-btn" onclick="switchTab('match')">🖼️ 单词配图</button>
+  <button class="tab-btn" onclick="switchTab('spell')">✏️ 拼写闯关</button>
+  <button class="tab-btn" onclick="switchTab('fill')">📝 填空句子</button>
+</div>
+
+<div class="speed-bar">
+  <span class="speed-label">🔊 播放速度</span>
+  <input type="range" class="speed-slider" id="speedSlider"
+    min="0.4" max="1.1" step="0.05" value="0.65"
+    oninput="updateSpeed(this)">
+  <span class="speed-value" id="speedVal">慢</span>
+</div>
+
+<!-- ══ TAB 1: Alphabet ══ -->
+<div id="tab-alpha">
+  <div class="card-panel">
+    <div class="alpha-toolbar">
+      <button class="btn btn-teal" onclick="speakAll()">🔊 朗读全部字母</button>
+      <button class="btn btn-ghost" onclick="stopSpeak()">⏹ 停止</button>
+    </div>
+    <div class="alpha-grid" id="alphaGrid"></div>
+    <div class="alpha-preview" id="alphaPreview">
+      <span class="ap-hint">点击任意字母 — 听发音 · 看例词 👆</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 2: Word Match ══ -->
+<div id="tab-match" class="hidden">
+  <div class="card-panel">
+    <div class="cat-bar" id="catBar"></div>
+    <div class="hud">
+      <span class="hud-score" id="matchScore">✅ 0 &nbsp; ❌ 0</span>
+      <span class="hud-streak" id="matchStreak">🔥 连对 0</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="matchProg" style="width:0%"></div></div>
+    <div class="match-stage">
+      <span class="match-emoji" id="matchEmoji"></span>
+      <div class="match-cn" id="matchCn"></div>
+    </div>
+    <div class="choices" id="matchChoices"></div>
+    <div class="match-fb" id="matchFb"></div>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-ghost" onclick="nextMatch()">跳过 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 3: Spelling ══ -->
+<div id="tab-spell" class="hidden">
+  <div class="card-panel">
+    <div class="hud">
+      <span class="hud-score" id="spellScore">✅ 0 &nbsp; ❌ 0</span>
+      <select id="spellCat" class="cat-select" onchange="nextSpell()">
+        <option value="all">全部单词</option>
+        <option value="animals">🐾 动物</option>
+        <option value="colors">🎨 颜色</option>
+        <option value="numbers">🔢 数字</option>
+        <option value="fruits">🍎 水果</option>
+        <option value="school">🎒 文具</option>
+      </select>
+    </div>
+    <div class="spell-stage">
+      <span class="spell-emoji" id="spellEmoji"></span>
+      <div class="spell-cn" id="spellCn"></div>
+      <div class="spell-slots" id="spellSlots"></div>
+    </div>
+    <div class="spell-letters" id="spellLetters"></div>
+    <div class="spell-actions">
+      <button class="btn btn-ghost" onclick="spellDelete()">⌫ 删除</button>
+      <button class="btn btn-ghost" onclick="nextSpell()">跳过</button>
+      <button class="btn btn-teal"  onclick="speakEn(spellCurrent && spellCurrent.word)">🔊 再听一遍</button>
+    </div>
+    <div class="spell-fb" id="spellFb"></div>
+  </div>
+</div>
+
+<!-- TAB 4: Fill-in -->
+<div id="tab-fill" class="hidden">
+  <div class="card-panel">
+    <div class="hud">
+      <span class="hud-score" id="fillScore">✅ 0 &nbsp; ❌ 0</span>
+      <span class="hud-streak" id="fillStreak">🔥 连对 0</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="fillProg" style="width:0%"></div></div>
+    <div class="fill-stage">
+      <span class="fill-emoji" id="fillEmoji"></span>
+      <div class="fill-sentence" id="fillSentence"></div>
+      <div class="fill-cn" id="fillCn"></div>
+    </div>
+    <div class="choices" id="fillChoices"></div>
+    <div class="match-fb" id="fillFb"></div>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-ghost" onclick="nextFill()">跳过 →</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════
+const ALPHABET = [
+  { l:'A', word:'apple',    emoji:'🍎', cn:'苹果'   },
+  { l:'B', word:'bear',     emoji:'🐻', cn:'熊'     },
+  { l:'C', word:'cat',      emoji:'🐱', cn:'猫'     },
+  { l:'D', word:'dog',      emoji:'🐶', cn:'狗'     },
+  { l:'E', word:'elephant', emoji:'🐘', cn:'大象'   },
+  { l:'F', word:'fish',     emoji:'🐟', cn:'鱼'     },
+  { l:'G', word:'grape',    emoji:'🍇', cn:'葡萄'   },
+  { l:'H', word:'hen',      emoji:'🐔', cn:'母鸡'   },
+  { l:'I', word:'igloo',    emoji:'🏔️', cn:'冰屋'   },
+  { l:'J', word:'jellyfish',emoji:'🪼', cn:'水母'   },
+  { l:'K', word:'kite',     emoji:'🪁', cn:'风筝'   },
+  { l:'L', word:'lion',     emoji:'🦁', cn:'狮子'   },
+  { l:'M', word:'monkey',   emoji:'🐒', cn:'猴子'   },
+  { l:'N', word:'nest',     emoji:'🪺', cn:'鸟巢'   },
+  { l:'O', word:'orange',   emoji:'🍊', cn:'橙子'   },
+  { l:'P', word:'pig',      emoji:'🐷', cn:'猪'     },
+  { l:'Q', word:'queen',    emoji:'👸', cn:'女王'   },
+  { l:'R', word:'rabbit',   emoji:'🐰', cn:'兔子'   },
+  { l:'S', word:'star',     emoji:'⭐', cn:'星星'   },
+  { l:'T', word:'tiger',    emoji:'🐯', cn:'老虎'   },
+  { l:'U', word:'umbrella', emoji:'☂️', cn:'雨伞'   },
+  { l:'V', word:'violin',   emoji:'🎻', cn:'小提琴' },
+  { l:'W', word:'whale',    emoji:'🐳', cn:'鲸鱼'   },
+  { l:'X', word:'xylophone',emoji:'🎵', cn:'木琴'   },
+  { l:'Y', word:'yoyo',     emoji:'🪀', cn:'悠悠球' },
+  { l:'Z', word:'zebra',    emoji:'🦓', cn:'斑马'   },
+];
+
+const WORDS = {
+  animals: [
+    { word:'cat',    emoji:'🐱', cn:'猫'   }, { word:'dog',   emoji:'🐶', cn:'狗'     },
+    { word:'bird',   emoji:'🐦', cn:'鸟'   }, { word:'fish',  emoji:'🐟', cn:'鱼'     },
+    { word:'frog',   emoji:'🐸', cn:'青蛙' }, { word:'duck',  emoji:'🦆', cn:'鸭子'   },
+    { word:'bear',   emoji:'🐻', cn:'熊'   }, { word:'pig',   emoji:'🐷', cn:'猪'     },
+    { word:'cow',    emoji:'🐮', cn:'牛'   }, { word:'ant',   emoji:'🐜', cn:'蚂蚁'   },
+    { word:'bee',    emoji:'🐝', cn:'蜜蜂' }, { word:'rabbit',emoji:'🐰', cn:'兔子'   },
+    { word:'tiger',  emoji:'🐯', cn:'老虎' }, { word:'lion',  emoji:'🦁', cn:'狮子'   },
+    { word:'monkey', emoji:'🐒', cn:'猴子' }, { word:'whale', emoji:'🐳', cn:'鲸鱼'   },
+    { word:'zebra',  emoji:'🦓', cn:'斑马' }, { word:'fox',   emoji:'🦊', cn:'狐狸'   },
+  ],
+  colors: [
+    { word:'red',    emoji:'🔴', cn:'红色' }, { word:'blue',  emoji:'🔵', cn:'蓝色' },
+    { word:'green',  emoji:'🟢', cn:'绿色' }, { word:'yellow',emoji:'🟡', cn:'黄色' },
+    { word:'orange', emoji:'🟠', cn:'橙色' }, { word:'purple',emoji:'🟣', cn:'紫色' },
+    { word:'black',  emoji:'⚫', cn:'黑色' }, { word:'white', emoji:'⚪', cn:'白色' },
+    { word:'pink',   emoji:'🩷', cn:'粉色' }, { word:'brown', emoji:'🟤', cn:'棕色' },
+  ],
+  numbers: [
+    { word:'one',       emoji:'1️⃣',     cn:'一'   }, { word:'two',      emoji:'2️⃣',     cn:'二'   },
+    { word:'three',     emoji:'3️⃣',     cn:'三'   }, { word:'four',     emoji:'4️⃣',     cn:'四'   },
+    { word:'five',      emoji:'5️⃣',     cn:'五'   }, { word:'six',      emoji:'6️⃣',     cn:'六'   },
+    { word:'seven',     emoji:'7️⃣',     cn:'七'   }, { word:'eight',    emoji:'8️⃣',     cn:'八'   },
+    { word:'nine',      emoji:'9️⃣',     cn:'九'   }, { word:'ten',      emoji:'🔟',      cn:'十'   },
+    { word:'eleven',    emoji:'1️⃣1️⃣', cn:'十一' }, { word:'twelve',   emoji:'1️⃣2️⃣', cn:'十二' },
+    { word:'thirteen',  emoji:'1️⃣3️⃣', cn:'十三' }, { word:'fourteen', emoji:'1️⃣4️⃣', cn:'十四' },
+    { word:'fifteen',   emoji:'1️⃣5️⃣', cn:'十五' }, { word:'sixteen',  emoji:'1️⃣6️⃣', cn:'十六' },
+    { word:'seventeen', emoji:'1️⃣7️⃣', cn:'十七' }, { word:'eighteen', emoji:'1️⃣8️⃣', cn:'十八' },
+    { word:'nineteen',  emoji:'1️⃣9️⃣', cn:'十九' }, { word:'twenty',   emoji:'2️⃣0️⃣', cn:'二十' },
+    { word:'thirty',    emoji:'3️⃣0️⃣', cn:'三十' }, { word:'forty',    emoji:'4️⃣0️⃣', cn:'四十' },
+    { word:'fifty',     emoji:'5️⃣0️⃣', cn:'五十' }, { word:'sixty',    emoji:'6️⃣0️⃣', cn:'六十' },
+    { word:'seventy',   emoji:'7️⃣0️⃣', cn:'七十' }, { word:'eighty',   emoji:'8️⃣0️⃣', cn:'八十' },
+    { word:'ninety',    emoji:'9️⃣0️⃣', cn:'九十' }, { word:'hundred',  emoji:'💯',      cn:'一百' },
+  ],
+  fruits: [
+    { word:'apple',     emoji:'🍎', cn:'苹果'   }, { word:'banana',emoji:'🍌', cn:'香蕉'   },
+    { word:'orange',    emoji:'🍊', cn:'橙子'   }, { word:'grape', emoji:'🍇', cn:'葡萄'   },
+    { word:'lemon',     emoji:'🍋', cn:'柠檬'   }, { word:'peach', emoji:'🍑', cn:'桃子'   },
+    { word:'pear',      emoji:'🍐', cn:'梨'     }, { word:'cherry',emoji:'🍒', cn:'樱桃'   },
+    { word:'mango',     emoji:'🥭', cn:'芒果'   }, { word:'kiwi',  emoji:'🥝', cn:'猕猴桃' },
+    { word:'melon',     emoji:'🍈', cn:'哈密瓜' }, { word:'pineapple',emoji:'🍍',cn:'菠萝' },
+    { word:'strawberry',emoji:'🍓', cn:'草莓'   },
+  ],
+  school: [
+    { word:'book',    emoji:'📚', cn:'书'    }, { word:'pen',    emoji:'🖊️',cn:'钢笔' },
+    { word:'bag',     emoji:'🎒', cn:'书包'  }, { word:'ruler',  emoji:'📏',cn:'尺子' },
+    { word:'pencil',  emoji:'✏️', cn:'铅笔'  }, { word:'crayon', emoji:'🖍️',cn:'蜡笔' },
+    { word:'scissors',emoji:'✂️', cn:'剪刀'  }, { word:'eraser', emoji:'🔲',cn:'橡皮' },
+    { word:'clock',   emoji:'🕐', cn:'时钟'  }, { word:'globe',  emoji:'🌍',cn:'地球仪'},
+  ],
+};
+
+const ALL_WORDS = Object.values(WORDS).flat();
+
+const FILL = [
+  // I am a/an ___
+  { template:'I am a ___.', answer:'student',  options:['student','apple','run','happy'],   full:'I am a student.',  cn:'我是一名学生。', emoji:'🎒' },
+  { template:'I am a ___.', answer:'boy',       options:['boy','cat','jump','big'],          full:'I am a boy.',      cn:'我是一个男孩。', emoji:'👦' },
+  { template:'I am a ___.', answer:'girl',      options:['girl','dog','swim','red'],         full:'I am a girl.',     cn:'我是一个女孩。', emoji:'👧' },
+  { template:'I am ___.', answer:'happy',       options:['happy','apple','run','book'],      full:'I am happy.',      cn:'我很开心。',     emoji:'😊' },
+  { template:'I am ___.', answer:'tall',        options:['tall','pen','dog','read'],         full:'I am tall.',       cn:'我很高。',       emoji:'📏' },
+  { template:'I am ___.', answer:'hungry',      options:['hungry','cat','jump','blue'],      full:'I am hungry.',     cn:'我饿了。',       emoji:'🍽️' },
+  // This is a/an ___
+  { template:'This is a ___.', answer:'cat',    options:['cat','run','happy','blue'],        full:'This is a cat.',   cn:'这是一只猫。',   emoji:'🐱' },
+  { template:'This is a ___.', answer:'dog',    options:['dog','jump','red','student'],      full:'This is a dog.',   cn:'这是一只狗。',   emoji:'🐶' },
+  { template:'This is a ___.', answer:'book',   options:['book','swim','tall','apple'],      full:'This is a book.',  cn:'这是一本书。',   emoji:'📚' },
+  { template:'This is an ___.', answer:'apple', options:['apple','run','boy','pen'],         full:'This is an apple.',cn:'这是一个苹果。', emoji:'🍎' },
+  { template:'This is a ___.', answer:'pen',    options:['pen','fly','girl','cat'],          full:'This is a pen.',   cn:'这是一支钢笔。', emoji:'🖊️' },
+  { template:'This is a ___.', answer:'bag',    options:['bag','read','happy','dog'],        full:'This is a bag.',   cn:'这是一个书包。', emoji:'🎒' },
+  { template:'This is a ___.', answer:'bird',   options:['bird','tall','book','swim'],       full:'This is a bird.',  cn:'这是一只鸟。',   emoji:'🐦' },
+  // I like ___
+  { template:'I like ___.', answer:'cats',      options:['cats','jump','red','pen'],         full:'I like cats.',     cn:'我喜欢猫。',     emoji:'🐱' },
+  { template:'I like ___.', answer:'dogs',      options:['dogs','fly','big','book'],         full:'I like dogs.',     cn:'我喜欢狗。',     emoji:'🐶' },
+  { template:'I like ___.', answer:'apples',    options:['apples','run','tall','bag'],       full:'I like apples.',   cn:'我喜欢苹果。',   emoji:'🍎' },
+  { template:'I like ___.', answer:'fish',      options:['fish','happy','blue','student'],   full:'I like fish.',     cn:'我喜欢鱼。',     emoji:'🐟' },
+  { template:'I like ___.', answer:'singing',   options:['singing','cat','big','pen'],       full:'I like singing.',  cn:'我喜欢唱歌。',   emoji:'🎵' },
+  { template:'I like ___.', answer:'reading',   options:['reading','dog','red','jump'],      full:'I like reading.',  cn:'我喜欢读书。',   emoji:'📖' },
+  // I can ___
+  { template:'I can ___.', answer:'run',        options:['run','cat','happy','pen'],         full:'I can run.',       cn:'我会跑步。',     emoji:'🏃' },
+  { template:'I can ___.', answer:'jump',       options:['jump','dog','red','book'],         full:'I can jump.',      cn:'我会跳。',       emoji:'🦘' },
+  { template:'I can ___.', answer:'swim',       options:['swim','apple','tall','bag'],       full:'I can swim.',      cn:'我会游泳。',     emoji:'🏊' },
+  { template:'I can ___.', answer:'fly',        options:['fly','student','big','pen'],       full:'I can fly.',       cn:'我能飞。',       emoji:'🦅' },
+  { template:'I can ___.', answer:'sing',       options:['sing','cat','happy','fish'],       full:'I can sing.',      cn:'我会唱歌。',     emoji:'🎤' },
+  { template:'I can ___.', answer:'dance',      options:['dance','dog','blue','book'],       full:'I can dance.',     cn:'我会跳舞。',     emoji:'💃' },
+  { template:'I can ___.', answer:'read',       options:['read','apple','tall','bag'],       full:'I can read.',      cn:'我会阅读。',     emoji:'📖' },
+  // I have a ___
+  { template:'I have a ___.', answer:'pen',     options:['pen','run','happy','cat'],         full:'I have a pen.',    cn:'我有一支钢笔。', emoji:'🖊️' },
+  { template:'I have a ___.', answer:'book',    options:['book','jump','red','dog'],         full:'I have a book.',   cn:'我有一本书。',   emoji:'📚' },
+  { template:'I have a ___.', answer:'bag',     options:['bag','swim','tall','apple'],       full:'I have a bag.',    cn:'我有一个书包。', emoji:'🎒' },
+  { template:'I have a ___.', answer:'dog',     options:['dog','fly','big','pen'],           full:'I have a dog.',    cn:'我有一只狗。',   emoji:'🐶' },
+  // The ___ is ___
+  { template:'The apple is ___.', answer:'red',    options:['red','run','cat','jump'],       full:'The apple is red.',   cn:'苹果是红色的。', emoji:'🍎' },
+  { template:'The dog is ___.', answer:'big',      options:['big','swim','pen','fly'],       full:'The dog is big.',     cn:'狗很大。',       emoji:'🐶' },
+  { template:'The cat is ___.', answer:'small',    options:['small','read','book','sing'],   full:'The cat is small.',   cn:'猫很小。',       emoji:'🐱' },
+  { template:'The sky is ___.', answer:'blue',     options:['blue','dance','bag','fish'],    full:'The sky is blue.',    cn:'天空是蓝色的。', emoji:'🌤️' },
+  { template:'The sun is ___.', answer:'yellow',   options:['yellow','run','cat','pen'],     full:'The sun is yellow.',  cn:'太阳是黄色的。', emoji:'☀️' },
+  { template:'The grass is ___.', answer:'green',  options:['green','jump','dog','book'],    full:'The grass is green.', cn:'草是绿色的。',   emoji:'🌿' },
+  // She/He is ___
+  { template:'She is ___.', answer:'happy',     options:['happy','run','cat','pen'],         full:'She is happy.',    cn:'她很开心。',     emoji:'😊' },
+  { template:'He is ___.', answer:'tall',       options:['tall','swim','dog','apple'],       full:'He is tall.',      cn:'他很高。',       emoji:'👨' },
+  { template:'She is a ___.', answer:'teacher', options:['teacher','jump','fish','red'],     full:'She is a teacher.',cn:'她是一位老师。', emoji:'👩‍🏫' },
+  { template:'He is a ___.', answer:'student',  options:['student','fly','big','bag'],       full:'He is a student.', cn:'他是一名学生。', emoji:'👨‍🎓' },
+];
+const CAT_META  = { animals:'🐾 动物', colors:'🎨 颜色', numbers:'🔢 数字', fruits:'🍎 水果', school:'🎒 文具' };
+
+// ══ SPEECH ════════════════════════════════════════════════
+let speechRate = 0.65;
+
+function updateSpeed(slider) {
+  speechRate = parseFloat(slider.value);
+  const labels = [[0.55,'很慢'],[0.70,'慢'],[0.85,'中'],[1.0,'快'],[Infinity,'很快']];
+  const label = labels.find(([t]) => speechRate <= t)[1];
+  document.getElementById('speedVal').textContent = label;
+  const pct = ((speechRate - 0.4) / (1.1 - 0.4) * 100).toFixed(1) + '%';
+  slider.style.setProperty('--pct', pct);
+}
+
+let _enVoice = null;
+if (window.speechSynthesis) {
+  const _loadVoices = () => {
+    const vs = speechSynthesis.getVoices();
+    _enVoice = vs.find(v => /en[-_]US/i.test(v.lang))
+            || vs.find(v => /en/i.test(v.lang)) || null;
+  };
+  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+  _loadVoices();
+}
+function speakEn(text) {
+  if (!text || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (_enVoice) { u.voice = _enVoice; u.lang = _enVoice.lang; }
+    else { u.lang = 'en-US'; }
+    u.rate = speechRate; u.pitch = 1.05;
+    window.speechSynthesis.speak(u);
+  }, 50);
+}
+
+// ══ TABS ══════════════════════════════════════════════════
+function switchTab(name) {
+  ['alpha','match','spell','fill'].forEach((t, i) => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active', t === name);
+  });
+  if (name === 'match' && !matchInited) initMatch();
+  if (name === 'spell' && !spellInited) { spellInited = true; nextSpell(); }
+  if (name === 'fill'  && !fillInited)  { fillInited  = true; nextFill(); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB 1 — ALPHABET
+// ══════════════════════════════════════════════════════════
+let speakAllTimer = null;
+
+function buildAlpha() {
+  const grid = document.getElementById('alphaGrid');
+  ALPHABET.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'alpha-card';
+    card.setAttribute('tabindex', '0');
+    card.innerHTML = `
+      <div class="ac-upper">${item.l}</div>
+      <div class="ac-lower">${item.l.toLowerCase()}</div>
+      <div class="ac-emoji">${item.emoji}</div>
+      <div class="ac-word">${item.word}</div>`;
+    const activate = () => {
+      document.querySelectorAll('.alpha-card.active').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      showPreview(item);
+      speakEn(`${item.l}. ${item.word}.`);
+    };
+    card.addEventListener('click', activate);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+    grid.appendChild(card);
+  });
+}
+
+function showPreview(item) {
+  document.getElementById('alphaPreview').innerHTML = `
+    <span class="ap-letter pop-in">${item.l}</span>
+    <span class="ap-emoji  pop-in" style="animation-delay:.05s">${item.emoji}</span>
+    <span class="ap-word   pop-in" style="animation-delay:.10s">${item.word}</span>
+    <span class="ap-cn     pop-in" style="animation-delay:.14s">${item.cn}</span>`;
+}
+
+function speakAll() {
+  let i = 0;
+  const cards = document.querySelectorAll('.alpha-card');
+  function next() {
+    if (i >= ALPHABET.length) { cards.forEach(c => c.classList.remove('active')); return; }
+    const item = ALPHABET[i];
+    cards.forEach((c, ci) => c.classList.toggle('active', ci === i));
+    showPreview(item); i++;
+    window.speechSynthesis.cancel();
+    setTimeout(() => {
+      const u = new SpeechSynthesisUtterance(`${item.l}. ${item.word}.`);
+      if (_enVoice) { u.voice = _enVoice; u.lang = _enVoice.lang; }
+      else { u.lang = 'en-US'; }
+      u.rate = Math.max(0.4, speechRate - 0.05); u.pitch = 1.05;
+      u.onend = () => { speakAllTimer = setTimeout(next, 200); };
+      window.speechSynthesis.speak(u);
+    }, 50);
+  }
+  next();
+}
+
+function stopSpeak() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  clearTimeout(speakAllTimer);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB 2 — WORD MATCH
+// ══════════════════════════════════════════════════════════
+let matchInited  = false;
+let matchCat     = 'animals';
+let matchCorrect = 0, matchWrong = 0, matchStreak = 0;
+let matchAnswered = false, matchCurrent = null;
+
+function initMatch() {
+  matchInited = true;
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = '';
+  Object.keys(CAT_META).forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat === matchCat ? ' active' : '');
+    btn.textContent = CAT_META[cat];
+    btn.onclick = () => {
+      matchCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      nextMatch();
+    };
+    bar.appendChild(btn);
+  });
+  nextMatch();
+}
+
+function nextMatch() {
+  matchAnswered = false;
+  const pool = WORDS[matchCat];
+  matchCurrent = pool[Math.floor(Math.random() * pool.length)];
+
+  document.getElementById('matchEmoji').textContent = matchCurrent.emoji;
+  document.getElementById('matchCn').textContent    = matchCurrent.cn;
+  const fb = document.getElementById('matchFb');
+  fb.textContent = ''; fb.className = 'match-fb';
+
+  // 3 wrong options: prefer same-category words, pad from all
+  const samePool  = pool.filter(w => w.word !== matchCurrent.word).sort(() => Math.random() - .5);
+  const otherPool = ALL_WORDS.filter(w => w.word !== matchCurrent.word && !samePool.find(s => s.word === w.word)).sort(() => Math.random() - .5);
+  const wrongs    = [...samePool, ...otherPool].slice(0, 3);
+  const options   = [matchCurrent, ...wrongs].sort(() => Math.random() - .5);
+
+  const box = document.getElementById('matchChoices');
+  box.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt.word.toUpperCase();
+    btn.onclick = () => handleMatch(btn, opt);
+    box.appendChild(btn);
+  });
+  updateMatchHud();
+}
+
+function handleMatch(btn, chosen) {
+  if (matchAnswered) return;
+  matchAnswered = true;
+  const ok = chosen.word === matchCurrent.word;
+  const fb = document.getElementById('matchFb');
+
+  // always reveal correct
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    if (b.textContent === matchCurrent.word.toUpperCase()) b.classList.add('correct');
+  });
+
+  if (ok) {
+    matchCorrect++; matchStreak++;
+    btn.classList.add('correct');
+    const msg = matchStreak >= 5 ? `🔥 ${matchStreak} 连对！Amazing!` :
+                matchStreak >= 3 ? `🎉 ${matchStreak} 连对！Great!` : '✅ Correct!';
+    fb.textContent = msg; fb.className = 'match-fb fb-ok';
+    playOk(); speakEn(matchCurrent.word);
+    if (matchStreak >= 5 && matchStreak % 5 === 0) launchConfetti();
+  } else {
+    matchWrong++; matchStreak = 0;
+    btn.classList.add('wrong');
+    fb.textContent = `❌ 答案是 ${matchCurrent.word.toUpperCase()}`;
+    fb.className = 'match-fb fb-fail';
+    playFail(); speakEn(matchCurrent.word);
+  }
+
+  const total = matchCorrect + matchWrong;
+  document.getElementById('matchProg').style.width = Math.min(total * 4, 100) + '%';
+  updateMatchHud();
+  setTimeout(nextMatch, ok ? 1100 : 1900);
+}
+
+function updateMatchHud() {
+  document.getElementById('matchScore').innerHTML  = `✅ ${matchCorrect} &nbsp; ❌ ${matchWrong}`;
+  document.getElementById('matchStreak').textContent = `🔥 连对 ${matchStreak}`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB 3 — SPELLING
+// ══════════════════════════════════════════════════════════
+let spellInited  = false;
+let spellCorrect = 0, spellWrong = 0;
+let spellCurrent = null, spellEntered = [];
+
+function getSpellPool() {
+  const cat = document.getElementById('spellCat').value;
+  return cat === 'all' ? ALL_WORDS : (WORDS[cat] || ALL_WORDS);
+}
+
+function nextSpell() {
+  spellEntered = [];
+  const pool = getSpellPool();
+  spellCurrent = pool[Math.floor(Math.random() * pool.length)];
+  const target = spellCurrent.word.replace(/[\s\-]/g, '');
+
+  document.getElementById('spellEmoji').textContent = spellCurrent.emoji;
+  document.getElementById('spellCn').textContent    = spellCurrent.cn;
+  const fb = document.getElementById('spellFb');
+  fb.textContent = ''; fb.style.color = '';
+
+  // Blank slots
+  const slotsEl = document.getElementById('spellSlots');
+  slotsEl.innerHTML = '';
+  target.split('').forEach((_, i) => {
+    const s = document.createElement('div');
+    s.className = 'spell-slot'; s.id = 'sl-' + i;
+    slotsEl.appendChild(s);
+  });
+
+  // Scrambled letters: word letters + up to 3 decoys
+  const wordLetters = target.split('');
+  const decoys = 'abcdefghijklmnopqrstuvwxyz'
+    .split('').filter(l => !wordLetters.includes(l))
+    .sort(() => Math.random() - .5)
+    .slice(0, Math.min(3, wordLetters.length));
+  const letters = [...wordLetters, ...decoys].sort(() => Math.random() - .5);
+
+  const lettersEl = document.getElementById('spellLetters');
+  lettersEl.innerHTML = '';
+  letters.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'letter-btn';
+    btn.textContent = letter.toUpperCase();
+    btn.dataset.letter = letter;
+    btn.onclick = () => handleSpellLetter(btn, letter, target);
+    lettersEl.appendChild(btn);
+  });
+
+  updateSpellHud();
+  speakEn(spellCurrent.word);
+}
+
+function handleSpellLetter(btn, letter, target) {
+  if (btn.disabled || spellEntered.length >= target.length) return;
+  btn.disabled = true;
+  spellEntered.push({ letter, btn });
+
+  const slotIdx = spellEntered.length - 1;
+  const slot = document.getElementById('sl-' + slotIdx);
+  if (slot) { slot.textContent = letter.toUpperCase(); slot.classList.add('filled'); }
+
+  if (spellEntered.length === target.length) {
+    const typed = spellEntered.map(e => e.letter).join('');
+    const ok    = typed === target;
+    const fb    = document.getElementById('spellFb');
+    const slots = document.querySelectorAll('.spell-slot');
+
+    if (ok) {
+      spellCorrect++;
+      slots.forEach(s => { s.classList.remove('filled'); s.classList.add('correct'); });
+      fb.textContent = '✅ Correct! 拼对啦！'; fb.style.color = 'var(--mint)';
+      playOk(); speakEn(spellCurrent.word);
+      if (spellCorrect % 5 === 0) launchConfetti();
+      setTimeout(nextSpell, 1400);
+    } else {
+      spellWrong++;
+      slots.forEach(s => { s.classList.remove('filled'); s.classList.add('wrong'); });
+      target.split('').forEach((l, i) => {
+        const s = document.getElementById('sl-' + i);
+        if (s) s.textContent = l.toUpperCase();
+      });
+      fb.textContent = `❌ 正确拼写：${target.toUpperCase()}`; fb.style.color = 'var(--coral)';
+      playFail(); speakEn(spellCurrent.word);
+      setTimeout(nextSpell, 2100);
+    }
+    updateSpellHud();
+  }
+}
+
+function spellDelete() {
+  if (spellEntered.length === 0) return;
+  const last = spellEntered.pop();
+  last.btn.disabled = false;
+  const slot = document.getElementById('sl-' + spellEntered.length);
+  if (slot) { slot.textContent = ''; slot.classList.remove('filled'); }
+}
+
+function updateSpellHud() {
+  document.getElementById('spellScore').innerHTML = `✅ ${spellCorrect} &nbsp; ❌ ${spellWrong}`;
+}
+
+// ══ SOUND ═════════════════════════════════════════════════
+let aCtx = null;
+function getACtx() { if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)(); if (aCtx.state === 'suspended') aCtx.resume(); return aCtx; }
+function tone(f, d, type = 'sine', v = .2) {
+  try {
+    const ctx = getACtx(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.type = type;
+    o.frequency.setValueAtTime(f, ctx.currentTime);
+    g.gain.setValueAtTime(v, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d);
+    o.start(); o.stop(ctx.currentTime + d);
+  } catch(e) {}
+}
+function playOk()   { tone(659, .09); setTimeout(() => tone(784, .14), 90); }
+function playFail() { tone(196, .22, 'sawtooth', .14); }
+
+// ══ CONFETTI ══════════════════════════════════════════════
+function launchConfetti() {
+  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#0D5C63','#FFD166','#06D6A0','#EF476F','#118AB2','#FFB703','#1A8A94'];
+  const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const ps = Array.from({ length: 130 }, () => ({
+    x: Math.random() * cv.width, y: Math.random() * cv.height - cv.height,
+    w: rand(5, 12), h: rand(4, 8), color: cols[rand(0, cols.length - 1)],
+    vx: (Math.random() - .5) * 3, vy: rand(2, 6),
+    angle: Math.random() * Math.PI * 2, spin: (Math.random() - .5) * .2, op: 1
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    let alive = 0;
+    ps.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+      p.op = Math.max(0, 1 - frame / 130);
+      if (p.y < cv.height + 20) alive++;
+      ctx.save(); ctx.globalAlpha = p.op;
+      ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive > 0 && frame < 160) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB 4 — FILL-IN
+// ══════════════════════════════════════════════════════════
+let fillInited  = false;
+let fillCorrect = 0, fillWrong = 0, fillStreak = 0;
+let fillAnswered = false, fillCurrent = null;
+
+function renderSentence(template, filled, cls) {
+  const parts = template.split('___');
+  const slot = filled
+    ? `<span class="fill-blank ${cls}">${filled}</span>`
+    : `<span class="fill-blank">&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
+  return parts[0] + slot + (parts[1] || '');
+}
+
+function nextFill() {
+  fillAnswered = false;
+  fillCurrent = FILL[Math.floor(Math.random() * FILL.length)];
+
+  document.getElementById('fillEmoji').textContent = fillCurrent.emoji;
+  document.getElementById('fillSentence').innerHTML = renderSentence(fillCurrent.template, '', '');
+  document.getElementById('fillCn').textContent = '';
+  const fb = document.getElementById('fillFb');
+  fb.textContent = ''; fb.className = 'match-fb';
+
+  const options = [...fillCurrent.options].sort(() => Math.random() - .5);
+  const box = document.getElementById('fillChoices');
+  box.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt.toUpperCase();
+    btn.onclick = () => handleFill(btn, opt);
+    box.appendChild(btn);
+  });
+  updateFillHud();
+}
+
+function handleFill(btn, chosen) {
+  if (fillAnswered) return;
+  fillAnswered = true;
+  const ok = chosen === fillCurrent.answer;
+  const fb = document.getElementById('fillFb');
+  const senEl = document.getElementById('fillSentence');
+
+  document.querySelectorAll('#fillChoices .choice-btn').forEach(b => {
+    if (b.textContent === fillCurrent.answer.toUpperCase()) b.classList.add('correct');
+  });
+
+  if (ok) {
+    fillCorrect++; fillStreak++;
+    btn.classList.add('correct');
+    senEl.innerHTML = renderSentence(fillCurrent.template, chosen, 'correct');
+    document.getElementById('fillCn').textContent = fillCurrent.cn;
+    const msg = fillStreak >= 5 ? `🔥 ${fillStreak} 连对！Amazing!` :
+                fillStreak >= 3 ? `🎉 ${fillStreak} 连对！Great!`   : '✅ Correct!';
+    fb.textContent = msg; fb.className = 'match-fb fb-ok';
+    playOk(); speakEn(fillCurrent.full);
+    if (fillStreak >= 5 && fillStreak % 5 === 0) launchConfetti();
+  } else {
+    fillWrong++; fillStreak = 0;
+    btn.classList.add('wrong');
+    senEl.innerHTML = renderSentence(fillCurrent.template, fillCurrent.answer, 'correct');
+    document.getElementById('fillCn').textContent = fillCurrent.cn;
+    fb.textContent = `❌ 答案是 "${fillCurrent.answer}"`;
+    fb.className = 'match-fb fb-fail';
+    playFail(); speakEn(fillCurrent.full);
+  }
+
+  const total = fillCorrect + fillWrong;
+  document.getElementById('fillProg').style.width = Math.min(total * 3, 100) + '%';
+  updateFillHud();
+  setTimeout(nextFill, ok ? 1300 : 2000);
+}
+
+function updateFillHud() {
+  document.getElementById('fillScore').innerHTML  = `✅ ${fillCorrect} &nbsp; ❌ ${fillWrong}`;
+  document.getElementById('fillStreak').textContent = `🔥 连对 ${fillStreak}`;
+}
+
+// ══ INIT ══════════════════════════════════════════════════
+buildAlpha();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
