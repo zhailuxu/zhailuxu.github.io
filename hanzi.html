@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>趣味汉字 — 3000常用字</title>
+<meta name="description" content="从简单到复杂，趣味学习3000常用汉字，含拼音、笔画、例词">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:"华文圆体","微软雅黑","Comic Sans MS",sans-serif;
+  background:linear-gradient(145deg,#fff8e1 0%,#fce4ec 45%,#e8eaf6 100%);
+  min-height:100vh;
+}
+
+/* ─── page containers ─── */
+.page { display:none; min-height:100vh; padding:16px 14px 36px; }
+.page.show { display:block; }
+
+/* ─── header ─── */
+.hdr { text-align:center; padding:20px 0 14px; }
+.hdr h1 { font-size:2rem; color:#880e4f; text-shadow:2px 2px 0 #f48fb1; letter-spacing:3px; }
+.hdr p  { font-size:.85rem; color:#aaa; margin-top:4px; }
+
+/* back btn */
+.back-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.8); border:none; border-radius:20px;
+  padding:8px 16px; font-size:.9rem; color:#555; cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.1); margin-bottom:14px;
+}
+.back-btn:hover { background:#fff; }
+
+/* ─── Level cards ─── */
+.level-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:16px; max-width:860px; margin:0 auto;
+}
+.lvl-card {
+  border-radius:20px; padding:20px 18px; cursor:pointer;
+  box-shadow:0 5px 20px rgba(0,0,0,.12);
+  transition:transform .16s, box-shadow .16s;
+  position:relative; overflow:hidden;
+}
+.lvl-card:hover { transform:translateY(-4px); box-shadow:0 10px 28px rgba(0,0,0,.18); }
+.lvl-icon { font-size:2.4rem; margin-bottom:8px; }
+.lvl-name { font-size:1.15rem; font-weight:bold; color:#fff; margin-bottom:4px; }
+.lvl-sub  { font-size:.8rem; color:rgba(255,255,255,.8); margin-bottom:12px; }
+.lvl-progress-bg { height:7px; background:rgba(255,255,255,.3); border-radius:4px; margin-bottom:6px; }
+.lvl-progress-bar { height:7px; background:#fff; border-radius:4px; transition:width .4s; }
+.lvl-count { font-size:.78rem; color:rgba(255,255,255,.9); }
+.lvl-badge {
+  position:absolute; top:12px; right:14px;
+  background:rgba(255,255,255,.25); border-radius:12px;
+  padding:3px 10px; font-size:.75rem; color:#fff; font-weight:bold;
+}
+
+/* ─── Level browser ─── */
+.level-hdr {
+  border-radius:18px; padding:16px 20px; margin-bottom:14px;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+}
+.level-hdr h2 { font-size:1.3rem; font-weight:bold; color:#fff; }
+.level-hdr p  { font-size:.82rem; color:rgba(255,255,255,.85); }
+.mode-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.mode-btn  {
+  padding:8px 18px; border:none; border-radius:14px;
+  font-size:.88rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.25); color:#fff;
+  transition:background .15s;
+}
+.mode-btn:hover, .mode-btn.on { background:rgba(255,255,255,.5); }
+
+/* character grid */
+.char-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(76px,1fr));
+  gap:10px;
+}
+.char-cell {
+  background:rgba(255,255,255,.88); border-radius:14px; padding:12px 6px 8px;
+  text-align:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.08);
+  transition:transform .14s, box-shadow .14s;
+  position:relative;
+}
+.char-cell:hover { transform:scale(1.07); box-shadow:0 5px 16px rgba(0,0,0,.15); }
+.char-cell.learned { background:rgba(200,230,201,.9); }
+.char-cell .ch   { font-size:1.7rem; line-height:1.3; }
+.char-cell .py   { font-size:.65rem; color:#888; margin-top:3px; }
+.char-cell .tick { position:absolute; top:5px; right:6px; font-size:.7rem; color:#43a047; }
+
+/* ─── Modal ─── */
+.modal-mask {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.45); z-index:1000;
+  justify-content:center; align-items:center; padding:16px;
+}
+.modal-mask.show { display:flex; }
+.modal {
+  background:#fff; border-radius:24px; padding:28px 24px 20px;
+  max-width:380px; width:100%; position:relative;
+  box-shadow:0 12px 48px rgba(0,0,0,.22);
+  animation:modalIn .22s ease-out;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
+.modal-close {
+  position:absolute; top:12px; right:14px;
+  border:none; background:none; font-size:1.5rem; cursor:pointer; color:#bbb;
+}
+.modal-char {
+  text-align:center; font-size:7rem; line-height:1.1; color:#1a237e;
+  text-shadow:3px 4px 0 rgba(26,35,126,.12);
+  margin-bottom:10px; cursor:default; user-select:none;
+  transition:transform .1s;
+}
+.modal-char:active { transform:scale(.94); }
+.modal-py   { text-align:center; font-size:1.4rem; color:#e91e63; margin-bottom:6px; font-weight:bold; }
+.modal-meta { display:flex; justify-content:center; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
+.meta-tag   { padding:4px 14px; border-radius:14px; font-size:.82rem; font-weight:bold; color:#fff; }
+.modal-meaning { background:#f3e5f5; border-radius:14px; padding:12px 16px; margin-bottom:10px; text-align:center; }
+.meaning-label { font-size:.75rem; color:#9c27b0; margin-bottom:4px; }
+.meaning-text  { font-size:1.05rem; color:#333; font-weight:bold; }
+.modal-word { display:flex; gap:12px; margin-bottom:16px; }
+.word-box {
+  flex:1; background:#e8f5e9; border-radius:14px; padding:10px 12px;
+  text-align:center;
+}
+.word-label { font-size:.7rem; color:#388e3c; margin-bottom:3px; }
+.word-char  { font-size:1.3rem; font-weight:bold; color:#1b5e20; }
+.word-mean  { font-size:.75rem; color:#555; margin-top:2px; }
+.modal-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.btn-learned {
+  flex:1; padding:12px 10px; border:none; border-radius:14px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  background:linear-gradient(135deg,#66bb6a,#2e7d32); color:#fff;
+  box-shadow:0 4px 12px rgba(46,125,50,.3);
+  transition:transform .12s;
+}
+.btn-learned:active { transform:scale(.96); }
+.btn-learned.done { background:#c8e6c9; color:#388e3c; box-shadow:none; }
+.btn-nav {
+  padding:11px 18px; border:none; border-radius:14px;
+  font-size:.9rem; font-weight:bold; cursor:pointer;
+  background:#e8eaf6; color:#3f51b5;
+}
+.btn-nav:hover { background:#c5cae9; }
+
+/* ─── Flashcard ─── */
+.fc-wrap { max-width:400px; margin:0 auto; }
+.fc-progress { text-align:center; font-size:.85rem; color:#888; margin-bottom:14px; }
+.fc-card {
+  background:#fff; border-radius:24px; padding:40px 24px;
+  text-align:center; box-shadow:0 8px 28px rgba(0,0,0,.12);
+  cursor:pointer; min-height:260px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  position:relative; margin-bottom:16px;
+  transition:transform .15s;
+}
+.fc-card:active { transform:scale(.97); }
+.fc-front .fc-ch { font-size:7rem; color:#1a237e; line-height:1; }
+.fc-hint { font-size:.82rem; color:#bbb; margin-top:14px; }
+.fc-back-content { opacity:0; transition:opacity .25s; }
+.fc-back-content.show { opacity:1; }
+.fc-py    { font-size:1.6rem; color:#e91e63; font-weight:bold; margin-bottom:6px; }
+.fc-mean  { font-size:1.15rem; color:#333; margin-bottom:8px; }
+.fc-word  { font-size:1rem; color:#555; }
+.fc-word b { color:#1565c0; }
+.fc-stroke { font-size:.82rem; color:#aaa; margin-top:8px; }
+.fc-ctrl { display:flex; gap:10px; justify-content:center; }
+.btn-again {
+  flex:1; padding:14px 10px; border:none; border-radius:14px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  background:#ffebee; color:#c62828;
+}
+.btn-got {
+  flex:1; padding:14px 10px; border:none; border-radius:14px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  background:#e8f5e9; color:#2e7d32;
+}
+.fc-done { text-align:center; padding:30px 0; }
+.fc-done .big { font-size:3rem; margin-bottom:10px; }
+.fc-done p  { font-size:1.1rem; color:#555; }
+
+/* ─── Quiz ─── */
+.quiz-wrap { max-width:440px; margin:0 auto; }
+.quiz-meta { display:flex; justify-content:space-between; margin-bottom:16px; font-size:.9rem; color:#888; }
+.quiz-question {
+  background:#fff; border-radius:20px; padding:32px 24px; text-align:center;
+  box-shadow:0 6px 22px rgba(0,0,0,.1); margin-bottom:18px; min-height:160px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:10px;
+}
+.quiz-q-char { font-size:5rem; color:#1a237e; line-height:1; }
+.quiz-q-text { font-size:1.1rem; color:#555; font-weight:bold; }
+.quiz-q-label { font-size:.8rem; color:#bbb; }
+.choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.choice-btn {
+  padding:16px 10px; border:2.5px solid #e0e0e0; border-radius:16px;
+  background:#fff; font-size:1rem; font-weight:bold; cursor:pointer;
+  transition:all .14s; min-height:64px;
+  display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.3;
+}
+.choice-btn:hover { border-color:#9fa8da; background:#e8eaf6; }
+.choice-btn.correct { border-color:#43a047; background:#e8f5e9; color:#2e7d32; }
+.choice-btn.wrong   { border-color:#e53935; background:#ffebee; color:#c62828; }
+.quiz-fb { text-align:center; font-size:1.1rem; font-weight:bold; min-height:32px; margin-bottom:10px; }
+.quiz-fb.ok   { color:#2e7d32; }
+.quiz-fb.fail { color:#c62828; }
+.quiz-done { text-align:center; padding:24px 0; }
+.quiz-score-big { font-size:3.5rem; font-weight:bold; color:#4a148c; }
+
+/* ─── Toast ─── */
+#toast {
+  position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:#323232; color:#fff; border-radius:20px; padding:10px 22px;
+  font-size:.9rem; opacity:0; transition:opacity .2s, transform .2s;
+  pointer-events:none; white-space:nowrap; z-index:9999;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ─── util ─── */
+.btn { border:none; border-radius:14px; padding:10px 22px; font-size:.95rem; font-weight:bold; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.1); }
+.btn-purple { background:linear-gradient(135deg,#ce93d8,#6a1b9a); color:#fff; }
+.btn-blue   { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-orange { background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-gray   { background:#eeeeee; color:#555; }
+.center { text-align:center; }
+.mt12 { margin-top:12px; }
+.mt20 { margin-top:20px; }
+.gap10{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+@media(max-width:400px){
+  .char-grid { grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); }
+  .modal-char,.fc-front .fc-ch,.quiz-q-char { font-size:5.5rem; }
+  .choices { grid-template-columns:1fr 1fr; }
+}
+
+/* ─ Write page ─ */
+.write-wrap{max-width:340px;margin:0 auto;padding:0 12px;}
+.write-prog{text-align:center;font-size:.9rem;color:#888;margin-bottom:6px;}
+.write-title{text-align:center;font-size:1.6rem;font-weight:bold;color:#4a148c;margin-bottom:2px;letter-spacing:8px;}
+.write-sub{text-align:center;font-size:.88rem;color:#888;margin-bottom:10px;}
+/* guideCanvas 在正常流中撑起容器高度，writeCanvas 绝对定位叠在上方 */
+.write-canvas-wrap{position:relative;margin:0 auto;max-width:280px;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.13);}
+#guideCanvas{display:block;width:100%;height:auto;}
+#writeCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
+.write-hint{text-align:center;font-size:.78rem;color:#ccc;margin:6px 0 8px;}
+.write-result{text-align:center;font-size:1rem;font-weight:bold;min-height:28px;margin-bottom:6px;}
+.write-result.ok{color:#2e7d32;}.write-result.so{color:#f57c00;}
+.write-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.write-btns .btn{min-width:72px;}
+.btn-guide-toggle{padding:7px 16px;border:2px solid #ce93d8;border-radius:18px;background:#fff;color:#6a1b9a;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
+.btn-guide-toggle.on{background:#6a1b9a;color:#fff;}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+
+<!-- ══ Page: Home ══ -->
+<div id="pgHome" class="page show">
+  <div class="hdr">
+    <div style="font-size:3rem">📖</div>
+    <h1>趣味汉字</h1>
+    <p>从简单到复杂，认识3000个常用汉字</p>
+  </div>
+  <div class="level-grid" id="levelGrid"></div>
+  <div style="text-align:center;margin-top:20px;color:#bbb;font-size:.78rem">
+    进度自动保存 · 当前版本收录 <span id="totalCount"></span> 个常用字
+  </div>
+</div>
+
+<!-- ══ Page: Level ══ -->
+<div id="pgLevel" class="page">
+  <button class="back-btn" onclick="goHome()">← 返回关卡</button>
+  <div class="level-hdr" id="levelHdr">
+    <div>
+      <h2 id="lvlTitle"></h2>
+      <p id="lvlSub"></p>
+    </div>
+    <div class="mode-btns">
+      <button class="mode-btn" onclick="startFlash()">📖 闪卡学习</button>
+      <button class="mode-btn" onclick="startQuiz()">🎯 小测验</button>
+      <button class="mode-btn" onclick="startWrite()">✍️ 手写练习</button>
+    </div>
+  </div>
+  <div class="char-grid" id="charGrid"></div>
+</div>
+
+<!-- ══ Page: Flashcard ══ -->
+<div id="pgFlash" class="page">
+  <button class="back-btn" onclick="goLevel()">← 返回</button>
+  <div class="fc-wrap">
+    <div class="fc-progress" id="fcProg"></div>
+    <div class="fc-card" id="fcCard" onclick="flipCard()">
+      <div id="fcFront">
+        <div class="fc-ch" id="fcChar"></div>
+        <div class="fc-hint">👆 点击翻面</div>
+      </div>
+      <div class="fc-back-content" id="fcBack" style="display:none">
+        <div class="fc-py"   id="fcPy"></div>
+        <div class="fc-mean" id="fcMean"></div>
+        <div class="fc-word" id="fcWord"></div>
+        <div class="fc-stroke" id="fcStroke"></div>
+      </div>
+    </div>
+    <div class="fc-ctrl" id="fcCtrl" style="display:none">
+      <button class="btn-again" onclick="fcNext(false)">👀 再看看</button>
+      <button class="btn-got"   onclick="fcNext(true)">✓ 认识了！</button>
+    </div>
+    <div class="fc-done" id="fcDone" style="display:none">
+      <div class="big">🎉</div>
+      <p id="fcDoneText"></p>
+      <div class="gap10 mt20">
+        <button class="btn btn-purple" onclick="startFlash()">再来一遍</button>
+        <button class="btn btn-blue"   onclick="startQuiz()">去测验</button>
+        <button class="btn btn-gray"   onclick="goLevel()">返回字库</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Page: Quiz ══ -->
+<div id="pgQuiz" class="page">
+  <button class="back-btn" onclick="goLevel()">← 返回</button>
+  <div class="quiz-wrap">
+    <div class="quiz-meta">
+      <span id="qMeta">第 1 / 10 题</span>
+      <span id="qScore">✅ 0 &nbsp;❌ 0</span>
+    </div>
+    <div class="quiz-question" id="quizQ"></div>
+    <div class="choices" id="choices"></div>
+    <div class="quiz-fb" id="quizFb"></div>
+    <div class="center">
+      <button class="btn btn-blue" id="qNextBtn" onclick="quizNext()" style="display:none">下一题 →</button>
+    </div>
+    <div class="quiz-done" id="quizDone" style="display:none">
+      <div class="quiz-score-big" id="qFinalScore"></div>
+      <p id="qFinalMsg" style="color:#666;margin-top:8px"></p>
+      <div class="gap10 mt20">
+        <button class="btn btn-purple" onclick="startQuiz()">再来一次</button>
+        <button class="btn btn-gray"   onclick="goLevel()">返回字库</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Character Detail Modal ══ -->
+<div class="modal-mask" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-char" id="mChar" onclick="speak(this.textContent)" title="点击发音"></div>
+    <div style="text-align:center;margin-top:-6px;margin-bottom:4px">
+      <span style="font-size:.72rem;color:#bbb">🔊 点击大字重播发音</span>
+    </div>
+    <div class="modal-py"   id="mPy"></div>
+    <div class="modal-meta">
+      <span class="meta-tag" id="mStrokeTag" style="background:#7e57c2">0画</span>
+      <span class="meta-tag" id="mLvlTag"    style="background:#e91e63">第1关</span>
+    </div>
+    <div class="modal-meaning">
+      <div class="meaning-label">字义</div>
+      <div class="meaning-text" id="mMeaning"></div>
+    </div>
+    <div class="modal-word">
+      <div class="word-box">
+        <div class="word-label">例词</div>
+        <div class="word-char" id="mWord"></div>
+        <div class="word-mean" id="mWordMean"></div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-nav" onclick="modalStep(-1)">◀ 上一个</button>
+      <button class="btn-learned" id="mLearnBtn" onclick="toggleLearned()">✓ 学会了</button>
+      <button class="btn-nav" onclick="modalStep(1)">下一个 ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Page: Write ══ -->
+<div id="pgWrite" class="page">
+  <button class="back-btn" onclick="goLevel()">← 返回</button>
+  <div class="write-wrap">
+    <div class="write-prog" id="wProg"></div>
+    <div class="write-title" id="wTitle"></div>
+    <div class="write-sub" id="wSub"></div>
+    <div class="write-canvas-wrap">
+      <canvas id="guideCanvas" width="280" height="280"></canvas>
+      <canvas id="writeCanvas" width="280" height="280"></canvas>
+    </div>
+    <div class="write-hint">用手指或鼠标在田字格里书写</div>
+    <div class="write-result" id="wResult"></div>
+    <div class="write-btns">
+      <button class="btn btn-gray" onclick="writeNav(-1)">◀ 上一个</button>
+      <button class="btn-guide-toggle on" id="guideToggle" onclick="toggleGuide()">👁 显示参考</button>
+      <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showWriteHint()">💡 笔顺提示</button>
+      <button class="btn" style="background:#e91e63;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="clearWrite()">🗑 清除</button>
+      <button class="btn btn-gray" onclick="writeNav(1)">下一个 ▶</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────
+//  Character Data
+//  Format: [char, pinyin, strokes, meaning, example_word, word_meaning, level]
+// ─────────────────────────────────────────────────
+const CHARS = [
+
+// ══════ Level 1 · 入门 · 独体字（1-5画）══════
+['一','yī',1,'数字一，最小的正整数','一起','大家一起去',1],
+['二','èr',2,'数字二','二月','第二个月',1],
+['三','sān',3,'数字三','三角','三个角',1],
+['七','qī',2,'数字七','七月','第七个月',1],
+['八','bā',2,'数字八','八月','第八个月',1],
+['九','jiǔ',2,'数字九','九月','第九个月',1],
+['十','shí',2,'数字十','十分','非常，很',1],
+['千','qiān',3,'数字千','千里','很远的路',1],
+['万','wàn',3,'数字万','万岁','祝健康长寿',1],
+['人','rén',2,'人类','大人','成年人',1],
+['口','kǒu',3,'嘴巴','口渴','想喝水',1],
+['力','lì',2,'力量','力气','体力',1],
+['刀','dāo',2,'刀','小刀','小型刀具',1],
+['又','yòu',2,'再次，也','又一次','再做一次',1],
+['土','tǔ',3,'泥土','土地','大地',1],
+['山','shān',3,'山','山水','山和水',1],
+['大','dà',3,'大的，宽广','大海','广阔的海',1],
+['小','xiǎo',3,'小的，细微','小鸟','小小的鸟',1],
+['上','shàng',3,'上面，上方','上学','去学校',1],
+['下','xià',3,'下面，下方','下课','课结束',1],
+['子','zǐ',3,'孩子','子女','儿子女儿',1],
+['女','nǚ',3,'女性','女生','女孩子',1],
+['工','gōng',3,'工作','工人','做工的人',1],
+['门','mén',3,'门','门口','门的入口',1],
+['四','sì',5,'数字四','四季','春夏秋冬',1],
+['五','wǔ',4,'数字五','五官','脸上器官',1],
+['六','liù',4,'数字六','六月','第六个月',1],
+['中','zhōng',4,'中间','中心','最中间',1],
+['日','rì',4,'太阳，白天','日记','每天记录',1],
+['月','yuè',4,'月亮','月光','月亮的光',1],
+['水','shuǐ',4,'水','水果','多汁食物',1],
+['火','huǒ',4,'火','火红','红如烈火',1],
+['手','shǒu',4,'手','手心','手掌中心',1],
+['天','tiān',4,'天空','天气','天上气象',1],
+['王','wáng',4,'大王，帝王','王子','王的孩子',1],
+['心','xīn',4,'心脏，内心','心情','内心感受',1],
+['云','yún',4,'云','云朵','一朵白云',1],
+['牛','niú',4,'牛','牛奶','牛产的奶',1],
+['马','mǎ',3,'马','马上','立刻',1],
+['木','mù',4,'树木','木头','木材',1],
+['田','tián',5,'田地','田野','农田',1],
+['目','mù',5,'眼睛','目光','眼神',1],
+['石','shí',5,'石头','石头','坚硬的石',1],
+['鸟','niǎo',5,'鸟','鸟儿','小鸟',1],
+
+// ══════ Level 2 · 初级（6-7画）══════
+['耳','ěr',6,'耳朵','耳边','耳旁边',2],
+['百','bǎi',6,'数字百','百分','百分之一',2],
+['羊','yáng',6,'羊','羊毛','羊的毛',2],
+['当','dāng',6,'当然，担当','当时','那个时候',2],
+['光','guāng',6,'光，光明','光明','明亮的',2],
+['同','tóng',6,'相同，一起','同学','同班学习',2],
+['向','xiàng',6,'方向，朝向','向来','一直以来',2],
+['因','yīn',6,'因为','因此','所以',2],
+['在','zài',6,'在，存在','在家','待在家里',2],
+['有','yǒu',6,'有，拥有','有时','有的时候',2],
+['年','nián',6,'年，年份','年级','学习年级',2],
+['地','dì',6,'大地，地方','地方','某个地方',2],
+['多','duō',6,'多，数量大','多少','有多少',2],
+['名','míng',6,'名字，名声','名人','著名的人',2],
+['后','hòu',6,'后面，以后','后来','以后，后来',2],
+['安','ān',6,'安全，平安','安心','放心',2],
+['字','zì',6,'文字','字体','文字形态',2],
+['好','hǎo',6,'好的，友好','好看','很好看',2],
+['问','wèn',6,'问，询问','问题','疑问的事',2],
+['行','xíng',6,'行走，行动','行动','采取行动',2],
+['全','quán',6,'全部，完全','完全','全都是',2],
+['先','xiān',6,'先，首先','先生','对男性尊称',2],
+['自','zì',6,'自己，自然','自然','大自然',2],
+['色','sè',6,'颜色','色彩','丰富颜色',2],
+['合','hé',6,'合适，结合','合力','合作用力',2],
+['西','xī',6,'西方','东西','物品，事物',2],
+['吃','chī',6,'吃','吃饭','吃食物',2],
+['回','huí',6,'回来，回去','回家','返回家',2],
+['时','shí',7,'时间，时候','时候','那个时候',2],
+['来','lái',7,'来，到来','来年','明年',2],
+['走','zǒu',7,'走，行走','走路','行走',2],
+['告','gào',7,'告诉，告知','告诉','让知道',2],
+['我','wǒ',7,'我，自己','我们','大家',2],
+['你','nǐ',7,'你，对方','你好','问候语',2],
+['他','tā',5,'他，男性第三人称','他们','他和大家',2],
+['她','tā',6,'她，女性第三人称','她们','她和大家',2],
+['们','men',5,'复数助词','我们','大家',2],
+['里','lǐ',7,'里面，里边','里面','在里边',2],
+['那','nà',6,'那个，那里','那里','那个地方',2],
+['这','zhè',7,'这个，这里','这里','这个地方',2],
+['吗','ma',7,'疑问语气词','是吗','真的吗',2],
+['说','shuō',9,'说话，讲述','说话','说出话来',2],
+['每','měi',7,'每个，每次','每天','每一天',2],
+['见','jiàn',4,'看见，会见','见面','相互见到',2],
+['长','cháng',4,'长度，长远','长大','生长变大',2],
+['去','qù',5,'去，离去','去年','上一年',2],
+['生','shēng',5,'生活，出生','学生','在学习的人',2],
+['用','yòng',5,'使用','用力','使劲',2],
+['出','chū',5,'出去，出来','出门','走出门',2],
+['可','kě',5,'可以，可能','可爱','令人喜爱',2],
+['东','dōng',5,'东方','东西','物品事物',2],
+['北','běi',5,'北方','北方','北边方向',2],
+['平','píng',5,'平坦，平静','平时','通常时候',2],
+['叶','yè',5,'叶子，树叶','叶子','植物叶片',2],
+['电','diàn',5,'电，电力','电话','打电话',2],
+['正','zhèng',5,'正确，正在','正在','现在进行',2],
+['白','bái',5,'白色','白天','白天时间',2],
+
+// ══════ Level 3 · 中级（常用词汇）══════
+['学','xué',8,'学习，学校','学生','在学的人',3],
+['明','míng',8,'明亮，明白','明天','明日',3],
+['知','zhī',8,'知道，了解','知道','明白了',3],
+['和','hé',8,'和，与，和平','和平','没有战争',3],
+['国','guó',8,'国家','国家','一个国',3],
+['的','de',8,'助词，的','我的','属于我的',3],
+['是','shì',9,'是，正确','就是','确实是',3],
+['为','wéi',4,'为了，因为','为什么','什么原因',3],
+['以','yǐ',4,'以，用来','以为','认为',3],
+['当','dāng',6,'当，当时','当然','理所当然',3],
+['果','guǒ',8,'果实，结果','水果','多汁食物',3],
+['图','tú',8,'图画，地图','图画','用笔画的',3],
+['空','kōng',8,'天空，空的','空气','大气',3],
+['花','huā',7,'花，花朵','花园','种花的园',3],
+['雨','yǔ',8,'雨，下雨','下雨','天降雨水',3],
+['草','cǎo',9,'草，草地','草地','长草地方',3],
+['树','shù',9,'树木，大树','树木','树林',3],
+['字','zì',6,'文字','生字','新的汉字',3],
+['语','yǔ',9,'语言，话语','语文','语言文字',3],
+['重','zhòng',9,'重量，重要','重要','很关键',3],
+['思','sī',9,'思考，想法','思想','想法观念',3],
+['南','nán',9,'南方','南方','南边方向',3],
+['看','kàn',9,'看，观看','看书','阅读书',3],
+['美','měi',9,'美丽，美好','美丽','好看',3],
+['家','jiā',10,'家，家庭','家人','家里的人',3],
+['要','yào',9,'要，需要','需要','必须有',3],
+['高','gāo',10,'高，高大','高兴','开心',3],
+['能','néng',10,'能，能力','能干','很厉害',3],
+['读','dú',10,'读，阅读','读书','读书学习',3],
+['通','tōng',10,'通，通过','通过','经过',3],
+['前','qián',9,'前面，以前','以前','过去时候',3],
+['做','zuò',11,'做，制作','做事','做某件事',3],
+['情','qíng',11,'情感，情况','心情','内心感受',3],
+['清','qīng',11,'清楚，清洁','清楚','很明白',3],
+['理','lǐ',11,'道理，管理','道理','有道理',3],
+['事','shì',8,'事情','事情','某件事',3],
+['话','huà',8,'话，说话','说话','讲话',3],
+['想','xiǎng',13,'想，想法','想法','思路主意',3],
+['开','kāi',4,'打开，开始','开心','快乐',3],
+['没','méi',7,'没有','没有','不拥有',3],
+['很','hěn',9,'很，非常','很好','非常好',3],
+['什','shén',4,'什么','什么','询问事物',3],
+['么','me',3,'助词','什么','询问语气',3],
+['不','bù',4,'不，否定','不行','不可以',3],
+['都','dōu',10,'都，全部','都是','全部是',3],
+['会','huì',6,'会，能够','学会','掌握了',3],
+['让','ràng',6,'让，允许','让开','请挪开',3],
+['从','cóng',4,'从，从此','从小','从小时候',3],
+['发','fā',5,'发，发出','发现','找到了',3],
+['到','dào',8,'到，到达','到达','抵达目的',3],
+['方','fāng',4,'方向，方法','方法','做事方式',3],
+['面','miàn',9,'面，表面','面前','在前边',3],
+['间','jiān',7,'间，中间','中间','两者之间',3],
+['过','guò',6,'过，经过','过去','已经过了',3],
+['把','bǎ',7,'把，握住','把握','紧紧抓住',3],
+['用','yòng',5,'用，使用','有用','有作用',3],
+
+// ══════ Level 4 · 进阶（较常用字）══════
+['就','jiù',12,'就，立刻','就是','确实',4],
+['然','rán',12,'然后，自然','自然','大自然',4],
+['最','zuì',12,'最，极','最好','第一好',4],
+['道','dào',12,'道路，道理','道路','行走路',4],
+['新','xīn',13,'新，新的','新年','新的一年',4],
+['意','yì',13,'意思，意义','意思','含义',4],
+['感','gǎn',13,'感觉，感谢','感谢','谢谢',4],
+['满','mǎn',13,'满，充满','满意','很满足',4],
+['精','jīng',14,'精神，精细','精神','有活力',4],
+['数','shù',13,'数字，数量','数学','数的学科',4],
+['整','zhěng',16,'整齐，整理','整理','把乱收拾',4],
+['题','tí',15,'题目，问题','题目','问题名称',4],
+['静','jìng',14,'安静，平静','安静','很安静',4],
+['写','xiě',5,'写，书写','写字','写汉字',4],
+['字','zì',6,'文字','练字','练习写字',4],
+['老','lǎo',6,'老，年老','老师','教书的人',4],
+['师','shī',6,'老师，师傅','老师','教书的人',4],
+['父','fù',4,'父亲，爸爸','父亲','爸爸',4],
+['母','mǔ',5,'母亲，妈妈','母亲','妈妈',4],
+['兄','xiōng',5,'兄弟，哥哥','兄弟','哥弟统称',4],
+['弟','dì',7,'弟弟','弟弟','比自己小的男孩',4],
+['姐','jiě',8,'姐姐','姐姐','比自己大的女孩',4],
+['妹','mèi',8,'妹妹','妹妹','比自己小的女孩',4],
+['朋','péng',8,'朋友','朋友','好的友人',4],
+['友','yǒu',4,'朋友，友好','友好','和睦相处',4],
+['书','shū',4,'书本，书籍','书本','学习的书',4],
+['本','běn',5,'本，书本','本来','原来',4],
+['课','kè',10,'课，课程','上课','在上课',4],
+['校','xiào',10,'学校','学校','学习地方',4],
+['班','bān',10,'班级','班级','同班同学',4],
+['考','kǎo',6,'考试','考试','学习测验',4],
+['试','shì',8,'试，尝试','考试','学习测验',4],
+['成','chéng',6,'成功，成为','成功','达到目标',4],
+['功','gōng',5,'功，功劳','成功','达到目标',4],
+['进','jìn',7,'进入，进步','进步','有进步',4],
+['步','bù',7,'步，步伐','进步','有进步',4],
+['努','nǔ',7,'努力','努力','用心去做',4],
+['力','lì',2,'力量','努力','用心去做',4],
+['认','rèn',4,'认识，认为','认识','了解知道',4],
+['识','shí',7,'认识，知识','知识','所知道的',4],
+['真','zhēn',10,'真的，真实','真心','真诚之心',4],
+['假','jiǎ',11,'假的，假日','假期','休假时间',4],
+['快','kuài',7,'快，快乐','快乐','很高兴',4],
+['乐','lè',5,'快乐，音乐','快乐','开心',4],
+['笑','xiào',10,'笑，微笑','笑声','笑出声音',4],
+['哭','kū',10,'哭','哭泣','流泪哭泣',4],
+['爱','ài',10,'爱，喜爱','爱好','兴趣',4],
+['心','xīn',4,'心，内心','爱心','关爱之心',4],
+['话','huà',8,'话语','对话','两人说话',4],
+['语','yǔ',9,'语言','语言','沟通方式',4],
+['文','wén',4,'文字，文化','文化','文明程度',4],
+['化','huà',4,'化，变化','变化','发生改变',4],
+['画','huà',8,'画，图画','画画','用笔画图',4],
+['图','tú',8,'图，图形','图形','各种形状',4],
+['音','yīn',9,'音，音乐','音乐','美妙乐声',4],
+['乐','yuè',5,'音乐','音乐','美妙声音',4],
+['体','tǐ',7,'身体','身体','人的身躯',4],
+['育','yù',8,'教育，体育','体育','体能运动',4],
+['运','yùn',7,'运动，运气','运动','体能活动',4],
+['动','dòng',6,'运动，行动','运动','体能活动',4],
+
+// ══════ Level 5 · 高级（词汇扩展）══════
+['环','huán',8,'环境，环绕','环境','周围情况',5],
+['境','jìng',14,'境，环境','境界','达到的层次',5],
+['保','bǎo',9,'保护，保持','保护','守护安全',5],
+['护','hù',7,'保护','保护','守护安全',5],
+['类','lèi',9,'类，种类','人类','人的种类',5],
+['种','zhǒng',9,'种，种类','种类','各种类别',5],
+['物','wù',8,'物，事物','动物','会动的生物',5],
+['生','shēng',5,'生命，生活','生命','生存的命',5],
+['命','mìng',8,'生命','生命','生存根本',5],
+['健','jiàn',10,'健康','健康','身体好',5],
+['康','kāng',11,'健康','健康','身体好',5],
+['快','kuài',7,'快，快速','快速','很快',5],
+['速','sù',10,'速度','速度','快慢程度',5],
+['力','lì',2,'力量，能力','能力','做事的力',5],
+['量','liàng',12,'数量，重量','数量','有多少',5],
+['记','jì',5,'记住，记录','记住','记在心里',5],
+['忆','yì',4,'记忆','记忆','记住的事',5],
+['思','sī',9,'思考','思考','动脑想',5],
+['考','kǎo',6,'思考，考试','思考','动脑想',5],
+['问','wèn',6,'问题，提问','提问','提出问题',5],
+['答','dá',12,'回答','回答','给出答案',5],
+['练','liàn',8,'练习','练习','反复学习',5],
+['习','xí',3,'习惯，练习','习惯','固定做法',5],
+['法','fǎ',8,'方法，法律','方法','做事方式',5],
+['律','lǜ',9,'法律，规律','规律','固定规则',5],
+['规','guī',8,'规则','规则','必须遵守',5],
+['则','zé',9,'规则，则是','规则','必须遵守',5],
+['世','shì',5,'世界','世界','全球',5],
+['界','jiè',9,'界，世界','世界','全球范围',5],
+['球','qiú',11,'球，地球','地球','我们星球',5],
+['地','dì',6,'大地，地方','地球','我们星球',5],
+['太','tài',4,'太，太阳','太阳','发光的星',5],
+['阳','yáng',7,'太阳，阳光','阳光','太阳之光',5],
+['风','fēng',4,'风','风景','美好景色',5],
+['景','jǐng',12,'景色','风景','美好景色',5],
+['雪','xuě',11,'雪，下雪','下雪','天降雪花',5],
+['冰','bīng',6,'冰，冰冷','冰冷','非常冷',5],
+['热','rè',10,'热，热情','热情','很积极',5],
+['冷','lěng',7,'冷，寒冷','寒冷','非常冷',5],
+['春','chūn',9,'春天','春天','第一个季',5],
+['夏','xià',10,'夏天','夏天','第二个季',5],
+['秋','qiū',9,'秋天','秋天','第三个季',5],
+['冬','dōng',5,'冬天','冬天','第四个季',5],
+['古','gǔ',5,'古代，古老','古老','很久以前',5],
+['代','dài',5,'时代，代替','时代','那个时期',5],
+['历','lì',4,'历史','历史','过去发生',5],
+['史','shǐ',5,'历史','历史','过去的事',5],
+['故','gù',9,'故事，原因','故事','有趣的事',5],
+['事','shì',8,'事情','故事','有趣的事',5],
+['科','kē',9,'科学，科目','科学','研究自然',5],
+['学','xué',8,'学习','科学','研究自然',5],
+['技','jì',7,'技术','技术','做事方法',5],
+['术','shù',5,'技术，艺术','艺术','美的创造',5],
+['艺','yì',4,'艺术','艺术','美的创造',5],
+['创','chuàng',6,'创造','创造','做出新东西',5],
+['造','zào',10,'制造，创造','制造','做出来',5],
+
+// ══════ Level 6 · 拓展（进阶常用字）══════
+['观','guān',6,'观察，观看','观察','认真看',6],
+['察','chá',14,'观察，察觉','观察','认真看',6],
+['研','yán',9,'研究','研究','深入学习',6],
+['究','jiū',7,'研究','研究','深入探索',6],
+['分','fēn',4,'分，分钟','分钟','时间单位',6],
+['秒','miǎo',9,'秒，秒钟','秒钟','最小时间',6],
+['组','zǔ',8,'小组，组成','小组','一个团队',6],
+['织','zhī',8,'组织','组织','有序安排',6],
+['队','duì',4,'队，队伍','队伍','一群人',6],
+['伍','wǔ',6,'队伍','队伍','一群人',6],
+['共','gòng',6,'共同，一共','共同','大家一起',6],
+['同','tóng',6,'相同，共同','相同','一样的',6],
+['别','bié',7,'区别，特别','特别','尤其',6],
+['特','tè',10,'特别，特殊','特别','很特别',6],
+['般','bān',10,'一般，般的','一般','通常情况',6],
+['普','pǔ',12,'普通，普及','普通','很平常',6],
+['通','tōng',10,'通，通用','通用','都能用',6],
+['用','yòng',5,'使用，通用','使用','拿来用',6],
+['表','biǎo',8,'表示，表格','表示','说明含义',6],
+['示','shì',5,'表示，展示','展示','给大家看',6],
+['简','jiǎn',13,'简单，简洁','简单','不复杂',6],
+['单','dān',8,'简单，单独','单独','只有一个',6],
+['复','fù',9,'复杂，反复','复杂','不简单',6],
+['杂','zá',6,'复杂，杂乱','复杂','很难理解',6],
+['困','kùn',7,'困难，困惑','困难','不容易',6],
+['难','nán',10,'困难','困难','不容易',6],
+['易','yì',8,'容易','容易','不困难',6],
+['简','jiǎn',13,'简单','简单','不复杂',6],
+['决','jué',6,'决定，解决','决定','下定主意',6],
+['定','dìng',8,'定，确定','确定','肯定没错',6],
+['解','jiě',13,'解，理解','理解','弄明白',6],
+['释','shì',12,'解释','解释','说明原因',6],
+['比','bǐ',4,'比较','比较','对比看看',6],
+['较','jiào',13,'比较','比较','对比看看',6],
+['差','chā',9,'差别，差距','差别','不同之处',6],
+['距','jù',12,'距离','距离','两者间隔',6],
+['离','lí',10,'离开，距离','离开','离去',6],
+['开','kāi',4,'打开','离开','离去',6],
+['总','zǒng',9,'总共，总结','总结','归纳要点',6],
+['结','jié',9,'结果，结束','结束','完成了',6],
+['束','shù',7,'束，结束','结束','完成了',6],
+['始','shǐ',8,'开始','开始','起头了',6],
+['末','mò',5,'结尾，末尾','末尾','最后面',6],
+['初','chū',7,'最初，初级','最初','最开始',6],
+['级','jí',6,'级，年级','年级','学习年级',6],
+['段','duàn',9,'段，阶段','阶段','某个时期',6],
+['节','jié',5,'节日，节约','节日','庆祝的日',6],
+['日','rì',4,'日子','节日','庆祝的日',6],
+['庆','qìng',6,'庆祝','庆祝','热闹纪念',6],
+['祝','zhù',9,'祝，祝贺','祝贺','表示庆贺',6],
+['贺','hè',9,'祝贺','恭贺','恭喜祝贺',6],
+['喜','xǐ',12,'喜欢，喜悦','喜欢','很爱',6],
+['欢','huān',6,'欢迎，欢乐','欢迎','热情迎接',6],
+['迎','yíng',7,'迎接，欢迎','迎接','去接来人',6],
+['接','jiē',11,'接，接待','接待','招待客人',6],
+['待','dài',9,'等待，接待','等待','耐心等',6],
+['等','děng',12,'等待，等级','等待','耐心等',6],
+['候','hòu',10,'等候，时候','等候','等待',6],
+['望','wàng',11,'希望，看望','希望','有期望',6],
+['希','xī',7,'希望','希望','有期望',6],
+
+]; // end CHARS
+
+// ─────────────────────────────────────────────────
+//  Level configuration
+// ─────────────────────────────────────────────────
+const LEVELS = [
+  { id:1, icon:'🌱', name:'入门', sub:'独体字 · 1-5画', color:'#4caf50', grad:'linear-gradient(135deg,#81c784,#2e7d32)' },
+  { id:2, icon:'🌿', name:'初级', sub:'常见字 · 6-7画', color:'#00897b', grad:'linear-gradient(135deg,#4db6ac,#00695c)' },
+  { id:3, icon:'🌸', name:'中级', sub:'常用词汇 · 8画+', color:'#e91e63', grad:'linear-gradient(135deg,#f48fb1,#880e4f)' },
+  { id:4, icon:'🏮', name:'进阶', sub:'词汇扩展', color:'#f57c00', grad:'linear-gradient(135deg,#ffb74d,#e65100)' },
+  { id:5, icon:'🎯', name:'高级', sub:'词汇深化', color:'#7b1fa2', grad:'linear-gradient(135deg,#ce93d8,#4a148c)' },
+  { id:6, icon:'🏆', name:'拓展', sub:'进阶常用字', color:'#1565c0', grad:'linear-gradient(135deg,#64b5f6,#0d47a1)' },
+];
+
+// ─────────────────────────────────────────────────
+//  State
+// ─────────────────────────────────────────────────
+let learned  = new Set(JSON.parse(localStorage.getItem('hz_learned') || '[]'));
+let curLevel = null;
+let curChars = [];
+let modalIdx = 0;
+
+// Flashcard state
+let fcQueue = [], fcIdx = 0, fcFlipped = false;
+
+// Quiz state
+let quizList = [], qIdx = 0, qOk = 0, qBad = 0, qAnswered = false;
+
+// ─────────────────────────────────────────────────
+//  Persistence
+// ─────────────────────────────────────────────────
+function saveLearned() {
+  localStorage.setItem('hz_learned', JSON.stringify([...learned]));
+}
+
+// ─────────────────────────────────────────────────
+//  Navigation helpers
+// ─────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  closeModal();
+  renderHome();
+  show('pgHome');
+}
+
+function goLevel() {
+  closeModal();
+  renderLevel(curLevel);
+  show('pgLevel');
+}
+
+// ─────────────────────────────────────────────────
+//  Home
+// ─────────────────────────────────────────────────
+function renderHome() {
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  const total = CHARS.length;
+  document.getElementById('totalCount').textContent = total;
+
+  LEVELS.forEach(lv => {
+    const chars = CHARS.filter(c => c[6] === lv.id);
+    const done  = chars.filter(c => learned.has(c[0])).length;
+    const pct   = chars.length ? Math.round(done / chars.length * 100) : 0;
+
+    const card = document.createElement('div');
+    card.className = 'lvl-card';
+    card.style.background = lv.grad;
+    card.innerHTML = `
+      <div class="lvl-badge">第${lv.id}关</div>
+      <div class="lvl-icon">${lv.icon}</div>
+      <div class="lvl-name">${lv.name} · ${lv.sub}</div>
+      <div class="lvl-sub">${chars.length} 个汉字</div>
+      <div class="lvl-progress-bg"><div class="lvl-progress-bar" style="width:${pct}%"></div></div>
+      <div class="lvl-count">已学 ${done} / ${chars.length}　${pct === 100 ? '🎉 全部完成！' : pct + '%'}</div>
+    `;
+    card.onclick = () => openLevel(lv.id);
+    grid.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────────────
+//  Level browser
+// ─────────────────────────────────────────────────
+function openLevel(id) {
+  curLevel = id;
+  curChars = CHARS.filter(c => c[6] === id);
+  renderLevel(id);
+  show('pgLevel');
+}
+
+function renderLevel(id) {
+  const lv = LEVELS.find(l => l.id === id);
+  const hdr = document.getElementById('levelHdr');
+  hdr.style.background = lv.grad;
+  document.getElementById('lvlTitle').textContent = `${lv.icon} ${lv.name}·${lv.sub}`;
+  const done = curChars.filter(c => learned.has(c[0])).length;
+  document.getElementById('lvlSub').textContent = `已学 ${done} / ${curChars.length}`;
+
+  const grid = document.getElementById('charGrid');
+  grid.innerHTML = '';
+  curChars.forEach((ch, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'char-cell' + (learned.has(ch[0]) ? ' learned' : '');
+    cell.innerHTML = `
+      ${learned.has(ch[0]) ? '<span class="tick">✓</span>' : ''}
+      <div class="ch">${ch[0]}</div>
+      <div class="py">${ch[1]}</div>
+    `;
+    cell.onclick = () => { speak(ch[0]); openModal(i); };
+    grid.appendChild(cell);
+  });
+}
+
+// ─────────────────────────────────────────────────
+//  Modal
+// ─────────────────────────────────────────────────
+function openModal(idx) {
+  modalIdx = idx;
+  showModalChar();
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+function showModalChar() {
+  const ch = curChars[modalIdx];
+  if (!ch) return;
+  const lv = LEVELS.find(l => l.id === ch[6]);
+
+  speak(ch[0]);
+  document.getElementById('mChar').textContent    = ch[0];
+  document.getElementById('mPy').textContent      = ch[1];
+  document.getElementById('mStrokeTag').textContent = ch[2] + '画';
+  document.getElementById('mStrokeTag').style.background = lv.color;
+  document.getElementById('mLvlTag').textContent  = '第'+ch[6]+'关';
+  document.getElementById('mLvlTag').style.background = lv.color;
+  document.getElementById('mMeaning').textContent = ch[3];
+  document.getElementById('mWord').textContent    = ch[4];
+  document.getElementById('mWordMean').textContent= ch[5];
+
+  const btn = document.getElementById('mLearnBtn');
+  const isLearned = learned.has(ch[0]);
+  btn.textContent = isLearned ? '✓ 已学会' : '✓ 学会了';
+  btn.className   = 'btn-learned' + (isLearned ? ' done' : '');
+}
+
+function toggleLearned() {
+  const ch = curChars[modalIdx];
+  if (learned.has(ch[0])) {
+    learned.delete(ch[0]);
+    showToast('取消标记：' + ch[0]);
+  } else {
+    learned.add(ch[0]);
+    showToast('已学会：' + ch[0] + ' (' + ch[1] + ')');
+  }
+  saveLearned();
+  showModalChar();
+  // update cell
+  const cells = document.querySelectorAll('.char-cell');
+  if (cells[modalIdx]) {
+    cells[modalIdx].className = 'char-cell' + (learned.has(ch[0]) ? ' learned' : '');
+    cells[modalIdx].querySelector('.tick') && cells[modalIdx].querySelector('.tick').remove();
+    if (learned.has(ch[0])) {
+      const tick = document.createElement('span');
+      tick.className = 'tick'; tick.textContent = '✓';
+      cells[modalIdx].prepend(tick);
+    }
+  }
+  // update level sub
+  const done = curChars.filter(c => learned.has(c[0])).length;
+  document.getElementById('lvlSub').textContent = `已学 ${done} / ${curChars.length}`;
+}
+
+function modalStep(dir) {
+  modalIdx = (modalIdx + dir + curChars.length) % curChars.length;
+  // animate
+  const mc = document.getElementById('mChar');
+  mc.style.transform = 'scale(.6)';
+  mc.style.opacity   = '0';
+  setTimeout(() => { showModalChar(); mc.style.transform=''; mc.style.opacity=''; }, 140);
+}
+
+// ─────────────────────────────────────────────────
+//  Flashcard
+// ─────────────────────────────────────────────────
+function startFlash() {
+  closeModal();
+  // build queue: not-learned first, then shuffle
+  const notDone = curChars.filter(c => !learned.has(c[0]));
+  const done    = curChars.filter(c =>  learned.has(c[0]));
+  fcQueue = shuffle([...notDone]).concat(shuffle([...done]));
+  fcIdx = 0;
+  fcFlipped = false;
+  show('pgFlash');
+  renderFC();
+}
+
+function renderFC() {
+  document.getElementById('fcDone').style.display  = 'none';
+  document.getElementById('fcCtrl').style.display  = 'none';
+  document.getElementById('fcCard').style.display  = 'flex';
+
+  if (fcIdx >= fcQueue.length) {
+    const doneEl = document.getElementById('fcDone');
+    doneEl.style.display = 'block';
+    document.getElementById('fcCard').style.display = 'none';
+    const d = fcQueue.filter(c => learned.has(c[0])).length;
+    document.getElementById('fcDoneText').textContent =
+      `本关 ${fcQueue.length} 个字已全部翻阅，认识了 ${d} 个 🎉`;
+    document.getElementById('fcProg').textContent = '';
+    return;
+  }
+
+  const ch = fcQueue[fcIdx];
+  document.getElementById('fcProg').textContent =
+    `第 ${fcIdx + 1} / ${fcQueue.length} 个　　已学：${[...learned].filter(h => curChars.find(c=>c[0]===h)).length}/${curChars.length}`;
+
+  document.getElementById('fcChar').textContent = ch[0];
+  setTimeout(() => speak(ch[0]), 100);
+
+  const front = document.getElementById('fcFront');
+  const back  = document.getElementById('fcBack');
+  front.style.display = 'block';
+  back.style.display  = 'none';
+  back.classList.remove('show');
+
+  document.getElementById('fcPy').textContent   = ch[1];
+  document.getElementById('fcMean').textContent = ch[3];
+  document.getElementById('fcWord').innerHTML   = `例词：<b>${ch[4]}</b> — ${ch[5]}`;
+  document.getElementById('fcStroke').textContent = `笔画：${ch[2]}画`;
+
+  fcFlipped = false;
+}
+
+function flipCard() {
+  if (fcFlipped) return;
+  fcFlipped = true;
+  const front = document.getElementById('fcFront');
+  const back  = document.getElementById('fcBack');
+  front.style.display = 'none';
+  back.style.display  = 'block';
+  setTimeout(() => back.classList.add('show'), 20);
+  document.getElementById('fcCtrl').style.display = 'flex';
+  const ch = fcQueue[fcIdx];
+  setTimeout(() => speak(ch[0] + '，' + ch[4]), 200);
+}
+
+function fcNext(gotIt) {
+  const ch = fcQueue[fcIdx];
+  if (gotIt) {
+    learned.add(ch[0]);
+    saveLearned();
+  }
+  fcIdx++;
+  renderFC();
+}
+
+// ─────────────────────────────────────────────────
+//  Quiz
+// ─────────────────────────────────────────────────
+function startQuiz() {
+  closeModal();
+  qOk = 0; qBad = 0; qIdx = 0; qAnswered = false;
+
+  // pick 10 random chars from current level
+  quizList = shuffle([...curChars]).slice(0, Math.min(10, curChars.length));
+
+  show('pgQuiz');
+  document.getElementById('quizDone').style.display = 'none';
+  renderQuiz();
+}
+
+function renderQuiz() {
+  document.getElementById('quizDone').style.display = 'none';
+  document.getElementById('qNextBtn').style.display  = 'none';
+  document.getElementById('quizFb').textContent = '';
+  document.getElementById('quizFb').className = 'quiz-fb';
+  qAnswered = false;
+
+  const ch = quizList[qIdx];
+  document.getElementById('qMeta').textContent = `第 ${qIdx + 1} / ${quizList.length} 题`;
+  document.getElementById('qScore').innerHTML  = `✅ ${qOk} &nbsp;❌ ${qBad}`;
+
+  // random quiz mode per question
+  const mode = Math.random() < 0.5 ? 'A' : 'B';
+  const qEl  = document.getElementById('quizQ');
+
+  if (mode === 'A') {
+    // show char → pick meaning
+    qEl.innerHTML = `
+      <div class="quiz-q-label">看汉字，选意思</div>
+      <div class="quiz-q-char" onclick="speak(this.textContent)" style="cursor:pointer" title="点击发音">${ch[0]}</div>
+      <div class="quiz-q-text">${ch[1]} &nbsp;<span style="font-size:.8rem;color:#bbb">🔊</span></div>
+    `;
+    setTimeout(() => speak(ch[0]), 100);
+  } else {
+    // show meaning → pick char
+    qEl.innerHTML = `
+      <div class="quiz-q-label">看意思，选汉字</div>
+      <div class="quiz-q-text">「${ch[3]}」</div>
+      <div class="quiz-q-text" style="font-size:.9rem;color:#aaa">例：${ch[4]}</div>
+    `;
+    setTimeout(() => speak(ch[3] + '，' + ch[4]), 100);
+  }
+
+  // build 4 choices
+  const pool = CHARS.filter(c => c[6] === curLevel && c[0] !== ch[0]);
+  const wrong3 = shuffle(pool).slice(0, 3);
+  const choices = shuffle([ch, ...wrong3]);
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  choices.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = mode === 'A' ? opt[3] : opt[0];
+    btn.onclick = () => pickChoice(btn, opt[0] === ch[0], mode, ch);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function pickChoice(btn, correct, mode, ch) {
+  if (qAnswered) return;
+  qAnswered = true;
+
+  if (correct) {
+    btn.classList.add('correct');
+    qOk++;
+    learned.add(ch[0]);
+    saveLearned();
+    document.getElementById('quizFb').textContent = '✅ 正确！';
+    document.getElementById('quizFb').className   = 'quiz-fb ok';
+    tone(523,.08); setTimeout(()=>tone(659,.12),90);
+    setTimeout(() => speak(ch[0] + '，' + ch[4]), 300);
+  } else {
+    btn.classList.add('wrong');
+    qBad++;
+    document.getElementById('quizFb').innerHTML =
+      `❌ 正确答案：<b>${mode==='A' ? ch[3] : ch[0]}</b>（${mode==='A' ? ch[0]+' '+ch[1] : ch[1]}）`;
+    document.getElementById('quizFb').className = 'quiz-fb fail';
+    setTimeout(() => speak(ch[0] + '，' + ch[3]), 300);
+    // highlight correct
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      const txt = b.textContent;
+      if ((mode==='A' && txt===ch[3]) || (mode==='B' && txt===ch[0])) b.classList.add('correct');
+    });
+    tone(200,.18,'sawtooth');
+  }
+
+  document.getElementById('qScore').innerHTML = `✅ ${qOk} &nbsp;❌ ${qBad}`;
+
+  if (qIdx + 1 >= quizList.length) {
+    setTimeout(showQuizDone, 1200);
+  } else {
+    document.getElementById('qNextBtn').style.display = 'inline-block';
+  }
+}
+
+function quizNext() {
+  qIdx++;
+  renderQuiz();
+}
+
+function showQuizDone() {
+  document.getElementById('quizDone').style.display = 'block';
+  document.getElementById('qNextBtn').style.display  = 'none';
+  const total = quizList.length;
+  const pct   = Math.round(qOk / total * 100);
+  document.getElementById('qFinalScore').textContent = `${qOk} / ${total}`;
+  const msgs = ['加油，继续努力！💪','不错哦，再练练！😊','很棒！继续保持！🌟','厉害！你已经很棒了！🏆','满分！你是汉字小达人！🎉'];
+  const lv   = pct < 40 ? 0 : pct < 60 ? 1 : pct < 80 ? 2 : pct < 100 ? 3 : 4;
+  document.getElementById('qFinalMsg').textContent = msgs[lv];
+}
+
+// ─────────────────────────────────────────────────
+//  Write Practice
+// ─────────────────────────────────────────────────
+let wList=[], wIdx=0, wGuideOn=true;
+let _hintTimer=null, _writeInited=false;
+
+function startWrite(){
+  wList=[...curChars];
+  wIdx=0;
+  renderWrite();
+  show('pgWrite');
+  if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
+}
+
+function renderWrite(){
+  const ch=wList[wIdx];
+  document.getElementById('wProg').textContent=(wIdx+1)+' / '+wList.length+' · '+ch[2]+'画';
+  document.getElementById('wTitle').textContent=ch[0]+'   '+ch[1];
+  document.getElementById('wSub').textContent=ch[3]+(ch[4]?'  ·  例：'+ch[4]:'');
+  document.getElementById('wResult').textContent='';
+  document.getElementById('wResult').className='write-result';
+  drawGuide(ch[0]);
+  clearWrite();
+  speak(ch[0]);
+}
+
+function drawGuide(char){
+  const canvas=document.getElementById('guideCanvas');
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  // 背景
+  ctx.fillStyle='#fdf6ff';
+  ctx.fillRect(0,0,w,h);
+  // 田字格外框
+  ctx.strokeStyle='#d8b4e8';ctx.lineWidth=2;ctx.setLineDash([]);
+  ctx.strokeRect(4,4,w-8,h-8);
+  // 中线虚线
+  ctx.strokeStyle='#e4c8f0';ctx.lineWidth=1;ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  ctx.moveTo(w/2,6);ctx.lineTo(w/2,h-6);
+  ctx.moveTo(6,h/2);ctx.lineTo(w-6,h/2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // 对角线（极淡）
+  ctx.strokeStyle='#eeddf8';ctx.lineWidth=1;ctx.setLineDash([3,7]);
+  ctx.beginPath();ctx.moveTo(8,8);ctx.lineTo(w-8,h-8);
+  ctx.moveTo(w-8,8);ctx.lineTo(8,h-8);ctx.stroke();
+  ctx.setLineDash([]);
+  if(!wGuideOn) return;
+  // 参考字：先画粗描红线（模拟 numbers.html 的粉色笔画路径）
+  const font=`bold ${Math.round(w*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
+  ctx.font=font;ctx.textAlign='center';ctx.textBaseline='middle';
+  // 最外层：淡紫色粗轮廓，让用户能"描"这条线
+  ctx.strokeStyle='rgba(255,155,185,0.55)';ctx.lineWidth=28;
+  ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeText(char,w/2,h/2+4);
+  // 中层：稍亮填充
+  ctx.fillStyle='rgba(220,130,220,0.22)';
+  ctx.fillText(char,w/2,h/2+4);
+  // 内层：细轮廓让笔画边缘更清晰
+  ctx.strokeStyle='rgba(180,80,200,0.35)';ctx.lineWidth=1.5;
+  ctx.strokeText(char,w/2,h/2+4);
+}
+
+function clearWrite(){
+  clearTimeout(_hintTimer);
+  const canvas=document.getElementById('writeCanvas');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById('wResult').textContent='';
+  document.getElementById('wResult').className='write-result';
+}
+
+function toggleGuide(){
+  wGuideOn=!wGuideOn;
+  const btn=document.getElementById('guideToggle');
+  btn.classList.toggle('on',wGuideOn);
+  btn.textContent=wGuideOn?'👁 显示参考':'👁 隐藏参考';
+  if(wList.length) drawGuide(wList[wIdx][0]);
+}
+
+function writeNav(dir){
+  clearTimeout(_hintTimer);
+  wIdx=(wIdx+dir+wList.length)%wList.length;
+  renderWrite();
+}
+
+// 笔顺提示：在 traceCanvas 上逐步描绘字形（用字体采样点动画）
+function showWriteHint(){
+  clearTimeout(_hintTimer);
+  clearWrite();
+  const canvas=document.getElementById('writeCanvas');
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  const char=wList[wIdx][0];
+  // 用渐进 clip 方式：每帧扩大一个竖向切片来揭示字形
+  const offscreen=document.createElement('canvas');
+  offscreen.width=w;offscreen.height=h;
+  const oc=offscreen.getContext('2d');
+  oc.fillStyle='#1a237e';
+  oc.font=`bold ${Math.round(w*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
+  oc.textAlign='center';oc.textBaseline='middle';
+  oc.fillText(char,w/2,h/2+4);
+  const STEPS=30;
+  let s=0;
+  function step(){
+    ctx.clearRect(0,0,w,h);
+    const sliceW=Math.ceil(w/STEPS*(s+1));
+    ctx.drawImage(offscreen,0,0,sliceW,h,0,0,sliceW,h);
+    // 红点标示当前笔画前沿
+    ctx.save();ctx.fillStyle='rgba(255,23,68,.9)';
+    ctx.beginPath();ctx.arc(sliceW,h/2,9,0,Math.PI*2);ctx.fill();ctx.restore();
+    s++;
+    if(s<STEPS) _hintTimer=setTimeout(step,60);
+    else ctx.clearRect(sliceW-1,0,2,h); // 清掉红点列
+  }
+  step();
+}
+
+// 书写匹配度检测（像素比对，pointerup 后调用）
+function checkMatch(){
+  const S=280, GRID=14, STEP=S/GRID;
+  const tCtx=document.getElementById('writeCanvas').getContext('2d');
+  // 离屏 canvas 只画纯字（透明背景），排除田字格背景对 alpha 的干扰
+  const off=document.createElement('canvas');
+  off.width=S; off.height=S;
+  const gCtx=off.getContext('2d');
+  if(wList[wIdx]){
+    const ch=wList[wIdx];
+    gCtx.font=`bold ${Math.round(S*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
+    gCtx.textAlign='center'; gCtx.textBaseline='middle';
+    gCtx.fillStyle='#000';
+    gCtx.fillText(ch,S/2,S/2+4);
+  }
+  const tPx=tCtx.getImageData(0,0,S,S).data;
+  const gPx=gCtx.getImageData(0,0,S,S).data;
+  let tCells=0,gCells=0,both=0;
+  for(let row=0;row<GRID;row++){
+    for(let col=0;col<GRID;col++){
+      let tSum=0,gSum=0;
+      for(let dy=0;dy<STEP;dy++) for(let dx=0;dx<STEP;dx++){
+        const i=((Math.floor(row*STEP+dy))*S+Math.floor(col*STEP+dx))*4;
+        tSum+=tPx[i+3]; gSum+=gPx[i+3];
+      }
+      const area=STEP*STEP;
+      const tOn=(tSum/area)>20, gOn=(gSum/area)>15;
+      if(tOn) tCells++;
+      if(gOn) gCells++;
+      if(tOn&&gOn) both++;
+    }
+  }
+  if(tCells<3) return;
+  const pct=gCells>0?Math.round(both/gCells*100):0;
+  const el=document.getElementById('wResult');
+  if(pct>=70){el.textContent='写得棒！覆盖 '+pct+'%';el.className='write-result ok';tone(660,.25);}
+  else{el.textContent='继续练！覆盖 '+pct+'%，再描一遍';el.className='write-result so';}
+}
+
+function initWriteCanvas(){
+  const canvas=document.getElementById('writeCanvas');
+  if(!canvas) return;
+  let isWriting=false, lastX=0, lastY=0;
+  function xy(e){
+    const r=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/r.width, scaleY=canvas.height/r.height;
+    return [(e.clientX-r.left)*scaleX,(e.clientY-r.top)*scaleY];
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    isWriting=true;
+    try{canvas.setPointerCapture(e.pointerId);}catch(err){}
+    const [x,y]=xy(e);
+    lastX=x; lastY=y;
+    const ctx=canvas.getContext('2d');
+    ctx.strokeStyle='#1a237e';ctx.lineWidth=18;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(x,y);
+  });
+  canvas.addEventListener('pointermove',e=>{
+    e.preventDefault();
+    if(!isWriting) return;
+    const [x,y]=xy(e);
+    const ctx=canvas.getContext('2d');
+    ctx.strokeStyle='#1a237e';ctx.lineWidth=18;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.lineTo(x,y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x,y);
+    lastX=x; lastY=y;
+  });
+  canvas.addEventListener('pointerup',e=>{
+    e.preventDefault();
+    isWriting=false;
+    try{checkMatch();}catch(err){}
+  });
+  canvas.addEventListener('pointercancel',()=>{isWriting=false;});
+}
+
+// ─────────────────────────────────────────────────
+//  Toast
+// ─────────────────────────────────────────────────
+let _toastT = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────
+//  Speech (Web Speech API)
+// ─────────────────────────────────────────────────
+let _zhVoice = null;
+if (window.speechSynthesis) {
+  const _loadVoices = () => {
+    const vs = speechSynthesis.getVoices();
+    _zhVoice = vs.find(v => /zh[-_](CN|TW|HK)/i.test(v.lang))
+            || vs.find(v => /zh/i.test(v.lang)) || null;
+  };
+  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+  _loadVoices();
+}
+function speak(text, rate=0.85) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
+    else { u.lang = 'zh-CN'; }
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  }, 50);
+}
+
+// ─────────────────────────────────────────────────
+//  Audio
+// ─────────────────────────────────────────────────
+let _ac = null;
+function tone(f, d, t='sine', v=.18) {
+  try {
+    if (!_ac) _ac = new (window.AudioContext||window.webkitAudioContext)();
+    if (_ac.state === 'suspended') _ac.resume();
+    const o=_ac.createOscillator(), g=_ac.createGain();
+    o.connect(g); g.connect(_ac.destination);
+    o.type=t; o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start(); o.stop(_ac.currentTime+d);
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────
+//  Utilities
+// ─────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// click outside modal to close
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─────────────────────────────────────────────────
+//  Init
+// ─────────────────────────────────────────────────
+renderHome();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
