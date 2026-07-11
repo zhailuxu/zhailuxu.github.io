@@ -803,7 +803,6 @@ function show(id) {
 function goHome() {
   closeModal();
   renderHome();
-initWriteCanvas();
   show('pgHome');
 }
 
@@ -1143,13 +1142,14 @@ function showQuizDone() {
 //  Write Practice
 // ─────────────────────────────────────────────────
 let wList=[], wIdx=0, wGuideOn=true;
-let _hintTimer=null;
+let _hintTimer=null, _writeInited=false;
 
 function startWrite(){
   wList=[...curChars];
   wIdx=0;
   renderWrite();
   show('pgWrite');
+  if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
 }
 
 function renderWrite(){
