@@ -351,6 +351,7 @@ body {
       <button class="btn btn-gray"   onclick="clearTrace()">🗑️ 清除</button>
       <button class="btn btn-pink"   onclick="speak(numCN(traceDigit))">🔊 读数字</button>
     </div>
+    <div id="traceResult" style="text-align:center;font-size:1.1rem;font-weight:bold;min-height:36px;margin-top:10px;transition:color .25s;letter-spacing:.5px;"></div>
   </div>
 </div>
 
@@ -746,8 +747,8 @@ function initTraceTab(){
     ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
     lastX=x; lastY=y;
   });
-  tc.addEventListener('pointerup',()=>isDrawing=false);
-  tc.addEventListener('pointercancel',()=>isDrawing=false);
+  tc.addEventListener('pointerup',()=>{ isDrawing=false; checkMatch(); });
+  tc.addEventListener('pointercancel',()=>{ isDrawing=false; checkMatch(); });
   selectDigit(1);
 }
 
@@ -774,6 +775,8 @@ function drawGuide(){
 function clearTrace(){
   clearTimeout(hintTimer);
   document.getElementById('traceCanvas').getContext('2d').clearRect(0,0,280,280);
+  const r=document.getElementById('traceResult');
+  if(r) r.textContent='';
 }
 
 function setPen(c,btn){
@@ -797,9 +800,73 @@ function showHint(){
     else{ctx.lineTo(px,py);ctx.stroke();ctx.beginPath();ctx.moveTo(px,py);}
     ctx.save();ctx.fillStyle='rgba(255,23,68,.85)';
     ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();ctx.restore();
-    idx++; hintTimer=setTimeout(step,28);
+    idx++; hintTimer=setTimeout(step,150);
   }
   step();
+}
+
+// ─── 手写匹配度检测 ───
+function checkMatch(){
+  const S=280, GRID=28, STEP=S/GRID;
+  const tCtx=document.getElementById('traceCanvas').getContext('2d');
+  const gCtx=document.getElementById('guideCanvas').getContext('2d');
+  const tPx=tCtx.getImageData(0,0,S,S).data;
+  const gPx=gCtx.getImageData(0,0,S,S).data;
+
+  let tCells=0, gCells=0, both=0;
+  for(let row=0;row<GRID;row++){
+    for(let col=0;col<GRID;col++){
+      let tSum=0, gSum=0;
+      for(let dy=0;dy<STEP;dy++){
+        for(let dx=0;dx<STEP;dx++){
+          const px=Math.floor(col*STEP+dx), py=Math.floor(row*STEP+dy);
+          const i=(py*S+px)*4;
+          tSum+=tPx[i+3]; gSum+=gPx[i+3];
+        }
+      }
+      const area=STEP*STEP;
+      const tOn=(tSum/area)>25;
+      const gOn=(gSum/area)>12; // guide是半透明 alpha≈128，阈值低一些
+      if(tOn) tCells++;
+      if(gOn) gCells++;
+      if(tOn&&gOn) both++;
+    }
+  }
+
+  if(tCells<3){ showMatchResult(-1); return; } // 几乎没写
+  if(gCells===0) return;
+
+  const recall=both/gCells;           // 覆盖了多少参考区域
+  const prec=both/tCells;             // 有多少笔迹在参考区域内
+  const f1=(recall+prec>0)?2*recall*prec/(recall+prec):0;
+  showMatchResult(Math.round(f1*100));
+}
+
+function showMatchResult(pct){
+  const el=document.getElementById('traceResult');
+  if(!el) return;
+  if(pct<0){
+    el.style.color='#aaa';
+    el.textContent='✍️ 在格子里写写看！';
+    return;
+  }
+  if(pct>=60){
+    el.style.color='#2e7d32';
+    if(pct>=75){
+      el.textContent=`🌟 棒极了！匹配度 ${pct}%，自动进入下一个…`;
+      chime();
+      setTimeout(()=>selectDigit((traceDigit+1)%10), 1200);
+    } else {
+      el.textContent=`✅ 不错哦！匹配度 ${pct}%`;
+    }
+  } else if(pct>=40){
+    el.style.color='#f57c00';
+    el.textContent=`⚠️ 接近了！匹配度 ${pct}%，再仔细一点！`;
+  } else {
+    el.style.color='#e53935';
+    el.textContent=`❌ 写得不像哦，匹配度 ${pct}%，看看笔顺提示再试试！`;
+    tone(200,.18,'sawtooth');
+  }
 }
 
 // ─── Tab 6: 比大小 ───

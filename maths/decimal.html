@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小数加减法</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#e8f5e9 0%,#e3f2fd 55%,#fff8e1 100%);
+  min-height: 100vh; padding: 16px 12px;
+}
+.container { max-width: 700px; margin: 0 auto; }
+
+.header { text-align:center; margin-bottom:18px; }
+.header h1 { font-size:1.9rem; color:#1b5e20; letter-spacing:3px; }
+.header p  { font-size:.83rem; color:#999; margin-top:4px; }
+
+.mode-row { display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
+.mode-btn {
+  padding:10px 28px; border:none; border-radius:25px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  transition:all .2s; box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+.mode-btn.add { background:#e8f5e9; color:#2e7d32; }
+.mode-btn.add.on { background:linear-gradient(135deg,#66bb6a,#2e7d32); color:#fff; box-shadow:0 4px 14px rgba(46,125,50,.4); }
+.mode-btn.sub { background:#fff3e0; color:#e65100; }
+.mode-btn.sub.on { background:linear-gradient(135deg,#ffa726,#e65100); color:#fff; box-shadow:0 4px 14px rgba(230,81,0,.4); }
+
+.tabs { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+.tab-btn {
+  padding:8px 24px; border:none; border-radius:20px;
+  font-size:.95rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.65); color:#666;
+  box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .2s;
+}
+.tab-btn.on { background:#2e7d32; color:#fff; box-shadow:0 4px 14px rgba(46,125,50,.35); }
+
+.card {
+  background:rgba(255,255,255,.92); border-radius:20px;
+  padding:20px 18px; box-shadow:0 4px 20px rgba(0,0,0,.1);
+  margin-bottom:14px;
+}
+
+.diff-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.diff-btn {
+  padding:6px 16px; border:2px solid #a5d6a7; border-radius:14px;
+  background:#fff; color:#2e7d32; font-size:.88rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.diff-btn.on { background:#2e7d32; color:#fff; border-color:#2e7d32; }
+
+.input-row { display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.num-inp {
+  width:104px; height:46px; border:2.5px solid #a5d6a7; border-radius:12px;
+  text-align:center; font-size:1.3rem; font-weight:bold; color:#333;
+  background:#f1f8e9; outline:none;
+}
+.num-inp:focus { border-color:#2e7d32; }
+.op-label { font-size:1.6rem; color:#888; min-width:24px; text-align:center; }
+
+.btn {
+  border:none; border-radius:12px; padding:9px 20px;
+  font-size:.92rem; font-weight:bold; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+.btn:active { transform:scale(.95); }
+.btn-blue   { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-green  { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; }
+.btn-orange { background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-purple { background:linear-gradient(135deg,#ce93d8,#6a1b9a); color:#fff; }
+.btn-gray   { background:#e0e0e0; color:#555; }
+
+.narration {
+  background:linear-gradient(135deg,#e8f5e9,#e3f2fd);
+  border-radius:14px; padding:12px 16px;
+  font-size:1rem; color:#333; text-align:center;
+  border-left:4px solid #2e7d32; min-height:50px;
+  margin-bottom:14px; transition:all .3s;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ── 竖式计算板 ── */
+.board-wrap { display:flex; justify-content:center; margin-bottom:14px; overflow-x:auto; }
+
+.calc-board {
+  display:inline-flex; flex-direction:column; align-items:flex-end;
+  gap:0; position:relative;
+}
+
+.b-row { display:flex; align-items:center; }
+.b-cell {
+  width:54px; height:58px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem; font-weight:bold; color:#222;
+  position:relative; border-radius:10px;
+  transition:background .3s;
+}
+.b-cell.active { background:rgba(46,125,50,.15); }
+.b-cell.op-col { width:38px; color:#777; font-size:1.8rem; }
+
+/* 小数点列：宽度收窄 */
+.b-cell.dot-col {
+  width:28px; font-size:2rem; color:#333;
+  cursor:default;
+}
+.b-cell.dot-col.active { background:rgba(255,193,7,.28); }
+
+/* 进/退位行 */
+.b-carry { height:32px; }
+.b-carry .b-cell { height:32px; font-size:1rem; color:#e53935; }
+.b-carry .b-cell.dot-col { color:transparent; }
+
+/* 横线 */
+.b-line { height:3px; background:#333; border-radius:2px; margin:3px 0; }
+
+/* 结果行 */
+.res-digit { opacity:0; transform:translateY(-10px); transition:opacity .4s, transform .4s; }
+.res-digit.show { opacity:1; transform:translateY(0); }
+.b-cell.result { color:#1565c0; }
+
+/* 进位指示器 */
+.carry-ind {
+  opacity:0; transform:translateY(8px);
+  transition:opacity .35s, transform .35s;
+  color:#e53935; font-weight:bold;
+}
+.carry-ind.show { opacity:1; transform:translateY(0); }
+
+/* 借位 */
+.orig-dig { color:#bbb; text-decoration:line-through; font-size:1.5rem; }
+.new-dig  { color:#f57c00; font-size:1.3rem; margin-left:2px; }
+
+/* 小数点对齐提示线 */
+.dot-guide {
+  position:absolute; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg,#ffca28 0%,#ff9800 100%);
+  border-radius:2px; opacity:0;
+  transition:opacity .5s;
+  pointer-events:none;
+  z-index:10;
+}
+.dot-guide.show { opacity:.75; }
+
+.comp-box {
+  min-height:68px; text-align:center; margin-bottom:14px;
+}
+.comp-eq {
+  font-size:1.45rem; font-weight:bold; color:#333;
+  opacity:0; transform:scale(.9);
+  transition:opacity .3s, transform .3s;
+}
+.comp-eq.show { opacity:1; transform:scale(1); }
+.comp-note {
+  font-size:.9rem; color:#2e7d32; margin-top:5px;
+  opacity:0; transition:opacity .3s;
+}
+.comp-note.show { opacity:1; }
+
+.ctrl-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.speed-row { display:flex; gap:6px; justify-content:center; align-items:center; font-size:.83rem; color:#888; }
+.sp-btn {
+  padding:4px 12px; border:1.5px solid #bbb; border-radius:10px;
+  background:#fff; color:#555; font-size:.8rem; cursor:pointer; transition:all .15s;
+}
+.sp-btn.on { background:#2e7d32; color:#fff; border-color:#2e7d32; }
+
+/* ── 对齐提示横幅 ── */
+.align-tip {
+  background:linear-gradient(135deg,#fff9c4,#fff3e0);
+  border:2px dashed #ff9800;
+  border-radius:12px; padding:10px 14px;
+  font-size:.92rem; color:#555;
+  text-align:center; margin-bottom:14px;
+}
+.align-tip b { color:#e65100; }
+
+/* Quiz */
+.q-display { text-align:center; font-size:2.4rem; font-weight:bold; color:#333; letter-spacing:4px; margin:14px 0; }
+.q-row { display:flex; gap:10px; justify-content:center; margin-bottom:10px; }
+.q-inp {
+  width:108px; height:58px; border:3px solid #a5d6a7; border-radius:14px;
+  text-align:center; font-size:1.8rem; font-weight:bold; color:#333;
+  background:#f1f8e9; outline:none;
+}
+.q-inp:focus { border-color:#2e7d32; background:#e8f5e9; }
+.q-inp.ok   { border-color:#43a047; background:#e8f5e9; color:#2e7d32; }
+.q-inp.fail { border-color:#e53935; background:#ffebee; color:#c62828; }
+.q-fb { min-height:30px; text-align:center; font-size:1rem; font-weight:bold; }
+.q-fb.ok   { color:#2e7d32; }
+.q-fb.fail { color:#c62828; }
+.q-score { text-align:center; color:#888; font-size:.9rem; margin-top:8px; }
+
+.hidden { display:none !important; }
+
+/* ── 声音 ── */
+.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;}
+.speak-toggle{padding:7px 18px;border:2px solid #a5d6a7;border-radius:20px;background:#fff;color:#2e7d32;font-size:.9rem;font-weight:bold;cursor:pointer;transition:all .2s;}
+.speak-toggle.on{background:#2e7d32;color:#fff;border-color:#2e7d32;}
+.speak-btn-sm{padding:5px 12px;border:none;border-radius:12px;background:#e8f5e9;color:#2e7d32;font-size:.88rem;font-weight:bold;cursor:pointer;}
+.speak-btn-sm:hover{background:#a5d6a7;}
+
+@keyframes floatCarry {
+  0%   { opacity:0; transform:translateY(14px) scale(.5); }
+  50%  { opacity:1; transform:translateY(-4px) scale(1.3); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+.carry-pop { animation:floatCarry .45s ease-out forwards; }
+
+@keyframes borrowSlide {
+  0%   { opacity:0; transform:translateX(16px); }
+  100% { opacity:1; transform:translateX(0); }
+}
+.borrow-appear { animation:borrowSlide .35s ease-out forwards; }
+
+@keyframes dotPulse {
+  0%,100% { transform:scale(1); }
+  50%      { transform:scale(1.6); color:#ff6f00; }
+}
+.dot-pulse { animation:dotPulse .6s ease-in-out; }
+
+@media(max-width:420px){
+  .b-cell { width:44px; height:50px; font-size:1.6rem; }
+  .b-cell.dot-col { width:22px; }
+  .b-cell.op-col { width:30px; }
+  .q-display { font-size:1.8rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2e7d32">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🔢 小数加减法</h1>
+  <p>竖式对齐小数点，逐位动画演示</p>
+</div>
+
+<div class="speak-bar">
+  <button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button>
+  <button class="speak-btn-sm" onclick="speakNarr()">▶ 重读</button>
+</div>
+
+<div class="mode-row">
+  <button class="mode-btn add on" id="modeAdd" onclick="setMode('add')">➕ 小数加法</button>
+  <button class="mode-btn sub"    id="modeSub" onclick="setMode('sub')">➖ 小数减法</button>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" id="tabD" onclick="switchTab('demo')">🎬 动画演示</button>
+  <button class="tab-btn"    id="tabQ" onclick="switchTab('quiz')">✏️ 练习</button>
+</div>
+
+<!-- ══ Demo ══ -->
+<div id="pDemo">
+  <div class="align-tip">
+    核心规则：<b>小数点对齐</b>，然后从最右边一位往左算，满十进一、不够借一
+  </div>
+
+  <div class="card">
+    <div class="diff-row">
+      <button class="diff-btn on" data-d="1" onclick="setDiff(1)">一位小数</button>
+      <button class="diff-btn"    data-d="2" onclick="setDiff(2)">两位小数</button>
+      <button class="diff-btn"    data-d="3" onclick="setDiff(3)">混合位数</button>
+    </div>
+    <div class="input-row">
+      <input class="num-inp" id="inA" type="text" value="3.7" placeholder="如 3.7">
+      <span class="op-label" id="opLbl">＋</span>
+      <input class="num-inp" id="inB" type="text" value="1.8" placeholder="如 1.8">
+      <button class="btn btn-gray"  onclick="randProb()">🎲 随机</button>
+      <button class="btn btn-green" onclick="initDemo()">▶ 开始</button>
+    </div>
+
+    <div class="narration" id="narr">点击「开始」观看动画演示 👆</div>
+
+    <div class="board-wrap" id="boardWrap"></div>
+    <div class="comp-box"   id="compBox"></div>
+
+    <div class="ctrl-row">
+      <button class="btn btn-green"  id="btnPlay" onclick="togglePlay()">▶ 自动播放</button>
+      <button class="btn btn-purple" onclick="stepFwd()">⏭ 下一步</button>
+      <button class="btn btn-gray"   onclick="resetDemo()">↺ 重置</button>
+    </div>
+    <div class="speed-row">
+      速度：
+      <button class="sp-btn on" data-ms="1700" onclick="setSp(1700,this)">慢</button>
+      <button class="sp-btn"    data-ms="1000" onclick="setSp(1000,this)">正常</button>
+      <button class="sp-btn"    data-ms="500"  onclick="setSp(500,this)">快</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Quiz ══ -->
+<div id="pQuiz" class="hidden">
+  <div class="card">
+    <div class="diff-row">
+      <button class="diff-btn on" data-d="1" onclick="setDiff(1)">一位小数</button>
+      <button class="diff-btn"    data-d="2" onclick="setDiff(2)">两位小数</button>
+      <button class="diff-btn"    data-d="3" onclick="setDiff(3)">混合位数</button>
+    </div>
+    <div class="q-display" id="qDisp">? + ? = ?</div>
+    <div class="q-row">
+      <input class="q-inp" id="qInp" type="text" inputmode="decimal" placeholder="答案"
+        onkeydown="if(event.key==='Enter')checkQ()">
+      <button class="btn btn-green" onclick="checkQ()">确认</button>
+    </div>
+    <div class="q-fb" id="qFb"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button class="btn btn-purple" onclick="nextQ()">下一题</button>
+      <button class="btn btn-orange" onclick="demoThisQ()">🎬 看演示</button>
+    </div>
+    <div class="q-score" id="qScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<script>
+// ─── State ───
+let mode   = 'add';
+let diff   = 1;
+let spMs   = 1700;
+let steps  = [];
+let sIdx   = 0;
+let playing = false;
+let pTimer  = null;
+let curA = 3.7, curB = 1.8;
+let data = null;
+
+let qA=0, qB=0, qOk=0, qBad=0, qDone=false;
+
+// ─── Parse decimal to integer array ───
+// Returns { intPart, fracPart, fracLen }
+function parseNum(n, maxFrac) {
+  const s = n.toFixed(maxFrac);
+  const [ip, fp=''] = s.split('.');
+  return {
+    intPart: ip.split('').map(Number),
+    fracPart: fp.split('').map(Number),
+    fracLen: fp.length
+  };
+}
+
+// Get all digits as flat array: index 0 = rightmost fraction digit
+// Layout: [...fracDigits reversed, ...intDigits reversed]
+// e.g. 12.34 with fracLen=2 → [4,3,2,1]
+function toDigits(n, intLen, fracLen) {
+  const s = n.toFixed(fracLen);
+  const [ip, fp=''] = s.split('.');
+  const ipPad = ip.padStart(intLen,'0');
+  const fpPad = (fp+'0'.repeat(fracLen)).slice(0,fracLen);
+  // rightmost first: frac digits right→left, then int digits right→left
+  return [...fpPad.split('').reverse(), ...ipPad.split('').reverse()].map(Number);
+}
+
+// ─── Build steps ───
+function buildProblem(a, b) {
+  const fracLen = Math.max(
+    (String(a).split('.')[1]||'').length,
+    (String(b).split('.')[1]||'').length
+  );
+  const intLen = Math.max(
+    (String(Math.floor(a))).length,
+    (String(Math.floor(b))).length
+  ) + 1; // +1 for possible carry/result overflow
+
+  const totalCols = intLen + fracLen; // total digit columns (no dot col)
+  const dA = toDigits(a, intLen, fracLen);
+  const dB = toDigits(b, intLen, fracLen);
+  const result = mode === 'add' ? +(a + b).toFixed(fracLen) : +(a - b).toFixed(fracLen);
+  const dR = toDigits(result, intLen, fracLen);
+
+  const steps = [];
+
+  // Step 0: highlight decimal point alignment
+  steps.push({ type:'align', fracLen, totalCols });
+
+  if (mode === 'add') {
+    const adjA = dA.slice();
+    const adjB = dB.slice();
+    const resDigs = new Array(totalCols).fill(null);
+    let carry = 0;
+    for (let col = 0; col < totalCols; col++) {
+      const da = adjA[col]||0, db = adjB[col]||0;
+      const sum = da + db + carry;
+      const digit = sum % 10;
+      const nc = Math.floor(sum/10);
+      resDigs[col] = digit;
+      steps.push({ type:'add', col, da, db, carry, sum, digit, nc, fracLen, totalCols });
+      carry = nc;
+    }
+    if (carry) {
+      // shouldn't happen given our intLen+1 buffer, but safety
+      steps.push({ type:'add_final', digit:carry, fracLen, totalCols });
+    }
+    steps.push({ type:'done', result, resDigs, fracLen, totalCols });
+  } else {
+    const adjA = dA.slice();
+    const origA = dA.slice();
+    const resDigs = new Array(totalCols).fill(null);
+    for (let col = 0; col < totalCols; col++) {
+      let da = adjA[col], db = dB[col]||0;
+      let borrow = 0;
+      if (da < db) {
+        borrow = 1;
+        adjA[col+1] = (adjA[col+1]||0) - 1;
+        da += 10;
+      }
+      const digit = da - db;
+      resDigs[col] = digit;
+      steps.push({
+        type:'sub', col, daOrigDisplay: origA[col],
+        adjAcol1Before: (adjA[col+1]||0) + (borrow?1:0),
+        adjAcol1After: adjA[col+1]||0,
+        da, db, borrow, digit, fracLen, totalCols
+      });
+      // update origA for display (next step sees adjusted value)
+      origA[col+1] = adjA[col+1]||0;
+    }
+    steps.push({ type:'done', result, resDigs, fracLen, totalCols });
+  }
+
+  return { steps, result, dA, dB, dR, fracLen, intLen, totalCols };
+}
+
+// ─── Column index → display info ───
+// columns in the board (left to right visual):
+//   op-col | [int digits high→low] | dot | [frac digits low→high]
+// but internally col 0 = rightmost frac digit
+// boardColIndex: 0..totalCols-1 mapped to visual positions
+// Visual order (left→right): int cols (high→low), dot, frac cols (low→high)
+// col (internal, 0=rightmost frac) maps to visual position:
+//   frac digit col i (0=rightmost) → visual position: fracLen - 1 - i  (from right of frac block)
+//   int digit col i (0=ones)       → visual position: fracLen + 1 + i  from right (after dot)
+// We assign IDs: ca-{col}, cb-{col}, cr-{col}, cc-{col} same as carry.html
+// dot is a special fixed column with id "dot-col"
+
+function colName(col, fracLen) {
+  if (col < fracLen) {
+    const pos = fracLen - col; // 1=tenths,2=hundredths
+    return pos === 1 ? '十分位' : '百分位';
+  }
+  const intPos = col - fracLen; // 0=ones,1=tens,2=hundreds
+  return ['个位','十位','百位','千位'][intPos] || `第${col}位`;
+}
+
+// ─── Build Board HTML ───
+function buildBoard(d) {
+  const { fracLen, intLen, totalCols, dA, dB } = d;
+  const isAdd = mode === 'add';
+
+  // Visual columns left→right:
+  // op-col, int-cols (most sig → least sig = intLen cols, indices intLen-1..0 in intPart),
+  // dot-col,
+  // frac-cols (least sig → most sig = fracLen cols, indices 0..fracLen-1)
+  // Internal col index: frac cols: 0..fracLen-1 (0=rightmost), int cols: fracLen..totalCols-1
+
+  function renderRow(prefix, showOp, opChar) {
+    let html = `<div class="b-row" id="row-${prefix}">`;
+    if (showOp) {
+      html += `<div class="b-cell op-col">${opChar}</div>`;
+    } else {
+      html += `<div class="b-cell op-col" style="visibility:hidden">x</div>`;
+    }
+
+    // int digits: visual left→right = most significant first
+    // internal col for ones = fracLen, tens = fracLen+1, ...
+    for (let i = intLen-1; i >= 0; i--) {
+      const internalCol = fracLen + i;
+      const dig = (prefix === 'a') ? dA[internalCol] : (prefix === 'b') ? dB[internalCol] : '';
+      const showDig = (prefix === 'a' || prefix === 'b') ? dig : '';
+      if (prefix === 'carry') {
+        html += `<div class="b-cell" id="cc-${internalCol}"><span class="carry-ind" id="ci-${internalCol}"></span></div>`;
+      } else if (prefix === 'res') {
+        html += `<div class="b-cell result" id="cr-${internalCol}"><span class="res-digit" id="rd-${internalCol}"></span></div>`;
+      } else {
+        html += `<div class="b-cell" id="c${prefix}-${internalCol}">${showDig}</div>`;
+      }
+    }
+
+    // dot col
+    if (fracLen > 0) {
+      if (prefix === 'carry') {
+        html += `<div class="b-cell dot-col"></div>`;
+      } else if (prefix === 'res') {
+        html += `<div class="b-cell dot-col" id="dot-res">.</div>`;
+      } else {
+        html += `<div class="b-cell dot-col" id="dot-${prefix}">.</div>`;
+      }
+    }
+
+    // frac digits: visual left→right = most significant frac first
+    // frac internal col: fracLen-1=most sig frac, 0=least sig frac
+    for (let i = fracLen-1; i >= 0; i--) {
+      const internalCol = i; // internal col for frac
+      const dig = (prefix === 'a') ? dA[internalCol] : (prefix === 'b') ? dB[internalCol] : '';
+      const showDig = (prefix === 'a' || prefix === 'b') ? dig : '';
+      if (prefix === 'carry') {
+        html += `<div class="b-cell" id="cc-${internalCol}"><span class="carry-ind" id="ci-${internalCol}"></span></div>`;
+      } else if (prefix === 'res') {
+        html += `<div class="b-cell result" id="cr-${internalCol}"><span class="res-digit" id="rd-${internalCol}"></span></div>`;
+      } else {
+        html += `<div class="b-cell" id="c${prefix}-${internalCol}">${showDig}</div>`;
+      }
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  // Total visual width for the line
+  const dotW = fracLen > 0 ? 28 : 0;
+  const lineW = intLen * 54 + dotW + fracLen * 54;
+
+  let html = '<div class="calc-board" id="calcBoard">';
+  html += renderRow('carry', false, '');
+  html += renderRow('a', false, '');
+  html += renderRow('b', true, isAdd ? '+' : '−');
+  html += `<div style="display:flex"><div style="width:38px"></div><div class="b-line" style="width:${lineW}px"></div></div>`;
+  html += renderRow('res', false, '');
+  html += '</div>';
+
+  document.getElementById('boardWrap').innerHTML = html;
+}
+
+// ─── Highlight column ───
+function clearHL() {
+  document.querySelectorAll('.b-cell').forEach(c => c.classList.remove('active'));
+}
+
+function hlCol(col, fracLen) {
+  ['cc','ca','cb','cr'].forEach(p => {
+    const el = document.getElementById(`${p}-${col}`);
+    if (el) el.classList.add('active');
+  });
+  // Also highlight dot column if we're at the boundary
+}
+
+function hlDots() {
+  ['a','b','res'].forEach(p => {
+    const el = document.getElementById(`dot-${p}`);
+    if (el) { el.classList.add('active', 'dot-pulse'); setTimeout(()=>el.classList.remove('dot-pulse'),700); }
+  });
+  const dr = document.getElementById('dot-res');
+  if (dr) dr.classList.add('active');
+}
+
+function setNarr(txt) { document.getElementById('narr').textContent = txt; speak(txt); }
+
+function setComp(eqHtml, note='') {
+  document.getElementById('compBox').innerHTML =
+    `<div class="comp-eq show">${eqHtml}</div>` +
+    (note ? `<div class="comp-note show">${note}</div>` : '');
+}
+
+function showRD(col, digit) {
+  const rd = document.getElementById(`rd-${col}`);
+  if (rd) { rd.textContent = digit; rd.classList.add('show'); }
+}
+
+function showCI(col, digit) {
+  const ci = document.getElementById(`ci-${col}`);
+  if (ci) { ci.textContent = digit; ci.classList.add('show','carry-pop'); }
+}
+
+// ─── Apply step ───
+function applyStep(step) {
+  clearHL();
+
+  if (step.type === 'align') {
+    hlDots();
+    setNarr('第一步：对齐小数点！小数点对齐后，每一位才能正确相加减。');
+    setComp(
+      `<span style="color:#ff6f00;font-size:1.6rem">● 小数点对齐</span>`,
+      '对齐小数点，就像对齐尺子上的刻度，缺少的位补 0'
+    );
+    return;
+  }
+
+  if (step.type === 'add') {
+    const { col, da, db, carry, sum, digit, nc, fracLen } = step;
+    hlCol(col, fracLen);
+    const name = colName(col, fracLen);
+    let narr = `${name}：${da} + ${db}`;
+    if (carry) narr += ` + 进位${carry}`;
+    narr += ` = ${sum}`;
+    if (nc) narr += `　满十！写 ${digit}，向左进 ${nc}`;
+    setNarr(narr);
+
+    let eq = `<span style="color:#1565c0">${da}</span> + <span style="color:#c62828">${db}</span>`;
+    if (carry) eq += ` + <span style="color:#f57c00;font-size:.95rem">进${carry}</span>`;
+    eq += ` = <span style="color:#2e7d32;font-size:1.7rem">${sum}</span>`;
+    const note = nc
+      ? `🎉 ${sum} ≥ 10，<b style="color:#1565c0">写 ${digit}</b>，向左进 <b style="color:#e53935">${nc}</b>`
+      : `写 <b style="color:#1565c0">${digit}</b>`;
+    setComp(eq, note);
+
+    setTimeout(() => showRD(col, digit), spMs * 0.45);
+    if (nc) setTimeout(() => showCI(col+1, nc), spMs * 0.72);
+
+  } else if (step.type === 'sub') {
+    const { col, daOrigDisplay, adjAcol1Before, adjAcol1After, da, db, borrow, digit, fracLen } = step;
+    hlCol(col, fracLen);
+    const name = colName(col, fracLen);
+
+    if (borrow) {
+      setNarr(`${name}：${daOrigDisplay} < ${db}，不够减！向左借 1`);
+      const eq = `<span style="color:#f57c00">借1后：</span>`
+        + `<span style="color:#1565c0">${da}</span>`
+        + ` − <span style="color:#c62828">${db}</span>`
+        + ` = <span style="color:#2e7d32;font-size:1.7rem">${digit}</span>`;
+      setComp(eq, `${daOrigDisplay} 不够减 ${db}，借来10变成 <b>${da}</b>，再减 ${db} = <b>${digit}</b>`);
+      setTimeout(() => {
+        const lendCell = document.getElementById(`ca-${col+1}`);
+        if (lendCell) {
+          lendCell.classList.add('active');
+          lendCell.innerHTML =
+            `<span class="orig-dig borrow-appear">${adjAcol1Before}</span>` +
+            `<span class="new-dig borrow-appear" style="animation-delay:.15s">${adjAcol1After}</span>`;
+        }
+      }, spMs * 0.25);
+    } else {
+      setNarr(`${name}：${daOrigDisplay} − ${db} = ${digit}`);
+      const eq = `<span style="color:#1565c0">${daOrigDisplay}</span>`
+        + ` − <span style="color:#c62828">${db}</span>`
+        + ` = <span style="color:#2e7d32;font-size:1.7rem">${digit}</span>`;
+      setComp(eq, `直接写 <b style="color:#1565c0">${digit}</b>`);
+    }
+    setTimeout(() => showRD(col, digit), spMs * 0.58);
+
+  } else if (step.type === 'done') {
+    clearHL();
+    const op = mode === 'add' ? '+' : '−';
+    setNarr(`🎉 完成！${curA} ${op} ${curB} = ${step.result}`);
+    setComp(
+      `<span style="color:#4a148c;font-size:1.6rem">${curA} ${op} ${curB} = <b>${step.result}</b></span>`,
+      '✅ 全部计算完毕！'
+    );
+    step.resDigs.forEach((d,i) => { if (d !== null) showRD(i, d); });
+    // Reveal result dot
+    const dr = document.getElementById('dot-res');
+    if (dr) dr.style.opacity = '1';
+  }
+}
+
+// ─── Demo control ───
+function initDemo() {
+  const rawA = document.getElementById('inA').value.trim();
+  const rawB = document.getElementById('inB').value.trim();
+  const a = parseFloat(rawA), b = parseFloat(rawB);
+  if (isNaN(a)||isNaN(b)) { setNarr('请输入有效的小数，例如 3.7 或 12.45'); return; }
+  if (mode==='sub' && a <= b) { setNarr('减法中被减数需要大于减数，请重新输入'); return; }
+  curA = a; curB = b;
+  stopPlay();
+  data  = buildProblem(a, b);
+  steps = data.steps;
+  sIdx  = 0;
+  buildBoard(data);
+  document.getElementById('compBox').innerHTML = '';
+  setNarr(`演示 ${a} ${mode==='add'?'+':'−'} ${b}，先对齐小数点 →`);
+  // hide result dot initially
+  const dr = document.getElementById('dot-res');
+  if (dr) dr.style.opacity = '0';
+}
+
+function resetDemo() {
+  stopPlay();
+  document.getElementById('boardWrap').innerHTML = '';
+  document.getElementById('compBox').innerHTML = '';
+  setNarr('点击「开始」观看动画演示 👆');
+  steps=[]; sIdx=0; data=null;
+}
+
+function stepFwd() {
+  if (!steps.length) { initDemo(); return; }
+  if (sIdx >= steps.length) return;
+  applyStep(steps[sIdx++]);
+}
+
+function togglePlay() {
+  if (playing) stopPlay();
+  else { if (!steps.length) initDemo(); startPlay(); }
+}
+
+function startPlay() {
+  playing = true;
+  document.getElementById('btnPlay').textContent = '⏸ 暂停';
+  playNext();
+}
+
+function stopPlay() {
+  playing = false;
+  clearTimeout(pTimer);
+  document.getElementById('btnPlay').textContent = '▶ 自动播放';
+}
+
+function playNext() {
+  if (!playing) return;
+  if (sIdx >= steps.length) { stopPlay(); return; }
+  applyStep(steps[sIdx++]);
+  pTimer = setTimeout(playNext, spMs);
+}
+
+// ─── Random problem ───
+function ri(lo,hi){ return Math.floor(Math.random()*(hi-lo+1))+lo; }
+function rf1(lo,hi){ return +(lo + Math.random()*(hi-lo)).toFixed(1); }
+function rf2(lo,hi){ return +(lo + Math.random()*(hi-lo)).toFixed(2); }
+
+function randProb() {
+  stopPlay(); resetDemo();
+  let a, b;
+  for (let t=0;t<200;t++) {
+    if (diff === 1) {
+      a = rf1(1.1, 9.8); b = rf1(0.1, mode==='add'?9.8:a-0.1);
+    } else if (diff === 2) {
+      a = rf2(1.01, 9.98); b = rf2(0.01, mode==='add'?9.98:a-0.01);
+    } else {
+      // mixed: one 1-decimal, one 2-decimal
+      a = rf2(1.01, 9.98);
+      b = rf1(0.1, mode==='add'?9.8:a-0.1);
+      if (Math.random()<0.5) { [a,b]=[b,a]; }
+    }
+    if (mode==='sub' && a<=b) continue;
+    const r = mode==='add' ? +(a+b).toFixed(2) : +(a-b).toFixed(2);
+    if (r > 0) break;
+  }
+  curA=a; curB=b;
+  document.getElementById('inA').value = a;
+  document.getElementById('inB').value = b;
+}
+
+// ─── Mode / Tab / Diff ───
+function setMode(m) {
+  mode=m;
+  document.getElementById('modeAdd').className='mode-btn add'+(m==='add'?' on':'');
+  document.getElementById('modeSub').className='mode-btn sub'+(m==='sub'?' on':'');
+  document.getElementById('opLbl').textContent = m==='add'?'＋':'－';
+  speak(m==='add'?'小数加法模式。记住：小数点要对齐，再从右往左逐位相加。':'小数减法模式。记住：小数点要对齐，不够减时向左借一位。');
+  randProb();
+}
+
+function switchTab(t) {
+  document.getElementById('pDemo').classList.toggle('hidden', t!=='demo');
+  document.getElementById('pQuiz').classList.toggle('hidden', t!=='quiz');
+  document.getElementById('tabD').classList.toggle('on', t==='demo');
+  document.getElementById('tabQ').classList.toggle('on', t==='quiz');
+  if (t==='quiz') { genQ(); speak('练习模式，请计算下面的小数加减法，输入答案后按确认。'); }
+  else speak('动画演示模式，点击开始观看竖式演示。');
+}
+
+function setDiff(d) {
+  diff=d;
+  document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',+b.dataset.d===d));
+  randProb();
+}
+
+function setSp(ms,btn) {
+  spMs=ms;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ─── Quiz ───
+function genQ() {
+  qDone=false;
+  let a,b;
+  for(let t=0;t<200;t++){
+    if(diff===1){a=rf1(1.1,9.8);b=rf1(0.1,mode==='add'?9.8:a-0.1);}
+    else if(diff===2){a=rf2(1.01,9.98);b=rf2(0.01,mode==='add'?9.98:a-0.01);}
+    else{a=rf2(1.01,9.98);b=rf1(0.1,mode==='add'?9.8:a-0.1);if(Math.random()<.5)[a,b]=[b,a];}
+    if(mode==='sub'&&a<=b)continue;
+    const r=mode==='add'?+(a+b).toFixed(2):+(a-b).toFixed(2);
+    if(r>0){qA=a;qB=b;break;}
+  }
+  const op=mode==='add'?'+':'−';
+  document.getElementById('qDisp').textContent=`${qA}  ${op}  ${qB}  =`;
+  const inp=document.getElementById('qInp');
+  inp.value='';inp.className='q-inp';inp.disabled=false;
+  document.getElementById('qFb').textContent='';
+  document.getElementById('qFb').className='q-fb';
+  inp.focus();setTimeout(()=>inp.focus(),80);
+}
+
+function checkQ(){
+  if(qDone)return;
+  const inp=document.getElementById('qInp');
+  if(inp.value.trim()==='')return;
+  qDone=true;
+  const ans=parseFloat(inp.value);
+  const fracLen=Math.max((String(qA).split('.')[1]||'').length,(String(qB).split('.')[1]||'').length);
+  const correct=+(mode==='add'?qA+qB:qA-qB).toFixed(fracLen);
+  const fb=document.getElementById('qFb');
+  if(Math.abs(ans-correct)<0.001){
+    qOk++;inp.classList.add('ok');
+    fb.textContent=`✅ 正确！${correct}`;fb.className='q-fb ok';
+    tone(523,.1);setTimeout(()=>tone(659,.15),90);
+    speak(`太棒了，答对了！答案是${correct}。`);
+  }else{
+    qBad++;inp.classList.add('fail');
+    fb.textContent=`❌ 答案是 ${correct}`;fb.className='q-fb fail';
+    tone(220,.2,'sawtooth');
+    speak(`答错了，正确答案是${correct}，可以点击看演示，了解计算过程。`);
+  }
+  inp.disabled=true;
+  document.getElementById('qScore').textContent=`✅ ${qOk}  ❌ ${qBad}`;
+}
+
+function nextQ(){genQ();}
+
+function demoThisQ(){
+  switchTab('demo');
+  document.getElementById('inA').value=qA;
+  document.getElementById('inB').value=qB;
+  initDemo();
+  setTimeout(startPlay,200);
+}
+
+// ─── Audio ───
+let _ac=null;
+function tone(f,d,t='sine',v=.22){
+  try{
+    if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended')_ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g);g.connect(_ac.destination);
+    o.type=t;o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start();o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+
+// ─── 语音引擎 ───
+let _speakOn=true, _zhVoice=null;
+function _loadVoices(){
+  const vs=speechSynthesis.getVoices();
+  _zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;
+}
+if(typeof speechSynthesis!=='undefined'){
+  _loadVoices();
+  speechSynthesis.addEventListener('voiceschanged',_loadVoices);
+}
+function speak(txt){
+  if(!_speakOn||typeof speechSynthesis==='undefined') return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  if(_zhVoice){u.voice=_zhVoice;u.lang=_zhVoice.lang;}else{u.lang='zh-CN';}
+  u.rate=0.92; u.pitch=1.05;
+  speechSynthesis.speak(u);
+}
+function toggleSpeak(){
+  _speakOn=!_speakOn;
+  const btn=document.getElementById('speakToggle');
+  btn.textContent=_speakOn?'🔊 声音解说 开':'🔇 声音解说 关';
+  btn.classList.toggle('on',_speakOn);
+  if(!_speakOn) speechSynthesis.cancel();
+  else speak('声音解说已开启。');
+}
+function speakNarr(){
+  const txt=document.getElementById('narr')?.textContent||'';
+  if(txt) speak(txt);
+}
+
+// ─── Init ───
+randProb();
+speak('欢迎来到小数加减法！核心规则：小数点要对齐，再从右往左逐位计算。');
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小数认识</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e0f2f1 50%,#fff9c4 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:18px;}
+.header h1{font-size:2rem;color:#283593;letter-spacing:3px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.speak-toggle{padding:7px 18px;border:2px solid #9fa8da;border-radius:20px;background:#fff;color:#283593;font-size:.9rem;font-weight:bold;cursor:pointer;transition:all .2s;}
+.speak-toggle.on{background:#283593;color:#fff;}
+.speak-btn-sm{padding:5px 12px;border:none;border-radius:12px;background:#e8eaf6;color:#283593;font-size:.88rem;font-weight:bold;cursor:pointer;}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{padding:8px 22px;border:none;border-radius:20px;font-size:.95rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,.65);color:#666;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;font-family:inherit;}
+.tab-btn.on{background:#283593;color:#fff;box-shadow:0 4px 14px rgba(40,53,147,.35);}
+.card{background:rgba(255,255,255,.93);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.section-title{font-size:1rem;font-weight:bold;color:#283593;margin-bottom:12px;text-align:center;}
+
+/* ── 方块可视化 ── */
+.block-wrap{display:flex;flex-direction:column;gap:14px;align-items:center;}
+.block-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;}
+.block-label{font-size:.95rem;color:#555;min-width:60px;text-align:right;}
+.block-grid{display:flex;gap:2px;flex-wrap:wrap;cursor:pointer;}
+.block-cell{width:32px;height:32px;border-radius:5px;border:1.5px solid #c5cae9;background:#e8eaf6;transition:background .2s,transform .15s;}
+.block-cell:hover{transform:scale(1.1);}
+.block-cell.lit{background:#5c6bc0;}
+.block-cell.lit-tenth{background:#42a5f5;}
+.block-cell.lit-hundredth{background:#ef9a9a;}
+.block-big{width:300px;height:30px;border-radius:6px;border:2px solid #c5cae9;background:#e8eaf6;cursor:pointer;overflow:hidden;position:relative;}
+.block-big-fill{height:100%;background:#5c6bc0;transition:width .35s;border-radius:4px;}
+.block-eq{font-size:1.1rem;font-weight:bold;color:#283593;min-width:120px;}
+
+/* ── 数轴 ── */
+.axis-wrap{overflow-x:auto;padding:8px 0;}
+canvas{display:block;margin:0 auto;}
+.axis-controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+.axis-btn{padding:7px 18px;border:2px solid #9fa8da;border-radius:12px;background:#fff;color:#283593;font-weight:bold;font-size:.9rem;cursor:pointer;font-family:inherit;transition:all .18s;}
+.axis-btn.on{background:#283593;color:#fff;border-color:#283593;}
+.axis-desc{text-align:center;font-size:.95rem;color:#555;margin-top:10px;min-height:28px;}
+
+/* ── 读写练习 ── */
+.rw-box{display:flex;flex-direction:column;gap:14px;}
+.rw-item{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.rw-blocks{display:flex;gap:2px;}
+.rw-cell{width:22px;height:22px;border-radius:3px;border:1.5px solid #c5cae9;}
+.rw-q{font-size:1.1rem;color:#333;flex:1;min-width:160px;}
+.rw-inp{width:80px;font-size:1.1rem;border:2px solid #9fa8da;border-radius:8px;padding:4px 8px;text-align:center;font-family:inherit;outline:none;}
+.rw-inp:focus{border-color:#283593;}
+.rw-inp.ok{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.rw-inp.no{background:#ffebee;border-color:#ef9a9a;color:#c62828;}
+
+/* ── 对比感受 ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cmp-card{background:#f5f5f5;border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;}
+.cmp-card:hover,.cmp-card.active{border-color:#283593;background:#e8eaf6;}
+.cmp-val{font-size:2rem;font-weight:bold;color:#283593;}
+.cmp-name{font-size:.85rem;color:#777;margin-top:4px;}
+.cmp-bar-wrap{height:16px;background:#e0e0e0;border-radius:8px;margin-top:8px;overflow:hidden;}
+.cmp-bar{height:100%;border-radius:8px;transition:width .5s;}
+.cmp-desc{font-size:.95rem;color:#555;text-align:center;min-height:40px;margin-top:10px;line-height:1.8;}
+
+/* ── quiz ── */
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#283593;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;text-align:center;line-height:1.9;}
+.q-canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+.options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.opt-btn{padding:10px 22px;border:2px solid #9fa8da;border-radius:14px;background:#fff;font-size:1rem;font-weight:bold;color:#283593;cursor:pointer;transition:all .18s;font-family:inherit;}
+.opt-btn:hover{background:#e8eaf6;}
+.opt-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.opt-btn.wrong{background:#ffebee;border-color:#ef9a9a;color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;text-align:center;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{display:block;margin:12px auto 0;padding:10px 32px;border:none;border-radius:20px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.back-link{display:block;text-align:center;margin-top:20px;color:#283593;text-decoration:none;font-size:.9rem;}
+.formula-box{background:#fffde7;border-radius:12px;padding:10px 16px;font-size:.95rem;color:#555;text-align:center;line-height:2;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🔢</div>
+    <h1>小数认识</h1>
+    <p>把1平均分成10份或100份，感受0.1和0.01</p>
+  </div>
+
+  <div class="speak-bar">
+    <button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button>
+    <button class="speak-btn-sm" onclick="speakCurrent()">▶ 重读</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('block')">🟦 方块拆分</button>
+    <button class="tab-btn" onclick="switchTab('axis')">📏 数轴感受</button>
+    <button class="tab-btn" onclick="switchTab('compare')">⚖️ 大小对比</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- ══ 方块拆分 ══ -->
+  <div id="tab-block">
+    <div class="card">
+      <div class="section-title">点击方块，看"1"被拆分成几份</div>
+      <div class="block-wrap">
+
+        <!-- 整体 1 -->
+        <div class="block-row">
+          <div class="block-label" style="color:#283593;font-weight:bold;">整体 1</div>
+          <div style="width:322px;height:34px;background:#5c6bc0;border-radius:6px;border:2px solid #3949ab;cursor:pointer;" onclick="selectLevel(0)"></div>
+          <div class="block-eq" id="eq0">= 1</div>
+        </div>
+
+        <!-- 十分之一 -->
+        <div class="block-row">
+          <div class="block-label" style="color:#1565c0;">÷ 10</div>
+          <div class="block-grid" id="grid10"></div>
+          <div class="block-eq" id="eq10">每格 = 0.1</div>
+        </div>
+
+        <!-- 百分之一 -->
+        <div class="block-row">
+          <div class="block-label" style="color:#c62828;">÷ 100</div>
+          <div class="block-grid" id="grid100"></div>
+          <div class="block-eq" id="eq100">每格 = 0.01</div>
+        </div>
+
+      </div>
+      <div id="blockDesc" style="text-align:center;font-size:1rem;color:#555;margin-top:14px;min-height:48px;line-height:1.9;background:#f5f5f5;border-radius:10px;padding:8px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🔢 拖动滑块，拼出你想要的小数</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <label style="font-size:.85rem;color:#1565c0;font-weight:bold;">十分位（0.1 的个数）</label>
+          <input type="range" id="slTenth" min="0" max="9" value="3" oninput="updateBuilder()" style="width:140px;accent-color:#1565c0;">
+          <span id="slTenthVal" style="font-weight:bold;color:#1565c0;font-size:1.1rem;">3</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <label style="font-size:.85rem;color:#c62828;font-weight:bold;">百分位（0.01 的个数）</label>
+          <input type="range" id="slHundredth" min="0" max="9" value="5" oninput="updateBuilder()" style="width:140px;accent-color:#c62828;">
+          <span id="slHundredthVal" style="font-weight:bold;color:#c62828;font-size:1.1rem;">5</span>
+        </div>
+      </div>
+      <div id="builderVisual" style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin:8px 0;"></div>
+      <div id="builderResult" style="text-align:center;font-size:1.4rem;font-weight:bold;color:#283593;margin-top:6px;"></div>
+    </div>
+
+    <div class="card formula-box">
+      <div>1 = <b style="color:#1565c0">10</b> 个 0.1 &nbsp;=&nbsp; <b style="color:#c62828">100</b> 个 0.01</div>
+      <div style="color:#888;font-size:.85rem;margin-top:4px;">0.1 读作：<b>十分之一</b> &nbsp;|&nbsp; 0.01 读作：<b>百分之一</b></div>
+    </div>
+  </div>
+
+  <!-- ══ 数轴感受 ══ -->
+  <div id="tab-axis" style="display:none;">
+    <div class="card">
+      <div class="section-title">点击数轴上的位置，放大看小数</div>
+      <div class="axis-controls">
+        <button class="axis-btn on" id="axisBtn1" onclick="setAxisMode(1)">0 ~ 1（认识0.1）</button>
+        <button class="axis-btn" id="axisBtn2" onclick="setAxisMode(2)">0 ~ 0.1（认识0.01）</button>
+        <button class="axis-btn" id="axisBtn3" onclick="setAxisMode(3)">0 ~ 2（综合）</button>
+      </div>
+      <div class="axis-wrap"><canvas id="axisCanvas" width="680" height="160"></canvas></div>
+      <div class="axis-desc" id="axisDesc"></div>
+    </div>
+    <div class="card formula-box">
+      <div>数轴上相邻两个整数之间，被平均分成 <b style="color:#1565c0">10</b> 份，每份是 <b style="color:#1565c0">0.1</b></div>
+      <div>每个 0.1 再被分成 <b style="color:#c62828">10</b> 份，每份是 <b style="color:#c62828">0.01</b></div>
+    </div>
+  </div>
+
+  <!-- ══ 大小对比 ══ -->
+  <div id="tab-compare" style="display:none;">
+    <div class="card">
+      <div class="section-title">点击卡片，直观感受各小数的大小</div>
+      <div class="compare-grid" id="cmpGrid"></div>
+      <div class="cmp-desc" id="cmpDesc"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">小数比较规则</div>
+      <div style="font-size:.95rem;color:#555;line-height:2.4;padding:0 4px;">
+        <div>① 先比较<b style="color:#283593">整数部分</b>，整数大的小数就大</div>
+        <div>② 整数相同，再比<b style="color:#1565c0">十分位</b>，十分位大的就大</div>
+        <div>③ 十分位相同，再比<b style="color:#c62828">百分位</b></div>
+        <div>例：0.3 &gt; 0.19 &nbsp;（0.3 十分位是3，0.19 十分位是1，3＞1）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 练习 ══ -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card" style="text-align:center;">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="q-canvas-wrap"><canvas id="quizCanvas" width="360" height="100"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="options" id="quizOpts"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回学习乐园</a>
+</div>
+
+<script>
+// ── 方块拆分 ──
+let selectedBlock = -1;
+
+function buildGrids() {
+  const g10 = document.getElementById('grid10');
+  const g100 = document.getElementById('grid100');
+  g10.innerHTML = '';
+  g100.innerHTML = '';
+
+  for (let i = 0; i < 10; i++) {
+    const c = document.createElement('div');
+    c.className = 'block-cell lit-tenth';
+    c.title = `第 ${i+1} 格 = 0.${i+1}`;
+    c.onclick = () => selectBlock10(i);
+    g10.appendChild(c);
+  }
+
+  for (let i = 0; i < 100; i++) {
+    const c = document.createElement('div');
+    c.style.cssText = 'width:18px;height:18px;border-radius:3px;border:1px solid #c5cae9;background:#fce4ec;cursor:pointer;transition:background .15s;';
+    c.onclick = () => selectBlock100(i);
+    g100.appendChild(c);
+  }
+}
+
+function selectLevel(lvl) {
+  selectedBlock = lvl;
+  let desc = '';
+  if (lvl === 0) {
+    desc = '这是整体 <b style="color:#283593">1</b>，还没有被分开。';
+    speak('这是整体1，一个完整的正方形。');
+  }
+  document.getElementById('blockDesc').innerHTML = desc;
+}
+
+function selectBlock10(i) {
+  document.querySelectorAll('#grid10 .block-cell').forEach((c, j) => {
+    c.style.background = j <= i ? '#42a5f5' : '#e8eaf6';
+  });
+  const n = i + 1;
+  const val = (n * 0.1).toFixed(1);
+  document.getElementById('blockDesc').innerHTML =
+    `选中了 <b style="color:#1565c0">${n}</b> 个小格，每格是 0.1，<br>` +
+    `合起来是 <b style="color:#283593;font-size:1.3rem;">${val}</b>（读作：${readDecimal(val)}）`;
+  speak(`把整体1平均分成10份，选了${n}份，合起来是${readDecimal(val)}。`);
+}
+
+function selectBlock100(i) {
+  const cells = document.querySelectorAll('#grid100 div');
+  cells.forEach((c, j) => {
+    c.style.background = j <= i ? '#ef9a9a' : '#fce4ec';
+  });
+  const n = i + 1;
+  const val = (n * 0.01).toFixed(2);
+  document.getElementById('blockDesc').innerHTML =
+    `选中了 <b style="color:#c62828">${n}</b> 个小格，每格是 0.01，<br>` +
+    `合起来是 <b style="color:#283593;font-size:1.3rem;">${val}</b>（读作：${readDecimal(val)}）`;
+  speak(`把整体1平均分成100份，选了${n}份，合起来是${readDecimal(val)}。`);
+}
+
+function updateBuilder() {
+  const t = parseInt(document.getElementById('slTenth').value);
+  const h = parseInt(document.getElementById('slHundredth').value);
+  document.getElementById('slTenthVal').textContent = t;
+  document.getElementById('slHundredthVal').textContent = h;
+  const val = (t * 0.1 + h * 0.01).toFixed(2);
+
+  const vis = document.getElementById('builderVisual');
+  vis.innerHTML = '';
+  for (let i = 0; i < t; i++) {
+    const b = document.createElement('div');
+    b.style.cssText = 'width:28px;height:28px;border-radius:5px;background:#42a5f5;border:2px solid #1565c0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;font-weight:bold;';
+    b.textContent = '0.1';
+    vis.appendChild(b);
+  }
+  for (let i = 0; i < h; i++) {
+    const b = document.createElement('div');
+    b.style.cssText = 'width:22px;height:22px;border-radius:4px;background:#ef9a9a;border:1.5px solid #c62828;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#fff;font-weight:bold;';
+    b.textContent = '0.01';
+    vis.appendChild(b);
+  }
+
+  document.getElementById('builderResult').innerHTML =
+    `<span style="color:#1565c0">${t}</span> 个 0.1 + <span style="color:#c62828">${h}</span> 个 0.01 = <span style="color:#283593;font-size:1.6rem;">${val}</span>`;
+  speak(`${t}个零点一，加${h}个零点零一，合起来是${readDecimal(val)}。`);
+}
+
+// ── 数轴 ──
+let axisMode = 1;
+let axisHover = -1;
+
+function setAxisMode(m) {
+  axisMode = m;
+  [1,2,3].forEach(i => document.getElementById('axisBtn'+i).classList.toggle('on', i===m));
+  drawAxis();
+  const hints = {
+    1: '0到1之间平均分成10份，每份是0.1。点击数轴上的刻度查看对应小数。',
+    2: '0.0到0.1之间平均分成10份，每份是0.01，也就是百分之一。',
+    3: '0到2之间的综合数轴，可以看到各个小数的位置。'
+  };
+  document.getElementById('axisDesc').textContent = hints[m];
+  speak(hints[m]);
+}
+
+function drawAxis(highlight) {
+  const canvas = document.getElementById('axisCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const cfg = {
+    1: { lo: 0, hi: 1,   step: 0.1,  sub: 0.1,  bigEvery: 1    },
+    2: { lo: 0, hi: 0.1, step: 0.01, sub: 0.01, bigEvery: 0.1  },
+    3: { lo: 0, hi: 2,   step: 0.2,  sub: 0.1,  bigEvery: 1    },
+  }[axisMode];
+
+  const ML = 40, MR = 40, MY = 80;
+  const axW = W - ML - MR;
+
+  function px(v) { return ML + (v - cfg.lo) / (cfg.hi - cfg.lo) * axW; }
+
+  // axis line
+  ctx.strokeStyle = '#9fa8da'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(ML - 10, MY); ctx.lineTo(W - MR + 10, MY); ctx.stroke();
+  // arrow
+  ctx.fillStyle = '#9fa8da';
+  ctx.beginPath(); ctx.moveTo(W - MR + 10, MY); ctx.lineTo(W - MR + 4, MY - 5); ctx.lineTo(W - MR + 4, MY + 5); ctx.fill();
+
+  // ticks
+  const steps = Math.round((cfg.hi - cfg.lo) / cfg.sub);
+  for (let i = 0; i <= steps; i++) {
+    const v = +(cfg.lo + i * cfg.sub).toFixed(4);
+    const x = px(v);
+    const isBig = Math.abs(v % cfg.bigEvery) < 0.0001 || Math.abs(v % cfg.bigEvery - cfg.bigEvery) < 0.0001;
+    const tickH = isBig ? 16 : 8;
+
+    // highlight
+    if (highlight !== undefined && Math.abs(v - highlight) < 0.0001) {
+      ctx.fillStyle = 'rgba(92,107,192,.18)';
+      ctx.fillRect(x - 18, MY - 36, 36, 52);
+      ctx.strokeStyle = '#5c6bc0'; ctx.lineWidth = 2.5;
+    } else {
+      ctx.strokeStyle = isBig ? '#5c6bc0' : '#b0bec5'; ctx.lineWidth = isBig ? 2 : 1;
+    }
+    ctx.beginPath(); ctx.moveTo(x, MY - tickH); ctx.lineTo(x, MY + tickH); ctx.stroke();
+
+    // label
+    if (isBig || axisMode === 2 || (axisMode === 1 && i % 1 === 0)) {
+      ctx.fillStyle = highlight !== undefined && Math.abs(v - highlight) < 0.0001 ? '#283593' : '#555';
+      ctx.font = isBig ? 'bold 13px sans-serif' : '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(v.toFixed(axisMode === 2 ? 2 : 1), x, MY + 28);
+    }
+  }
+
+  // dot for highlight
+  if (highlight !== undefined) {
+    const x = px(highlight);
+    ctx.fillStyle = '#5c6bc0';
+    ctx.beginPath(); ctx.arc(x, MY, 7, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+document.getElementById('axisCanvas').addEventListener('click', function(e) {
+  const rect = this.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (this.width / rect.width);
+  const cfg = { 1:{lo:0,hi:1,sub:0.1}, 2:{lo:0,hi:0.1,sub:0.01}, 3:{lo:0,hi:2,sub:0.1} }[axisMode];
+  const ML = 40, axW = this.width - 80;
+  const v = cfg.lo + (x - ML) / axW * (cfg.hi - cfg.lo);
+  // snap to nearest tick
+  const snapped = Math.round(v / cfg.sub) * cfg.sub;
+  const sv = Math.max(cfg.lo, Math.min(cfg.hi, +snapped.toFixed(4)));
+  drawAxis(sv);
+  const desc = `<b style="color:#283593;font-size:1.2rem;">${sv.toFixed(axisMode===2?2:1)}</b>（${readDecimal(sv.toFixed(axisMode===2?2:1))}）在数轴上对应这个位置`;
+  document.getElementById('axisDesc').innerHTML = desc;
+  speak(`数轴上这个位置是${readDecimal(sv.toFixed(axisMode===2?2:1))}。`);
+});
+
+// ── 大小对比 ──
+const CMP_VALS = [
+  {v:0.1,  label:'0.1',  color:'#42a5f5', name:'十分之一'},
+  {v:0.3,  label:'0.3',  color:'#29b6f6', name:'十分之三'},
+  {v:0.5,  label:'0.5',  color:'#26c6da', name:'十分之五'},
+  {v:0.01, label:'0.01', color:'#ef9a9a', name:'百分之一'},
+  {v:0.07, label:'0.07', color:'#f48fb1', name:'百分之七'},
+  {v:0.99, label:'0.99', color:'#ce93d8', name:'百分之九十九'},
+];
+
+function buildCompare() {
+  const grid = document.getElementById('cmpGrid');
+  CMP_VALS.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'cmp-card';
+    const pct = (d.v * 100).toFixed(0);
+    card.innerHTML = `
+      <div class="cmp-val" style="color:${d.color}">${d.label}</div>
+      <div class="cmp-name">${d.name}</div>
+      <div class="cmp-bar-wrap"><div class="cmp-bar" style="width:${pct}%;background:${d.color}"></div></div>`;
+    card.onclick = () => {
+      document.querySelectorAll('.cmp-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      document.getElementById('cmpDesc').innerHTML =
+        `<b style="color:${d.color};font-size:1.2rem;">${d.label}</b> 占整体的 <b>${pct}%</b>，` +
+        `${d.v < 0.1 ? '小于十分之一' : d.v < 1 ? '小于1' : '等于或大于1'}，读作<b style="color:#283593">「${d.name}」</b>`;
+      speak(`${d.label}，读作${d.name}，占整体百分之${pct}。`);
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ── Quiz ──
+let qScore = {c:0, w:0}, qAns = '';
+const QTYPES = ['read','write','compare','count'];
+
+function drawQuizBlocks(canvas, n, total, color) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cw = total <= 10 ? 36 : 18;
+  const ch = total <= 10 ? 36 : 18;
+  const gap = 3;
+  const cols = total <= 10 ? 10 : 10;
+  const rows = Math.ceil(total / cols);
+  const ox = (canvas.width - cols * (cw + gap)) / 2;
+  const oy = (canvas.height - rows * (ch + gap)) / 2;
+  for (let i = 0; i < total; i++) {
+    const col = i % cols, row = Math.floor(i / cols);
+    ctx.fillStyle = i < n ? color : '#f0f0f0';
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+    roundRect(ctx, ox + col * (cw + gap), oy + row * (ch + gap), cw, ch, 4);
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); ctx.stroke();
+}
+
+function nextQ() {
+  document.getElementById('quizMsg').textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.querySelectorAll('.opt-btn').forEach(b => { b.disabled = false; b.className = 'opt-btn'; });
+
+  const type = QTYPES[Math.floor(Math.random() * QTYPES.length)];
+  const canvas = document.getElementById('quizCanvas');
+  canvas.style.display = 'block';
+
+  if (type === 'read') {
+    const pool = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.01,0.02,0.05,0.07,0.09];
+    const v = pool[Math.floor(Math.random() * pool.length)];
+    const total = v < 0.1 ? 100 : 10;
+    const n = Math.round(v * total);
+    drawQuizBlocks(canvas, n, total, total === 10 ? '#42a5f5' : '#ef9a9a');
+    qAns = readDecimal(v.toFixed(total === 10 ? 1 : 2));
+    document.getElementById('quizQ').innerHTML = `图中涂色部分怎么读？`;
+    const wrong = new Set([qAns]);
+    const others = ['零点一','零点二','零点五','零点零一','零点零七','零点三','零点九','零点零五'];
+    while (wrong.size < 4) wrong.add(others[Math.floor(Math.random() * others.length)]);
+    renderOpts([...wrong].sort(() => Math.random() - .5));
+    speak('图中涂色部分是多少？请选择正确的读法。');
+
+  } else if (type === 'write') {
+    const pool = ['零点一','零点三','零点五','零点零一','零点零七','零点二','零点八'];
+    const name = pool[Math.floor(Math.random() * pool.length)];
+    const map = {'零点一':'0.1','零点二':'0.2','零点三':'0.3','零点四':'0.4','零点五':'0.5',
+                 '零点六':'0.6','零点七':'0.7','零点八':'0.8','零点九':'0.9',
+                 '零点零一':'0.01','零点零二':'0.02','零点零七':'0.07','零点零五':'0.05'};
+    qAns = map[name] || '0.1';
+    canvas.style.display = 'none';
+    document.getElementById('quizQ').innerHTML = `「<b style="color:#283593">${name}</b>」写成小数是？`;
+    const allVals = Object.values(map);
+    const wrong = new Set([qAns]);
+    while (wrong.size < 4) wrong.add(allVals[Math.floor(Math.random() * allVals.length)]);
+    renderOpts([...wrong].sort(() => Math.random() - .5));
+    speak(`${name}写成小数是哪个？`);
+
+  } else if (type === 'compare') {
+    canvas.style.display = 'none';
+    const a = +(Math.random() * 0.9 + 0.1).toFixed(1);
+    const b = +(Math.random() * 0.9 + 0.1).toFixed(1);
+    if (a === b) { nextQ(); return; }
+    qAns = a > b ? '>' : '<';
+    document.getElementById('quizQ').innerHTML =
+      `<b style="color:#283593;font-size:1.3rem;">${a} __ ${b}</b><br>填 &gt; 还是 &lt; ？`;
+    renderOpts(['>', '<', '=', '≠'].slice(0, a === b ? 4 : 3).sort(() => Math.random() - .5).slice(0,4));
+    speak(`${readDecimal(String(a))} 和 ${readDecimal(String(b))}，哪个大？`);
+
+  } else {
+    const total = Math.random() < 0.5 ? 10 : 100;
+    const n = 1 + Math.floor(Math.random() * (total - 1));
+    const v = +(n / total).toFixed(total === 10 ? 1 : 2);
+    drawQuizBlocks(canvas, n, total, total === 10 ? '#42a5f5' : '#ef9a9a');
+    qAns = String(v);
+    document.getElementById('quizQ').innerHTML = `涂色了 ${n} 格，共 ${total} 格，涂色部分是多少？`;
+    const wrong = new Set([qAns]);
+    while (wrong.size < 4) {
+      const wn = 1 + Math.floor(Math.random() * (total - 1));
+      wrong.add(String(+(wn / total).toFixed(total === 10 ? 1 : 2)));
+    }
+    renderOpts([...wrong].sort(() => Math.random() - .5));
+    speak(`涂色了${n}格，一共${total}格，涂色部分是多少？`);
+  }
+}
+
+function renderOpts(arr) {
+  const cont = document.getElementById('quizOpts');
+  cont.innerHTML = '';
+  arr.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'opt-btn'; b.textContent = o;
+    b.onclick = () => {
+      document.querySelectorAll('.opt-btn').forEach(x => x.disabled = true);
+      if (o === qAns) {
+        b.classList.add('correct'); qScore.c++;
+        document.getElementById('quizMsg').className = 'result-msg ok';
+        document.getElementById('quizMsg').textContent = '✅ 答对了！';
+        speak('太棒了，答对了！');
+      } else {
+        b.classList.add('wrong'); qScore.w++;
+        document.querySelectorAll('.opt-btn').forEach(x => { if (x.textContent === qAns) x.classList.add('correct'); });
+        document.getElementById('quizMsg').className = 'result-msg no';
+        document.getElementById('quizMsg').textContent = '❌ 正确答案是 ' + qAns;
+        speak(`答错了，正确答案是${qAns}。`);
+      }
+      document.getElementById('qC').textContent = qScore.c;
+      document.getElementById('qW').textContent = qScore.w;
+      document.getElementById('nextBtn').style.display = 'block';
+    };
+    cont.appendChild(b);
+  });
+}
+
+// ── 工具：读小数 ──
+function readDecimal(s) {
+  const map = {'0':'零','1':'一','2':'二','3':'三','4':'四','5':'五','6':'六','7':'七','8':'八','9':'九'};
+  const [ip, fp] = String(s).split('.');
+  let r = (ip === '0' ? '零' : ip.split('').map(d => map[d]).join('')) + '点';
+  if (fp) r += fp.split('').map(d => map[d]).join('');
+  return r;
+}
+
+// ── tab 切换 ──
+let curTab = 'block';
+function switchTab(t) {
+  curTab = t;
+  ['block','axis','compare','quiz'].forEach(id => {
+    document.getElementById('tab-'+id).style.display = id === t ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('on', ['block','axis','compare','quiz'][i] === t);
+  });
+  const hints = {
+    block: '方块拆分，把1分成10份或100份，点击方块感受零点一和零点零一。',
+    axis: '数轴感受，点击数轴上的刻度，看看每个小数在数轴上的位置。',
+    compare: '大小对比，点击卡片感受各个小数的大小关系。',
+    quiz: '练习时间，看图填写小数，开始答题吧。'
+  };
+  speak(hints[t]);
+  if (t === 'axis') { drawAxis(); }
+  if (t === 'quiz') nextQ();
+}
+
+// ── 语音引擎 ──
+let _speakOn = true, _zhVoice = null;
+function _loadVoices() {
+  const vs = speechSynthesis.getVoices();
+  _zhVoice = vs.find(v => v.lang === 'zh-CN') || vs.find(v => v.lang.startsWith('zh')) || null;
+}
+if (typeof speechSynthesis !== 'undefined') {
+  _loadVoices();
+  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+}
+function speak(txt) {
+  if (!_speakOn || typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt);
+  if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; } else { u.lang = 'zh-CN'; }
+  u.rate = 0.9; u.pitch = 1.1;
+  speechSynthesis.speak(u);
+}
+function toggleSpeak() {
+  _speakOn = !_speakOn;
+  const btn = document.getElementById('speakToggle');
+  btn.textContent = _speakOn ? '🔊 声音解说 开' : '🔇 声音解说 关';
+  btn.classList.toggle('on', _speakOn);
+  if (!_speakOn) speechSynthesis.cancel();
+  else speak('声音解说已开启。');
+}
+function speakCurrent() {
+  const hints = {
+    block: '方块拆分，把整体1平均分成10份，每份是零点一；分成100份，每份是零点零一。',
+    axis: document.getElementById('axisDesc').textContent || '点击数轴上的刻度查看小数。',
+    compare: document.getElementById('cmpDesc').textContent || '点击卡片感受各小数大小。',
+    quiz: document.getElementById('quizQ').textContent || ''
+  };
+  speak(hints[curTab] || '');
+}
+
+// ── 初始化 ──
+buildGrids();
+buildCompare();
+drawAxis();
+updateBuilder();
+</script>
+</body>
+</html>
