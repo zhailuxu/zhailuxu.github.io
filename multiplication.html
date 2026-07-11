@@ -297,12 +297,32 @@ body {
     <!-- 设置 -->
     <div id="quizSetupArea">
       <div class="quiz-setup">
-        <div>
-          <label>范围：</label>
-          <select id="quizRange">
-            <option value="5">1～5 段</option>
-            <option value="9" selected>1～9 段（全部）</option>
+        <div style="display:flex;align-items:center;gap:4px">
+          <label>范围：第</label>
+          <select id="quizRangeFrom" onchange="syncRangeTo()">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
           </select>
+          <label>段 到 第</label>
+          <select id="quizRangeTo">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9" selected>9</option>
+          </select>
+          <label>段</label>
         </div>
         <div>
           <label>题数：</label>
@@ -315,9 +335,9 @@ body {
         <div>
           <label>限时：</label>
           <select id="quizTimer">
-            <option value="0">不限时</option>
+            <option value="0" selected>不限时</option>
             <option value="5">每题 5 秒</option>
-            <option value="8" selected>每题 8 秒</option>
+            <option value="8">每题 8 秒</option>
             <option value="15">每题 15 秒</option>
             <option value="60">每题 60 秒</option>
           </select>
@@ -332,6 +352,7 @@ body {
         <span class="quiz-score" id="quizScore">✅ 0 &nbsp; ❌ 0</span>
         <span class="quiz-score" id="quizQNum">第 1 / 10 题</span>
         <span class="quiz-timer-display" id="quizTimerDisp" style="display:none">⏱ 8s</span>
+        <button class="btn btn-gray" onclick="resetQuiz()" style="padding:4px 12px;font-size:.78rem;box-shadow:none">⚙️ 重设</button>
       </div>
       <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgFill" style="width:0%"></div></div>
 
@@ -639,10 +660,18 @@ let quizList = [], quizIdx = 0, quizCorrect = 0, quizWrong = [];
 let quizTimerInterval = null, quizTimerLeft = 0, quizTimerSec = 0;
 let quizAnswered = false;
 
+function syncRangeTo() {
+  const from = parseInt(document.getElementById('quizRangeFrom').value);
+  const toSel = document.getElementById('quizRangeTo');
+  [...toSel.options].forEach(o => { o.disabled = parseInt(o.value) < from; });
+  if (parseInt(toSel.value) < from) toSel.value = from;
+}
+
 function buildQuizList() {
-  const range = parseInt(document.getElementById('quizRange').value);
+  const from  = parseInt(document.getElementById('quizRangeFrom').value);
+  const to    = parseInt(document.getElementById('quizRangeTo').value);
   const count = parseInt(document.getElementById('quizCount').value);
-  const pool = ALL.filter(x => x.b <= range);
+  const pool  = ALL.filter(x => x.b >= from && x.b <= to);
   const shuffled = [...pool].sort(() => Math.random() - .5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -853,5 +882,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 }
 </script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
