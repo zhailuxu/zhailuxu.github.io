@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10以内加减法：学过程</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.75rem;color:#ef6c00;letter-spacing:1px;text-shadow:2px 3px 0 #ffe0b2;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{padding:8px 14px;border:none;border-radius:20px;font-size:.84rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,.65);color:#666;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;font-family:inherit;}
+.tab-btn.on{background:#ef6c00;color:#fff;box-shadow:0 4px 14px rgba(239,108,0,.35);}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:12px;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:120px;accent-color:#ef6c00;}
+.sl-val{font-weight:bold;font-size:1.1rem;color:#ef6c00;}
+.gen-btn{padding:9px 22px;border:none;border-radius:14px;background:#fb8c00;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+/* 加法/减法演示 */
+.obj-groups{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:14px 0;min-height:60px;}
+.obj-eq-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:14px 0;min-height:60px;}
+.obj-pack{display:flex;flex-wrap:wrap;gap:4px;max-width:200px;min-width:56px;min-height:44px;justify-content:center;align-items:center;padding:8px;border-radius:12px;background:#fff8e1;}
+.obj-pack span{font-size:1.5rem;animation:popIn .25s ease-out;}
+.obj-pack.result{background:#e8f5e9;border:2.5px dashed #a5d6a7;gap:14px;}
+.obj-pack.result .ph{color:#bbb;font-size:1.4rem;}
+.result-sub{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+span.countable{cursor:pointer;transition:transform .15s;}
+span.countable:hover{transform:scale(1.15);}
+span.countable.tapped{animation:tapBounce .3s ease;}
+@keyframes tapBounce{0%{transform:scale(1);}50%{transform:scale(1.4);}100%{transform:scale(1);}}
+.obj-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.obj-num{font-size:1.6rem;font-weight:bold;color:#333;min-height:1.9rem;transition:transform .15s;}
+.obj-num.answer{color:#2e7d32;}
+.obj-num.pop{animation:numPop .3s ease-out;}
+@keyframes numPop{0%{transform:scale(.5);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
+.obj-plus, .obj-minus, .obj-op{font-size:1.8rem;color:#bbb;font-weight:bold;}
+.merge-wrap{text-align:center;margin:14px 0;}
+.merge-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:340px;margin:8px auto;min-height:40px;}
+.merge-row span{font-size:1.5rem;animation:popIn .25s ease-out;}
+.merge-row span.taken{opacity:.25;filter:grayscale(1);}
+.merge-count{font-size:1.3rem;font-weight:bold;color:#ef6c00;min-height:1.6rem;}
+.eq-display{text-align:center;font-size:1.8rem;font-weight:bold;color:#333;margin:14px 0;letter-spacing:1px;}
+.eq-display b{color:#2e7d32;}
+.sub-eq-row{display:flex;align-items:baseline;justify-content:center;gap:16px;flex-wrap:wrap;margin:14px 0;}
+.sub-eq-row .eq-display{margin:0;}
+.sub-eq-row .merge-count{margin:0;}
+@keyframes popIn{from{opacity:0;transform:scale(.4);}to{opacity:1;transform:scale(1);}}
+/* 数轴 */
+.numline-wrap{position:relative;width:340px;max-width:100%;margin:10px auto;overflow-x:auto;}
+.numline-svg{display:block;}
+.frog{position:absolute;top:16px;transform:translateX(-50%);transition:left .4s ease-in-out;text-align:center;cursor:grab;touch-action:none;}
+.frog.dragging{cursor:grabbing;transition:none;}
+.frog-emoji{font-size:1.8rem;line-height:1;}
+.frog-num{font-size:.8rem;font-weight:bold;color:#2e7d32;background:#fff;border:2px solid #a5d6a7;border-radius:8px;padding:0 6px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+.dir-row{display:flex;gap:10px;justify-content:center;margin:10px 0;}
+.dir-btn{padding:8px 20px;border:2px solid #ffb74d;border-radius:14px;background:#fff;color:#ef6c00;font-size:.92rem;font-weight:bold;cursor:pointer;}
+.dir-btn.on{background:#ef6c00;color:#fff;border-color:#ef6c00;}
+/* 数的组成 */
+.decomp-list{display:flex;flex-direction:column;gap:8px;margin:14px auto;max-width:280px;}
+.decomp-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.15rem;font-weight:bold;background:#fff8e1;border-radius:10px;padding:8px 12px;}
+.decomp-row .da{color:#1565c0;} .decomp-row .db{color:#c62828;}
+.formula-box{background:#fff3e0;border-radius:12px;padding:12px 18px;text-align:center;font-size:.95rem;color:#ef6c00;line-height:1.8;margin-top:10px;}
+/* 综合练习 */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fff3e0;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#ef6c00;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:10px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:80px;border:2px solid #ffb74d;border-radius:10px;padding:6px 8px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#ef6c00;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#ef6c00;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#ef6c00;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.back-link{display:block;text-align:center;margin-top:20px;color:#ef6c00;text-decoration:none;font-size:.9rem;}
+.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.speak-toggle{padding:7px 18px;border:2px solid #ccc;border-radius:20px;background:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
+.speak-toggle.on{background:#ef6c00;color:#fff;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🍎</div>
+    <h1>10以内加减法</h1>
+    <p>不是刷题，是先看懂"为什么" —— 合并就是加法，去掉就是减法</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('add')">➕ 加法：合起来</button>
+    <button class="tab-btn" onclick="switchTab('sub')">➖ 减法：去掉</button>
+    <button class="tab-btn" onclick="switchTab('line')">🐸 数轴跳一跳</button>
+    <button class="tab-btn" onclick="switchTab('decomp')">🔟 数的分成</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 加法：合起来 -->
+  <div id="tab-add">
+    <div class="card">
+      <div class="net-desc">两堆合起来是多少？一个一个数一数就知道了（演示完还可以点右边的苹果，听听它是第几个）</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>第一堆</label><input type="range" id="addA" min="0" max="9" value="3" oninput="onAddAChange()"><span class="sl-val" id="addAVal">3</span></div>
+        <div class="sl-group"><label>第二堆</label><input type="range" id="addB" min="0" max="7" value="2" oninput="onAddBChange()"><span class="sl-val" id="addBVal">2</span></div>
+      </div>
+      <div class="obj-eq-row" id="addEqRow">
+        <div class="obj-col">
+          <div class="obj-pack" id="addPackA"></div>
+          <div class="obj-num" id="addNumA">3</div>
+        </div>
+        <div class="obj-op">＋</div>
+        <div class="obj-col">
+          <div class="obj-pack" id="addPackB"></div>
+          <div class="obj-num" id="addNumB">2</div>
+        </div>
+        <div class="obj-op">＝</div>
+        <div class="obj-col">
+          <div class="obj-pack result" id="addPackResult">
+            <span class="ph" id="addResultPh">?</span>
+            <div class="result-sub" id="addResultSubA"></div>
+            <div class="result-sub" id="addResultSubB"></div>
+          </div>
+          <div class="obj-num" id="addNumResult">?</div>
+        </div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="playAddDemo()">▶ 演示合并</button></div>
+    </div>
+  </div>
+
+  <!-- 减法：去掉 -->
+  <div id="tab-sub" style="display:none;">
+    <div class="card">
+      <div class="net-desc">从一堆里去掉几个，还剩多少？划掉去掉的，数一数剩下的</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>一共</label><input type="range" id="subTotal" min="1" max="10" value="6" oninput="onSubTotalChange()"><span class="sl-val" id="subTotalVal">6</span></div>
+        <div class="sl-group"><label>去掉</label><input type="range" id="subTake" min="0" max="6" value="2" oninput="onSubTakeChange()"><span class="sl-val" id="subTakeVal">2</span></div>
+      </div>
+      <div class="merge-wrap">
+        <div class="merge-row" id="subRow"></div>
+      </div>
+      <div class="sub-eq-row">
+        <div class="eq-display" id="subEq">6 － 2 ＝ ?</div>
+        <div class="merge-count" id="subCount"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="playSubDemo()">▶ 演示去掉</button></div>
+    </div>
+  </div>
+
+  <!-- 数轴跳一跳 -->
+  <div id="tab-line" style="display:none;">
+    <div class="card">
+      <div class="net-desc">🐸小青蛙站在"起点"这个数字上——它头顶的数字牌，就是它现在所在的位置。点"跳一跳"看它自己跳，也可以直接用手拖着青蛙跳，松手看看跳对了没有</div>
+      <div class="dir-row">
+        <button class="dir-btn on" id="dirAdd" onclick="setLineDir('add')">➕ 加法（往右跳）</button>
+        <button class="dir-btn" id="dirSub" onclick="setLineDir('sub')">➖ 减法（往左跳）</button>
+      </div>
+      <div class="slider-row">
+        <div class="sl-group"><label>起点</label><input type="range" id="lineStart" min="0" max="10" value="3" oninput="onLineChange()"><span class="sl-val" id="lineStartVal">3</span></div>
+        <div class="sl-group"><label>跳几步</label><input type="range" id="lineStep" min="0" max="7" value="4" oninput="onLineChange()"><span class="sl-val" id="lineStepVal">4</span></div>
+      </div>
+      <div class="numline-wrap">
+        <svg class="numline-svg" id="numlineSvg" width="340" height="130" viewBox="0 0 340 130"></svg>
+        <div class="frog" id="frog"><div class="frog-emoji">🐸</div><div class="frog-num" id="frogNum">3</div></div>
+      </div>
+      <div class="eq-display" id="lineEq">3 ＋ 4 ＝ ?</div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="playLineDemo()">▶ 跳一跳</button></div>
+    </div>
+  </div>
+
+  <!-- 数的分成 -->
+  <div id="tab-decomp" style="display:none;">
+    <div class="card">
+      <div class="net-desc">一个数可以分成两部分，反过来两部分合起来就是这个数——这就是加减法的秘密</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>选一个数</label><input type="range" id="decompN" min="2" max="10" value="10" oninput="renderDecomp()"><span class="sl-val" id="decompNVal">10</span></div>
+      </div>
+      <div class="decomp-list" id="decompList"></div>
+      <div class="formula-box" id="decompFormula"></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div id="quizVisual" style="margin-bottom:10px;"></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script>
+let _speakOn=true,_zhVoice=null;
+function _loadVoices(){const vs=speechSynthesis.getVoices();_zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;}
+if(typeof speechSynthesis!=='undefined'){_loadVoices();speechSynthesis.addEventListener('voiceschanged',_loadVoices);}
+// speak() 返回一个 Promise：朗读真正结束（或出错/被禁用）才 resolve，避免下一句话把当前这句打断
+// 注意：部分浏览器的语音引擎闲置一段时间后会静默卡死（既不触发 onend 也不触发 onerror），
+// 加个兜底超时，避免朗读一卡，后面的演示动画跟着永远卡住不出结果
+function speak(text){
+  return new Promise(resolve=>{
+    if(!_speakOn||typeof speechSynthesis==='undefined'){ resolve(); return; }
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(_zhVoice){u.voice=_zhVoice;u.lang=_zhVoice.lang;}else{u.lang='zh-CN';}
+    u.rate=0.85;u.pitch=1.1;
+    let done=false;
+    const finish=()=>{ if(done) return; done=true; resolve(); };
+    u.onend=finish;
+    u.onerror=finish;
+    speechSynthesis.speak(u);
+    setTimeout(finish,4000);
+  });
+}
+function toggleSpeak(){_speakOn=!_speakOn;const btn=document.getElementById('speakToggle');btn.textContent=_speakOn?'🔊 声音解说 开':'🔇 声音解说 关';btn.classList.toggle('on',_speakOn);if(!_speakOn) speechSynthesis.cancel();else speak('声音解说已开启。');}
+function randInt(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+let _ac=null;
+function tone(f,d=.1,t='sine',v=.18){
+  try{
+    if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended')_ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g);g.connect(_ac.destination);
+    o.type=t;o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start();o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+function chime(){tone(523,.1);setTimeout(()=>tone(659,.12),100);setTimeout(()=>tone(784,.18),220);}
+
+// ── 加法：合起来 ──
+let addAnimId=0;
+function onAddAChange(){
+  const a=+document.getElementById('addA').value;
+  const bSlider=document.getElementById('addB');
+  bSlider.max=10-a;
+  if(+bSlider.value>10-a) bSlider.value=10-a;
+  renderAddStatic();
+}
+function onAddBChange(){
+  const b=+document.getElementById('addB').value;
+  const aSlider=document.getElementById('addA');
+  aSlider.max=10-b;
+  if(+aSlider.value>10-b) aSlider.value=10-b;
+  renderAddStatic();
+}
+function renderAddStatic(){
+  const a=+document.getElementById('addA').value, b=+document.getElementById('addB').value;
+  document.getElementById('addAVal').textContent=a;
+  document.getElementById('addBVal').textContent=b;
+  document.getElementById('addPackA').innerHTML='<span>🍎</span>'.repeat(a);
+  document.getElementById('addPackB').innerHTML='<span>🍎</span>'.repeat(b);
+  document.getElementById('addResultSubA').innerHTML='';
+  document.getElementById('addResultSubB').innerHTML='';
+  document.getElementById('addResultPh').style.display='';
+  document.getElementById('addNumA').textContent=a;
+  document.getElementById('addNumB').textContent=b;
+  document.getElementById('addNumResult').textContent='?';
+  document.getElementById('addNumResult').className='obj-num';
+}
+async function playAddDemo(){
+  const a=+document.getElementById('addA').value, b=+document.getElementById('addB').value;
+  const total=a+b;
+  const myId=++addAnimId;
+  renderAddStatic();
+  await speak(`${a}个苹果和${b}个苹果，合起来是多少个？`);
+  await delay(300);
+  if(addAnimId!==myId) return;
+  document.getElementById('addResultPh').style.display='none';
+  const subA=document.getElementById('addResultSubA'), subB=document.getElementById('addResultSubB');
+  const numResult=document.getElementById('addNumResult');
+  subA.innerHTML=''; subB.innerHTML='';
+  for(let i=0;i<total;i++){
+    if(addAnimId!==myId) return;
+    const span=document.createElement('span'); span.textContent='🍎';
+    span.classList.add('countable');
+    span.onclick=()=>{ speak(String(i+1)); tone(392+i*18,.08); span.classList.remove('tapped'); void span.offsetWidth; span.classList.add('tapped'); };
+    (i<a ? subA : subB).appendChild(span);
+    numResult.textContent=i+1;
+    numResult.classList.remove('pop'); void numResult.offsetWidth; numResult.classList.add('pop');
+    tone(392+i*18,.08);
+    await Promise.all([speak(String(i+1)), delay(450)]);
+  }
+  if(addAnimId!==myId) return;
+  numResult.classList.add('answer');
+  await speak(`一共${total}个，${a}加${b}等于${total}`);
+  chime();
+}
+
+// ── 减法：去掉 ──
+let subAnimId=0;
+function onSubTotalChange(){
+  const total=+document.getElementById('subTotal').value;
+  const takeSlider=document.getElementById('subTake');
+  takeSlider.max=total;
+  if(+takeSlider.value>total) takeSlider.value=total;
+  renderSubStatic();
+}
+function onSubTakeChange(){ renderSubStatic(); }
+function renderSubStatic(){
+  const total=+document.getElementById('subTotal').value, take=+document.getElementById('subTake').value;
+  document.getElementById('subTotalVal').textContent=total;
+  document.getElementById('subTakeVal').textContent=take;
+  const row=document.getElementById('subRow');
+  row.innerHTML='';
+  for(let i=0;i<total;i++){ const span=document.createElement('span'); span.textContent='🍓'; row.appendChild(span); }
+  document.getElementById('subEq').innerHTML=`${total} － ${take} ＝ ?`;
+  document.getElementById('subCount').textContent='';
+}
+async function playSubDemo(){
+  const total=+document.getElementById('subTotal').value, take=+document.getElementById('subTake').value;
+  const remain=total-take;
+  const myId=++subAnimId;
+  renderSubStatic();
+  await speak(`一共${total}个草莓，吃掉${take}个，还剩多少个？`);
+  await delay(500);
+  if(subAnimId!==myId) return;
+  const spans=document.querySelectorAll('#subRow span');
+  for(let i=0;i<take;i++){
+    if(subAnimId!==myId) return;
+    spans[i].classList.add('taken');
+    document.getElementById('subCount').textContent=`吃掉了 ${i+1} 个`;
+    tone(260-i*10,.1,'sawtooth');
+    await Promise.all([speak(`吃掉${i+1}个`), delay(650)]);
+  }
+  await delay(500);
+  if(subAnimId!==myId) return;
+  document.getElementById('subCount').textContent='数一数还剩几个……';
+  await delay(800);
+  for(let i=take;i<total;i++){
+    if(subAnimId!==myId) return;
+    spans[i].style.outline='3px solid #2e7d32'; spans[i].style.borderRadius='8px';
+    const remainNum=i-take+1;
+    spans[i].classList.add('countable');
+    spans[i].onclick=()=>{ speak(String(remainNum)); tone(392+remainNum*18,.08); spans[i].classList.remove('tapped'); void spans[i].offsetWidth; spans[i].classList.add('tapped'); };
+    document.getElementById('subCount').textContent=`剩下数到 ${remainNum}`;
+    tone(440+i*18,.08);
+    await Promise.all([speak(String(remainNum)), delay(650)]);
+  }
+  if(subAnimId!==myId) return;
+  document.getElementById('subEq').innerHTML=`${total} － ${take} ＝ <b>${remain}</b>`;
+  document.getElementById('subCount').textContent=`还剩 ${remain} 个`;
+  await speak(`${total}减${take}等于${remain}`);
+  chime();
+}
+
+// ── 数轴跳一跳 ──
+let lineDir='add', lineAnimId=0;
+function buildNumline(){
+  const svg=document.getElementById('numlineSvg');
+  const x0=20, x1=320, y=90;
+  let html=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#888" stroke-width="2"/>`;
+  for(let n=0;n<=10;n++){
+    const x=x0+(x1-x0)*n/10;
+    html+=`<circle cx="${x}" cy="${y}" r="4.5" fill="#fb8c00"/>`;
+    html+=`<text x="${x}" y="${y+28}" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">${n}</text>`;
+  }
+  svg.innerHTML=html;
+}
+function lineX(n){ return 20+(320-20)*n/10; }
+function setLineDir(d){
+  lineDir=d;
+  document.getElementById('dirAdd').classList.toggle('on', d==='add');
+  document.getElementById('dirSub').classList.toggle('on', d==='sub');
+  clampLineStep();
+  onLineChange();
+}
+function clampLineStep(){
+  const start=+document.getElementById('lineStart').value;
+  const stepSlider=document.getElementById('lineStep');
+  const maxStep = lineDir==='add' ? (10-start) : start;
+  stepSlider.max=maxStep;
+  if(+stepSlider.value>maxStep) stepSlider.value=maxStep;
+}
+function onLineChange(){
+  clampLineStep();
+  const start=+document.getElementById('lineStart').value, step=+document.getElementById('lineStep').value;
+  document.getElementById('lineStartVal').textContent=start;
+  document.getElementById('lineStepVal').textContent=step;
+  document.getElementById('frog').style.left=lineX(start)+'px';
+  document.getElementById('frogNum').textContent=start;
+  const end = lineDir==='add' ? start+step : start-step;
+  document.getElementById('lineEq').innerHTML=`${start} ${lineDir==='add'?'＋':'－'} ${step} ＝ ?`;
+}
+async function playLineDemo(){
+  const start=+document.getElementById('lineStart').value, step=+document.getElementById('lineStep').value;
+  const end = lineDir==='add' ? start+step : start-step;
+  const myId=++lineAnimId;
+  document.getElementById('frog').style.left=lineX(start)+'px';
+  document.getElementById('frogNum').textContent=start;
+  await speak(`从${start}开始，${lineDir==='add'?'往右跳':'往左跳'}${step}步，跳到几？`);
+  await delay(300);
+  let cur=start;
+  for(let i=0;i<step;i++){
+    if(lineAnimId!==myId) return;
+    cur = lineDir==='add' ? cur+1 : cur-1;
+    document.getElementById('frog').style.left=lineX(cur)+'px';
+    document.getElementById('frogNum').textContent=cur;
+    tone(392+cur*15,.09);
+    await delay(450);
+  }
+  if(lineAnimId!==myId) return;
+  document.getElementById('lineEq').innerHTML=`${start} ${lineDir==='add'?'＋':'－'} ${step} ＝ <b>${end}</b>`;
+  await speak(`跳到了${end}，${start}${lineDir==='add'?'加':'减'}${step}等于${end}`);
+  chime();
+}
+
+// ── 数轴：拖着青蛙自己跳 ──
+let lineDragging=false;
+function xToN(x){ return Math.max(0,Math.min(10,Math.round((x-20)/(320-20)*10))); }
+function initFrogDrag(){
+  const frog=document.getElementById('frog');
+  const wrap=document.querySelector('.numline-wrap');
+  frog.addEventListener('pointerdown',e=>{
+    lineAnimId++; // 打断可能正在播放的自动演示
+    lineDragging=true;
+    frog.classList.add('dragging');
+    frog.setPointerCapture(e.pointerId);
+  });
+  frog.addEventListener('pointermove',e=>{
+    if(!lineDragging) return;
+    const rect=wrap.getBoundingClientRect();
+    const x=Math.max(20,Math.min(320,e.clientX-rect.left));
+    frog.style.left=x+'px';
+    document.getElementById('frogNum').textContent=xToN(x);
+  });
+  frog.addEventListener('pointerup',e=>{
+    if(!lineDragging) return;
+    lineDragging=false;
+    frog.classList.remove('dragging');
+    const rect=wrap.getBoundingClientRect();
+    const n=xToN(Math.max(20,Math.min(320,e.clientX-rect.left)));
+    frog.style.left=lineX(n)+'px';
+    document.getElementById('frogNum').textContent=n;
+    checkFrogLanding(n);
+  });
+}
+function checkFrogLanding(n){
+  const start=+document.getElementById('lineStart').value, step=+document.getElementById('lineStep').value;
+  const end = lineDir==='add' ? start+step : start-step;
+  if(n===end){
+    document.getElementById('lineEq').innerHTML=`${start} ${lineDir==='add'?'＋':'－'} ${step} ＝ <b>${end}</b>`;
+    speak(`跳对了！落在${n}，真棒！`); chime();
+  } else {
+    speak(`跳到了${n}，再想想，是不是${lineDir==='add'?'加':'减'}${step}后的数字`); tone(200,.2,'sawtooth');
+  }
+}
+
+// ── 数的分成 ──
+function renderDecomp(){
+  const n=+document.getElementById('decompN').value;
+  document.getElementById('decompNVal').textContent=n;
+  const list=document.getElementById('decompList');
+  let html='';
+  for(let a=0;a<=n;a++){
+    const b=n-a;
+    html+=`<div class="decomp-row"><span>${n}</span><span>＝</span><span class="da">${a}</span><span>＋</span><span class="db">${b}</span></div>`;
+  }
+  list.innerHTML=html;
+  document.getElementById('decompFormula').innerHTML=
+    `💡 反过来想：${n} － ${randInt(1,n-1||1)} 这类减法题，答案就藏在上面的分成表里`;
+  speak(`${n}可以分成很多种，一份加一份合起来还是${n}`);
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, quizAns=0;
+const OBJ_EMOJI=['🍎','🍓','⭐','🎈','🍭','🐟'];
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const type=randInt(0,3);
+  const em=OBJ_EMOJI[randInt(0,OBJ_EMOJI.length-1)];
+  if(type===0){
+    const a=randInt(1,8), b=randInt(0,10-a);
+    quizAns=a+b;
+    document.getElementById('quizVisual').innerHTML=`<div class="obj-groups"><div class="obj-pack">${`<span>${em}</span>`.repeat(a)}</div><div class="obj-plus">＋</div><div class="obj-pack">${`<span>${em}</span>`.repeat(b)}</div></div>`;
+    document.getElementById('quizQ').textContent=`一共有多少个？`;
+    speak(`${a}个加${b}个，一共多少个？`);
+  } else if(type===1){
+    const total=randInt(2,10), take=randInt(0,total);
+    quizAns=total-take;
+    document.getElementById('quizVisual').innerHTML=`<div class="merge-row">${Array.from({length:total},(_,i)=>`<span class="${i<take?'taken':''}">${em}</span>`).join('')}</div>`;
+    document.getElementById('quizQ').textContent=`一共${total}个，去掉了${take}个，还剩多少个？`;
+    speak(`一共${total}个，去掉${take}个，还剩多少个？`);
+  } else if(type===2){
+    const start=randInt(0,9);
+    const dir=Math.random()<0.5?'add':'sub';
+    const maxStep = dir==='add' ? (10-start) : start;
+    const step=randInt(0,maxStep);
+    quizAns = dir==='add' ? start+step : start-step;
+    document.getElementById('quizVisual').innerHTML='';
+    document.getElementById('quizQ').textContent=`${start} ${dir==='add'?'＋':'－'} ${step} ＝ ？（在数轴上${dir==='add'?'往右':'往左'}跳${step}步）`;
+    speak(`${start}${dir==='add'?'加':'减'}${step}等于多少？`);
+  } else {
+    const n=randInt(2,10);
+    const a=randInt(0,n);
+    quizAns=n-a;
+    document.getElementById('quizVisual').innerHTML='';
+    document.getElementById('quizQ').textContent=`${n} 可以分成 ${a} 和几？`;
+    speak(`${n}可以分成${a}和几？`);
+  }
+}
+async function checkQuiz(){
+  const input=document.getElementById('quizInput');
+  if(input.disabled) return; // 防止禁用输入框触发的blur重复判题
+  const v=parseInt(input.value);
+  if(isNaN(v)) return;
+  input.disabled=true;
+  if(v===quizAns){
+    qScore.c++;
+    document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    chime();
+    await speak('正确！真棒！');
+    await delay(400);
+    nextQ();
+  } else {
+    qScore.w++;
+    document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+quizAns;
+    tone(200,.2,'sawtooth');
+    await speak('答案是'+quizAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQuiz();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const val=document.getElementById('quizInput').value;
+  if(val.length>0 && val.length>=String(quizAns).length) checkQuiz();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  const val=document.getElementById('quizInput').value;
+  if(val.length>0) checkQuiz();
+});
+
+function switchTab(t){
+  ['add','sub','line','decomp','quiz'].forEach(id=>{document.getElementById('tab-'+id).style.display=id===t?'':'none';});
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('on',['add','sub','line','decomp','quiz'][i]===t);});
+  if(t==='add') speak('加法就是把两堆合起来，一个一个数一数。');
+  if(t==='sub') speak('减法就是从一堆里去掉几个，数一数剩下的。');
+  if(t==='line') speak('数轴跳一跳：加法往右跳，减法往左跳。');
+  if(t==='decomp') { speak('数的分成：一个数可以分成两部分。'); renderDecomp(); }
+  if(t==='quiz') nextQ();
+}
+buildNumline();
+initFrogDrag();
+renderAddStatic();
+renderSubStatic();
+onLineChange();
+renderDecomp();
+speak('欢迎来到10以内加减法！我们先看懂合并和去掉是什么意思，再来做练习。');
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
