@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>汉语拼音入门</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e1f5fe 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:760px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.75rem;color:#e65100;letter-spacing:1px;text-shadow:2px 3px 0 #ffe0b2;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{padding:8px 14px;border:none;border-radius:20px;font-size:.82rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,.65);color:#666;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;font-family:inherit;}
+.tab-btn.on{background:#e65100;color:#fff;box-shadow:0 4px 14px rgba(230,81,0,.35);}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.group-title{font-size:.95rem;font-weight:bold;color:#e65100;margin:12px 0 8px;}
+.py-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;margin-bottom:8px;}
+.py-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;transition:transform .12s;}
+.py-chip:hover{transform:translateY(-2px);background:#ffe0b2;}
+.py-chip .letter{font-size:1.3rem;font-weight:bold;color:#e65100;}
+.py-chip .word{font-size:.78rem;color:#795548;margin-top:4px;}
+.tone-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+.tone-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:14px 16px;text-align:center;cursor:pointer;min-width:90px;}
+.tone-chip .letter{font-size:1.6rem;font-weight:bold;color:#e65100;}
+.tone-chip .shape{font-size:.75rem;color:#999;margin-top:4px;}
+.tone-chip .char{font-size:1rem;color:#795548;margin-top:4px;}
+.blend-box{background:#fff8e1;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px;}
+.blend-expr{font-size:1.6rem;font-weight:bold;color:#e65100;margin-bottom:14px;}
+.choice-col{display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;}
+.choice-btn{padding:10px 16px;border:2px solid #ffcc80;border-radius:12px;background:#fff;color:#333;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-btn:hover{background:#fff3e0;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;text-align:center;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#fb8c00;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.back-link{display:block;text-align:center;margin-top:20px;color:#e65100;text-decoration:none;font-size:.9rem;}
+.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.speak-toggle{padding:7px 18px;border:2px solid #ccc;border-radius:20px;background:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
+.speak-toggle.on{background:#e65100;color:#fff;}
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fff8e1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
+.quiz-q{font-size:1.15rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🀄</div>
+    <h1>汉语拼音入门</h1>
+    <p>声母 · 韵母 · 声调 · 整体认读音节 · 拼读 —— 一年级语文地基</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('initial')">🅱️ 声母</button>
+    <button class="tab-btn" onclick="switchTab('final')">🅰️ 韵母</button>
+    <button class="tab-btn" onclick="switchTab('tone')">🎵 声调</button>
+    <button class="tab-btn" onclick="switchTab('whole')">🔤 整体认读音节</button>
+    <button class="tab-btn" onclick="switchTab('blend')">🧩 拼读练习</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 声母 -->
+  <div id="tab-initial">
+    <div class="card">
+      <div class="net-desc">一共23个声母，点一下听读音（配例词），拼音的第一步先认熟它们</div>
+      <div class="py-grid" id="initialGrid"></div>
+    </div>
+  </div>
+
+  <!-- 韵母 -->
+  <div id="tab-final" style="display:none;">
+    <div class="card">
+      <div class="net-desc">一共24个韵母，分成单韵母、复韵母、前鼻韵母、后鼻韵母，还有一个特殊的 er</div>
+      <div id="finalGroups"></div>
+    </div>
+  </div>
+
+  <!-- 声调 -->
+  <div id="tab-tone" style="display:none;">
+    <div class="card">
+      <div class="net-desc">同一个音，声调不同意思完全不同：妈 麻 马 骂 吗</div>
+      <div class="tone-row" id="toneRow"></div>
+      <div class="quiz-q" id="toneQ" style="margin-top:16px;"></div>
+      <div class="choice-col" id="toneChoices"></div>
+      <div class="result-msg" id="toneMsg"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextTonePractice()">下一题 →</button></div>
+    </div>
+  </div>
+
+  <!-- 整体认读音节 -->
+  <div id="tab-whole" style="display:none;">
+    <div class="card">
+      <div class="net-desc">这16个音节要整体认读，不是靠声母韵母拼出来的，直接记住它的读音</div>
+      <div class="py-grid" id="wholeGrid"></div>
+    </div>
+  </div>
+
+  <!-- 拼读练习 -->
+  <div id="tab-blend" style="display:none;">
+    <div class="card">
+      <div class="net-desc">声母读得又轻又短，韵母读得响亮拖长，两个音连起来拼成一个字的音</div>
+      <div class="blend-box">
+        <div class="blend-expr" id="blendExpr"></div>
+        <div class="choice-col" id="blendChoices"></div>
+        <div class="result-msg" id="blendMsg"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextBlend()">下一题 →</button></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-col" id="quizChoices"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script>
+let _speakOn=true,_zhVoice=null;
+function _loadVoices(){const vs=speechSynthesis.getVoices();_zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;}
+if(typeof speechSynthesis!=='undefined'){_loadVoices();speechSynthesis.addEventListener('voiceschanged',_loadVoices);}
+function speak(text){if(!_speakOn||typeof speechSynthesis==='undefined') return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);if(_zhVoice){u.voice=_zhVoice;u.lang=_zhVoice.lang;}else{u.lang='zh-CN';}u.rate=0.85;u.pitch=1.1;speechSynthesis.speak(u);}
+function toggleSpeak(){_speakOn=!_speakOn;const btn=document.getElementById('speakToggle');btn.textContent=_speakOn?'🔊 声音解说 开':'🔇 声音解说 关';btn.classList.toggle('on',_speakOn);if(!_speakOn) speechSynthesis.cancel();else speak('声音解说已开启。');}
+function randInt(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ── 声母（23个）──
+const INITIALS=[
+  {py:'b',word:'爸爸'},{py:'p',word:'苹果'},{py:'m',word:'妈妈'},{py:'f',word:'飞机'},
+  {py:'d',word:'大象'},{py:'t',word:'兔子'},{py:'n',word:'牛奶'},{py:'l',word:'老虎'},
+  {py:'g',word:'哥哥'},{py:'k',word:'开心'},{py:'h',word:'河流'},
+  {py:'j',word:'鸡蛋'},{py:'q',word:'铅笔'},{py:'x',word:'西瓜'},
+  {py:'zh',word:'桌子'},{py:'ch',word:'吃饭'},{py:'sh',word:'书本'},{py:'r',word:'热闹'},
+  {py:'z',word:'字典'},{py:'c',word:'草地'},{py:'s',word:'数字三'},
+  {py:'y',word:'月亮'},{py:'w',word:'乌龟'},
+];
+function renderInitials(){
+  document.getElementById('initialGrid').innerHTML=INITIALS.map(it=>
+    `<div class="py-chip" onclick="speak('${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('');
+}
+
+// ── 韵母（24个，分组）──
+const FINAL_GROUPS=[
+  { name:'单韵母（6个）', items:[
+    {py:'a',word:'啊'},{py:'o',word:'哦'},{py:'e',word:'鹅'},{py:'i',word:'衣服'},{py:'u',word:'房屋'},{py:'ü',word:'鱼'},
+  ]},
+  { name:'复韵母（8个）', items:[
+    {py:'ai',word:'爱心'},{py:'ei',word:'黑色'},{py:'ui',word:'排队'},{py:'ao',word:'小猫'},
+    {py:'ou',word:'猴子'},{py:'iu',word:'小牛'},{py:'ie',word:'姐姐'},{py:'üe',word:'月亮'},
+  ]},
+  { name:'前鼻韵母（5个）', items:[
+    {py:'an',word:'雨伞'},{py:'en',word:'大门'},{py:'in',word:'声音'},{py:'un',word:'温暖'},{py:'ün',word:'白云'},
+  ]},
+  { name:'后鼻韵母（4个）', items:[
+    {py:'ang',word:'山羊'},{py:'eng',word:'台灯'},{py:'ing',word:'星星'},{py:'ong',word:'红色'},
+  ]},
+  { name:'特殊韵母（1个）', items:[
+    {py:'er',word:'耳朵'},
+  ]},
+];
+function renderFinals(){
+  document.getElementById('finalGroups').innerHTML=FINAL_GROUPS.map(g=>
+    `<div class="group-title">${g.name}</div><div class="py-grid">${g.items.map(it=>
+      `<div class="py-chip" onclick="speak('${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('')}</div>`
+  ).join('');
+}
+
+// ── 声调 ──
+const TONE_DEMO=[
+  {py:'mā',char:'妈',tone:1,shape:'高而平 ——'},
+  {py:'má',char:'麻',tone:2,shape:'往上扬 ↗'},
+  {py:'mǎ',char:'马',tone:3,shape:'先降后升 ∨'},
+  {py:'mà',char:'骂',tone:4,shape:'往下降 ↘'},
+  {py:'ma',char:'吗',tone:0,shape:'又轻又短'},
+];
+const TONE_BANK=[
+  {py:'mā',char:'妈',tone:1},{py:'tiān',char:'天',tone:1},{py:'shū',char:'书',tone:1},{py:'huā',char:'花',tone:1},{py:'fēi',char:'飞',tone:1},
+  {py:'má',char:'麻',tone:2},{py:'lái',char:'来',tone:2},{py:'rén',char:'人',tone:2},{py:'huí',char:'回',tone:2},{py:'tóng',char:'同',tone:2},
+  {py:'mǎ',char:'马',tone:3},{py:'hǎo',char:'好',tone:3},{py:'shǒu',char:'手',tone:3},{py:'lǎo',char:'老',tone:3},{py:'wǒ',char:'我',tone:3},
+  {py:'mà',char:'骂',tone:4},{py:'qù',char:'去',tone:4},{py:'dà',char:'大',tone:4},{py:'zài',char:'再',tone:4},{py:'rè',char:'热',tone:4},
+];
+function renderTones(){
+  document.getElementById('toneRow').innerHTML=TONE_DEMO.map(t=>
+    `<div class="tone-chip" onclick="speak('${t.char}')">
+      <div class="letter">${t.py}</div>
+      <div class="shape">${t.tone===0?'轻声':'第'+t.tone+'声'}：${t.shape}</div>
+      <div class="char">${t.char}</div>
+    </div>`).join('');
+}
+let toneState=null;
+function nextTonePractice(){
+  const item=TONE_BANK[randInt(0,TONE_BANK.length-1)];
+  toneState=item;
+  document.getElementById('toneQ').textContent=`${item.py}（${item.char}）是第几声？`;
+  const opts=shuffle([1,2,3,4]);
+  document.getElementById('toneChoices').innerHTML=opts.map(o=>
+    `<button class="choice-btn" onclick="checkTone(this,${o})">第${o}声</button>`).join('');
+  document.getElementById('toneMsg').textContent='';
+  speak(item.char);
+}
+function checkTone(btn,choice){
+  const correct=toneState.tone;
+  document.querySelectorAll('#toneChoices .choice-btn').forEach(b=>{
+    b.disabled=true;
+    if(parseInt(b.textContent.replace('第','').replace('声',''))===correct) b.classList.add('correct');
+  });
+  if(choice!==correct) btn.classList.add('wrong');
+  const msg=document.getElementById('toneMsg');
+  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; speak('正确！真棒！'); }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是第'+correct+'声'; speak('答案是第'+correct+'声，再想想！'); }
+}
+
+// ── 整体认读音节（16个）──
+const WHOLE_SYLLABLES=[
+  {py:'zhi',word:'知识'},{py:'chi',word:'吃饭'},{py:'shi',word:'十'},{py:'ri',word:'日出'},
+  {py:'zi',word:'字'},{py:'ci',word:'词语'},{py:'si',word:'数字四'},{py:'yi',word:'数字一'},
+  {py:'wu',word:'数字五'},{py:'yu',word:'鱼'},{py:'ye',word:'叶子'},{py:'yue',word:'月亮'},
+  {py:'yuan',word:'圆形'},{py:'yin',word:'音乐'},{py:'yun',word:'云朵'},{py:'ying',word:'英雄'},
+];
+function renderWhole(){
+  document.getElementById('wholeGrid').innerHTML=WHOLE_SYLLABLES.map(it=>
+    `<div class="py-chip" onclick="speak('${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('');
+}
+
+// ── 拼读练习 ──
+const BLEND_COMBOS=[
+  {i:'b',f:'a',syl:'ba',char:'爸',word:'爸爸'},
+  {i:'m',f:'a',syl:'ma',char:'妈',word:'妈妈'},
+  {i:'d',f:'a',syl:'da',char:'大',word:'大象'},
+  {i:'t',f:'u',syl:'tu',char:'兔',word:'兔子'},
+  {i:'n',f:'i',syl:'ni',char:'你',word:'你好'},
+  {i:'l',f:'ao',syl:'lao',char:'老',word:'老虎'},
+  {i:'g',f:'e',syl:'ge',char:'哥',word:'哥哥'},
+  {i:'k',f:'ai',syl:'kai',char:'开',word:'开心'},
+  {i:'h',f:'e',syl:'he',char:'河',word:'河流'},
+  {i:'x',f:'i',syl:'xi',char:'西',word:'西瓜'},
+  {i:'sh',f:'u',syl:'shu',char:'书',word:'书本'},
+  {i:'h',f:'ong',syl:'hong',char:'红',word:'红色'},
+  {i:'sh',f:'an',syl:'shan',char:'山',word:'大山'},
+  {i:'n',f:'iu',syl:'niu',char:'牛',word:'牛奶'},
+  {i:'h',f:'ai',syl:'hai',char:'海',word:'大海'},
+  {i:'f',f:'ei',syl:'fei',char:'飞',word:'飞机'},
+  {i:'j',f:'i',syl:'ji',char:'鸡',word:'鸡蛋'},
+  {i:'c',f:'ao',syl:'cao',char:'草',word:'草地'},
+  {i:'p',f:'ing',syl:'ping',char:'苹',word:'苹果'},
+  {i:'d',f:'eng',syl:'deng',char:'灯',word:'灯笼'},
+];
+let blendState=null;
+function nextBlend(){
+  const item=BLEND_COMBOS[randInt(0,BLEND_COMBOS.length-1)];
+  blendState=item;
+  document.getElementById('blendExpr').textContent=`${item.i} + ${item.f} = ?`;
+  const distractors=shuffle(BLEND_COMBOS.filter(b=>b.syl!==item.syl)).slice(0,3);
+  const opts=shuffle([item, ...distractors]);
+  document.getElementById('blendChoices').innerHTML=opts.map(o=>
+    `<button class="choice-btn" onclick="checkBlend(this,'${o.syl}')">${o.syl}（${o.char}）</button>`).join('');
+  document.getElementById('blendMsg').textContent='';
+  speak(`${item.i}和${item.f}拼在一起，读什么？`);
+}
+function checkBlend(btn,choice){
+  const correct=blendState.syl;
+  document.querySelectorAll('#blendChoices .choice-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent.startsWith(correct)) b.classList.add('correct');
+  });
+  if(choice!==correct) btn.classList.add('wrong');
+  const msg=document.getElementById('blendMsg');
+  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'+blendState.i+'+'+blendState.f+'='+blendState.syl+'（'+blendState.char+'）'; speak('正确！'+blendState.word); }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+correct+'（'+blendState.char+'）'; speak('答案是'+correct+'，再想想！'); }
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0};
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const type=randInt(0,3);
+  if(type===0){
+    const item=INITIALS[randInt(0,INITIALS.length-1)];
+    document.getElementById('quizQ').textContent=`声母 "${item.py}" 对应下面哪个词？`;
+    const distractors=shuffle(INITIALS.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
+    const opts=shuffle([item.word, ...distractors]);
+    document.getElementById('quizChoices').innerHTML=opts.map(o=>
+      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
+    speak(`声母${item.py}对应哪个词？`);
+  } else if(type===1){
+    const flat=FINAL_GROUPS.flatMap(g=>g.items);
+    const item=flat[randInt(0,flat.length-1)];
+    document.getElementById('quizQ').textContent=`韵母 "${item.py}" 对应下面哪个词？`;
+    const distractors=shuffle(flat.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
+    const opts=shuffle([item.word, ...distractors]);
+    document.getElementById('quizChoices').innerHTML=opts.map(o=>
+      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
+    speak(`韵母${item.py}对应哪个词？`);
+  } else if(type===2){
+    const item=TONE_BANK[randInt(0,TONE_BANK.length-1)];
+    document.getElementById('quizQ').textContent=`"${item.py}"（${item.char}）是第几声？`;
+    const opts=shuffle([1,2,3,4]).map(o=>'第'+o+'声');
+    document.getElementById('quizChoices').innerHTML=opts.map(o=>
+      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','第${item.tone}声')">${o}</button>`).join('');
+    speak(item.char+'是第几声？');
+  } else {
+    const item=WHOLE_SYLLABLES[randInt(0,WHOLE_SYLLABLES.length-1)];
+    document.getElementById('quizQ').textContent=`整体认读音节 "${item.py}" 对应下面哪个词？`;
+    const distractors=shuffle(WHOLE_SYLLABLES.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
+    const opts=shuffle([item.word, ...distractors]);
+    document.getElementById('quizChoices').innerHTML=opts.map(o=>
+      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
+    speak(`整体认读音节${item.py}对应哪个词？`);
+  }
+}
+function checkQuizChoice(btn,choice,correct){
+  document.querySelectorAll('#quizChoices .choice-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct) b.classList.add('correct');
+  });
+  if(choice!==correct) btn.classList.add('wrong');
+  const ok=choice===correct;
+  if(ok) qScore.c++; else qScore.w++;
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  const msg=document.getElementById('quizMsg');
+  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; speak('正确！真棒！'); }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是：'+correct; speak('答案是'+correct+'，再想想！'); }
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  ['initial','final','tone','whole','blend','quiz'].forEach(id=>{document.getElementById('tab-'+id).style.display=id===t?'':'none';});
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('on',['initial','final','tone','whole','blend','quiz'][i]===t);});
+  if(t==='initial') speak('声母：点一下听读音，认熟23个声母。');
+  if(t==='final') speak('韵母：一共24个，分成单韵母、复韵母、前鼻韵母和后鼻韵母。');
+  if(t==='tone') { speak('声调：同一个音，声调不同意思完全不同。'); nextTonePractice(); }
+  if(t==='whole') speak('整体认读音节：这16个要整体记住读音。');
+  if(t==='blend') nextBlend();
+  if(t==='quiz') nextQ();
+}
+renderInitials();
+renderFinals();
+renderTones();
+renderWhole();
+speak('欢迎来到汉语拼音入门！我们先认声母和韵母，再学声调，最后学拼读。');
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
