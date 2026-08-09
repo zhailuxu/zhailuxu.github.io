@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>两位数乘法竖式</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#e8eaf6 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#e65100;letter-spacing:3px;text-shadow:2px 3px 0 #ffcc80;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;}
+.tab-btn{padding:8px 26px;border:none;border-radius:20px;font-size:.95rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,.65);color:#666;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;font-family:inherit;}
+.tab-btn.on{background:#e65100;color:#fff;box-shadow:0 4px 14px rgba(230,81,0,.35);}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* vertical calc */
+.vc-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.vc-controls{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.vc-input{display:flex;align-items:center;gap:8px;font-size:1rem;color:#555;}
+.num-inp{width:72px;font-size:1.3rem;border:2px solid #ffcc80;border-radius:10px;padding:4px 8px;text-align:center;font-family:inherit;outline:none;}
+.num-inp:focus{border-color:#e65100;}
+.go-btn{padding:8px 22px;border:none;border-radius:12px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.go-btn:hover{background:#bf360c;}
+/* steps */
+.step-nav{display:flex;gap:8px;align-items:center;justify-content:center;}
+.sn-btn{padding:7px 18px;border:none;border-radius:10px;background:#fff3e0;color:#e65100;font-weight:bold;cursor:pointer;font-family:inherit;}
+.sn-btn:hover{background:#e65100;color:#fff;}
+.step-info{font-size:.9rem;color:#999;min-width:80px;text-align:center;}
+/* multiplication table display */
+.vert-calc{font-family:'Courier New',monospace;font-size:1.6rem;font-weight:bold;text-align:right;line-height:2;position:relative;min-width:220px;}
+.vc-row{display:flex;justify-content:flex-end;align-items:center;gap:4px;position:relative;}
+.vc-digit{width:38px;text-align:center;border-radius:6px;transition:background .3s,color .3s;}
+.vc-digit.hi-a{background:#fff9c4;color:#e65100;}
+.vc-digit.hi-b{background:#ffe0b2;color:#e65100;}
+.vc-digit.hi-c{background:#c8e6c9;color:#2e7d32;}
+.vc-digit.hi-carry{background:#e8eaf6;color:#5c6bc0;font-size:1rem;vertical-align:super;}
+.vc-line{border-top:3px solid #ccc;width:100%;margin:2px 0;}
+.step-desc{text-align:center;font-size:1rem;color:#555;min-height:48px;line-height:1.8;background:#fffde7;border-radius:10px;padding:8px 12px;}
+/* mode toggle */
+.mode-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.mode-btn{padding:8px 22px;border:none;border-radius:20px;font-size:.95rem;font-weight:bold;cursor:pointer;background:#fff3e0;color:#e65100;font-family:inherit;}
+.mode-btn.on{background:#e65100;color:#fff;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fff3e0;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
+.quiz-q{font-size:1.4rem;color:#333;font-weight:bold;margin-bottom:14px;font-family:'Courier New',monospace;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #ffcc80;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#e65100;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.back-link{display:block;text-align:center;margin-top:20px;color:#e65100;text-decoration:none;font-size:.9rem;}
+.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.speak-toggle{padding:7px 18px;border:2px solid #ccc;border-radius:20px;background:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
+.speak-toggle.on{background:#e65100;color:#fff;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">✖️</div>
+    <h1>两位数乘法竖式</h1>
+    <p>一步一步看，进位不再怕</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('demo')">📖 竖式演示</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 演示 -->
+  <div id="tab-demo">
+    <div class="card">
+      <div class="mode-row">
+        <button class="mode-btn on" id="m1btn" onclick="setMode(1)">两位数 × 一位数</button>
+        <button class="mode-btn" id="m2btn" onclick="setMode(2)">两位数 × 两位数</button>
+      </div>
+      <div class="vc-controls">
+        <div class="vc-input">
+          <input type="number" id="numA" class="num-inp" value="47" min="10" max="99">
+          <span>×</span>
+          <input type="number" id="numB" class="num-inp" value="6" min="1" max="99">
+        </div>
+        <button class="go-btn" onclick="buildSteps()">演示 ▶</button>
+        <button class="go-btn" style="background:#888;" onclick="randomPick()">随机</button>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="step-nav">
+          <button class="sn-btn" onclick="prevStep()">◀ 上一步</button>
+          <span class="step-info" id="stepInfo">第1步</span>
+          <button class="sn-btn" onclick="nextStep()">下一步 ▶</button>
+        </div>
+        <div style="margin:14px 0;display:flex;justify-content:center;">
+          <div class="vert-calc" id="vcDisplay"></div>
+        </div>
+        <div class="step-desc" id="stepDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="= ?">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script>
+let _speakOn=true,_zhVoice=null;
+function _loadVoices(){const vs=speechSynthesis.getVoices();_zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;}
+if(typeof speechSynthesis!=='undefined'){_loadVoices();speechSynthesis.addEventListener('voiceschanged',_loadVoices);}
+function speak(text){if(!_speakOn||typeof speechSynthesis==='undefined') return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);if(_zhVoice){u.voice=_zhVoice;u.lang=_zhVoice.lang;}else{u.lang='zh-CN';}u.rate=0.9;u.pitch=1.1;speechSynthesis.speak(u);}
+function toggleSpeak(){_speakOn=!_speakOn;const btn=document.getElementById('speakToggle');btn.textContent=_speakOn?'🔊 声音解说 开':'🔇 声音解说 关';btn.classList.toggle('on',_speakOn);if(!_speakOn) speechSynthesis.cancel();else speak('声音解说已开启。');}
+
+let curMode=1, steps=[], curStep=0;
+
+function setMode(m){
+  curMode=m;
+  speak(m===1?'两位数乘以一位数模式。':'两位数乘以两位数模式。');
+  document.getElementById('m1btn').classList.toggle('on',m===1);
+  document.getElementById('m2btn').classList.toggle('on',m===2);
+  document.getElementById('numB').max=m===1?9:99;
+  document.getElementById('numB').min=m===1?2:10;
+  if(m===1) document.getElementById('numB').value=6;
+  else document.getElementById('numB').value=13;
+  buildSteps();
+}
+
+function buildSteps(){
+  const A=parseInt(document.getElementById('numA').value)||47;
+  const B=parseInt(document.getElementById('numB').value)||(curMode===1?6:13);
+  steps=[];
+  if(curMode===1){
+    build1x(A,B);
+  } else {
+    build2x(A,B);
+  }
+  curStep=0;
+  renderStep();
+}
+
+function build1x(A,B){
+  const a1=A%10, a10=Math.floor(A/10);
+  const carry=Math.floor(a1*B/10), lo=(a1*B)%10;
+  const hi=(a10*B+carry);
+  const result=A*B;
+  const rs=String(result);
+
+  steps=[
+    {desc:`写竖式：${A} × ${B}，被乘数在上，乘数在下`,highlights:{a:[],b:[],rows:[]}},
+    {desc:`先算个位：${a1} × ${B} = ${a1*B}，个位写 <b style="color:#2e7d32">${lo}</b>${carry>0?`，进位 <b style="color:#5c6bc0">${carry}</b>`:''}`,highlights:{a:[1],b:[],carry:carry>0?carry:null,lo:lo,rows:[]}},
+    {desc:`再算十位：${a10} × ${B} = ${a10*B}${carry>0?`，加进位 ${carry} = ${hi}`:''}，写 <b style="color:#e65100">${hi}</b>`,highlights:{a:[0],b:[],rows:[]}},
+    {desc:`结果：<b style="color:#ad1457">${A} × ${B} = ${result}</b> ✅`,highlights:{a:[],b:[],showResult:true,rows:[]}},
+  ];
+  steps._A=A;steps._B=B;steps._result=result;steps._carry=carry;steps._lo=lo;steps._hi=hi;steps._mode=1;
+}
+
+function build2x(A,B){
+  const b1=B%10, b10=Math.floor(B/10);
+  const p1=A*b1, p2=A*b10;
+  const result=A*B;
+  steps=[
+    {desc:`写竖式：${A} × ${B}，分两步计算`,highlights:{}},
+    {desc:`第一步：${A} × ${b1}（个位）= <b style="color:#2e7d32">${p1}</b>，写在第一行`,highlights:{row1:true}},
+    {desc:`第二步：${A} × ${b10}（十位）= ${p2}，向左移一位写 <b style="color:#e65100">${p2}0</b>，写在第二行`,highlights:{row2:true}},
+    {desc:`最后相加：${p1} + ${p2*10} = <b style="color:#ad1457">${result}</b> ✅`,highlights:{showResult:true}},
+  ];
+  steps._A=A;steps._B=B;steps._result=result;steps._p1=p1;steps._p2=p2;steps._mode=2;
+}
+
+function renderStep(){
+  document.getElementById('stepInfo').textContent=`第 ${curStep+1} / ${steps.length} 步`;
+  document.getElementById('stepDesc').innerHTML=steps[curStep].desc;
+  speak(steps[curStep].desc.replace(/<[^>]+>/g,''));
+
+  const A=steps._A, B=steps._B, result=steps._result;
+  const h=steps[curStep].highlights;
+  let html='';
+
+  if(steps._mode===1){
+    const carry=steps._carry, lo=steps._lo, hi=steps._hi;
+    const As=String(A), Rs=String(result);
+    // carry row
+    if(curStep>=1&&carry>0){
+      html+=`<div class="vc-row"><div class="vc-digit hi-carry" style="width:38px;font-size:1rem;color:#5c6bc0;">${carry}</div><div style="width:38px;"></div></div>`;
+    }
+    // A row
+    html+=`<div class="vc-row">`;
+    [...As].forEach((d,i)=>{
+      const cls=h.a&&h.a.includes(i)?'vc-digit hi-a':'vc-digit';
+      html+=`<div class="${cls}">${d}</div>`;
+    });
+    html+=`</div>`;
+    // × B
+    html+=`<div class="vc-row"><span style="color:#888;font-size:1.3rem;margin-right:4px;">×</span><div class="vc-digit">${B}</div></div>`;
+    html+=`<div class="vc-line"></div>`;
+    // result
+    if(curStep>=3){
+      html+=`<div class="vc-row">`;
+      [...Rs].forEach(d=>{html+=`<div class="vc-digit hi-c">${d}</div>`;});
+      html+=`</div>`;
+    } else if(curStep>=1){
+      let partial='';
+      if(curStep===1) partial=String(lo);
+      if(curStep>=2) partial=String(result);
+      html+=`<div class="vc-row">`;
+      [...partial].forEach((d,i)=>{
+        const cls=i===partial.length-1&&curStep===1?'vc-digit hi-c':curStep>=2?'vc-digit hi-c':'vc-digit';
+        html+=`<div class="${cls}">${d}</div>`;
+      });
+      html+=`</div>`;
+    }
+  } else {
+    const p1=steps._p1, p2=steps._p2;
+    const As=String(A),Bs=String(B);
+    html+=`<div class="vc-row">${[...As].map(d=>`<div class="vc-digit">${d}</div>`).join('')}</div>`;
+    html+=`<div class="vc-row"><span style="color:#888;font-size:1.3rem;margin-right:4px;">×</span>${[...Bs].map(d=>`<div class="vc-digit">${d}</div>`).join('')}</div>`;
+    html+=`<div class="vc-line"></div>`;
+    if(curStep>=1){
+      html+=`<div class="vc-row">${[...String(p1)].map(d=>`<div class="vc-digit ${h.row1?'hi-c':''}">${d}</div>`).join('')}</div>`;
+    }
+    if(curStep>=2){
+      const p2str=String(p2)+'0';
+      html+=`<div class="vc-row">${[...p2str].map(d=>`<div class="vc-digit ${h.row2?'hi-a':''}">${d}</div>`).join('')}</div>`;
+      html+=`<div class="vc-line"></div>`;
+    }
+    if(curStep>=3){
+      html+=`<div class="vc-row">${[...String(result)].map(d=>`<div class="vc-digit hi-c">${d}</div>`).join('')}</div>`;
+    }
+  }
+  document.getElementById('vcDisplay').innerHTML=html;
+}
+
+function nextStep(){if(curStep<steps.length-1){curStep++;renderStep();}}
+function prevStep(){if(curStep>0){curStep--;renderStep();}}
+function randomPick(){
+  const A=10+Math.floor(Math.random()*90);
+  document.getElementById('numA').value=A;
+  if(curMode===1){document.getElementById('numB').value=2+Math.floor(Math.random()*8);}
+  else{document.getElementById('numB').value=11+Math.floor(Math.random()*88);}
+  buildSteps();
+}
+
+// quiz
+let qScore={c:0,w:0},qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const mode=Math.random()<0.5?1:2;
+  const A=10+Math.floor(Math.random()*90);
+  const B=mode===1?2+Math.floor(Math.random()*8):11+Math.floor(Math.random()*88);
+  qAns=A*B;
+  document.getElementById('quizQ').textContent=A+' × '+B+' = ?';
+  speak(`${A}乘以${B}等于多少？`);
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';document.getElementById('quizMsg').textContent='✅ 正确！';speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns;speak('答案是'+qAns+'，看竖式再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  ['demo','quiz'].forEach(id=>{document.getElementById('tab-'+id).style.display=id===t?'':'none';});
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('on',['demo','quiz'][i]===t);});
+  if(t==='demo') speak('竖式演示：一步一步看，进位不再怕。');
+  if(t==='quiz') nextQ();
+}
+buildSteps();
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
