@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拼豆乐园</title>
+<meta name="description" content="5种图案任选，豆板大小可调，拖动彩色豆子对照图案完成拼豆。">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#e3f2dd 0%,#d5ecd2 55%,#e8f2df 100%);
+  min-height: 100vh; padding: 16px 12px 40px;
+}
+.container { max-width: 760px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+.hdr { text-align: center; margin-bottom: 14px; }
+.hdr h1 { font-size: 1.9rem; color: #6d4c41; text-shadow: 2px 3px 0 #d7ccc8; letter-spacing: 3px; }
+.hdr p  { font-size: .82rem; color: #aaa; margin-top: 4px; }
+
+.card {
+  background: rgba(233,244,227,.92); border-radius: 20px;
+  padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.1); margin-bottom: 14px;
+}
+
+.ctrl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-size: .85rem; color: #888; font-weight: bold; }
+.chip-btn {
+  border: 2px solid #d7ccc8; border-radius: 16px; padding: 6px 14px;
+  font-size: .85rem; font-weight: bold; cursor: pointer; background: #fff; color: #6d4c41;
+  transition: all .15s; font-family: inherit;
+}
+.chip-btn.on { background: #6d4c41; color: #fff; border-color: #6d4c41; box-shadow: 0 3px 10px rgba(109,76,65,.3); }
+.saved-chip { display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; }
+.saved-chip-label { cursor: pointer; }
+.saved-chip-del {
+  border: none; background: rgba(0,0,0,.12); color: inherit; border-radius: 50%;
+  width: 16px; height: 16px; line-height: 16px; font-size: .7rem; cursor: pointer; padding: 0;
+}
+.saved-chip.on .saved-chip-del { background: rgba(255,255,255,.3); }
+.btn {
+  border: none; border-radius: 14px; padding: 7px 16px; font-size: .85rem; font-weight: bold;
+  cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.12); transition: transform .1s; font-family: inherit;
+}
+.btn:active { transform: scale(.94); }
+.btn-gray { background: #e0e0e0; color: #555; }
+.btn-primary { background: linear-gradient(135deg,#a1887f,#6d4c41); color: #fff; }
+.btn-purple { background: linear-gradient(135deg,#9575cd,#5e35b1); color: #fff; }
+.btn-orange { background: linear-gradient(135deg,#ffb74d,#e65100); color: #fff; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* ── 进度条 ── */
+.progress-wrap { margin-bottom: 14px; }
+.progress-bar-track { background: #ffe0eb; border-radius: 8px; height: 12px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,#ffb74d,#e65100); border-radius: 8px; transition: width .3s; }
+.progress-text { text-align: center; font-size: .82rem; color: #aaa; margin-top: 6px; }
+
+/* ── 两栏布局 ── */
+.game-area { display: flex; gap: 16px; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; overflow-x: auto; padding-bottom: 6px; }
+.panel { background: rgba(233,244,227,.92); border-radius: 20px; padding: 14px; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+.left-panel { flex: 0 0 auto; width: 260px; position: sticky; left: 0; z-index: 2; }
+.right-panel { flex: 0 0 auto; max-width: 100%; overflow-x: auto; }
+.panel-title { font-size: .85rem; font-weight: bold; color: #6d4c41; margin-bottom: 8px; text-align: center; }
+
+.ref-preview { display: grid; gap: 2px; justify-content: center; margin: 0 auto 16px; background: #dcebd5; border-radius: 10px; padding: 8px; }
+.ref-cell { border-radius: 2px; }
+
+.bead-tray { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+.free-ref-upload { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#freeRefImg { max-width: 100%; max-height: 220px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,.15); object-fit: contain; cursor: zoom-in; }
+.zoom-float-panel {
+  position: fixed; top: 70px; left: 20px; z-index: 10002;
+  background: #fff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  padding: 8px; max-width: min(50vw, 420px); display: flex; flex-direction: column; gap: 6px;
+}
+.zoom-float-header {
+  display: flex; align-items: center; justify-content: space-between; cursor: move;
+  padding: 2px 6px; font-size: .82rem; color: #6d4c41; font-weight: bold; user-select: none; touch-action: none;
+}
+.zoom-float-close {
+  border: none; background: #eee; border-radius: 50%; width: 26px; height: 26px;
+  font-size: .9rem; line-height: 1; cursor: pointer; flex: 0 0 auto;
+}
+#freeRefZoomImg { max-width: 100%; max-height: 60vh; border-radius: 10px; object-fit: contain; display: block; }
+.folder-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px;
+  max-height: 50vh; overflow-y: auto; padding: 4px;
+}
+.folder-item {
+  border-radius: 12px; overflow: hidden; cursor: pointer; border: 3px solid transparent;
+  background: #f4ede4; transition: border-color .15s;
+}
+.folder-item.selected { border-color: #1565c0; }
+.folder-item img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; background: #fff; }
+.folder-item-label {
+  font-size: .68rem; color: #888; text-align: center; padding: 2px 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.folder-empty-hint { color: #aaa; font-size: .85rem; padding: 24px 10px; text-align: center; grid-column: 1 / -1; }
+.free-ref-hint { font-size: .76rem; color: #999; text-align: center; margin-top: 6px; line-height: 1.5; }
+.bead-swatch {
+  position: relative; width: 44px; height: 44px; border-radius: 50%;
+  cursor: grab; touch-action: none; box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 -3px 6px rgba(0,0,0,.15), inset 0 3px 5px rgba(255,255,255,.5);
+  display: flex; align-items: flex-end; justify-content: center;
+  transition: opacity .2s, transform .1s;
+}
+.bead-swatch:active { cursor: grabbing; transform: scale(1.08); }
+.bead-swatch.bead-w { box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 -3px 6px rgba(0,0,0,.1), inset 0 3px 5px rgba(255,255,255,.8), 0 0 0 2px #ccc; }
+.bead-swatch.depleted { opacity: .25; cursor: default; pointer-events: none; }
+.bead-swatch.armed {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px #6d4c41, 0 3px 8px rgba(0,0,0,.25), inset 0 -3px 6px rgba(0,0,0,.15), inset 0 3px 5px rgba(255,255,255,.5);
+  animation: armedPulse 1s ease-in-out infinite;
+}
+@keyframes armedPulse { 0%,100%{box-shadow:0 0 0 4px #6d4c41,0 3px 8px rgba(0,0,0,.25)} 50%{box-shadow:0 0 0 7px #a1887f,0 3px 8px rgba(0,0,0,.25)} }
+.bead-swatch.eraser-swatch {
+  background: repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 5px,#e0e0e0 5px,#e0e0e0 10px) !important;
+  align-items: center; justify-content: center; border: 2px solid #ccc;
+}
+.eraser-icon { font-size: 1.3rem; margin-bottom: 0; }
+.bead-count {
+  background: #fff; color: #555; font-size: .7rem; font-weight: bold;
+  border-radius: 8px; padding: 0 5px; margin-bottom: -8px; box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+
+.peg-board { display: grid; gap: 2px; justify-content: center; margin: 0 auto; --cell: 20px; }
+.peg-cell { border-radius: 50%; width: var(--cell); height: var(--cell); transition: width .15s, height .15s; }
+.peg-cell.need { background: #dcebd5; border: 2px solid #b9d4ac; }
+.peg-cell.need.filled {
+  border: 2px solid transparent;
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,.15), inset 0 3px 5px rgba(255,255,255,.5), 0 2px 5px rgba(0,0,0,.15);
+  animation: beadPop .28s ease-out;
+}
+.peg-cell.need.filled.bead-w { border: 2px solid #ccc; }
+.peg-cell.drag-hover { box-shadow: 0 0 0 3px rgba(30,136,199,.45); }
+.peg-cell.shake { animation: shakeCell .35s ease; }
+
+@keyframes beadPop { 0%{transform:scale(.4)} 60%{transform:scale(1.18)} 100%{transform:scale(1)} }
+@keyframes shakeCell { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+/* ── 拖拽幽灵豆子 ── */
+.ghost-bead {
+  position: fixed; top: 0; left: 0; border-radius: 50%; pointer-events: none; z-index: 9999;
+  box-shadow: 0 6px 16px rgba(0,0,0,.35), inset 0 -3px 6px rgba(0,0,0,.15), inset 0 3px 5px rgba(255,255,255,.5);
+}
+
+/* ── 完成横幅 ── */
+.win-banner {
+  position: fixed; top: 40%; left: 50%; transform: translate(-50%,-50%);
+  background: #fff; border-radius: 24px; padding: 22px 34px; text-align: center;
+  font-size: 1.6rem; font-weight: bold; color: #e65100; box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  z-index: 10000; animation: winPop .4s ease-out;
+}
+@keyframes winPop { 0%{opacity:0;transform:translate(-50%,-50%) scale(.6)} 100%{opacity:1;transform:translate(-50%,-50%) scale(1)} }
+
+#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; }
+
+/* ── 拍照/上传照片弹层 ── */
+.photo-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 10001;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.photo-modal-inner {
+  background: #fff; border-radius: 20px; padding: 18px; max-width: 360px; width: 100%;
+  text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,.3);
+}
+#photoVideo { width: 100%; max-height: 260px; border-radius: 12px; background: #222; object-fit: cover; }
+.photo-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.photo-hint { font-size: .78rem; color: #999; margin-top: 8px; line-height: 1.5; }
+#aiShapeInput {
+  width: 100%; padding: 9px 12px; border: 2px solid #d7ccc8; border-radius: 12px;
+  font-size: .95rem; font-family: inherit; outline: none;
+}
+#aiShapeInput:focus { border-color: #9575cd; }
+.ai-shape-hint { font-size: .78rem; color: #999; margin-top: 10px; line-height: 1.5; min-height: 18px; }
+.ai-shape-hint.loading { color: #7e57c2; font-style: italic; }
+.ai-shape-hint.error { color: #c62828; }
+.ai-shape-hint.success { color: #2e7d32; font-weight: bold; }
+.continuous-paint-toggle {
+  display: flex; align-items: center; gap: 6px; font-size: .78rem; color: #888;
+  margin-bottom: 8px; cursor: pointer; user-select: none; text-align: left;
+}
+.continuous-paint-toggle input { cursor: pointer; }
+.ai-shape-debug-toggle {
+  display: flex; align-items: center; gap: 6px; font-size: .78rem; color: #888;
+  margin-top: 10px; cursor: pointer; user-select: none;
+}
+.ai-shape-debug-toggle input { cursor: pointer; }
+#aiShapeModal .photo-modal-inner { max-width: 480px; }
+.ai-shape-engine-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: .82rem; color: #888; flex-wrap: wrap; }
+.ai-shape-engine-hint { font-size: .74rem; color: #aaa; margin-top: 4px; line-height: 1.5; width: 100%; text-align: left; }
+.ai-shape-debug {
+  margin-top: 10px; max-height: 240px; overflow-y: auto; text-align: left;
+  background: #2b2b2b; color: #d4d4d4; border-radius: 10px; padding: 10px 12px;
+  font-family: 'Courier New', monospace; font-size: .72rem; line-height: 1.5;
+}
+.ai-shape-debug .dbg-attempt { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #4a4a4a; }
+.ai-shape-debug .dbg-attempt:last-child { margin-bottom: 0; border-bottom: none; }
+.ai-shape-debug .dbg-label { color: #b39ddb; font-weight: bold; margin-bottom: 3px; }
+.ai-shape-debug summary { cursor: pointer; color: #90caf9; }
+.ai-shape-debug pre { white-space: pre-wrap; word-break: break-word; margin: 4px 0; color: #d4d4d4; }
+.ai-shape-debug .dbg-verdict-ok { color: #81c784; font-weight: bold; }
+.ai-shape-debug .dbg-verdict-fail { color: #e57373; font-weight: bold; }
+
+@media(max-width:480px){
+  .hdr h1 { font-size: 1.5rem; }
+  .left-panel { width: 200px; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6d4c41">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="ghost-bead hidden" id="ghostBead"></div>
+<div class="win-banner hidden" id="winBanner">🎉 完成啦！真棒！</div>
+
+<div class="container">
+
+<div class="hdr">
+  <div style="font-size:2.6rem">📿</div>
+  <h1>拼豆乐园</h1>
+  <p>照着左边的图案，把豆子拖到右边拼豆板上吧！</p>
+  <button class="btn btn-gray" style="margin-top:8px" onclick="openFolderModal()">📂 我的拼图夹</button>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <span class="ctrl-label">模式：</span>
+    <div class="chip-row" id="modeBtns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+  <div class="ctrl-row" id="patternRow">
+    <span class="ctrl-label">图案：</span>
+    <div class="chip-row" id="patternBtns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">豆板大小：</span>
+    <div class="chip-row" id="sizeBtns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <span class="hidden" id="freeSizeWrap" style="display:flex;align-items:center;gap:6px">
+      <input type="number" id="freeSizeInput" min="5" max="40" step="1" value="17"
+        onchange="onFreeSizeInput(this.value)"
+        style="width:64px;padding:5px 6px;border:2px solid #d7ccc8;border-radius:10px;font-size:.9rem;text-align:center;font-family:inherit">
+      <span style="font-size:.78rem;color:#888">格（5~40）</span>
+    </span>
+    <button class="btn btn-gray" onclick="resetBoard()">↺ 重新开始</button>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">豆子大小：</span>
+    <input type="range" id="beadSizeSlider" min="8" max="36" step="1" value="20"
+      oninput="onBeadSizeInput(this.value)" style="flex:1;min-width:120px;max-width:220px;accent-color:#6d4c41">
+    <span id="beadSizeLabel" style="font-size:.82rem;color:#888;min-width:38px">20px</span>
+  </div>
+  <div class="ctrl-row hidden" id="freeActionsRow">
+    <button class="btn btn-purple" onclick="openAIShapeModal()">🤖 AI 生成图案</button>
+    <button class="btn btn-gray" onclick="clearAIShape()">✏️ 空白画布</button>
+    <button class="btn btn-gray" onclick="clearFreeBoard()">🧹 清空重画</button>
+    <button class="btn btn-primary" onclick="celebrateFreeDrawing()">✅ 我画好了</button>
+    <button class="btn btn-orange" onclick="openSavePatternModal()">⭐ 收藏为图案</button>
+  </div>
+</div>
+
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progFill" style="width:0%"></div></div>
+  <div class="progress-text" id="progText">已拼 0 / 0 颗</div>
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-primary" id="saveToFolderBtn" onclick="saveCurrentWorkToFolder()">💾 保存到拼图夹</button>
+  </div>
+</div>
+
+<div class="game-area">
+  <div class="panel left-panel">
+    <div id="refPreviewBlock">
+      <div class="panel-title">📷 参考图</div>
+      <div class="ref-preview" id="refPreview"></div>
+    </div>
+    <div class="panel-title">🫘 豆子仓</div>
+    <div class="bead-tray" id="beadTray"></div>
+    <div class="hidden" id="freeRefBlock">
+      <div class="panel-title" style="margin-top:14px;">📷 参考图片</div>
+      <div class="free-ref-upload">
+        <input type="file" id="freeRefFileInput" accept="image/*" class="hidden" onchange="onFreeRefFileChange(event)">
+        <button class="btn btn-gray" id="freeRefUploadBtn" onclick="document.getElementById('freeRefFileInput').click()">📤 上传图片</button>
+        <img id="freeRefImg" class="hidden" alt="参考图片" ondblclick="openFreeRefZoom()">
+        <button class="btn btn-gray hidden" id="freeRefRemoveBtn" onclick="removeFreeRefImage()">🗑️ 移除图片</button>
+      </div>
+      <p class="free-ref-hint">照着这张图片，自己选颜色在右边拼豆板上画吧！双击图片可以放大悬浮显示，还能拖到你想放的位置～</p>
+    </div>
+  </div>
+  <div class="panel right-panel">
+    <div class="panel-title">🧷 拼豆板</div>
+    <label class="continuous-paint-toggle" id="continuousPaintRow">
+      <input type="checkbox" id="continuousPaintToggle" onchange="onContinuousPaintToggle(this.checked)">
+      🔁 双击选色后可连续点选填色，不用每次都重新双击
+    </label>
+    <div class="peg-board" id="pegBoard"></div>
+  </div>
+</div>
+
+</div>
+
+<div class="photo-modal hidden" id="photoModal">
+  <div class="photo-modal-inner">
+    <video id="photoVideo" autoplay playsinline muted></video>
+    <div class="photo-actions">
+      <button class="btn btn-primary" onclick="capturePhoto()">📷 拍照</button>
+      <label class="btn btn-blue" style="cursor:pointer">
+        📁 选择照片
+        <input type="file" accept="image/*" id="photoFileInput" style="display:none" onchange="onPhotoFileChosen(event)">
+      </label>
+      <button class="btn btn-gray" onclick="closePhotoModal()">取消</button>
+    </div>
+    <p class="photo-hint" id="photoHint">对准想拼的东西拍一张，或者直接从相册选一张照片</p>
+  </div>
+</div>
+
+<div class="photo-modal hidden" id="aiShapeModal">
+  <div class="photo-modal-inner">
+    <p style="font-weight:bold;color:#6d4c41;margin-bottom:10px">🤖 AI 帮你画轮廓</p>
+    <input type="text" id="aiShapeInput" placeholder="想画什么？比如：小兔子、太阳、彩虹、房子"
+      onkeydown="if(event.key==='Enter')generateAIShape()">
+    <div class="ai-shape-engine-row">
+      <span>生成引擎：</span>
+      <div class="chip-row" id="aiEngineBtns" style="display:flex;gap:6px"></div>
+      <div class="ai-shape-engine-hint" id="aiEngineHint"></div>
+    </div>
+    <div class="photo-actions">
+      <button class="btn btn-purple" id="aiShapeGenBtn" onclick="generateAIShape()">✨ 生成</button>
+      <button class="btn btn-gray" onclick="closeAIShapeModal()">取消</button>
+    </div>
+    <label class="ai-shape-debug-toggle">
+      <input type="checkbox" id="aiShapeDebugToggle" onchange="onAIShapeDebugToggle(this.checked)">
+      🔧 显示调试信息（AI 输入/输出），生成完不自动关闭
+    </label>
+    <p class="ai-shape-hint" id="aiShapeHint">AI 只画大致轮廓（圆形/椭圆/三角形拼出来的），画好后自己选颜色填色</p>
+    <div class="ai-shape-debug hidden" id="aiShapeDebug"></div>
+  </div>
+</div>
+
+<div class="photo-modal hidden" id="folderModal">
+  <div class="photo-modal-inner" style="max-width:520px">
+    <p style="font-weight:bold;color:#6d4c41;margin-bottom:10px">📂 我的拼图夹</p>
+    <div class="folder-grid" id="folderGrid"></div>
+    <div class="photo-actions">
+      <button class="btn btn-primary hidden" id="folderSaveImgBtn" onclick="exportSelectedWork()">📥 保存为图片</button>
+      <button class="btn btn-gray hidden" id="folderDeleteBtn" onclick="deleteSelectedWork()">🗑️ 删除</button>
+      <button class="btn btn-gray" onclick="closeFolderModal()">关闭</button>
+    </div>
+    <p class="ai-shape-hint">点一下选中一张，再保存为图片或者删除</p>
+  </div>
+</div>
+
+<div class="zoom-float-panel hidden" id="freeRefZoomModal">
+  <div class="zoom-float-header" id="freeRefZoomHeader">
+    <span>🔍 拖动标题移动</span>
+    <button class="zoom-float-close" onclick="closeFreeRefZoom()">✕</button>
+  </div>
+  <img id="freeRefZoomImg" alt="参考图片放大">
+</div>
+
+<div class="photo-modal hidden" id="savePatternModal">
+  <div class="photo-modal-inner">
+    <p style="font-weight:bold;color:#6d4c41;margin-bottom:10px">⭐ 收藏这个图案</p>
+    <input type="text" id="savePatternNameInput" placeholder="给它起个名字吧，比如：我的小狗" maxlength="12"
+      onkeydown="if(event.key==='Enter')confirmSavePattern()">
+    <div class="photo-actions">
+      <button class="btn btn-primary" id="savePatternSaveBtn" onclick="confirmSavePattern()">💾 保存</button>
+      <button class="btn btn-gray" onclick="closeSavePatternModal()">取消</button>
+    </div>
+    <p class="ai-shape-hint" id="savePatternHint"></p>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  颜色表
+// ══════════════════════════════════════
+const COLOR_MAP = {
+  R:  { name: '红色', hex: '#e53935' },
+  O:  { name: '橙色', hex: '#fb8c00' },
+  Y:  { name: '黄色', hex: '#fdd835' },
+  G:  { name: '绿色', hex: '#43a047' },
+  N:  { name: '棕色', hex: '#6d4c41' },
+  Pk: { name: '粉色', hex: '#f06292' },
+  W:  { name: '白色', hex: '#ffffff' },
+  K:  { name: '黑色', hex: '#3e3e3e' },
+  B:  { name: '蓝色', hex: '#1e88e5' },
+  Sk: { name: '天蓝色', hex: '#81d4fa' },
+  Pu: { name: '紫色', hex: '#8e24aa' },
+};
+
+// ══════════════════════════════════════
+//  图案生成（几何公式生成像素网格，保证形状稳定）
+// ══════════════════════════════════════
+function makeGrid(size) { return Array.from({length:size}, () => Array.from({length:size}, () => '.')); }
+
+function genHeart(size) {
+  const g = makeGrid(size);
+  const c = (size - 1) / 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = (x - c) / (size * 0.42);
+      const v = -(y - c) / (size * 0.42) + 0.35;
+      const val = Math.pow(u*u + v*v - 1, 3) - u*u*v*v*v;
+      if (val <= 0) g[y][x] = 'R';
+    }
+  }
+  const sx = Math.round(c - size*0.16), sy = Math.round(c - size*0.12);
+  if (g[sy] && g[sy][sx] === 'R') g[sy][sx] = 'W';
+  return g;
+}
+
+function pointInPoly(x, y, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+function starVerts(cx, cy, outerR, innerR, points, rot) {
+  const verts = [];
+  const step = Math.PI / points;
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const ang = rot + i * step;
+    verts.push([cx + Math.cos(ang) * r, cy + Math.sin(ang) * r]);
+  }
+  return verts;
+}
+function genStar(size) {
+  const g = makeGrid(size);
+  const c = (size - 1) / 2;
+  const outerR = size * 0.46, innerR = outerR * 0.42;
+  const poly = starVerts(c, c, outerR, innerR, 5, -Math.PI/2);
+  const polyInner = starVerts(c, c, outerR*0.66, innerR*0.66, 5, -Math.PI/2);
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      if (pointInPoly(x+0.5, y+0.5, poly)) g[y][x] = pointInPoly(x+0.5, y+0.5, polyInner) ? 'Y' : 'O';
+    }
+  return g;
+}
+
+function genFlower(size) {
+  const g = makeGrid(size);
+  const cx = (size - 1) / 2;
+  const headCy = size * 0.32;
+  const petals = 5;
+  const orbit = size * 0.20;
+  const petalLen = size * 0.19, petalWid = size * 0.11;
+  for (let i = 0; i < petals; i++) {
+    const ang = (Math.PI*2/petals)*i - Math.PI/2;
+    const px = cx + Math.cos(ang)*orbit, py = headCy + Math.sin(ang)*orbit;
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++) {
+        const dx = x-px, dy = y-py;
+        const rx = dx*Math.cos(ang) + dy*Math.sin(ang);
+        const ry = -dx*Math.sin(ang) + dy*Math.cos(ang);
+        if ((rx*rx)/(petalLen*petalLen) + (ry*ry)/(petalWid*petalWid) <= 1) g[y][x] = 'Pk';
+      }
+  }
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      if (Math.hypot(x-cx, y-headCy) <= size*0.115) g[y][x] = 'Y';
+    }
+  const stemTop = Math.round(headCy + orbit + petalWid*0.3);
+  for (let y = stemTop; y < size; y++) g[y][Math.round(cx)] = 'G';
+  const leafY = Math.round(stemTop + (size - stemTop)*0.42);
+  const leafR = size * 0.085;
+  [[cx-size*0.13, leafY], [cx+size*0.13, leafY]].forEach(([lx,ly]) => {
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++)
+        if (Math.hypot(x-lx, y-ly) <= leafR) g[y][x] = 'G';
+  });
+  return g;
+}
+
+function genApple(size) {
+  const g = makeGrid(size);
+  const cx = (size - 1) / 2, cy = size*0.56;
+  const rx = size*0.36, ry = size*0.34;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      const u = (x-cx)/rx, v = (y-cy)/ry;
+      let dent = (Math.abs(x-cx) < size*0.08 && y < cy - ry*0.55) ? 1 : 0;
+      if (u*u+v*v <= 1 && !dent) g[y][x] = 'R';
+    }
+  const stemX = Math.round(cx);
+  const stemTopY = Math.round(cy-ry) - 3;
+  for (let y = Math.max(0,stemTopY); y < cy-ry+1; y++) g[y][stemX] = 'N';
+  const leafCx = cx + size*0.10, leafCy = stemTopY + 1;
+  const leafR = size*0.10;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++)
+      if (Math.hypot((x-leafCx)/1.4, y-leafCy) <= leafR) g[y][x] = 'G';
+  const shineX = Math.round(cx - rx*0.4), shineY = Math.round(cy - ry*0.35);
+  if (g[shineY] && g[shineY][shineX] === 'R') g[shineY][shineX] = 'W';
+  return g;
+}
+
+function genMushroom(size) {
+  const g = makeGrid(size);
+  const cx = (size - 1) / 2;
+  const capCy = size*0.40, capRx = size*0.40, capRy = size*0.32;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      const u = (x-cx)/capRx, v = (y-capCy)/capRy;
+      if (v <= 0.15 && u*u+v*v <= 1) g[y][x] = 'R';
+    }
+  const dots = [[-0.16,-0.05],[0.15,-0.08],[0,0.08],[-0.3,0.1],[0.3,0.08]];
+  dots.forEach(([du,dv]) => {
+    const dx = Math.round(cx+du*size), dy = Math.round(capCy+dv*size);
+    if (g[dy] && g[dy][dx] === 'R') g[dy][dx] = 'W';
+  });
+  const stemTop = Math.round(capCy + capRy*0.12);
+  const stemW = size*0.20;
+  for (let y = stemTop; y < size*0.86; y++)
+    for (let x = 0; x < size; x++)
+      if (Math.abs(x-cx) <= stemW/2) g[y][x] = 'W';
+  return g;
+}
+
+function fillTri(g, size, p1, p2, p3, color) {
+  const minX = Math.max(0, Math.floor(Math.min(p1[0],p2[0],p3[0])));
+  const maxX = Math.min(size-1, Math.ceil(Math.max(p1[0],p2[0],p3[0])));
+  const minY = Math.max(0, Math.floor(Math.min(p1[1],p2[1],p3[1])));
+  const maxY = Math.min(size-1, Math.ceil(Math.max(p1[1],p2[1],p3[1])));
+  const sign = (a,b,c) => (a[0]-c[0])*(b[1]-c[1]) - (b[0]-c[0])*(a[1]-c[1]);
+  for (let y = minY; y <= maxY; y++)
+    for (let x = minX; x <= maxX; x++) {
+      const pt = [x+0.5, y+0.5];
+      const d1 = sign(pt,p1,p2), d2 = sign(pt,p2,p3), d3 = sign(pt,p3,p1);
+      const hasNeg = (d1<0)||(d2<0)||(d3<0), hasPos = (d1>0)||(d2>0)||(d3>0);
+      if (!(hasNeg && hasPos)) g[y][x] = color;
+    }
+}
+
+function genCat(size) {
+  const g = makeGrid(size);
+  const cx = (size - 1) / 2, cy = size * 0.58;
+  const r = size * 0.34;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++)
+      if (Math.hypot(x-cx, y-cy) <= r) g[y][x] = 'O';
+  const earBaseY = cy - r*0.62, earTipY = cy - r*1.7;
+  [-1, 1].forEach(dir => {
+    fillTri(g, size,
+      [cx + dir*r*0.18, earBaseY], [cx + dir*r*0.98, earBaseY], [cx + dir*r*0.62, earTipY], 'O');
+    fillTri(g, size,
+      [cx + dir*r*0.30, earBaseY - r*0.05], [cx + dir*r*0.80, earBaseY - r*0.05], [cx + dir*r*0.60, earTipY + r*0.45], 'Pk');
+  });
+  const eyeY = Math.round(cy - r*0.10), eyeDx = r*0.36;
+  g[eyeY][Math.round(cx - eyeDx)] = 'K';
+  g[eyeY][Math.round(cx + eyeDx)] = 'K';
+  g[Math.round(cy + r*0.18)][Math.round(cx)] = 'Pk';
+  return g;
+}
+
+// ══════════════════════════════════════
+//  通用图元渲染器：把"画什么"写成数据，而不是重复写循环
+//  spec 是一个图元数组，按顺序从后往前叠加（后面的覆盖前面的）：
+//    {type:'ellipse', cx,cy,rx,ry, color}  椭圆/圆（cx/cy/rx/ry 都是相对 size 的比例 0~1）
+//    {type:'circle',  cx,cy,r,     color}  圆
+//    {type:'tri',     points:[[x,y],[x,y],[x,y]], color}  三角形（复用 fillTri）
+//    {type:'pixel',   x,y,          color}  单个像素点（比如眼睛高光）
+// ══════════════════════════════════════
+function renderShapeSpec(size, spec) {
+  const g = makeGrid(size);
+  spec.forEach(part => {
+    if (part.type === 'ellipse') {
+      const cx = part.cx*size, cy = part.cy*size, rx = part.rx*size, ry = part.ry*size;
+      for (let y = 0; y < size; y++)
+        for (let x = 0; x < size; x++) {
+          const u = (x-cx)/rx, v = (y-cy)/ry;
+          if (u*u+v*v <= 1) g[y][x] = part.color;
+        }
+    } else if (part.type === 'circle') {
+      const cx = part.cx*size, cy = part.cy*size, r = part.r*size;
+      for (let y = 0; y < size; y++)
+        for (let x = 0; x < size; x++)
+          if (Math.hypot(x-cx, y-cy) <= r) g[y][x] = part.color;
+    } else if (part.type === 'tri') {
+      const pts = part.points.map(([px,py]) => [px*size, py*size]);
+      fillTri(g, size, pts[0], pts[1], pts[2], part.color);
+    } else if (part.type === 'pixel') {
+      const X = Math.round(part.x*size), Y = Math.round(part.y*size);
+      if (!g[Y] || g[Y][X] === undefined) return;
+      if (part.onlyIf !== undefined && g[Y][X] !== part.onlyIf) return; // 比如高光只在落在瞳孔里时才画，避免小尺寸下悬空的白点
+      g[Y][X] = part.color;
+    }
+  });
+  return g;
+}
+
+// 小鱼：椭圆身体 + 尾鳍/背鳍/腹鳍三角形 + 眼睛（圆+高光像素）
+const FISH_SPEC = [
+  { type:'ellipse', cx:0.58,  cy:0.52,   rx:0.26, ry:0.19, color:'Sk' },
+  { type:'tri', points:[[0.359,0.368],[0.359,0.672],[0.086,0.52]],   color:'B' }, // 尾鳍
+  { type:'tri', points:[[0.541,0.3585],[0.671,0.3585],[0.593,0.197]], color:'B' }, // 背鳍
+  { type:'tri', points:[[0.567,0.6815],[0.684,0.6815],[0.606,0.805]], color:'B' }, // 腹鳍
+  { type:'circle', cx:0.71, cy:0.4725, r:0.045, color:'K' }, // 眼睛
+  { type:'pixel',  x:0.69,  y:0.4525, color:'W', onlyIf:'K' }, // 眼睛高光（只在瞳孔范围内才画）
+];
+function genFish(size) { return renderShapeSpec(size, FISH_SPEC); }
+
+const PATTERNS = {
+  heart:    { label:'心形', icon:'❤️',  gen: genHeart },
+  star:     { label:'星星', icon:'⭐',  gen: genStar },
+  apple:    { label:'苹果', icon:'🍎', gen: genApple },
+  mushroom: { label:'蘑菇', icon:'🍄', gen: genMushroom },
+  flower:   { label:'花朵', icon:'🌸', gen: genFlower },
+  cat:      { label:'小猫', icon:'🐱', gen: genCat },
+  fish:     { label:'小鱼', icon:'🐟', gen: genFish },
+};
+const SIZE_PRESETS = [ {size:13, label:'简单'}, {size:17, label:'标准'}, {size:21, label:'挑战'} ];
+
+// ══════════════════════════════════════
+//  照片 → 拼豆网格（裁剪成正方形 → 降采样 → 就近吸附到调色板）
+// ══════════════════════════════════════
+const PALETTE_RGB = Object.entries(COLOR_MAP).map(([code, c]) => {
+  const hex = c.hex;
+  return { code, r: parseInt(hex.slice(1,3),16), g: parseInt(hex.slice(3,5),16), b: parseInt(hex.slice(5,7),16) };
+});
+function quantizeToPalette(r, g, b) {
+  let best = PALETTE_RGB[0].code, bestD = Infinity;
+  for (const p of PALETTE_RGB) {
+    const d = (r-p.r)**2 + (g-p.g)**2 + (b-p.b)**2;
+    if (d < bestD) { bestD = d; best = p.code; }
+  }
+  return best;
+}
+function imageToGrid(img, size) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const side = Math.min(iw, ih);
+  const sx = (iw - side) / 2, sy = (ih - side) / 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+  const data = ctx.getImageData(0, 0, size, size).data;
+  const grid = [];
+  for (let y = 0; y < size; y++) {
+    const row = [];
+    for (let x = 0; x < size; x++) {
+      const i = (y * size + x) * 4;
+      row.push(quantizeToPalette(data[i], data[i+1], data[i+2]));
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+function applyPhotoPattern() {
+  if (!customPhotoImg) return;
+  const grid = imageToGrid(customPhotoImg, currentSize);
+  loadPatternFromGrid(grid, '这张照片');
+}
+
+// ══════════════════════════════════════
+//  拍照 / 上传照片
+// ══════════════════════════════════════
+let photoStream = null;
+
+function openPhotoPanel() {
+  document.getElementById('photoModal').classList.remove('hidden');
+  document.getElementById('photoHint').textContent = '对准想拼的东西拍一张，或者直接从相册选一张照片';
+  startCamera();
+}
+function closePhotoModal() {
+  document.getElementById('photoModal').classList.add('hidden');
+  stopCamera();
+  if (!customPhotoImg && patternKeyBeforePhoto) {
+    currentPatternKey = patternKeyBeforePhoto;
+    document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === currentPatternKey));
+    loadPattern();
+  }
+}
+async function startCamera() {
+  try {
+    photoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    document.getElementById('photoVideo').srcObject = photoStream;
+  } catch (e) {
+    document.getElementById('photoHint').textContent = '打不开摄像头（可能没授权，或者页面不是 https/localhost），可以直接选择相册照片';
+  }
+}
+function stopCamera() {
+  if (photoStream) { photoStream.getTracks().forEach(t => t.stop()); photoStream = null; }
+  const video = document.getElementById('photoVideo');
+  if (video) video.srcObject = null;
+}
+function capturePhoto() {
+  const video = document.getElementById('photoVideo');
+  if (!video.videoWidth) { document.getElementById('photoHint').textContent = '摄像头还没准备好，再等一下下～'; return; }
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.toBlob(blob => {
+    const img = new Image();
+    img.onload = () => usePhotoImage(img);
+    img.src = URL.createObjectURL(blob);
+  }, 'image/jpeg', 0.92);
+}
+function onPhotoFileChosen(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => usePhotoImage(img);
+  img.src = URL.createObjectURL(file);
+  e.target.value = '';
+}
+function usePhotoImage(img) {
+  customPhotoImg = img;
+  currentPatternKey = 'photo';
+  closePhotoModal();
+  document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === 'photo'));
+  applyPhotoPattern();
+}
+
+// ══════════════════════════════════════
+//  语音 & 音效
+// ══════════════════════════════════════
+let _zhVoice = null;
+if (window.speechSynthesis) {
+  const _lv = () => {
+    const vs = speechSynthesis.getVoices();
+    _zhVoice = vs.find(v => /zh[-_](CN|TW|HK)/i.test(v.lang)) || vs.find(v => /zh/i.test(v.lang)) || null;
+  };
+  speechSynthesis.addEventListener('voiceschanged', _lv); _lv();
+}
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; } else u.lang = 'zh-CN';
+    u.rate = 0.9; u.pitch = 1.1;
+    speechSynthesis.speak(u);
+  }, 40);
+}
+let _ac = null;
+function tone(f,d,t='sine',v=.2){
+  try{
+    if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended')_ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g);g.connect(_ac.destination);
+    o.type=t;o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start();o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+function playOk(){ tone(660,.09); }
+function playFail(){ tone(200,.15,'sawtooth',.12); }
+function playWin(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.16),i*90)); }
+
+// ══════════════════════════════════════
+//  游戏状态
+// ══════════════════════════════════════
+let currentGrid = [];
+let beadCounts = {};
+let totalNeeded = 0, filledCount = 0;
+let currentPatternLabel = '';   // 当前图案的名字，保存到拼图夹时用作标签
+let currentPatternKey = 'heart';
+let lastProceduralKey = 'heart'; // 记住最近一个"正常"图案(不是 photo/custom)，切换豆板大小时用于回退
+let currentSize = 17;
+let beadSizePx = 20;
+let customPhotoImg = null;      // 用户拍照/上传的原图（Image 对象），用于换豆板大小时重新量化
+let patternKeyBeforePhoto = null;
+let currentMode = 'puzzle';     // 'puzzle' 拼图案 | 'free' 自由绘画
+let freeShapeSource = null;     // null=空白正方形画板；否则是 AI 生成的图形数组(0~1归一化坐标)
+let freeContinuousPaint = false; // 拼图案/自由绘画两种模式通用：双击选色后是否可以连续点选很多格子，不用每次重新双击
+try { freeContinuousPaint = localStorage.getItem('beadsFreeContinuousPaint') === '1'; } catch (e) {}
+function onContinuousPaintToggle(checked) {
+  freeContinuousPaint = checked;
+  try { localStorage.setItem('beadsFreeContinuousPaint', checked ? '1' : '0'); } catch (e) {}
+}
+
+// ══════════════════════════════════════
+//  自由绘画 → 收藏为拼图案模式的自定义图案
+// ══════════════════════════════════════
+let savedPatterns = [];
+try { savedPatterns = JSON.parse(localStorage.getItem('beadsSavedPatterns') || '[]'); } catch (e) { savedPatterns = []; }
+function saveSavedPatternsToStorage() {
+  try { localStorage.setItem('beadsSavedPatterns', JSON.stringify(savedPatterns)); } catch (e) {}
+}
+
+// 从当前拼豆板 DOM 读出已经涂色的格子，未涂色的一律当背景丢弃
+const SAVE_PATTERN_DEFAULT_COLOR = 'R'; // 轮廓里没涂色的格子，收藏时给个默认颜色占位
+
+function captureFreeBoardGrid() {
+  const cells = document.querySelectorAll('#pegBoard .peg-cell');
+  const total = cells.length;
+  const size = Math.round(Math.sqrt(total));
+  const grid = Array.from({ length: size }, () => Array(size).fill('.'));
+  let paintedCount = 0, shapeCount = 0;
+  cells.forEach((cell, i) => {
+    const x = i % size, y = Math.floor(i / size);
+    if (!cell.classList.contains('need')) return; // 不属于当前画布/轮廓的背景格子，不收藏
+    shapeCount++;
+    const code = cell.dataset.painted;
+    if (code) { grid[y][x] = code; paintedCount++; }
+    else grid[y][x] = SAVE_PATTERN_DEFAULT_COLOR; // 轮廓里没涂的格子也一起收藏，给默认色占位
+  });
+  return { grid, size, paintedCount, shapeCount };
+}
+
+let pendingSaveGrid = null;
+function openSavePatternModal() {
+  const { grid, size, paintedCount, shapeCount } = captureFreeBoardGrid();
+  pendingSaveGrid = { grid, size };
+  document.getElementById('savePatternNameInput').value = '';
+  const hint = document.getElementById('savePatternHint');
+  const saveBtn = document.getElementById('savePatternSaveBtn');
+  if (shapeCount === 0) {
+    hint.textContent = '画板是空的，先生成个图案或者随便画点什么吧';
+  } else if (paintedCount === 0) {
+    hint.textContent = `将收藏这个轮廓的全部 ${shapeCount} 颗豆子（还没涂色，先收藏形状，之后可以再来涂）`;
+  } else if (paintedCount < shapeCount) {
+    hint.textContent = `将收藏 ${shapeCount} 颗豆子（已涂色 ${paintedCount} 颗，剩下的用默认颜色占位）`;
+  } else {
+    hint.textContent = `将收藏 ${shapeCount} 颗豆子组成的图案`;
+  }
+  hint.className = 'ai-shape-hint';
+  saveBtn.disabled = false;
+  document.getElementById('savePatternModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('savePatternNameInput').focus(), 50);
+}
+function closeSavePatternModal() {
+  document.getElementById('savePatternModal').classList.add('hidden');
+  pendingSaveGrid = null;
+}
+function confirmSavePattern() {
+  if (!pendingSaveGrid) return;
+  const label = document.getElementById('savePatternNameInput').value.trim() || `我的图案${savedPatterns.length + 1}`;
+  const entry = {
+    id: 'p' + Date.now() + Math.floor(Math.random() * 1000),
+    label, grid: pendingSaveGrid.grid, size: pendingSaveGrid.size,
+  };
+  savedPatterns.push(entry);
+  saveSavedPatternsToStorage();
+  closeSavePatternModal();
+  buildPatternBtns();
+  speak('收藏成功！下次去拼图案模式就能找到啦');
+  playOk();
+}
+function selectSavedPattern(id) {
+  currentPatternKey = 'custom:' + id;
+  document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === currentPatternKey));
+  loadPattern();
+}
+function deleteSavedPattern(id) {
+  savedPatterns = savedPatterns.filter(p => p.id !== id);
+  saveSavedPatternsToStorage();
+  if (currentPatternKey === 'custom:' + id) {
+    currentPatternKey = lastProceduralKey;
+    loadPattern();
+  }
+  buildPatternBtns();
+}
+
+// ══════════════════════════════════════
+//  自由模式：正方形空白豆板，任意颜色随便画
+// ══════════════════════════════════════
+function loadFreeBoard(tryRestore) {
+  armedColor = null;
+  currentGrid = null;
+  totalNeeded = 0;
+  filledCount = 0;
+  let draft = null;
+  if (tryRestore) {
+    draft = loadFreeDraftFromStorage();
+    if (draft) {
+      currentSize = draft.size;
+      freeShapeSource = draft.shapeSource || null;
+      const sizeInput = document.getElementById('freeSizeInput');
+      if (sizeInput) sizeInput.value = currentSize;
+      document.querySelectorAll('#sizeBtns .chip-btn').forEach(b => b.classList.toggle('on', +b.dataset.size === currentSize));
+    }
+  }
+  beadSizePx = computeMaxBeadPx(currentSize);
+  if (freeShapeSource) {
+    renderPegBoard(shapesToGrid(freeShapeSource, currentSize), currentSize);
+  } else {
+    renderFreeBoard(currentSize);
+  }
+  renderTray();
+  syncBeadSizeUI();
+  if (draft) {
+    applyFreeDraftCells(draft.cells);
+    speak('帮你恢复了上次画到一半的作品，接着画吧！');
+  } else {
+    speak(freeShapeSource ? '照着轮廓自己选颜色填色吧！' : '自由涂色模式，想画什么都可以！');
+  }
+  startFreeAutoSave();
+}
+
+function renderFreeBoard(size) {
+  const board = document.getElementById('pegBoard');
+  board.style.gridTemplateColumns = `repeat(${size}, var(--cell))`;
+  board.style.setProperty('--cell', beadSizePx + 'px');
+  let html = '';
+  for (let i = 0; i < size * size; i++) html += `<div class="peg-cell need" data-need=""></div>`;
+  board.innerHTML = html;
+}
+
+// ── AI 生成轮廓：圆形/椭圆/三角形/矩形组合，代码负责栅格化 ──
+function shapeSign(p1, p2, p3) { return (p1[0]-p3[0])*(p2[1]-p3[1]) - (p2[0]-p3[0])*(p1[1]-p3[1]); }
+function pointInAIShape(x, y, s) {
+  if (!s || !s.type) return false;
+  if (s.type === 'circle') {
+    const r = s.r || 0.1;
+    return (x-s.cx)*(x-s.cx) + (y-s.cy)*(y-s.cy) <= r*r;
+  }
+  if (s.type === 'ellipse') {
+    const rx = s.rx || 0.1, ry = s.ry || 0.1;
+    return ((x-s.cx)/rx)**2 + ((y-s.cy)/ry)**2 <= 1;
+  }
+  if (s.type === 'rect') {
+    const rx = s.rx || 0.1, ry = s.ry || 0.1;
+    return Math.abs(x-s.cx) <= rx && Math.abs(y-s.cy) <= ry;
+  }
+  if (s.type === 'triangle') {
+    const pts = s.points;
+    if (!pts || pts.length < 3) return false;
+    const [p1, p2, p3] = pts, pt = [x, y];
+    const d1 = shapeSign(pt,p1,p2), d2 = shapeSign(pt,p2,p3), d3 = shapeSign(pt,p3,p1);
+    const hasNeg = (d1<0)||(d2<0)||(d3<0), hasPos = (d1>0)||(d2>0)||(d3>0);
+    return !(hasNeg && hasPos);
+  }
+  return false;
+}
+function isValidAIShape(s) {
+  if (!s || typeof s !== 'object') return false;
+  const nums = ['cx','cy','r','rx','ry'];
+  for (const k of nums) if (s[k] !== undefined && typeof s[k] !== 'number') return false;
+  if (s.type === 'triangle') {
+    return Array.isArray(s.points) && s.points.length >= 3 &&
+      s.points.slice(0,3).every(p => Array.isArray(p) && p.length >= 2 && typeof p[0] === 'number' && typeof p[1] === 'number');
+  }
+  return ['circle','ellipse','rect'].includes(s.type) && typeof s.cx === 'number' && typeof s.cy === 'number';
+}
+function shapesToGrid(shapes, size) {
+  const grid = [];
+  for (let gy = 0; gy < size; gy++) {
+    const row = [];
+    for (let gx = 0; gx < size; gx++) {
+      const x = (gx+0.5)/size, y = (gy+0.5)/size;
+      let inside = false;
+      for (const s of shapes) { if (pointInAIShape(x, y, s)) { inside = true; break; } }
+      row.push(inside ? 'X' : '.');
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+// 连通性检测：算出每个连通块的大小(从大到小)，用来发现"部件飘散、互相不连"的坏结果。
+// 只看最大块占比不够——一大块主体+一个飘着的小部件，占比照样很高——所以改成看"第二大的连通块是否大到不能忽略"。
+function componentSizes(grid) {
+  const size = grid.length;
+  const visited = Array.from({length: size}, () => Array(size).fill(false));
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  const sizes = [];
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (grid[y][x] !== 'X' || visited[y][x]) continue;
+      let count = 0;
+      const stack = [[x, y]];
+      visited[y][x] = true;
+      while (stack.length) {
+        const [cx, cy] = stack.pop();
+        count++;
+        for (const [dx, dy] of dirs) {
+          const nx = cx+dx, ny = cy+dy;
+          if (nx>=0 && nx<size && ny>=0 && ny<size && grid[ny][nx]==='X' && !visited[ny][nx]) {
+            visited[ny][nx] = true;
+            stack.push([nx, ny]);
+          }
+        }
+      }
+      sizes.push(count);
+    }
+  }
+  return sizes.sort((a, b) => b - a);
+}
+// 有明显的第二大连通块（不是噪点级别的一两格）就判定为"飘散"
+function hasFloatingParts(grid) {
+  const sizes = componentSizes(grid);
+  if (sizes.length < 2) return false;
+  const total = sizes.reduce((a, b) => a + b, 0);
+  const second = sizes[1];
+  return second >= Math.max(4, total * 0.08);
+}
+
+// 内容质量问题（形状太少/太小/太分散）—— 会触发自动重试；网络/格式错误不会重试
+class AIShapeQualityError extends Error {}
+
+const AI_SHAPE_OLLAMA_URL = 'http://localhost:11434/api/generate';
+const AI_SHAPE_OLLAMA_MODEL = 'qwen2.5:14b';
+const AI_SHAPE_SCHEMA = {
+  type: 'object',
+  properties: {
+    shapes: {
+      type: 'array', minItems: 2, maxItems: 10,
+      items: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: ['circle','ellipse','triangle','rect'] },
+          cx: { type: 'number' }, cy: { type: 'number' },
+          r: { type: 'number' }, rx: { type: 'number' }, ry: { type: 'number' },
+          points: { type: 'array', items: { type: 'array', items: { type: 'number' } } },
+        },
+        required: ['type'],
+      },
+    },
+  },
+  required: ['shapes'],
+};
+
+function buildAIShapePrompt(word) {
+  return `你是一个帮小朋友设计简笔画轮廓的助手。用户说想画什么，你要用基本图形（circle圆形/ellipse椭圆/triangle三角形/rect矩形）拼出这个东西的剪影轮廓。
+
+坐标规则：0~1归一化，(0,0)左上角，(1,1)右下角，y越大越靠下。
+- circle: cx,cy,r
+- ellipse: cx,cy,rx(半宽),ry(半高)
+- rect: cx,cy,rx(半宽),ry(半高)
+- triangle: points=[[x1,y1],[x2,y2],[x3,y3]]
+
+重要规则：
+1. 各个部件的位置必须挨着或者重叠，不能悬空分离。
+2. 三角形当屋顶用时，顶点是最小的y，两个底角是较大的y，底边要和下面矩形的顶边贴合。
+3. 拱形/弧形（比如彩虹、笑脸嘴巴）用小圆形沿着一条弧线排一圈来模拟，每个圆的半径至少0.07，相邻两个圆的圆心距离不能超过半径的1.2倍，这样才能连成一条连续的线不断开。
+4. 兔子耳朵是竖直细长的椭圆(rx小,ry大)，长在头顶两侧。
+
+举例1"雪人"：{"shapes":[{"type":"circle","cx":0.5,"cy":0.78,"r":0.2},{"type":"circle","cx":0.5,"cy":0.48,"r":0.15},{"type":"circle","cx":0.5,"cy":0.24,"r":0.1}]}
+举例2"房子"：{"shapes":[{"type":"rect","cx":0.5,"cy":0.65,"rx":0.25,"ry":0.25},{"type":"triangle","points":[[0.5,0.15],[0.2,0.4],[0.8,0.4]]}]}
+举例3"彩虹"：{"shapes":[{"type":"circle","cx":0.15,"cy":0.75,"r":0.09},{"type":"circle","cx":0.26,"cy":0.55,"r":0.09},{"type":"circle","cx":0.38,"cy":0.42,"r":0.09},{"type":"circle","cx":0.5,"cy":0.38,"r":0.09},{"type":"circle","cx":0.62,"cy":0.42,"r":0.09},{"type":"circle","cx":0.74,"cy":0.55,"r":0.09},{"type":"circle","cx":0.85,"cy":0.75,"r":0.09}]}
+
+最多用10个图形，不需要考虑颜色，只画轮廓形状。现在用户想画：${word}`;
+}
+
+let aiShapeDebugEnabled = false;
+try { aiShapeDebugEnabled = localStorage.getItem('beadsAIShapeDebug') === '1'; } catch (e) {}
+function onAIShapeDebugToggle(checked) {
+  aiShapeDebugEnabled = checked;
+  try { localStorage.setItem('beadsAIShapeDebug', checked ? '1' : '0'); } catch (e) {}
+}
+
+function openAIShapeModal() {
+  document.getElementById('aiShapeModal').classList.remove('hidden');
+  document.getElementById('aiShapeHint').textContent = 'AI 只画大致轮廓（圆形/椭圆/三角形拼出来的），画好后自己选颜色填色';
+  document.getElementById('aiShapeHint').className = 'ai-shape-hint';
+  document.getElementById('aiShapeDebugToggle').checked = aiShapeDebugEnabled;
+  const debugBox = document.getElementById('aiShapeDebug');
+  debugBox.innerHTML = '';
+  debugBox.classList.add('hidden');
+  setTimeout(() => document.getElementById('aiShapeInput').focus(), 50);
+}
+function closeAIShapeModal() {
+  document.getElementById('aiShapeModal').classList.add('hidden');
+}
+function clearAIShape() {
+  freeShapeSource = null;
+  loadFreeBoard();
+}
+
+function escapeAIDebugHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function appendAIShapeDebug(attempt, prompt, raw, verdict) {
+  const box = document.getElementById('aiShapeDebug');
+  box.classList.remove('hidden');
+  const verdictClass = verdict.startsWith('✅') ? 'dbg-verdict-ok' : 'dbg-verdict-fail';
+  const div = document.createElement('div');
+  div.className = 'dbg-attempt';
+  div.innerHTML = `
+    <div class="dbg-label">第 ${attempt} 次尝试</div>
+    <details><summary>输入 prompt</summary><pre>${escapeAIDebugHtml(prompt || '(无)')}</pre></details>
+    <div>输出：<pre>${escapeAIDebugHtml(raw || '(无)')}</pre></div>
+    <div class="${verdictClass}">${verdict}</div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+const AI_SHAPE_MAX_ATTEMPTS = 3;
+
+// ── 生成引擎：本地 Ollama（不变）/ Claude Code（新增，走本地代理服务）──
+const CLAUDE_PROXY_URL = 'http://localhost:8765/generate';
+let aiShapeEngine = 'ollama';
+try { aiShapeEngine = localStorage.getItem('beadsAIShapeEngine') || 'ollama'; } catch (e) {}
+
+const AI_ENGINES = [
+  { key: 'ollama', label: '🖥️ 本地模型', hint: '本机 Ollama qwen2.5:14b，免费、离线，速度较快' },
+  { key: 'claude',  label: '✨ Claude Code', hint: '效果通常更好，但要先在终端运行 python3 claude_shape_server.py 启动本地代理，且每次生成明显更慢（约15~30秒）' },
+];
+function buildAIEngineBtns() {
+  const wrap = document.getElementById('aiEngineBtns');
+  wrap.innerHTML = AI_ENGINES.map(e =>
+    `<button type="button" class="chip-btn${e.key===aiShapeEngine?' on':''}" data-engine="${e.key}" onclick="selectAIEngine('${e.key}')">${e.label}</button>`
+  ).join('');
+  updateAIEngineHint();
+}
+function updateAIEngineHint() {
+  const e = AI_ENGINES.find(x => x.key === aiShapeEngine);
+  document.getElementById('aiEngineHint').textContent = e ? e.hint : '';
+}
+function selectAIEngine(key) {
+  aiShapeEngine = key;
+  try { localStorage.setItem('beadsAIShapeEngine', key); } catch (e) {}
+  document.querySelectorAll('#aiEngineBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.engine === key));
+  updateAIEngineHint();
+}
+
+// 本地 Ollama 调用：跟之前完全一样，用 format 参数强制输出合法 JSON
+async function fetchRawFromOllama(prompt) {
+  const resp = await fetch(AI_SHAPE_OLLAMA_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: AI_SHAPE_OLLAMA_MODEL, prompt, stream: false, format: AI_SHAPE_SCHEMA }),
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  const raw = (data.response || '').trim();
+  if (!raw) throw new Error('空响应');
+  return raw;
+}
+
+// Claude Code 调用：走本地代理服务（claude_shape_server.py），代理内部 shell 出去调 `claude -p`
+async function fetchRawFromClaude(prompt) {
+  let resp;
+  try {
+    resp = await fetch(CLAUDE_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+  } catch (e) {
+    throw new Error('连不上本地 Claude 代理，请先在终端运行 python3 claude_shape_server.py');
+  }
+  const data = await resp.json();
+  if (!resp.ok || data.error) throw new Error(data.error || ('HTTP ' + resp.status));
+  const raw = (data.response || '').trim();
+  if (!raw) throw new Error('空响应');
+  return raw;
+}
+
+// Claude 的输出偶尔会带 markdown 代码块包裹或前后多余文字，比 Ollama(schema强约束)更需要容错解析
+function extractAIShapeJson(raw) {
+  let text = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  try { return JSON.parse(text); } catch (e) {}
+  const start = text.indexOf('{'), end = text.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(text.slice(start, end + 1)); } catch (e2) {}
+  }
+  return null;
+}
+
+// 单次请求 + 质量判定，成功返回 {shapes,prompt,raw}；质量不合格抛 AIShapeQualityError（会被重试），
+// 网络/格式类问题抛普通 Error（不重试，直接报错）。prompt/raw 挂在错误对象上，方便调试面板展示。
+async function requestAIShapesOnce(word) {
+  const prompt = buildAIShapePrompt(word);
+  let raw;
+  try {
+    raw = aiShapeEngine === 'claude' ? await fetchRawFromClaude(prompt) : await fetchRawFromOllama(prompt);
+  } catch (e) {
+    e.prompt = prompt;
+    throw e;
+  }
+
+  const parsed = extractAIShapeJson(raw);
+  if (!parsed) { const e = new Error('返回内容不是合法 JSON'); e.prompt = prompt; e.raw = raw; throw e; }
+
+  const shapes = (parsed.shapes || []).filter(isValidAIShape);
+  if (!shapes.length) { const e = new AIShapeQualityError('没生成出有效的图形'); e.prompt = prompt; e.raw = raw; throw e; }
+  const testGrid = shapesToGrid(shapes, 21);
+  const filled = testGrid.flat().filter(c => c === 'X').length;
+  if (filled < 21 * 21 * 0.03) { const e = new AIShapeQualityError('生成的图案太小了'); e.prompt = prompt; e.raw = raw; throw e; }
+  if (hasFloatingParts(testGrid)) { const e = new AIShapeQualityError('部件太分散、没连起来'); e.prompt = prompt; e.raw = raw; throw e; }
+
+  return { shapes, prompt, raw };
+}
+
+async function generateAIShape() {
+  const input = document.getElementById('aiShapeInput');
+  const word = input.value.trim();
+  const hint = document.getElementById('aiShapeHint');
+  if (!word) { hint.textContent = '先输入想画的东西吧～'; hint.className = 'ai-shape-hint error'; return; }
+
+  const btn = document.getElementById('aiShapeGenBtn');
+  btn.disabled = true;
+  document.getElementById('aiShapeDebug').innerHTML = '';
+
+  let lastErr = null;
+  for (let attempt = 1; attempt <= AI_SHAPE_MAX_ATTEMPTS; attempt++) {
+    hint.textContent = attempt === 1 ? '🤖 AI 正在构思，请稍候…' : `🤖 刚才拼出来的部件有点散，正在重新画（第 ${attempt} 次）…`;
+    hint.className = 'ai-shape-hint loading';
+    try {
+      const result = await requestAIShapesOnce(word);
+      if (aiShapeDebugEnabled) appendAIShapeDebug(attempt, result.prompt, result.raw, '✅ 通过');
+      freeShapeSource = result.shapes;
+      loadFreeBoard();
+      input.value = '';
+      btn.disabled = false;
+      if (aiShapeDebugEnabled) {
+        hint.textContent = '✅ 生成成功！轮廓已经画到右边豆板上了，看完调试信息后点"取消"关闭这个窗口吧';
+        hint.className = 'ai-shape-hint success';
+      } else {
+        closeAIShapeModal();
+      }
+      return;
+    } catch (err) {
+      if (aiShapeDebugEnabled) appendAIShapeDebug(attempt, err.prompt, err.raw, `❌ ${err.message}`);
+      lastErr = err;
+      if (!(err instanceof AIShapeQualityError)) break; // 网络/格式问题重试没用，直接跳出
+    }
+  }
+  hint.textContent = `生成失败：${lastErr.message}。请确认本机已启动 Ollama 并安装了 ${AI_SHAPE_OLLAMA_MODEL}，或换个词试试`;
+  hint.className = 'ai-shape-hint error';
+  btn.disabled = false;
+  if (!aiShapeDebugEnabled) setTimeout(closeAIShapeModal, 1800);
+}
+
+function paintCell(cell, code) {
+  if (code === 'ERASE') {
+    cell.classList.remove('filled', 'bead-w');
+    cell.style.background = '';
+    delete cell.dataset.painted;
+    return;
+  }
+  cell.classList.add('filled');
+  cell.classList.toggle('bead-w', code === 'W');
+  cell.style.background = COLOR_MAP[code].hex;
+  cell.dataset.painted = code;
+}
+
+function clearFreeBoard() {
+  document.querySelectorAll('#pegBoard .peg-cell.filled').forEach(c => {
+    c.classList.remove('filled', 'bead-w');
+    c.style.background = '';
+  });
+  clearFreeDraft();
+  tone(300, .12);
+}
+
+function celebrateFreeDrawing() {
+  speak('哇，画得真棒！');
+  playWin();
+  launchConfetti();
+}
+
+// ══════════════════════════════════════
+//  自由绘画：暂存与恢复（画一半离开，回来接着画）
+// ══════════════════════════════════════
+const FREE_DRAFT_KEY = 'beadsFreeDraft';
+let freeAutoSaveTimer = null;
+
+function serializeFreeCells() {
+  return Array.from(document.querySelectorAll('#pegBoard .peg-cell')).map(c => c.dataset.painted || '');
+}
+function saveFreeDraft() {
+  if (currentMode !== 'free') return;
+  const cells = serializeFreeCells();
+  if (!cells.length) return;
+  try {
+    localStorage.setItem(FREE_DRAFT_KEY, JSON.stringify({
+      size: currentSize, shapeSource: freeShapeSource, cells, ts: Date.now()
+    }));
+  } catch (e) {}
+}
+function loadFreeDraftFromStorage() {
+  try {
+    const raw = localStorage.getItem(FREE_DRAFT_KEY);
+    if (!raw) return null;
+    const draft = JSON.parse(raw);
+    if (!draft || !Array.isArray(draft.cells) || !draft.size) return null;
+    if (draft.cells.length !== draft.size * draft.size) return null;
+    if (!draft.cells.some(c => c)) return null; // 全空的暂存没有恢复的意义
+    return draft;
+  } catch (e) { return null; }
+}
+function clearFreeDraft() { try { localStorage.removeItem(FREE_DRAFT_KEY); } catch (e) {} }
+function applyFreeDraftCells(cells) {
+  document.querySelectorAll('#pegBoard .peg-cell').forEach((el, i) => {
+    if (cells[i]) paintCell(el, cells[i]);
+  });
+}
+function startFreeAutoSave() {
+  stopFreeAutoSave();
+  freeAutoSaveTimer = setInterval(saveFreeDraft, 1000);
+}
+function stopFreeAutoSave() {
+  if (freeAutoSaveTimer) { clearInterval(freeAutoSaveTimer); freeAutoSaveTimer = null; }
+}
+
+// ══════════════════════════════════════
+//  自由绘画模式：上传一张参考图片，照着它自己选颜色拼豆（不自动转换成图案）
+// ══════════════════════════════════════
+function onFreeRefFileChange(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = ''; // 允许下次重新选择同一张图片也能触发 onchange
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = document.getElementById('freeRefImg');
+    img.src = reader.result;
+    img.classList.remove('hidden');
+    document.getElementById('freeRefUploadBtn').classList.add('hidden');
+    document.getElementById('freeRefRemoveBtn').classList.remove('hidden');
+    speak('参考图片上传好了，照着它选颜色画吧！');
+  };
+  reader.readAsDataURL(file);
+}
+function openFreeRefZoom() {
+  const img = document.getElementById('freeRefImg');
+  if (!img.src) return;
+  document.getElementById('freeRefZoomImg').src = img.src;
+  document.getElementById('freeRefZoomModal').classList.remove('hidden');
+}
+function closeFreeRefZoom() {
+  document.getElementById('freeRefZoomModal').classList.add('hidden');
+}
+function bindFreeRefZoomDrag() {
+  const panel = document.getElementById('freeRefZoomModal');
+  const header = document.getElementById('freeRefZoomHeader');
+  let dragging = false, offX = 0, offY = 0;
+  const getPt = e => e.touches ? e.touches[0] : e;
+  function start(e) {
+    dragging = true;
+    const pt = getPt(e);
+    const rect = panel.getBoundingClientRect();
+    offX = pt.clientX - rect.left;
+    offY = pt.clientY - rect.top;
+    e.preventDefault();
+  }
+  function move(e) {
+    if (!dragging) return;
+    const pt = getPt(e);
+    const x = Math.max(0, Math.min(window.innerWidth - panel.offsetWidth, pt.clientX - offX));
+    const y = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, pt.clientY - offY));
+    panel.style.left = x + 'px';
+    panel.style.top = y + 'px';
+  }
+  function end() { dragging = false; }
+  header.addEventListener('mousedown', start);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  header.addEventListener('touchstart', start, {passive:false});
+  window.addEventListener('touchmove', move, {passive:false});
+  window.addEventListener('touchend', end);
+}
+function removeFreeRefImage() {
+  const img = document.getElementById('freeRefImg');
+  img.src = '';
+  img.classList.add('hidden');
+  document.getElementById('freeRefUploadBtn').classList.remove('hidden');
+  document.getElementById('freeRefRemoveBtn').classList.add('hidden');
+}
+
+function selectMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('#modeBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  document.getElementById('patternRow').style.display = mode === 'puzzle' ? '' : 'none';
+  document.getElementById('refPreviewBlock').style.display = mode === 'puzzle' ? '' : 'none';
+  document.getElementById('progressWrap').style.display = mode === 'puzzle' ? '' : 'none';
+  document.getElementById('freeActionsRow').classList.toggle('hidden', mode !== 'free');
+  document.getElementById('sizeBtns').style.display = mode === 'puzzle' ? '' : 'none';
+  document.getElementById('freeSizeWrap').classList.toggle('hidden', mode !== 'free');
+  document.getElementById('freeRefBlock').classList.toggle('hidden', mode !== 'free');
+  if (mode === 'free') {
+    document.getElementById('freeSizeInput').value = currentSize;
+    loadFreeBoard(true);
+  } else {
+    stopFreeAutoSave();
+    loadPattern();
+  }
+}
+function onFreeSizeInput(val) {
+  let n = parseInt(val, 10);
+  if (isNaN(n)) { document.getElementById('freeSizeInput').value = currentSize; return; }
+  n = Math.max(5, Math.min(40, n));
+  document.getElementById('freeSizeInput').value = n;
+  currentSize = n;
+  document.querySelectorAll('#sizeBtns .chip-btn').forEach(b => b.classList.toggle('on', +b.dataset.size === n));
+  loadFreeBoard();
+}
+function buildModeBtns() {
+  const wrap = document.getElementById('modeBtns');
+  wrap.innerHTML = `
+    <button class="chip-btn${currentMode==='puzzle'?' on':''}" data-mode="puzzle" onclick="selectMode('puzzle')">🧩 拼图案</button>
+    <button class="chip-btn${currentMode==='free'?' on':''}" data-mode="free" onclick="selectMode('free')">🎨 自由绘画</button>
+  `;
+}
+
+function loadPattern() {
+  if (currentPatternKey === 'photo') {
+    if (customPhotoImg) applyPhotoPattern();
+    return;
+  }
+  if (typeof currentPatternKey === 'string' && currentPatternKey.startsWith('custom:')) {
+    const id = currentPatternKey.slice('custom:'.length);
+    const entry = savedPatterns.find(p => p.id === id);
+    if (!entry) { currentPatternKey = lastProceduralKey; loadPattern(); return; }
+    currentSize = entry.size;
+    loadPatternFromGrid(entry.grid, entry.label);
+    return;
+  }
+  const grid = PATTERNS[currentPatternKey].gen(currentSize);
+  loadPatternFromGrid(grid, PATTERNS[currentPatternKey].label);
+}
+
+function loadPatternFromGrid(grid, label) {
+  armedColor = null;
+  currentGrid = grid;
+  currentPatternLabel = label;
+  const counts = {};
+  let total = 0;
+  grid.forEach(row => row.forEach(code => {
+    if (code === '.') return;
+    counts[code] = (counts[code]||0) + 1;
+    total++;
+  }));
+  beadCounts = counts;
+  totalNeeded = total;
+  filledCount = 0;
+  beadSizePx = computeMaxBeadPx(currentSize);
+  renderRefPreview(grid, currentSize);
+  renderPegBoard(grid, currentSize);
+  renderTray();
+  updateProgress();
+  syncBeadSizeUI();
+  speak(`一起来拼${label}吧`);
+}
+
+function renderRefPreview(grid, size) {
+  const wrap = document.getElementById('refPreview');
+  const panel = wrap.closest('.panel') || wrap.parentElement;
+  const gap = 2;
+  const availW = panel.clientWidth - 28 /* panel padding */ - 16 /* ref-preview padding */;
+  const cellPx = Math.max(4, Math.floor((availW - gap * (size - 1)) / size));
+  wrap.style.gridTemplateColumns = `repeat(${size}, ${cellPx}px)`;
+  let html = '';
+  grid.forEach(row => row.forEach(code => {
+    if (code === '.') html += `<div class="ref-cell" style="width:${cellPx}px;height:${cellPx}px"></div>`;
+    else html += `<div class="ref-cell" style="width:${cellPx}px;height:${cellPx}px;background:${COLOR_MAP[code].hex}${code==='W'?';box-shadow:inset 0 0 0 1px #ccc':''}"></div>`;
+  }));
+  wrap.innerHTML = html;
+}
+
+function renderPegBoard(grid, size) {
+  const board = document.getElementById('pegBoard');
+  board.style.gridTemplateColumns = `repeat(${size}, var(--cell))`;
+  board.style.setProperty('--cell', beadSizePx + 'px');
+  let html = '';
+  grid.forEach(row => row.forEach(code => {
+    if (code === '.') html += `<div class="peg-cell"></div>`;
+    else html += `<div class="peg-cell need" data-need="${code}"></div>`;
+  }));
+  board.innerHTML = html;
+}
+
+// 算出当前豆板大小(列数)下，豆子最大能有多少像素而不会超出可视区域(不允许出现滚动条)
+function computeMaxBeadPx(size) {
+  const gameArea = document.querySelector('.game-area');
+  const leftPanel = document.querySelector('.left-panel');
+  if (!gameArea || !leftPanel || !size) return 28;
+  const gap = 16, panelPadding = 28, cellGap = 2; // 分别对应 .game-area 的 gap、.panel 的左右内边距、.peg-cell 的 gap
+  const available = gameArea.clientWidth - leftPanel.offsetWidth - gap - panelPadding;
+  return Math.max(8, Math.floor((available - (size - 1) * cellGap) / size));
+}
+
+function syncBeadSizeUI() {
+  const slider = document.getElementById('beadSizeSlider');
+  const label = document.getElementById('beadSizeLabel');
+  const maxPx = computeMaxBeadPx(currentSize);
+  slider.max = maxPx;
+  if (beadSizePx > maxPx) beadSizePx = maxPx;
+  slider.value = beadSizePx;
+  label.textContent = beadSizePx + 'px';
+  const board = document.getElementById('pegBoard');
+  if (board) board.style.setProperty('--cell', beadSizePx + 'px');
+}
+
+function onBeadSizeInput(val) {
+  const maxPx = computeMaxBeadPx(currentSize);
+  beadSizePx = Math.min(+val, maxPx);
+  document.getElementById('pegBoard').style.setProperty('--cell', beadSizePx + 'px');
+  document.getElementById('beadSizeSlider').value = beadSizePx;
+  document.getElementById('beadSizeLabel').textContent = beadSizePx + 'px';
+}
+
+let _beadResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_beadResizeTimer);
+  _beadResizeTimer = setTimeout(syncBeadSizeUI, 150);
+});
+
+function renderTray() {
+  const wrap = document.getElementById('beadTray');
+  wrap.innerHTML = '';
+  // 拼图案模式下，如果当前图案是"从自由绘制收藏"来的自定义图案，豆子仓也展示完整的12色调色盘（含橡皮擦），
+  // 跟自由绘画模式一样；其余图案（内置几何图案/AI生成/照片转换）仍然只展示图案实际需要的颜色和数量
+  const showFullPalette = currentMode === 'free' || isCustomFreeDrawPattern();
+  const codes = showFullPalette ? Object.keys(COLOR_MAP) : Object.keys(beadCounts);
+  codes.forEach(code => {
+    const div = document.createElement('div');
+    div.className = 'bead-swatch' + (code === 'W' ? ' bead-w' : '');
+    div.style.background = COLOR_MAP[code].hex;
+    div.id = 'swatch-' + code;
+    div.dataset.code = code;
+    // 真正的自由绘画模式永远不显示数字；拼图案模式下，只有这个颜色确实是图案需要的（beadCounts 里有记录）才显示还需要几颗，
+    // 全调色盘里"多出来"的颜色不显示数字，表示数量不限、只是可选颜色
+    if (currentMode !== 'free' && beadCounts[code] !== undefined) {
+      div.innerHTML = `<span class="bead-count" id="cnt-${code}">${beadCounts[code]}</span>`;
+    }
+    attachBeadDrag(div, code);
+    wrap.appendChild(div);
+  });
+  if (showFullPalette) {
+    const eraser = document.createElement('div');
+    eraser.className = 'bead-swatch eraser-swatch';
+    eraser.id = 'swatch-ERASE';
+    eraser.dataset.code = 'ERASE';
+    eraser.title = '橡皮擦';
+    eraser.innerHTML = `<span class="eraser-icon">🧹</span>`;
+    attachBeadDrag(eraser, 'ERASE');
+    wrap.appendChild(eraser);
+  }
+}
+
+function updateTrayCount(code) {
+  const cnt = document.getElementById('cnt-' + code);
+  if (cnt) cnt.textContent = beadCounts[code];
+  const sw = document.getElementById('swatch-' + code);
+  if (sw) sw.classList.toggle('depleted', beadCounts[code] <= 0);
+}
+
+function updateProgress() {
+  const pct = totalNeeded ? Math.round(filledCount/totalNeeded*100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progText').textContent = `已拼 ${filledCount} / ${totalNeeded} 颗`;
+}
+
+// ══════════════════════════════════════
+//  拖拽（Pointer Events）
+// ══════════════════════════════════════
+let lastHoverCell = null;
+let armedColor = null;
+const DRAG_THRESHOLD = 6;   // 超过这个像素距离才算"拖拽"，否则算"点击"
+const DOUBLE_TAP_MS = 320;  // 两次点击间隔小于这个值算"双击"
+
+function attachBeadDrag(el, code) {
+  let startX = 0, startY = 0, moved = false, lastTapTime = 0;
+
+  el.addEventListener('pointerdown', e => {
+    if (currentMode !== 'free' && beadCounts[code] <= 0) return;
+    e.preventDefault();
+    el.setPointerCapture(e.pointerId);
+    startX = e.clientX; startY = e.clientY; moved = false;
+    showGhost(code, e.clientX, e.clientY);
+    speak(code === 'ERASE' ? '橡皮擦' : COLOR_MAP[code].name);
+  });
+  el.addEventListener('pointermove', e => {
+    if (!el.hasPointerCapture(e.pointerId)) return;
+    if (Math.hypot(e.clientX - startX, e.clientY - startY) > DRAG_THRESHOLD) moved = true;
+    moveGhost(e.clientX, e.clientY);
+    hoverAt(e.clientX, e.clientY);
+  });
+  el.addEventListener('pointerup', e => {
+    if (!el.hasPointerCapture(e.pointerId)) return;
+    hideGhost();
+    if (moved) {
+      // 真正拖拽过，走"拖到面板"逻辑
+      dropAt(e.clientX, e.clientY, code);
+    } else {
+      // 原地点击，没有拖动：判断是否构成双击 → 选中这个颜色待命
+      const now = Date.now();
+      if (now - lastTapTime < DOUBLE_TAP_MS) { armColor(code); lastTapTime = 0; }
+      else lastTapTime = now;
+    }
+  });
+  el.addEventListener('pointercancel', () => { hideGhost(); clearHover(); });
+}
+
+function armColor(code) {
+  if (currentMode !== 'free' && beadCounts[code] <= 0) return;
+  armedColor = code;
+  document.querySelectorAll('.bead-swatch').forEach(s => s.classList.toggle('armed', s.dataset.code === code));
+  tone(880, .08);
+}
+function disarmColor() {
+  armedColor = null;
+  document.querySelectorAll('.bead-swatch.armed').forEach(s => s.classList.remove('armed'));
+}
+
+function showGhost(code, x, y) {
+  const ghost = document.getElementById('ghostBead');
+  const px = beadSizePx + 6;
+  ghost.style.width = px + 'px';
+  ghost.style.height = px + 'px';
+  if (code === 'ERASE') {
+    ghost.style.background = 'repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 5px,#e0e0e0 5px,#e0e0e0 10px)';
+    ghost.style.boxShadow = '0 6px 16px rgba(0,0,0,.35), 0 0 0 2px #ccc';
+  } else {
+    ghost.style.background = COLOR_MAP[code].hex;
+    ghost.style.boxShadow = code === 'W'
+      ? '0 6px 16px rgba(0,0,0,.35), inset 0 -3px 6px rgba(0,0,0,.1), 0 0 0 2px #ccc'
+      : '0 6px 16px rgba(0,0,0,.35), inset 0 -3px 6px rgba(0,0,0,.15), inset 0 3px 5px rgba(255,255,255,.5)';
+  }
+  ghost.classList.remove('hidden');
+  moveGhost(x, y);
+}
+function moveGhost(x, y) {
+  const ghost = document.getElementById('ghostBead');
+  const half = ghost.offsetWidth / 2;
+  ghost.style.transform = `translate(${x-half}px, ${y-half}px)`;
+}
+function hideGhost() {
+  document.getElementById('ghostBead').classList.add('hidden');
+  clearHover();
+}
+function clearHover() {
+  if (lastHoverCell) { lastHoverCell.classList.remove('drag-hover'); lastHoverCell = null; }
+}
+function hoverAt(x, y) {
+  clearHover();
+  const el = document.elementFromPoint(x, y);
+  const cell = el && el.closest && el.closest('.peg-cell.need:not(.filled)');
+  if (cell) { cell.classList.add('drag-hover'); lastHoverCell = cell; }
+}
+
+// 是否是"从自由绘制收藏"来的自定义图案（拼图案模式下展示时不校验颜色是否一致）
+function isCustomFreeDrawPattern() {
+  return currentMode === 'puzzle' && typeof currentPatternKey === 'string' && currentPatternKey.startsWith('custom:');
+}
+
+function dropAt(x, y, code) {
+  clearHover();
+  document.getElementById('ghostBead').classList.add('hidden');
+  const el = document.elementFromPoint(x, y);
+  const cell = el && el.closest && el.closest('.peg-cell.need');
+  if (currentMode === 'free') {
+    if (cell) { paintCell(cell, code); playOk(); }
+    else playFail();
+    return;
+  }
+  if (isCustomFreeDrawPattern()) {
+    if (cell) fillCellAnyColor(cell, code);
+    else playFail();
+    return;
+  }
+  if (cell && cell.dataset.need === code && !cell.classList.contains('filled')) {
+    fillCell(cell, code);
+  } else {
+    playFail();
+    if (cell) { cell.classList.add('shake'); setTimeout(() => cell.classList.remove('shake'), 400); }
+  }
+}
+
+function fillCell(cell, code) {
+  cell.classList.add('filled');
+  if (code === 'W') cell.classList.add('bead-w');
+  cell.style.background = COLOR_MAP[code].hex;
+  beadCounts[code]--;
+  updateTrayCount(code);
+  filledCount++;
+  updateProgress();
+  playOk();
+  if (filledCount >= totalNeeded) onComplete();
+}
+
+// 从自由绘制收藏来的图案：随便用哪个颜色都能填，不检查颜色是否跟原图一致；支持用橡皮擦擦掉重填
+function fillCellAnyColor(cell, code) {
+  if (code === 'ERASE') {
+    if (cell.classList.contains('filled')) {
+      cell.classList.remove('filled', 'bead-w');
+      cell.style.background = '';
+      filledCount = Math.max(0, filledCount - 1);
+      updateProgress();
+      playOk();
+    }
+    return;
+  }
+  const wasFilled = cell.classList.contains('filled');
+  cell.classList.add('filled');
+  cell.classList.toggle('bead-w', code === 'W');
+  cell.style.background = COLOR_MAP[code].hex;
+  playOk();
+  if (!wasFilled) {
+    filledCount++;
+    updateProgress();
+    if (filledCount >= totalNeeded) onComplete();
+  }
+}
+
+// 双击选中颜色后，点击拼豆板槽位自动填充；是否连续填色（不用每次重新双击）由 freeContinuousPaint 开关控制，两种模式共用同一个开关
+function initPegBoardClick() {
+  document.getElementById('pegBoard').addEventListener('click', e => {
+    if (!armedColor) return;
+    const cell = e.target.closest('.peg-cell.need');
+    if (!cell) return;
+    if (currentMode === 'free') {
+      paintCell(cell, armedColor);
+      playOk();
+      if (!freeContinuousPaint) disarmColor();
+      return;
+    }
+    if (isCustomFreeDrawPattern()) {
+      fillCellAnyColor(cell, armedColor);
+      if (!freeContinuousPaint) disarmColor();
+      return;
+    }
+    if (cell.dataset.need === armedColor && !cell.classList.contains('filled')) {
+      fillCell(cell, armedColor);
+      if (!freeContinuousPaint) disarmColor();
+    } else {
+      playFail();
+      cell.classList.add('shake');
+      setTimeout(() => cell.classList.remove('shake'), 400);
+    }
+  });
+}
+
+function onComplete() {
+  document.getElementById('winBanner').classList.remove('hidden');
+  speak('太棒了，拼好啦！');
+  playWin();
+  launchConfetti();
+  setTimeout(() => document.getElementById('winBanner').classList.add('hidden'), 2600);
+}
+
+// ══════════════════════════════════════
+//  拼图夹：把拼好的图保存下来，之后能看、能导出成图片
+// ══════════════════════════════════════
+let myWorks = [];
+try { myWorks = JSON.parse(localStorage.getItem('beadsMyWorks') || '[]'); } catch (e) { myWorks = []; }
+function saveMyWorksStorage() { try { localStorage.setItem('beadsMyWorks', JSON.stringify(myWorks)); } catch (e) {} }
+let selectedWorkId = null;
+
+function capturePegBoardImage() {
+  const cells = document.querySelectorAll('#pegBoard .peg-cell');
+  const size = currentSize;
+  const scale = 32, pad = Math.round(scale * 0.3);
+  const canvas = document.createElement('canvas');
+  canvas.width = size * scale + pad * 2;
+  canvas.height = size * scale + pad * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fdf8f2';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  cells.forEach((cell, i) => {
+    if (!cell.classList.contains('need')) return;
+    const row = Math.floor(i / size), col = i % size;
+    const cx = pad + col * scale + scale / 2, cy = pad + row * scale + scale / 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, scale * 0.44, 0, Math.PI * 2);
+    ctx.fillStyle = cell.classList.contains('filled') ? (cell.style.background || '#dcebd5') : '#dcebd5';
+    ctx.fill();
+    if (cell.classList.contains('bead-w')) { ctx.strokeStyle = '#ccc'; ctx.lineWidth = 2; ctx.stroke(); }
+  });
+  return canvas.toDataURL('image/png');
+}
+
+function saveCurrentWorkToFolder() {
+  const img = capturePegBoardImage();
+  myWorks.unshift({ id: Date.now(), img, label: currentPatternLabel || '我的拼图', ts: Date.now() });
+  saveMyWorksStorage();
+  speak('保存到拼图夹啦！');
+}
+
+function openFolderModal() {
+  selectedWorkId = null;
+  renderFolderGrid();
+  document.getElementById('folderModal').classList.remove('hidden');
+}
+function closeFolderModal() {
+  document.getElementById('folderModal').classList.add('hidden');
+}
+function renderFolderGrid() {
+  const wrap = document.getElementById('folderGrid');
+  if (!myWorks.length) {
+    wrap.innerHTML = '<div class="folder-empty-hint">还没有保存的拼图，拼完一个图案后点"💾 保存到拼图夹"试试吧！</div>';
+  } else {
+    wrap.innerHTML = myWorks.map(w => {
+      const d = new Date(w.ts);
+      const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+      return `<div class="folder-item${w.id === selectedWorkId ? ' selected' : ''}" onclick="selectWork(${w.id})">
+        <img src="${w.img}" alt="${escapeAIDebugHtml(w.label)}">
+        <div class="folder-item-label">${escapeAIDebugHtml(w.label)} · ${dateStr}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('folderSaveImgBtn').classList.toggle('hidden', selectedWorkId === null);
+  document.getElementById('folderDeleteBtn').classList.toggle('hidden', selectedWorkId === null);
+}
+function selectWork(id) {
+  selectedWorkId = selectedWorkId === id ? null : id;
+  renderFolderGrid();
+}
+function exportSelectedWork() {
+  const w = myWorks.find(x => x.id === selectedWorkId);
+  if (!w) return;
+  const a = document.createElement('a');
+  a.href = w.img;
+  a.download = `拼豆-${w.label}-${w.id}.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  speak('图片保存好啦，去相册看看吧！');
+}
+function deleteSelectedWork() {
+  myWorks = myWorks.filter(w => w.id !== selectedWorkId);
+  saveMyWorksStorage();
+  selectedWorkId = null;
+  renderFolderGrid();
+}
+
+// ══════════════════════════════════════
+//  控制按钮
+// ══════════════════════════════════════
+function buildPatternBtns() {
+  const wrap = document.getElementById('patternBtns');
+  let html = Object.entries(PATTERNS).map(([key,p]) =>
+    `<button class="chip-btn${key===currentPatternKey?' on':''}" data-key="${key}" onclick="selectPattern('${key}')">${p.icon} ${p.label}</button>`
+  ).join('');
+  html += `<button class="chip-btn${currentPatternKey==='photo'?' on':''}" data-key="photo" onclick="selectPattern('photo')">📷 拍照/上传</button>`;
+  savedPatterns.forEach(p => {
+    const key = 'custom:' + p.id;
+    html += `<span class="chip-btn saved-chip${key===currentPatternKey?' on':''}" data-key="${key}">
+      <span class="saved-chip-label" onclick="selectSavedPattern('${p.id}')">⭐ ${escapeAIDebugHtml(p.label)}</span>
+      <button class="saved-chip-del" onclick="event.stopPropagation();deleteSavedPattern('${p.id}')" title="删除">×</button>
+    </span>`;
+  });
+  wrap.innerHTML = html;
+}
+function selectPattern(key) {
+  if (key === 'photo') {
+    if (currentPatternKey !== 'photo') patternKeyBeforePhoto = currentPatternKey;
+    currentPatternKey = 'photo';
+    document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === 'photo'));
+    openPhotoPanel();
+    return;
+  }
+  currentPatternKey = key;
+  lastProceduralKey = key;
+  document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === key));
+  loadPattern();
+}
+function buildSizeBtns() {
+  const wrap = document.getElementById('sizeBtns');
+  wrap.innerHTML = SIZE_PRESETS.map(s =>
+    `<button class="chip-btn${s.size===currentSize?' on':''}" data-size="${s.size}" onclick="selectSize(${s.size})">${s.label}</button>`
+  ).join('');
+}
+function selectSize(size) {
+  currentSize = size;
+  if (typeof currentPatternKey === 'string' && currentPatternKey.startsWith('custom:')) {
+    // 收藏的自定义图案是固定尺寸的，换豆板大小就退回最近一个普通图案
+    currentPatternKey = lastProceduralKey;
+    document.querySelectorAll('#patternBtns .chip-btn').forEach(b => b.classList.toggle('on', b.dataset.key === currentPatternKey));
+  }
+  document.querySelectorAll('#sizeBtns .chip-btn').forEach(b => b.classList.toggle('on', +b.dataset.size === size));
+  if (currentMode === 'free') loadFreeBoard(); else loadPattern();
+}
+function resetBoard() { if (currentMode === 'free') loadFreeBoard(); else loadPattern(); }
+
+// ══════════════════════════════════════
+//  烟花
+// ══════════════════════════════════════
+function launchConfetti() {
+  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#e53935','#fb8c00','#fdd835','#43a047','#1e88c7','#f06292','#8d6e53'];
+  const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  const ps = Array.from({length:130}, () => ({
+    x: Math.random()*cv.width, y: Math.random()*cv.height - cv.height,
+    w: rand(6,13), h: rand(4,8), color: cols[rand(0,cols.length-1)],
+    vx: (Math.random()-.5)*3, vy: rand(2,6),
+    angle: Math.random()*Math.PI*2, spin: (Math.random()-.5)*.2, op: 1
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let alive = 0;
+    ps.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.angle+=p.spin; p.op=Math.max(0,1-frame/130);
+      if (p.y<cv.height+20) alive++;
+      ctx.save(); ctx.globalAlpha=p.op; ctx.translate(p.x,p.y); ctx.rotate(p.angle);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    frame++;
+    if (alive>0 && frame<160) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+// ══════════════════════════════════════
+//  初始化
+// ══════════════════════════════════════
+buildModeBtns();
+buildPatternBtns();
+buildSizeBtns();
+buildAIEngineBtns();
+document.getElementById('continuousPaintToggle').checked = freeContinuousPaint;
+initPegBoardClick();
+bindFreeRefZoomDrag();
+loadPattern();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
