@@ -1,0 +1,82 @@
+/* Shared controls for standard Huipeixue lesson pages.
+   Pages opt in with data-hpx-page and set --hpx-accent when needed. */
+[data-hpx-page] .tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+[data-hpx-page] .tab-btn {
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .65);
+  color: #666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .2s, background .2s, color .2s, box-shadow .2s;
+}
+
+[data-hpx-page] .tab-btn.on {
+  background: var(--hpx-accent, #6a1b9a);
+  color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--hpx-accent, #6a1b9a) 35%, transparent);
+}
+
+[data-hpx-page] .speak-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+[data-hpx-page] .speak-toggle {
+  padding: 7px 18px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  background: #fff;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .2s, background .2s, color .2s;
+}
+
+[data-hpx-page] .speak-toggle.on {
+  background: var(--hpx-accent, #6a1b9a);
+  color: #fff;
+}
+
+[data-hpx-page] .back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: var(--hpx-accent, #6a1b9a);
+  text-decoration: none;
+  font-size: .9rem;
+}
+
+[data-hpx-page] .back-link:hover { text-decoration: underline; }
+
+[data-hpx-page] button:focus-visible,
+[data-hpx-page] input:focus-visible,
+[data-hpx-page] select:focus-visible,
+[data-hpx-page] a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--hpx-accent, #6a1b9a) 55%, white);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hpx-page] *,
+  [data-hpx-page] *::before,
+  [data-hpx-page] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
