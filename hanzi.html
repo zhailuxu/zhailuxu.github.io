@@ -127,6 +127,29 @@ body {
 .word-label { font-size:.7rem; color:#388e3c; margin-bottom:3px; }
 .word-char  { font-size:1.3rem; font-weight:bold; color:#1b5e20; }
 .word-mean  { font-size:.75rem; color:#555; margin-top:2px; }
+
+/* ── AI 讲汉字故事 ── */
+.ai-hz-btn{display:block;width:100%;border:none;border-radius:14px;padding:9px 10px;
+  margin-bottom:10px;font-size:.86rem;font-weight:bold;cursor:pointer;font-family:inherit;
+  color:#fff;background:linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow:0 3px 10px rgba(94,53,177,.3);transition:transform .1s;}
+.ai-hz-btn:active{transform:scale(.97);}
+.ai-hz-btn:disabled{opacity:.6;cursor:default;}
+.ai-hz-box{display:none;background:linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border:1.5px solid #d1c4e9;border-radius:14px;padding:11px 13px;margin-bottom:10px;
+  font-size:.85rem;color:#4527a0;line-height:1.7;text-align:left;}
+.ai-hz-box.show{display:block;animation:aiHzIn .25s ease-out;}
+@keyframes aiHzIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.ai-hz-box .ai-hz-tag{font-size:.7rem;font-weight:bold;color:#5e35b1;
+  background:#fff;display:inline-block;border-radius:8px;padding:1px 8px;margin-bottom:6px;}
+.ai-hz-box .ai-hz-loading{color:#7e57c2;font-style:italic;}
+.ai-hz-box .ai-hz-err{color:#c62828;font-size:.78rem;}
+.ai-hz-box .ai-hz-retry{margin-top:6px;border:1.5px solid #9575cd;background:#fff;color:#5e35b1;
+  border-radius:8px;padding:3px 10px;font-size:.75rem;cursor:pointer;font-family:inherit;}
+.ai-hz-story{background:#fff;border-radius:9px;padding:8px 10px;margin-bottom:7px;
+  font-weight:bold;}
+.ai-hz-sent{background:#fff;border-radius:9px;padding:8px 10px;}
+.ai-hz-sent b{color:#5e35b1;}
 .modal-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
 .btn-learned {
   flex:1; padding:12px 10px; border:none; border-radius:14px;
@@ -238,9 +261,13 @@ body {
 .write-prog{text-align:center;font-size:.9rem;color:#888;margin-bottom:6px;}
 .write-title{text-align:center;font-size:1.6rem;font-weight:bold;color:#4a148c;margin-bottom:2px;letter-spacing:8px;}
 .write-sub{text-align:center;font-size:.88rem;color:#888;margin-bottom:10px;}
-/* guideCanvas 在正常流中撑起容器高度，writeCanvas 绝对定位叠在上方 */
+/* 手写练习：左侧「自己写」+ 右侧「一笔笔跟着练」两栏并排，窄屏自动堆叠 */
+.write-panels{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:640px;margin:0 auto;padding:0 12px 20px;}
+.write-panel-col{width:280px;}
+.step-panel{display:none;}
+/* guideCanvas / stepGuideCanvas 在正常流中撑起容器高度，其余层绝对定位叠在上方 */
 .write-canvas-wrap{position:relative;margin:0 auto;max-width:280px;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.13);}
-#guideCanvas{display:block;width:100%;height:auto;}
+#guideCanvas,#stepGuideCanvas{display:block;width:100%;height:auto;}
 #writeCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
 .write-hint{text-align:center;font-size:.78rem;color:#ccc;margin:6px 0 8px;}
 .write-result{text-align:center;font-size:1rem;font-weight:bold;min-height:28px;margin-bottom:6px;}
@@ -249,12 +276,25 @@ body {
 .write-btns .btn{min-width:72px;}
 .btn-guide-toggle{padding:7px 16px;border:2px solid #ce93d8;border-radius:18px;background:#fff;color:#6a1b9a;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
 .btn-guide-toggle.on{background:#6a1b9a;color:#fff;}
+/* ─ Stroke practice ─ */
+.stroke-entry{display:flex;justify-content:center;margin:14px 0 4px;}
+.stroke-entry-btn{padding:10px 28px;border:none;border-radius:20px;background:linear-gradient(135deg,#ce93d8,#6a1b9a);color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(106,27,154,.32);transition:transform .12s;}
+.stroke-entry-btn:active{transform:scale(.95);}
+.stroke-wrap{max-width:340px;margin:0 auto;padding:0 12px;}
+.stroke-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.stroke-btn{padding:8px 14px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.stroke-btn.on{background:#6a1b9a;color:#fff;border-color:#6a1b9a;}
+.stroke-name{text-align:center;font-size:2.2rem;font-weight:bold;color:#4a148c;margin-bottom:2px;}
+.stroke-py{text-align:center;font-size:1rem;color:#e91e63;font-weight:bold;margin-bottom:2px;}
+.stroke-desc{text-align:center;font-size:.85rem;color:#888;margin-bottom:10px;}
+#sGuideCanvas{display:block;width:100%;height:auto;}
+#sTraceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#4a148c">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
   <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
@@ -265,6 +305,9 @@ body {
     <div style="font-size:3rem">📖</div>
     <h1>趣味汉字</h1>
     <p>从简单到复杂，认识3000个常用汉字</p>
+  </div>
+  <div class="stroke-entry">
+    <button class="stroke-entry-btn" onclick="startStroke()">✏️ 笔画练习</button>
   </div>
   <div class="level-grid" id="levelGrid"></div>
   <div style="text-align:center;margin-top:20px;color:#bbb;font-size:.78rem">
@@ -371,6 +414,8 @@ body {
         <div class="word-mean" id="mWordMean"></div>
       </div>
     </div>
+    <button class="ai-hz-btn" id="aiHzBtn" onclick="genHanziStory()">🤖 AI 讲讲这个字的故事</button>
+    <div class="ai-hz-box" id="aiHzBox"></div>
     <div class="modal-btns">
       <button class="btn-nav" onclick="modalStep(-1)">◀ 上一个</button>
       <button class="btn-learned" id="mLearnBtn" onclick="toggleLearned()">✓ 学会了</button>
@@ -386,24 +431,71 @@ body {
     <div class="write-prog" id="wProg"></div>
     <div class="write-title" id="wTitle"></div>
     <div class="write-sub" id="wSub"></div>
-    <div class="write-canvas-wrap">
-      <canvas id="guideCanvas" width="280" height="280"></canvas>
-      <canvas id="writeCanvas" width="280" height="280"></canvas>
+  </div>
+  <div class="write-panels">
+    <div class="write-panel-col">
+      <div class="write-canvas-wrap">
+        <canvas id="guideCanvas" width="280" height="280"></canvas>
+        <div id="hwGuideStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
+        <canvas id="writeCanvas" width="280" height="280"></canvas>
+        <div id="hwHintStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:none;pointer-events:none;"></div>
+      </div>
+      <div class="write-hint">用手指或鼠标在田字格里书写</div>
+      <div class="write-result" id="wResult"></div>
+      <div class="write-btns">
+        <button class="btn btn-gray" onclick="writeNav(-1)">◀ 上一个</button>
+        <button class="btn-guide-toggle on" id="guideToggle" onclick="toggleGuide()">👁 显示参考</button>
+        <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showWriteHint()">💡 笔顺提示</button>
+        <button class="btn-guide-toggle" id="stepToggle" onclick="toggleStepPanel()">✏️ 逐笔练习</button>
+        <button class="btn" style="background:#e91e63;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="clearWrite()">🗑 清除</button>
+        <button class="btn btn-gray" onclick="writeNav(1)">下一个 ▶</button>
+      </div>
     </div>
-    <div class="write-hint">用手指或鼠标在田字格里书写</div>
-    <div class="write-result" id="wResult"></div>
+    <div class="write-panel-col step-panel">
+      <div class="write-canvas-wrap">
+        <canvas id="stepGuideCanvas" width="280" height="280"></canvas>
+        <div id="hwStepStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
+      </div>
+      <div class="write-hint" id="stepLabel">点击"下一笔"开始</div>
+      <div class="write-btns">
+        <button class="btn btn-gray" onclick="stepReset()">↺ 重来</button>
+        <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:9px 20px;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="stepNext()">下一笔 ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Page: Stroke Practice ══ -->
+<div id="pgStroke" class="page">
+  <button class="back-btn" onclick="goHome()">← 返回</button>
+  <div class="hdr" style="padding:10px 0 8px">
+    <h1 style="font-size:1.6rem">✏️ 笔画练习</h1>
+    <p>练好基本笔画，写字更漂亮</p>
+  </div>
+  <div class="stroke-wrap">
+    <div class="stroke-btns" id="strokeBtns"></div>
+    <div class="stroke-name" id="strokeName">横</div>
+    <div class="stroke-py"   id="strokePy">héng</div>
+    <div class="stroke-desc" id="strokeDesc"></div>
+    <div class="write-canvas-wrap">
+      <canvas id="sGuideCanvas" width="280" height="280"></canvas>
+      <canvas id="sTraceCanvas" width="280" height="280"></canvas>
+    </div>
+    <div class="write-hint">沿着粉色笔画描写</div>
+    <div class="write-result" id="sResult"></div>
     <div class="write-btns">
-      <button class="btn btn-gray" onclick="writeNav(-1)">◀ 上一个</button>
-      <button class="btn-guide-toggle on" id="guideToggle" onclick="toggleGuide()">👁 显示参考</button>
-      <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showWriteHint()">💡 笔顺提示</button>
-      <button class="btn" style="background:#e91e63;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="clearWrite()">🗑 清除</button>
-      <button class="btn btn-gray" onclick="writeNav(1)">下一个 ▶</button>
+      <button class="btn btn-gray"  onclick="clearStroke()">🗑 清除</button>
+      <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showStrokeHint()">💡 提示</button>
+      <button class="btn btn-purple" onclick="speak(STROKE_DATA[curStroke].name)">🔊 读</button>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<script src="lib/hanzi-writer.min.js"></script>
+<script src="hanzi-data.js"></script>
+<script src="hpx-core.js"></script>
 <script>
 // ─────────────────────────────────────────────────
 //  Character Data
@@ -415,6 +507,9 @@ const CHARS = [
 ['一','yī',1,'数字一，最小的正整数','一起','大家一起去',1],
 ['二','èr',2,'数字二','二月','第二个月',1],
 ['三','sān',3,'数字三','三角','三个角',1],
+['四','sì',5,'数字四','四季','春夏秋冬',1],
+['五','wǔ',4,'数字五','五官','脸上器官',1],
+['六','liù',4,'数字六','六月','第六个月',1],
 ['七','qī',2,'数字七','七月','第七个月',1],
 ['八','bā',2,'数字八','八月','第八个月',1],
 ['九','jiǔ',2,'数字九','九月','第九个月',1],
@@ -436,9 +531,6 @@ const CHARS = [
 ['女','nǚ',3,'女性','女生','女孩子',1],
 ['工','gōng',3,'工作','工人','做工的人',1],
 ['门','mén',3,'门','门口','门的入口',1],
-['四','sì',5,'数字四','四季','春夏秋冬',1],
-['五','wǔ',4,'数字五','五官','脸上器官',1],
-['六','liù',4,'数字六','六月','第六个月',1],
 ['中','zhōng',4,'中间','中心','最中间',1],
 ['日','rì',4,'太阳，白天','日记','每天记录',1],
 ['月','yuè',4,'月亮','月光','月亮的光',1],
@@ -908,6 +1000,12 @@ function showModalChar() {
   const isLearned = learned.has(ch[0]);
   btn.textContent = isLearned ? '✓ 已学会' : '✓ 学会了';
   btn.className   = 'btn-learned' + (isLearned ? ' done' : '');
+
+  // 切换到新字时，清空上一个字残留的 AI 讲解内容
+  const aiBox=document.getElementById('aiHzBox');
+  if(aiBox){ aiBox.classList.remove('show'); aiBox.innerHTML=''; }
+  const aiBtn=document.getElementById('aiHzBtn');
+  if(aiBtn) aiBtn.disabled=false;
 }
 
 function toggleLearned() {
@@ -1161,6 +1259,7 @@ function renderWrite(){
   document.getElementById('wResult').className='write-result';
   drawGuide(ch[0]);
   clearWrite();
+  initStepChar(ch[0]);
   speak(ch[0]);
 }
 
@@ -1187,20 +1286,32 @@ function drawGuide(char){
   ctx.beginPath();ctx.moveTo(8,8);ctx.lineTo(w-8,h-8);
   ctx.moveTo(w-8,8);ctx.lineTo(8,h-8);ctx.stroke();
   ctx.setLineDash([]);
-  if(!wGuideOn) return;
-  // 参考字：先画粗描红线（模拟 numbers.html 的粉色笔画路径）
-  const font=`bold ${Math.round(w*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
-  ctx.font=font;ctx.textAlign='center';ctx.textBaseline='middle';
-  // 最外层：淡紫色粗轮廓，让用户能"描"这条线
-  ctx.strokeStyle='rgba(255,155,185,0.55)';ctx.lineWidth=28;
-  ctx.lineCap='round';ctx.lineJoin='round';
-  ctx.strokeText(char,w/2,h/2+4);
-  // 中层：稍亮填充
-  ctx.fillStyle='rgba(220,130,220,0.22)';
-  ctx.fillText(char,w/2,h/2+4);
-  // 内层：细轮廓让笔画边缘更清晰
-  ctx.strokeStyle='rgba(180,80,200,0.35)';ctx.lineWidth=1.5;
-  ctx.strokeText(char,w/2,h/2+4);
+  // 参考字：用 Hanzi Writer 渲染（和笔顺提示动画用同一套定位参数 HW_BOX，
+  // 保证参考字和逐笔动画完全重合，不会像之前"字体描字"那样跟真实笔画对不齐）
+  renderGuideChar(char);
+}
+
+// 参考字 / 笔顺提示动画共用的定位参数，两者必须一致才能重合
+const HW_BOX={width:280,height:280,padding:8};
+let _hwGuide=null;
+function renderGuideChar(char){
+  const stage=document.getElementById('hwGuideStage');
+  if(!stage) return;
+  stage.innerHTML='';
+  if(!wGuideOn){ stage.style.display='none'; return; }
+  stage.style.display='block';
+  try{
+    _hwGuide=HanziWriter.create(stage,char,{
+      ...HW_BOX,
+      showCharacter:true,
+      showOutline:false,
+      strokeColor:'rgba(190,110,210,.34)',
+      charDataLoader:hwLoadCharData,
+      onLoadCharDataError:()=>{ stage.style.display='none'; }
+    });
+  }catch(e){
+    stage.style.display='none';
+  }
 }
 
 function clearWrite(){
@@ -1209,6 +1320,8 @@ function clearWrite(){
   canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
   document.getElementById('wResult').textContent='';
   document.getElementById('wResult').className='write-result';
+  const stage=document.getElementById('hwHintStage');
+  if(stage){ stage.style.display='none'; stage.innerHTML=''; }
 }
 
 function toggleGuide(){
@@ -1225,36 +1338,128 @@ function writeNav(dir){
   renderWrite();
 }
 
-// 笔顺提示：在 traceCanvas 上逐步描绘字形（用字体采样点动画）
+// 笔顺提示：用 Hanzi Writer + 本地真实笔顺数据，按正确笔顺逐笔动画（而不是从左到右擦除）
+// 数据内嵌在 hanzi-data.js（window.HANZI_STROKE_DATA）里用普通 <script> 加载，
+// 而不是用 fetch 读取 json 文件——因为本页面是直接双击用 file:// 协议打开的，
+// fetch 本地文件会被浏览器 CORS 策略拦截，<script src> 方式则不受影响。
+let _hwWriter=null;
+function hwLoadCharData(char,onComplete,onError){
+  const data=window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  if(data) onComplete(data);
+  else onError(new Error('no stroke data for '+char));
+}
+
 function showWriteHint(){
   clearTimeout(_hintTimer);
   clearWrite();
-  const canvas=document.getElementById('writeCanvas');
+  const stage=document.getElementById('hwHintStage');
+  const char=wList[wIdx][0];
+  stage.innerHTML='';
+  stage.style.display='block';
+  try{
+    _hwWriter=HanziWriter.create(stage,char,{
+      ...HW_BOX,
+      showCharacter:false,
+      showOutline:true,
+      strokeColor:'#1a237e',
+      outlineColor:'#e4c8f0',
+      strokeAnimationSpeed:1,
+      delayBetweenStrokes:260,
+      charDataLoader:hwLoadCharData,
+      onLoadCharDataError:()=>{ stage.style.display='none'; }
+    });
+    _hwWriter.animateCharacter({
+      onComplete:()=>{ _hintTimer=setTimeout(()=>{ stage.style.display='none'; },1500); }
+    });
+  }catch(e){
+    stage.style.display='none';
+  }
+}
+
+// ─────────────────────────────────────────────────
+//  一笔笔跟着练：右侧新画布，点一下"下一笔"才画出一笔，
+//  之前画过的笔画会保留在画面上（累积展示），解决"动画看一遍记不住"的问题
+// ─────────────────────────────────────────────────
+let _hwStep=null, stepIdx=0, stepTotal=0, stepChar=null;
+
+function stepGridDraw(){
+  const canvas=document.getElementById('stepGuideCanvas');
+  if(!canvas) return;
   const ctx=canvas.getContext('2d');
   const w=canvas.width, h=canvas.height;
-  const char=wList[wIdx][0];
-  // 用渐进 clip 方式：每帧扩大一个竖向切片来揭示字形
-  const offscreen=document.createElement('canvas');
-  offscreen.width=w;offscreen.height=h;
-  const oc=offscreen.getContext('2d');
-  oc.fillStyle='#1a237e';
-  oc.font=`bold ${Math.round(w*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
-  oc.textAlign='center';oc.textBaseline='middle';
-  oc.fillText(char,w/2,h/2+4);
-  const STEPS=30;
-  let s=0;
-  function step(){
-    ctx.clearRect(0,0,w,h);
-    const sliceW=Math.ceil(w/STEPS*(s+1));
-    ctx.drawImage(offscreen,0,0,sliceW,h,0,0,sliceW,h);
-    // 红点标示当前笔画前沿
-    ctx.save();ctx.fillStyle='rgba(255,23,68,.9)';
-    ctx.beginPath();ctx.arc(sliceW,h/2,9,0,Math.PI*2);ctx.fill();ctx.restore();
-    s++;
-    if(s<STEPS) _hintTimer=setTimeout(step,60);
-    else ctx.clearRect(sliceW-1,0,2,h); // 清掉红点列
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#fdf6ff';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#d8b4e8';ctx.lineWidth=2;ctx.setLineDash([]);
+  ctx.strokeRect(4,4,w-8,h-8);
+  ctx.strokeStyle='#e4c8f0';ctx.lineWidth=1;ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  ctx.moveTo(w/2,6);ctx.lineTo(w/2,h-6);
+  ctx.moveTo(6,h/2);ctx.lineTo(w-6,h/2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle='#eeddf8';ctx.lineWidth=1;ctx.setLineDash([3,7]);
+  ctx.beginPath();ctx.moveTo(8,8);ctx.lineTo(w-8,h-8);
+  ctx.moveTo(w-8,8);ctx.lineTo(8,h-8);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function initStepChar(char){
+  stepChar=char;
+  stepIdx=0;
+  stepGridDraw();
+  const stage=document.getElementById('hwStepStage');
+  const data=window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  stepTotal=data?data.strokes.length:0;
+  updateStepLabel();
+  if(!stage) return;
+  stage.innerHTML='';
+  try{
+    _hwStep=HanziWriter.create(stage,char,{
+      ...HW_BOX,
+      showCharacter:false,
+      showOutline:true,
+      strokeColor:'#1a237e',
+      outlineColor:'#e4c8f0',
+      charDataLoader:hwLoadCharData,
+      onLoadCharDataError:()=>{ stage.innerHTML=''; }
+    });
+  }catch(e){
+    _hwStep=null;
   }
-  step();
+}
+
+function updateStepLabel(){
+  const el=document.getElementById('stepLabel');
+  if(!el) return;
+  if(!stepTotal) el.textContent='点击"下一笔"开始';
+  else if(stepIdx>=stepTotal) el.textContent=`✓ 全部 ${stepTotal} 笔完成啦`;
+  else el.textContent=`第 ${stepIdx+1} 笔 / 共 ${stepTotal} 笔`;
+}
+
+function stepNext(){
+  if(!_hwStep||stepIdx>=stepTotal) return;
+  _hwStep.animateStroke(stepIdx);
+  stepIdx++;
+  updateStepLabel();
+  if(stepIdx>=stepTotal) tone(660,.2);
+}
+
+function stepReset(){
+  if(!stepChar) return;
+  initStepChar(stepChar);
+}
+
+let stepPanelOn=false;
+function toggleStepPanel(){
+  stepPanelOn=!stepPanelOn;
+  const panel=document.querySelector('.step-panel');
+  const btn=document.getElementById('stepToggle');
+  if(panel) panel.style.display=stepPanelOn?'block':'none';
+  if(btn){
+    btn.classList.toggle('on',stepPanelOn);
+    btn.textContent=stepPanelOn?'✏️ 收起逐笔练习':'✏️ 逐笔练习';
+  }
+  if(stepPanelOn&&stepChar) initStepChar(stepChar);
 }
 
 // 书写匹配度检测（像素比对，pointerup 后调用）
@@ -1348,26 +1553,113 @@ function showToast(msg) {
 // ─────────────────────────────────────────────────
 //  Speech (Web Speech API)
 // ─────────────────────────────────────────────────
-let _zhVoice = null;
-if (window.speechSynthesis) {
-  const _loadVoices = () => {
-    const vs = speechSynthesis.getVoices();
-    _zhVoice = vs.find(v => /zh[-_](CN|TW|HK)/i.test(v.lang))
-            || vs.find(v => /zh/i.test(v.lang)) || null;
-  };
-  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
-  _loadVoices();
+const hanziSpeech=Hpx.speech.create({rate:0.85,startDelayMs:50});
+function speak(text,rate=0.85){return hanziSpeech.speak(text,{rate});}
+
+// ═══════════════════════════════════════════════
+//  AI 讲汉字故事（调用本地 Ollama）
+//  要求：Ollama 需在同一台设备上运行，且已设置
+//  OLLAMA_HOST=0.0.0.0 / OLLAMA_ORIGINS=* 允许跨域访问，
+//  否则浏览器会因 CORS 被拒绝。
+//
+//  采用 Ollama Structured Outputs（format: JSON Schema）强制
+//  模型按固定结构输出，字数上加了上限，避免输出一大段文字。
+// ═══════════════════════════════════════════════
+const HZ_OLLAMA_URL='http://localhost:11434/api/generate';
+const HZ_OLLAMA_MODEL='qwen2.5:14b';
+const HZ_STORY_MAXLEN=60;   // 造字故事/记忆技巧最多多少字
+const HZ_SENT_MAXLEN=30;    // 例句最多多少字
+
+const HZ_STORY_SCHEMA={
+  type:'object',
+  properties:{
+    story:{type:'string', maxLength:HZ_STORY_MAXLEN,
+      description:`用生动、画面感强的方式讲这个字为什么长这样（造字故事或记忆技巧），最多${HZ_STORY_MAXLEN}个字`},
+    sentence:{type:'string', maxLength:HZ_SENT_MAXLEN,
+      description:`用这个字的例词，现场造一个简单例句，最多${HZ_SENT_MAXLEN}个字`},
+  },
+  required:['story','sentence'],
+};
+
+function hzEscapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function speak(text, rate=0.85) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  setTimeout(() => {
-    const u = new SpeechSynthesisUtterance(text);
-    if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
-    else { u.lang = 'zh-CN'; }
-    u.rate = rate;
-    window.speechSynthesis.speak(u);
-  }, 50);
+function hzClampText(s,maxLen){
+  s=String(s||'').trim();
+  return s.length>maxLen ? s.slice(0,maxLen)+'…' : s;
+}
+
+function buildHanziStoryPrompt(ch){
+  const [char,pinyin,strokes,meaning,word,wordMeaning]=ch;
+  return `你是一名精通汉字字源、给小学生讲汉字的老师，正在讲解汉字"${char}"（拼音：${pinyin}，${strokes}画）。
+字义：${meaning}
+例词：${word}（${wordMeaning}）
+
+请你做两件事：
+
+1. story：讲清楚"古人当初为什么把这个字造成这个样子"，优先从真实的造字逻辑（六书）讲起，而不是编一个和字形无关的联想故事：
+   - 如果是【象形字】：说清楚它像什么东西的形状演变来的，比如"日"最早画的是圆圆的太阳、中间一点表示光芒；"山"像三座山峰连在一起。
+   - 如果是【指事字】：说清楚字形里的符号指的是什么位置/动作，比如"上""下"用一横加一个符号表示方位。
+   - 如果是【会意字】：说清楚是哪几个部分组合、组合起来表达了什么意思，比如"看"=手+目，手搭在眼睛上远望；"休"=人靠在树旁休息。
+   - 如果是【形声字】：说清楚哪部分表意（形旁）、哪部分表音（声旁），比如"河"，三点水表示和水有关，"可"表示读音。
+   - 如果实在无法确定属于哪一类，或者字形演变复杂，可以退而求其次讲一个好记的联想画面，但要明确说明"这是帮助记忆的联想，不是本义"。
+   最多${HZ_STORY_MAXLEN}个字，要具体、有画面感，让孩子能想象出字形和意思是怎么对上的，不要空泛地说"这个字很有趣"。
+2. sentence：用例词"${word}"现场造一个简单的句子，最多${HZ_SENT_MAXLEN}个字，贴近孩子的生活场景。
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+async function genHanziStory(){
+  const ch=curChars[modalIdx];
+  const box=document.getElementById('aiHzBox');
+  const btn=document.getElementById('aiHzBtn');
+  if(!ch||!box) return;
+
+  btn.disabled=true;
+  box.classList.add('show');
+  box.innerHTML=`<span class="ai-hz-tag">🤖 AI 讲故事</span><div class="ai-hz-loading">正在生成，请稍候…</div>`;
+
+  const prompt=buildHanziStoryPrompt(ch);
+  const charAtStart=ch[0]; // 记录发起请求时的字，回来后校验是否已经切到别的字
+
+  try{
+    const resp=await fetch(HZ_OLLAMA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:HZ_OLLAMA_MODEL,
+        prompt,
+        stream:false,
+        format:HZ_STORY_SCHEMA,
+      })
+    });
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    const raw=(data.response||'').trim();
+    if(!raw) throw new Error('空响应');
+    let parsed;
+    try{ parsed=JSON.parse(raw); }
+    catch(e){ throw new Error('返回内容不是合法 JSON'); }
+    if(!parsed.story||!parsed.sentence) throw new Error('返回内容缺少讲解字段');
+
+    // 如果用户在等待期间已经切到了别的字，就不要把旧请求的结果糊到新字上
+    if(!curChars[modalIdx]||curChars[modalIdx][0]!==charAtStart) return;
+
+    const story=hzClampText(parsed.story,HZ_STORY_MAXLEN);
+    const sentence=hzClampText(parsed.sentence,HZ_SENT_MAXLEN);
+    box.innerHTML=`<span class="ai-hz-tag">🤖 AI 讲的字故事</span>
+      <div class="ai-hz-story">📖 ${hzEscapeHtml(story)}</div>
+      <div class="ai-hz-sent">💬 <b>${hzEscapeHtml(ch[4])}</b>：${hzEscapeHtml(sentence)}</div>`;
+  }catch(err){
+    if(!curChars[modalIdx]||curChars[modalIdx][0]!==charAtStart) return;
+    box.innerHTML=`<span class="ai-hz-tag">🤖 AI 讲故事</span>
+      <div class="ai-hz-err">生成失败：无法连接本地 Ollama（${hzEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${HZ_OLLAMA_MODEL}</code>；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问。</div>
+      <button class="ai-hz-retry" onclick="genHanziStory()">🔄 重试</button>`;
+  }finally{
+    if(curChars[modalIdx]&&curChars[modalIdx][0]===charAtStart) btn.disabled=false;
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -1404,6 +1696,200 @@ document.getElementById('modal').addEventListener('click', function(e) {
 });
 
 // ─────────────────────────────────────────────────
+//  Stroke Practice
+// ─────────────────────────────────────────────────
+const STROKE_DATA = [
+  // ── 单一笔画 ──
+  { name:'横',     py:'héng',         desc:'从左向右，稍向上倾斜',
+    pts:[[.14,.52],[.36,.50],[.58,.49],[.78,.48],[.86,.47]] },
+  { name:'竖',     py:'shù',          desc:'从上向下，保持垂直',
+    pts:[[.50,.12],[.50,.34],[.50,.56],[.50,.76],[.50,.88]] },
+  { name:'撇',     py:'piě',          desc:'从右上斜向左下，末端出锋',
+    pts:[[.72,.18],[.58,.32],[.44,.48],[.30,.62],[.18,.78]] },
+  { name:'捺',     py:'nà',           desc:'从左上向右下，末端顿笔',
+    pts:[[.22,.20],[.38,.35],[.54,.50],[.68,.62],[.78,.72],[.84,.78]] },
+  { name:'点',     py:'diǎn',         desc:'短斜点，从左上向右下',
+    pts:[[.40,.28],[.50,.40],[.58,.52],[.62,.58]] },
+  { name:'提',     py:'tí',           desc:'从左下向右上挑出',
+    pts:[[.20,.74],[.36,.62],[.54,.50],[.68,.40],[.78,.30]] },
+  { name:'短撇',   py:'duǎn piě',     desc:'短小的撇，角度较平',
+    pts:[[.58,.24],[.48,.34],[.38,.46],[.28,.56]] },
+  // ── 带钩 ──
+  { name:'横钩',   py:'héng gōu',     desc:'横画末端向左下带钩',
+    pts:[[.14,.42],[.40,.41],[.66,.40],[.82,.40],[.82,.52],[.72,.62]] },
+  { name:'竖钩',   py:'shù gōu',      desc:'竖画末端向左挑钩',
+    pts:[[.50,.12],[.50,.34],[.50,.58],[.50,.80],[.50,.86],[.40,.78],[.30,.68]] },
+  { name:'斜钩',   py:'xié gōu',      desc:'从左上斜向右下，末端向上挑',
+    pts:[[.26,.22],[.38,.34],[.52,.48],[.64,.62],[.72,.72],[.76,.80],[.70,.72],[.60,.62]] },
+  { name:'弯钩',   py:'wān gōu',      desc:'弧形向下，末端向右上挑',
+    pts:[[.56,.18],[.60,.32],[.62,.48],[.58,.62],[.48,.72],[.36,.74],[.26,.66],[.22,.52]] },
+  { name:'卧钩',   py:'wò gōu',       desc:'弧形向右下，末端向上挑（如心）',
+    pts:[[.24,.58],[.30,.66],[.40,.74],[.52,.76],[.64,.72],[.74,.62],[.78,.48],[.74,.36],[.66,.28]] },
+  // ── 竖系复合 ──
+  { name:'竖弯钩', py:'shù wān gōu',  desc:'竖后弯向右，末端上钩（如乙）',
+    pts:[[.42,.14],[.42,.36],[.42,.58],[.46,.70],[.56,.78],[.68,.80],[.78,.74],[.82,.62]] },
+  { name:'竖折',   py:'shù zhé',      desc:'竖后折向右横（如山底）',
+    pts:[[.38,.14],[.38,.36],[.38,.58],[.38,.70],[.56,.70],[.74,.70],[.84,.70]] },
+  // ── 横系复合 ──
+  { name:'横折',   py:'héng zhé',     desc:'横后折向下竖（如口）',
+    pts:[[.18,.34],[.44,.33],[.72,.32],[.78,.32],[.78,.52],[.78,.70],[.78,.84]] },
+  { name:'横折钩', py:'héng zhé gōu', desc:'横折后末端带钩（如月）',
+    pts:[[.18,.30],[.46,.29],[.74,.28],[.78,.28],[.78,.50],[.78,.74],[.78,.84],[.66,.76],[.56,.66]] },
+  { name:'横折弯钩',py:'héng zhé wān gōu',desc:'横折后弯曲上钩（如九）',
+    pts:[[.18,.32],[.46,.31],[.72,.30],[.76,.30],[.76,.46],[.74,.60],[.66,.72],[.52,.78],[.40,.74],[.32,.62]] },
+  { name:'横撇',   py:'héng piě',     desc:'横后向左下撇出（如又）',
+    pts:[[.18,.36],[.44,.35],[.68,.34],[.54,.48],[.40,.62],[.24,.78]] },
+  // ── 撇系复合 ──
+  { name:'撇折',   py:'piě zhé',      desc:'撇后折向右（如女、云）',
+    pts:[[.64,.14],[.50,.28],[.36,.44],[.26,.58],[.40,.58],[.56,.58],[.72,.58],[.84,.58]] },
+  { name:'横折折撇',py:'héng zhé zhé piě',desc:'横折再折撇（如及）',
+    pts:[[.20,.32],[.48,.31],[.66,.31],[.66,.44],[.52,.54],[.40,.62],[.28,.72],[.18,.82]] },
+];
+
+let curStroke=0, _sHintTimer=null, _sInited=false;
+
+function startStroke(){
+  show('pgStroke');
+  if(!_sInited){ _sInited=true; initStrokeCanvas(); }
+  // build buttons
+  const wrap=document.getElementById('strokeBtns');
+  wrap.innerHTML='';
+  STROKE_DATA.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='stroke-btn'+(i===0?' on':'');
+    b.textContent=s.name; b.onclick=()=>selectStroke(i);
+    wrap.appendChild(b);
+  });
+  selectStroke(0);
+}
+
+function selectStroke(idx){
+  curStroke=idx;
+  document.querySelectorAll('.stroke-btn').forEach((b,i)=>b.classList.toggle('on',i===idx));
+  const s=STROKE_DATA[idx];
+  document.getElementById('strokeName').textContent=s.name;
+  document.getElementById('strokePy').textContent=s.py;
+  document.getElementById('strokeDesc').textContent=s.desc;
+  drawStrokeGuide(s.pts);
+  clearStroke();
+  speak(s.name);
+}
+
+function drawStrokeGuide(pts){
+  const S=280, cv=document.getElementById('sGuideCanvas'), ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,S,S);
+  ctx.fillStyle='#fdf6ff'; ctx.fillRect(0,0,S,S);
+  ctx.strokeStyle='#d8b4e8'; ctx.lineWidth=2; ctx.setLineDash([]);
+  ctx.strokeRect(4,4,S-8,S-8);
+  ctx.strokeStyle='#e4c8f0'; ctx.lineWidth=1; ctx.setLineDash([6,5]);
+  ctx.beginPath(); ctx.moveTo(S/2,6); ctx.lineTo(S/2,S-6);
+  ctx.moveTo(6,S/2); ctx.lineTo(S-6,S/2); ctx.stroke(); ctx.setLineDash([]);
+  // 粉色参考笔画
+  ctx.strokeStyle='rgba(255,155,185,0.72)'; ctx.lineWidth=32;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(pts[0][0]*S,pts[0][1]*S);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0]*S,pts[i][1]*S);
+  ctx.stroke();
+  // 起笔绿点
+  ctx.fillStyle='rgba(46,125,50,.6)';
+  ctx.beginPath(); ctx.arc(pts[0][0]*S,pts[0][1]*S,9,0,Math.PI*2); ctx.fill();
+  // 起笔标注
+  ctx.fillStyle='#2e7d32'; ctx.font='bold 13px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('起',pts[0][0]*S,pts[0][1]*S);
+}
+
+function clearStroke(){
+  clearTimeout(_sHintTimer);
+  document.getElementById('sTraceCanvas').getContext('2d').clearRect(0,0,280,280);
+  const r=document.getElementById('sResult');
+  r.textContent=''; r.className='write-result'; r.style.color='';
+}
+
+function showStrokeHint(){
+  clearStroke();
+  const S=280, cv=document.getElementById('sTraceCanvas'), ctx=cv.getContext('2d');
+  const pts=STROKE_DATA[curStroke].pts;
+  let idx=0;
+  ctx.strokeStyle='#1565c0'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(pts[0][0]*S,pts[0][1]*S);
+  function step(){
+    if(idx>=pts.length) return;
+    const x=pts[idx][0]*S, y=pts[idx][1]*S;
+    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+    ctx.save(); ctx.fillStyle='rgba(255,23,68,.85)';
+    ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fill(); ctx.restore();
+    idx++; _sHintTimer=setTimeout(step,150);
+  }
+  step();
+}
+
+function checkStrokeMatch(){
+  const S=280, GRID=20, STEP=S/GRID;
+  const pts=STROKE_DATA[curStroke].pts;
+
+  // 用透明离屏 canvas 渲染参考笔画，避免背景填充干扰 alpha 通道
+  const off=document.createElement('canvas');
+  off.width=S; off.height=S;
+  const oCtx=off.getContext('2d');
+  oCtx.strokeStyle='#000'; oCtx.lineWidth=36;
+  oCtx.lineCap='round'; oCtx.lineJoin='round';
+  oCtx.beginPath(); oCtx.moveTo(pts[0][0]*S,pts[0][1]*S);
+  for(let i=1;i<pts.length;i++) oCtx.lineTo(pts[i][0]*S,pts[i][1]*S);
+  oCtx.stroke();
+
+  const tPx=document.getElementById('sTraceCanvas').getContext('2d').getImageData(0,0,S,S).data;
+  const gPx=oCtx.getImageData(0,0,S,S).data;
+
+  let tC=0,gC=0,both=0;
+  for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+    let ts=0,gs=0;
+    for(let dy=0;dy<STEP;dy++) for(let dx=0;dx<STEP;dx++){
+      const i=(Math.floor(r*STEP+dy)*S+Math.floor(c*STEP+dx))*4;
+      ts+=tPx[i+3]; gs+=gPx[i+3];
+    }
+    const a=STEP*STEP;
+    const tOn=ts/a>20, gOn=gs/a>20;
+    if(tOn) tC++; if(gOn) gC++; if(tOn&&gOn) both++;
+  }
+  if(tC<2) return;
+  const rec=both/gC, pre=both/tC;
+  const f1=(rec+pre>0)?Math.round(2*rec*pre/(rec+pre)*100):0;
+  const el=document.getElementById('sResult');
+  el.style.color='';
+  if(f1>=65){
+    el.textContent=f1>=80?`🌟 写得棒！匹配 ${f1}%`:`✅ 不错！匹配 ${f1}%`;
+    el.className='write-result ok'; if(f1>=80) tone(660,.25);
+  } else if(f1>=40){
+    el.textContent=`⚠️ 接近了，匹配 ${f1}%，再试试`;
+    el.className='write-result so';
+  } else {
+    el.textContent=`❌ 匹配 ${f1}%，点💡看提示再描一遍`;
+    el.className='write-result'; el.style.color='#e53935';
+    tone(200,.18,'sawtooth');
+  }
+}
+
+function initStrokeCanvas(){
+  const cv=document.getElementById('sTraceCanvas');
+  let drawing=false;
+  function xy(e){ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*280/r.width,(e.clientY-r.top)*280/r.height]; }
+  cv.addEventListener('pointerdown',e=>{
+    e.preventDefault(); drawing=true; try{cv.setPointerCapture(e.pointerId);}catch(err){}
+    const [x,y]=xy(e), ctx=cv.getContext('2d');
+    ctx.strokeStyle='#1a237e'; ctx.lineWidth=18; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(x,y);
+  });
+  cv.addEventListener('pointermove',e=>{
+    e.preventDefault(); if(!drawing) return;
+    const [x,y]=xy(e), ctx=cv.getContext('2d');
+    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+  });
+  cv.addEventListener('pointerup',e=>{ e.preventDefault(); drawing=false; try{checkStrokeMatch();}catch(err){} });
+  cv.addEventListener('pointercancel',()=>{ drawing=false; });
+}
+
+// ─────────────────────────────────────────────────
 //  Init
 // ─────────────────────────────────────────────────
 renderHome();
@@ -1413,6 +1899,9 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 }
 </script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
