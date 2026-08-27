@@ -155,6 +155,12 @@ body {
   font-size: .9rem; color: #333; background: #fff; outline: none; cursor: pointer;
 }
 .quiz-setup select:focus { border-color: #9c27b0; }
+.quiz-auto-next {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 11px; border: 1.5px solid #e1bee7; border-radius: 10px;
+  background: #faf5fc; color: #555; cursor: pointer; user-select: none;
+}
+.quiz-auto-next input { width: 17px; height: 17px; accent-color: #9c27b0; cursor: pointer; }
 
 .quiz-board { display: none; }
 .quiz-board.active { display: block; }
@@ -201,12 +207,13 @@ body {
 .quiz-result.show { display: block; }
 .result-score-big { font-size: 3rem; font-weight: bold; color: #9c27b0; }
 .result-msg { font-size: 1.2rem; color: #555; margin: 8px 0 18px; }
+.result-time { font-size: .9rem; color: #888; margin: -12px 0 18px; }
 .wrong-review { text-align: left; margin-top: 14px; }
 .wr-title { font-size: .9rem; font-weight: bold; color: #c62828; margin-bottom: 8px; }
 .wr-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .wr-item {
   background: #ffebee; border: 1.5px solid #ffcdd2;
-  border-radius: 9px; padding: 6px 12px; font-size: .9rem;
+  border-radius: 9px; padding: 8px 12px; font-size: .9rem; min-width: 150px;
 }
 .wr-item .wr-correct { color: #2e7d32; font-weight: bold; }
 
@@ -242,6 +249,35 @@ body {
 .toast-add     { font-size: .9rem;  color: #666; }
 .toast-add b   { color: #e53935; }
 
+/* ══════════════════════════════════════
+   TAB 4 — 错题本
+══════════════════════════════════════ */
+.wr-book-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.wr-book-hint { color:#888; font-size:.85rem; margin:0; }
+.wr-book-empty { text-align:center; color:#888; padding:30px 0; font-size:1rem; }
+.wr-card { background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:12px; box-shadow:0 3px 12px rgba(0,0,0,.08); }
+.wr-card-top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+.wr-formula { font-size:1.1rem; font-weight:bold; color:#4a148c; }
+.wr-eq { font-size:.95rem; color:#666; }
+.wr-count { margin-left:auto; font-size:.8rem; font-weight:bold; color:#fff; background:#e53935; border-radius:10px; padding:3px 10px; }
+.wr-card-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.wr-card-btns .btn { padding:6px 14px; font-size:.82rem; box-shadow:none; }
+.ai-tip-btn {
+  border:none; border-radius:10px; padding:6px 14px; font-size:.82rem; font-weight:bold; cursor:pointer;
+  color:#fff; background:linear-gradient(135deg,#9575cd,#5e35b1); font-family:inherit;
+}
+.ai-tip-btn:disabled { opacity:.6; cursor:default; }
+.ai-tip-box {
+  display:none; margin-top:10px; background:linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border:1.5px solid #d1c4e9; border-radius:12px; padding:10px 12px; font-size:.85rem; color:#4527a0; line-height:1.6;
+}
+.ai-tip-box.show { display:block; }
+.ai-tip-tag { font-size:.7rem; font-weight:bold; color:#5e35b1; background:#fff; display:inline-block; border-radius:8px; padding:1px 8px; margin-bottom:6px; }
+.ai-tip-loading { color:#7e57c2; font-style:italic; }
+.ai-tip-err { color:#c62828; font-size:.78rem; }
+.ai-tip-retry { margin-top:6px; border:1.5px solid #9575cd; background:#fff; color:#5e35b1; border-radius:8px; padding:3px 10px; font-size:.75rem; cursor:pointer; font-family:inherit; }
+.ai-tip-trick, .ai-tip-breakdown { background:#fff; border-radius:9px; padding:8px 10px; margin-bottom:7px; }
+
 @media(max-width:480px){
   .header h1 { font-size:1.6rem; }
   .formula-cell { min-width:64px; padding:6px 7px; }
@@ -254,7 +290,7 @@ body {
   <meta name="theme-color" content="#4a148c">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
   <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
@@ -271,6 +307,7 @@ body {
   <button class="tab-btn active" onclick="switchTab('table')">📊 口诀表</button>
   <button class="tab-btn" onclick="switchTab('memo')">📖 背诵</button>
   <button class="tab-btn" onclick="switchTab('quiz')">✏️ 测验</button>
+  <button class="tab-btn" onclick="switchTab('wrongbook')">📕 错题本</button>
 </div>
 
 <!-- ══ TAB 1: 口诀表 ══ -->
@@ -342,6 +379,10 @@ body {
             <option value="60">每题 60 秒</option>
           </select>
         </div>
+        <label class="quiz-auto-next">
+          <input id="quizAutoNextOnWrong" type="checkbox">
+          答错后直接进入下一题
+        </label>
         <button class="btn btn-primary" onclick="startQuiz()">🚀 开始测验</button>
       </div>
     </div>
@@ -351,6 +392,7 @@ body {
       <div class="quiz-header">
         <span class="quiz-score" id="quizScore">✅ 0 &nbsp; ❌ 0</span>
         <span class="quiz-score" id="quizQNum">第 1 / 10 题</span>
+        <span class="quiz-score" id="quizStopwatchDisp">🕒 0:00</span>
         <span class="quiz-timer-display" id="quizTimerDisp" style="display:none">⏱ 8s</span>
         <button class="btn btn-gray" onclick="resetQuiz()" style="padding:4px 12px;font-size:.78rem;box-shadow:none">⚙️ 重设</button>
       </div>
@@ -370,6 +412,7 @@ body {
     <!-- 结果 -->
     <div class="quiz-result" id="quizResult">
       <div class="result-score-big" id="resultBig"></div>
+      <div class="result-time" id="resultTime"></div>
       <div class="result-msg" id="resultMsg"></div>
       <div class="wrong-review" id="wrongReview"></div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
@@ -380,8 +423,21 @@ body {
   </div>
 </div>
 
+<!-- ══ TAB 4: 错题本 ══ -->
+<div id="tab-wrongbook" class="hidden">
+  <div class="card-panel">
+    <div class="wr-book-empty" id="wrongBookEmpty">还没有错题，加油保持哦！🎉</div>
+    <div class="wr-book-top" id="wrongBookTop">
+      <p class="wr-book-hint">按错的次数排序，点「AI 解析」看记忆诀窍，掌握了就移除</p>
+      <button class="btn btn-primary" onclick="startWrongQuiz()">🎯 专项测验错题</button>
+    </div>
+    <div id="wrongBookList"></div>
+  </div>
+</div>
+
 </div><!-- /container -->
 
+<script src="hpx-core.js"></script>
 <script>
 // ══════════════════════════════════════
 //  数据
@@ -453,39 +509,15 @@ function showMathToast(item) {
 // ══════════════════════════════════════
 //  语音
 // ══════════════════════════════════════
-// 提前缓存中文语音，避免 getVoices() 在 Chrome 首次调用返回空数组
-let _zhVoice = null;
-if (window.speechSynthesis) {
-  const _loadVoices = () => {
-    const vs = speechSynthesis.getVoices();
-    _zhVoice = vs.find(v => /zh[-_](CN|TW|HK)/i.test(v.lang))
-            || vs.find(v => /zh/i.test(v.lang)) || null;
-  };
-  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
-  _loadVoices();
-}
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  setTimeout(() => {
-    const u = new SpeechSynthesisUtterance(text);
-    if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
-    else { u.lang = 'zh-CN'; }
-    u.rate = 0.82; u.pitch = 1.1;
-    window.speechSynthesis.speak(u);
-  }, 50);
-}
+const multiplicationSpeech=Hpx.speech.install({rate:0.82,pitch:1.1,startDelayMs:50});
 
 // ══════════════════════════════════════
 //  Tab 切换
 // ══════════════════════════════════════
 function switchTab(name) {
-  ['table','memo','quiz'].forEach(t => {
-    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
-    document.querySelectorAll('.tab-btn')[['table','memo','quiz'].indexOf(t)]
-      .classList.toggle('active', t === name);
-  });
+  Hpx.tabs.activate(name,['table','memo','quiz','wrongbook'],{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'memo' && !memoInited) initMemo();
+  if (name === 'wrongbook') renderWrongBook();
 }
 
 // ══════════════════════════════════════
@@ -533,20 +565,7 @@ function buildTable() {
 
 function speakRow(b) {
   const texts = ROWS[b].map(x => x.formula);
-  let i = 0;
-  function next() {
-    if (i >= texts.length) return;
-    window.speechSynthesis.cancel();
-    setTimeout(() => {
-      const u = new SpeechSynthesisUtterance(texts[i++]);
-      if (_zhVoice) { u.voice = _zhVoice; u.lang = _zhVoice.lang; }
-      else { u.lang = 'zh-CN'; }
-      u.rate = 0.78; u.pitch = 1.1;
-      u.onend = () => setTimeout(next, 150);
-      window.speechSynthesis.speak(u);
-    }, 50);
-  }
-  next();
+  return multiplicationSpeech.sequence(texts,{rate:0.78,pitch:1.1,gapMs:150});
 }
 
 // ══════════════════════════════════════
@@ -659,6 +678,27 @@ function updateMemoProgress(row) {
 let quizList = [], quizIdx = 0, quizCorrect = 0, quizWrong = [];
 let quizTimerInterval = null, quizTimerLeft = 0, quizTimerSec = 0;
 let quizAnswered = false;
+let quizCurrentHadWrong = false;
+let quizTransitionTimer = null;
+let quizStopwatchInterval = null, quizStartTime = 0;
+
+function formatElapsed(ms) {
+  const totalSec = Math.round(ms / 1000);
+  const m = Math.floor(totalSec / 60), s = totalSec % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+function startStopwatch() {
+  clearInterval(quizStopwatchInterval);
+  quizStartTime = Date.now();
+  document.getElementById('quizStopwatchDisp').textContent = '🕒 0:00';
+  quizStopwatchInterval = setInterval(() => {
+    document.getElementById('quizStopwatchDisp').textContent = `🕒 ${formatElapsed(Date.now() - quizStartTime)}`;
+  }, 1000);
+}
+function stopStopwatch() {
+  clearInterval(quizStopwatchInterval);
+  return Date.now() - quizStartTime;
+}
 
 function syncRangeTo() {
   const from = parseInt(document.getElementById('quizRangeFrom').value);
@@ -677,9 +717,23 @@ function buildQuizList() {
 }
 
 function startQuiz() {
-  quizList = buildQuizList();
-  quizIdx = 0; quizCorrect = 0; quizWrong = [];
   quizTimerSec = parseInt(document.getElementById('quizTimer').value);
+  runQuiz(buildQuizList());
+}
+
+// 从错题本抽题做专项测验：不限时，专心复习
+function startWrongQuiz() {
+  const items = Object.values(wrongBook).map(w => ({ a: w.a, b: w.b, result: w.result, formula: w.formula }));
+  if (!items.length) return;
+  quizTimerSec = 0;
+  switchTab('quiz');
+  runQuiz([...items].sort(() => Math.random() - .5));
+}
+
+function runQuiz(list) {
+  clearTimeout(quizTransitionTimer);
+  quizList = list;
+  quizIdx = 0; quizCorrect = 0; quizWrong = [];
 
   document.getElementById('quizSetupArea').style.display = 'none';
   document.getElementById('quizBoard').classList.add('active');
@@ -688,12 +742,15 @@ function startQuiz() {
   const timerDisp = document.getElementById('quizTimerDisp');
   timerDisp.style.display = quizTimerSec > 0 ? '' : 'none';
 
+  startStopwatch();
   showQuestion();
 }
 
 function showQuestion() {
+  clearTimeout(quizTransitionTimer);
   if (quizIdx >= quizList.length) { endQuiz(); return; }
   quizAnswered = false;
+  quizCurrentHadWrong = false;
 
   const item = quizList[quizIdx];
   const total = quizList.length;
@@ -708,7 +765,7 @@ function showQuestion() {
   inp.focus();
   setTimeout(() => inp.focus(), 80);
 
-  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizList.slice(0,quizIdx).length - quizCorrect}`;
+  updateQuizScore();
   document.getElementById('quizQNum').textContent = `第 ${quizIdx+1} / ${total} 题`;
   document.getElementById('quizProgFill').style.width = (quizIdx / total * 100) + '%';
 
@@ -739,11 +796,62 @@ function timeOut() {
   document.getElementById('qInput').disabled = true;
   document.getElementById('qInput').classList.add('wrong');
   const fb = document.getElementById('qFeedback');
-  fb.textContent = `⏰ 超时！答案是 ${item.result}（${item.formula}）`;
+  fb.textContent = '⏰ 超时了，先别看答案，再想一想';
   fb.className = 'q-feedback show-fail';
-  document.getElementById('qFormulaHint').textContent = item.formula;
-  quizWrong.push(item);
-  setTimeout(nextQuestion, 1600);
+  document.getElementById('qFormulaHint').textContent = '';
+  markCurrentWrong(item);
+  recordWrong(item);
+  handleWrongFollowUp();
+}
+
+function updateQuizScore() {
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizWrong.length}`;
+}
+
+function markCurrentWrong(item) {
+  quizCurrentHadWrong = true;
+  if (!quizWrong.includes(item)) quizWrong.push(item);
+  updateQuizScore();
+}
+
+function shouldAutoNextOnWrong() {
+  return document.getElementById('quizAutoNextOnWrong').checked;
+}
+
+function handleWrongFollowUp() {
+  clearTimeout(quizTransitionTimer);
+  if (shouldAutoNextOnWrong()) {
+    quizTransitionTimer = setTimeout(nextQuestion, 1600);
+    return;
+  }
+  const fb = document.getElementById('qFeedback');
+  fb.textContent += '，请再答一次';
+  quizTransitionTimer = setTimeout(prepareCurrentQuestionRetry, 900);
+}
+
+function prepareCurrentQuestionRetry() {
+  if (shouldAutoNextOnWrong()) { nextQuestion(); return; }
+  quizAnswered = false;
+  document.getElementById('qFormulaHint').textContent = '';
+  const inp = document.getElementById('qInput');
+  inp.value = '';
+  inp.className = 'q-input';
+  inp.disabled = false;
+  const fb = document.getElementById('qFeedback');
+  fb.textContent = '再试一次，你可以答对这道题！';
+  fb.className = 'q-feedback show-fail';
+  inp.focus();
+
+  clearInterval(quizTimerInterval);
+  if (quizTimerSec > 0) {
+    quizTimerLeft = quizTimerSec;
+    updateTimerDisp();
+    quizTimerInterval = setInterval(() => {
+      quizTimerLeft--;
+      updateTimerDisp();
+      if (quizTimerLeft <= 0) { clearInterval(quizTimerInterval); timeOut(); }
+    }, 1000);
+  }
 }
 
 function autoCheck(inp) {
@@ -767,31 +875,43 @@ function checkAnswer() {
   const userAns = parseInt(val);
   const ok = userAns === item.result;
   const fb = document.getElementById('qFeedback');
-  document.getElementById('qFormulaHint').textContent = item.formula;
 
   if (ok) {
-    quizCorrect++;
+    if (!quizCurrentHadWrong) quizCorrect++;
     inp.classList.add('correct');
-    fb.textContent = `✅ 正确！${item.formula}`;
+    document.getElementById('qFormulaHint').textContent = item.formula;
+    fb.textContent = quizCurrentHadWrong
+      ? `✅ 这次答对了！${item.formula}`
+      : `✅ 正确！${item.formula}`;
     fb.className = 'q-feedback show-ok';
     playOk();
+    speak(item.formula);
   } else {
     inp.classList.add('wrong');
-    fb.textContent = `❌ 答案是 ${item.result}（${item.formula}）`;
+    document.getElementById('qFormulaHint').textContent = '';
+    fb.textContent = '❌ 还不对，再想一想吧！';
     fb.className = 'q-feedback show-fail';
-    quizWrong.push(item);
+    markCurrentWrong(item);
+    recordWrong(item);
     playFail();
   }
   inp.disabled = true;
-  speak(item.formula);
 
-  setTimeout(nextQuestion, ok ? 900 : 1600);
+  if (ok) {
+    updateQuizScore();
+    clearTimeout(quizTransitionTimer);
+    quizTransitionTimer = setTimeout(nextQuestion, 900);
+  } else {
+    handleWrongFollowUp();
+  }
 }
 
 function nextQuestion() { quizIdx++; showQuestion(); }
 
 function endQuiz() {
+  clearTimeout(quizTransitionTimer);
   clearInterval(quizTimerInterval);
+  const elapsedMs = stopStopwatch();
   document.getElementById('quizBoard').classList.remove('active');
   const result = document.getElementById('quizResult');
   result.classList.add('show');
@@ -799,6 +919,7 @@ function endQuiz() {
   const total = quizList.length;
   const pct = Math.round(quizCorrect / total * 100);
   document.getElementById('resultBig').textContent = `${quizCorrect} / ${total} （${pct}%）`;
+  document.getElementById('resultTime').textContent = `⏱ 总用时 ${formatElapsed(elapsedMs)}，平均每题 ${(elapsedMs/1000/total).toFixed(1)} 秒`;
 
   const msgs = [[100,'🏆 满分！太厉害了！'],[90,'🌟 非常优秀！'],[80,'😊 做得不错！'],[60,'💪 继续努力！'],[0,'📚 多多练习！']];
   document.getElementById('resultMsg').textContent = msgs.find(([t]) => pct >= t)[1];
@@ -806,9 +927,12 @@ function endQuiz() {
   const wr = document.getElementById('wrongReview');
   if (quizWrong.length) {
     wr.innerHTML = `<div class="wr-title">❌ 以下 ${quizWrong.length} 道需要复习：</div>
-      <div class="wr-list">${quizWrong.map(x =>
-        `<div class="wr-item">${x.a}×${x.b}=<span class="wr-correct">${x.result}</span><br><small>${x.formula}</small></div>`
-      ).join('')}</div>`;
+      <div class="wr-list">${quizWrong.map(x => {
+        return `<div class="wr-item">
+          <div>${x.a}×${x.b}=？ <small>先自己想一想，再去错题本专项练习</small></div>
+        </div>`;
+      }).join('')}</div>
+      <p style="text-align:center;margin-top:10px;font-size:.82rem;color:#888">这些题已自动加入 📕 错题本，随时可以去专项复习</p>`;
   } else {
     wr.innerHTML = '<div style="color:#2e7d32;text-align:center;font-size:1.1rem;margin-top:8px">🎉 全部答对！太棒了！</div>';
   }
@@ -820,10 +944,149 @@ function endQuiz() {
 }
 
 function resetQuiz() {
+  clearTimeout(quizTransitionTimer);
   clearInterval(quizTimerInterval);
+  clearInterval(quizStopwatchInterval);
   document.getElementById('quizSetupArea').style.display = '';
   document.getElementById('quizBoard').classList.remove('active');
   document.getElementById('quizResult').classList.remove('show');
+}
+
+// ══════════════════════════════════════
+//  TAB 4 — 错题本（自动收集测验答错的题，持久化）
+// ══════════════════════════════════════
+const WRONG_KEY = 'multiWrongBook_v1';
+let wrongBook = {}; // key = "a×b", value = {a,b,result,formula,count,lastAt}
+
+function loadWrongBook() {
+  try { wrongBook = JSON.parse(localStorage.getItem(WRONG_KEY)) || {}; }
+  catch (e) { wrongBook = {}; }
+}
+function saveWrongBook() {
+  try { localStorage.setItem(WRONG_KEY, JSON.stringify(wrongBook)); } catch (e) {}
+}
+function recordWrong(item) {
+  const key = `${item.a}×${item.b}`;
+  const cur = wrongBook[key];
+  wrongBook[key] = {
+    a: item.a, b: item.b, result: item.result, formula: item.formula,
+    count: (cur ? cur.count : 0) + 1, lastAt: Date.now(),
+  };
+  saveWrongBook();
+}
+function removeWrong(key) {
+  delete wrongBook[key];
+  saveWrongBook();
+  renderWrongBook();
+}
+
+function renderWrongBook() {
+  loadWrongBook();
+  const list = document.getElementById('wrongBookList');
+  const empty = document.getElementById('wrongBookEmpty');
+  const top = document.getElementById('wrongBookTop');
+  const entries = Object.entries(wrongBook).sort((x, y) => y[1].count - x[1].count || y[1].lastAt - x[1].lastAt);
+
+  if (!entries.length) {
+    empty.style.display = 'block'; top.style.display = 'none'; list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none'; top.style.display = 'flex';
+  list.innerHTML = entries.map(([key, item]) => `
+    <div class="wr-card">
+      <div class="wr-card-top">
+        <span class="wr-formula">${item.formula}</span>
+        <span class="wr-eq">${item.a}×${item.b}=${item.result}</span>
+        <span class="wr-count">错 ${item.count} 次</span>
+      </div>
+      <div class="wr-card-btns">
+        <button class="btn btn-gray" onclick="speak('${item.formula}')">🔊 朗读</button>
+        <button class="ai-tip-btn" id="aiTipBtn-wb-${key}" onclick="genMulTip('${key}','wb')">🤖 AI 解析</button>
+        <button class="btn btn-green" onclick="removeWrong('${key}')">✓ 已掌握</button>
+      </div>
+      <div class="ai-tip-box" id="tipBox-wb-${key}"></div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════
+//  AI 解析：调用本地 Ollama，讲记忆诀窍 + 拆分算法
+//  和 hanzi.html 的「AI 讲汉字故事」用同一套本地调用模式
+// ══════════════════════════════════════
+const MUL_OLLAMA_URL = 'http://localhost:11434/api/generate';
+const MUL_OLLAMA_MODEL = 'qwen2.5:14b';
+const MUL_TIP_MAXLEN = 70;
+
+const MUL_TIP_SCHEMA = {
+  type: 'object',
+  properties: {
+    trick: { type: 'string', maxLength: MUL_TIP_MAXLEN,
+      description: `给一个好记的诀窍或联想小故事，帮孩子记住这个得数，最多${MUL_TIP_MAXLEN}个字` },
+    breakdown: { type: 'string', maxLength: MUL_TIP_MAXLEN,
+      description: `用拆分法讲清楚怎么算出这个得数的，最多${MUL_TIP_MAXLEN}个字` },
+  },
+  required: ['trick', 'breakdown'],
+};
+
+function mulEscapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function mulClampText(s, maxLen) {
+  s = String(s || '').trim();
+  return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+}
+
+function buildMulTipPrompt(item) {
+  const { a, b, result, formula } = item;
+  return `你是一名教小学生数学的老师，正在帮孩子记住乘法口诀"${formula}"（即 ${a} × ${b} = ${result}）。
+
+请你做两件事：
+1. trick：给一个好记的诀窍或联想小故事，帮孩子记住这个得数是${result}，最多${MUL_TIP_MAXLEN}个字，要具体、有画面感，不要说"这个很简单"这类空话。
+2. breakdown：用拆分法讲清楚怎么算出这个得数的，比如把其中一个乘数拆成整十数和个位数分别相乘再相加减（例如 7×8 可以想成 7×10-7×2=70-14=56，或者 9×6 可以想成 10×6-1×6=60-6=54），最多${MUL_TIP_MAXLEN}个字。
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+async function genMulTip(key, ctx) {
+  const item = wrongBook[key];
+  const box = document.getElementById(`tipBox-${ctx}-${key}`);
+  const btn = document.getElementById(`aiTipBtn-${ctx}-${key}`);
+  if (!item || !box) return;
+
+  if (btn) btn.disabled = true;
+  box.classList.add('show');
+  box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析</span><div class="ai-tip-loading">正在生成，请稍候…</div>`;
+
+  const prompt = buildMulTipPrompt(item);
+  try {
+    const resp = await fetch(MUL_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MUL_OLLAMA_MODEL, prompt, stream: false, format: MUL_TIP_SCHEMA }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const raw = (data.response || '').trim();
+    if (!raw) throw new Error('空响应');
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch (e) { throw new Error('返回内容不是合法 JSON'); }
+    if (!parsed.trick || !parsed.breakdown) throw new Error('返回内容缺少讲解字段');
+
+    const trick = mulClampText(parsed.trick, MUL_TIP_MAXLEN);
+    const breakdown = mulClampText(parsed.breakdown, MUL_TIP_MAXLEN);
+    box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析：${mulEscapeHtml(item.formula)}</span>
+      <div class="ai-tip-trick">💡 ${mulEscapeHtml(trick)}</div>
+      <div class="ai-tip-breakdown">🔢 ${mulEscapeHtml(breakdown)}</div>`;
+  } catch (err) {
+    box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析</span>
+      <div class="ai-tip-err">生成失败：无法连接本地 Ollama（${mulEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${MUL_OLLAMA_MODEL}</code>；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问。</div>
+      <button class="ai-tip-retry" onclick="genMulTip('${key}','${ctx}')">🔄 重试</button>`;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // ══════════════════════════════════════
@@ -876,6 +1139,7 @@ function launchConfetti() {
 //  初始化
 // ══════════════════════════════════════
 buildTable();
+loadWrongBook();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
@@ -883,6 +1147,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
 <script src="feedback.js"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
