@@ -1,0 +1,598 @@
+<title>小学语文六年学习计划 · 田字格</title>
+<style>
+  :root {
+    --bg: #EAE2CB;
+    --bg-line-outer: rgba(53, 44, 32, 0.15);
+    --bg-line-inner: rgba(53, 44, 32, 0.07);
+    --card-bg: #F8F3E5;
+    --card-bg-soft: #F1E9D6;
+    --ink: #2B2420;
+    --ink-soft: #6B5F4D;
+    --ink-faint: #9C8F76;
+    --seal: #B7382C;
+    --seal-soft: rgba(183, 56, 44, 0.14);
+    --accent: #35586B;
+    --accent-soft: rgba(53, 88, 107, 0.12);
+    --border: rgba(43, 36, 32, 0.15);
+    --shadow: rgba(43, 36, 32, 0.14);
+
+    --thread-lit: #A9702E;   /* 识字与写字 · 赭石 */
+    --thread-read: #2F6690;  /* 阅读 · 石青 */
+    --thread-write: #3E7A5C; /* 写作 · 石绿 */
+    --thread-poem: #C1602E;  /* 古诗文积累 · 朱磦 */
+    --thread-oral: #8A7A2E;  /* 口语交际 · 藤黄 */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #221F19;
+      --bg-line-outer: rgba(232, 224, 200, 0.09);
+      --bg-line-inner: rgba(232, 224, 200, 0.045);
+      --card-bg: #2A2620;
+      --card-bg-soft: #302B23;
+      --ink: #ECE5D2;
+      --ink-soft: #B6AC94;
+      --ink-faint: #857B66;
+      --seal: #E2836B;
+      --seal-soft: rgba(226, 131, 107, 0.16);
+      --accent: #8FB6CC;
+      --accent-soft: rgba(143, 182, 204, 0.14);
+      --border: rgba(236, 229, 210, 0.13);
+      --shadow: rgba(0, 0, 0, 0.4);
+
+      --thread-lit: #D3A15E;
+      --thread-read: #7FB2D6;
+      --thread-write: #8FCBA6;
+      --thread-poem: #E29A66;
+      --thread-oral: #C9BB70;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #221F19;
+    --bg-line-outer: rgba(232, 224, 200, 0.09);
+    --bg-line-inner: rgba(232, 224, 200, 0.045);
+    --card-bg: #2A2620;
+    --card-bg-soft: #302B23;
+    --ink: #ECE5D2;
+    --ink-soft: #B6AC94;
+    --ink-faint: #857B66;
+    --seal: #E2836B;
+    --seal-soft: rgba(226, 131, 107, 0.16);
+    --accent: #8FB6CC;
+    --accent-soft: rgba(143, 182, 204, 0.14);
+    --border: rgba(236, 229, 210, 0.13);
+    --shadow: rgba(0, 0, 0, 0.4);
+
+    --thread-lit: #D3A15E;
+    --thread-read: #7FB2D6;
+    --thread-write: #8FCBA6;
+    --thread-poem: #E29A66;
+    --thread-oral: #C9BB70;
+  }
+  :root[data-theme="light"] {
+    --bg: #EAE2CB;
+    --bg-line-outer: rgba(53, 44, 32, 0.15);
+    --bg-line-inner: rgba(53, 44, 32, 0.07);
+    --card-bg: #F8F3E5;
+    --card-bg-soft: #F1E9D6;
+    --ink: #2B2420;
+    --ink-soft: #6B5F4D;
+    --ink-faint: #9C8F76;
+    --seal: #B7382C;
+    --seal-soft: rgba(183, 56, 44, 0.14);
+    --accent: #35586B;
+    --accent-soft: rgba(53, 88, 107, 0.12);
+    --border: rgba(43, 36, 32, 0.15);
+    --shadow: rgba(43, 36, 32, 0.14);
+
+    --thread-lit: #A9702E;
+    --thread-read: #2F6690;
+    --thread-write: #3E7A5C;
+    --thread-poem: #C1602E;
+    --thread-oral: #8A7A2E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px 100px;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--bg-line-inner) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-line-inner) 1px, transparent 1px),
+      linear-gradient(var(--bg-line-outer) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-line-outer) 1px, transparent 1px);
+    background-size: 46px 46px, 46px 46px, 46px 46px, 46px 46px;
+    background-position: 0 23px, 23px 0, 0 0, 0 0;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+  .serif {
+    font-family: "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif;
+  }
+
+  a { color: var(--accent); }
+
+  .sheet {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px -20px var(--shadow);
+    padding: 54px 46px 60px;
+  }
+
+  header.cover { margin-bottom: 40px; }
+  .head-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+  .seal {
+    flex: none;
+    width: 54px; height: 54px;
+    background: var(--seal);
+    color: #F8F3E5;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1.15;
+    letter-spacing: 0;
+    transform: rotate(-4deg);
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.22), 0 4px 10px var(--shadow);
+    font-weight: 700;
+  }
+  .head-titles { flex: 1; min-width: 0; padding-top: 4px; }
+  .eyebrow {
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+    color: var(--seal);
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: 29px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0 0 12px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 0;
+    padding-top: 22px;
+    border-top: 1px dashed var(--border);
+  }
+  nav.toc a {
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 13px;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  nav.toc a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  section { margin-top: 52px; scroll-margin-top: 20px; }
+  section > h2 {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+  section > h2::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .dot {
+    flex: none;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+  .legend-item b { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .legend-item span.d { color: var(--ink-soft); font-size: 12.3px; }
+  .legend-note {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin: 10px 2px 0;
+    font-style: italic;
+  }
+
+  .grade-card {
+    position: relative;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 24px 22px;
+    margin-top: 18px;
+  }
+  .grade-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+  .badge {
+    flex: none;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2.5px solid var(--seal);
+    color: var(--seal);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    transform: rotate(-3deg);
+  }
+  .grade-card:nth-of-type(even) .badge { transform: rotate(2.5deg); }
+  .grade-titles { flex: 1; min-width: 0; }
+  .grade-name { font-size: 18.5px; font-weight: 700; margin: 0; }
+
+  .thread-rows { display: flex; flex-direction: column; gap: 9px; margin: 14px 0 0; }
+  .thread-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  .thread-row .label {
+    flex: none;
+    width: 108px;
+    font-weight: 600;
+    font-size: 13px;
+    padding-top: 1px;
+  }
+  .thread-row .text { color: var(--ink-soft); }
+
+  .keypoint {
+    margin-top: 16px;
+    border-left: 3px solid var(--seal);
+    background: var(--seal-soft);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .keypoint b {
+    color: var(--seal);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .transit { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .transit-card {
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .transit-card .t-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0 0 10px;
+    color: var(--accent);
+  }
+  .transit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .transit-grid .k {
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+  .transit-grid .v { font-size: 13.5px; color: var(--ink-soft); }
+  @media (max-width: 520px) { .transit-grid { grid-template-columns: 1fr; } }
+
+  .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .method-item {
+    display: flex;
+    gap: 10px;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 13px 14px;
+  }
+  .method-item .box {
+    flex: none;
+    width: 17px; height: 17px;
+    margin-top: 2px;
+    border: 2px solid var(--accent);
+    border-radius: 3px;
+  }
+  .method-item .txt b { display: block; font-size: 13.5px; margin-bottom: 3px; }
+  .method-item .txt span { font-size: 12.8px; color: var(--ink-soft); }
+  @media (max-width: 560px) { .methods { grid-template-columns: 1fr; } }
+
+  /* 教学原则 */
+  .principles { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .principle {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px 18px;
+  }
+  .principle .num {
+    flex: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--card-bg);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .principle .body b { display: block; font-size: 14.5px; margin-bottom: 5px; }
+  .principle .body span { font-size: 13.3px; color: var(--ink-soft); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 20px 10px 70px; }
+    .sheet { padding: 40px 22px 46px; }
+    h1.title { font-size: 23px; }
+    .thread-row { flex-direction: column; gap: 2px; }
+    .thread-row .label { width: auto; }
+    .head-row { gap: 12px; }
+    .seal { width: 46px; height: 46px; font-size: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="sheet">
+
+  <header class="cover">
+    <div class="head-row">
+      <div class="seal serif"><span>语</span><span>文</span></div>
+      <div class="head-titles">
+        <div class="eyebrow">小学语文 · 一至六年级</div>
+        <h1 class="title serif">小学语文六年学习计划</h1>
+      </div>
+    </div>
+    <p class="subtitle">识字与写字、阅读、写作、古诗文积累、口语交际 —— 五个领域螺旋上升，六年一以贯之</p>
+    <p class="lede">语文学习最忌把六个年级当成六份孤立的教材来学。本计划以「识字与写字」「阅读」「写作」「古诗文积累」「口语交际」五条主线贯穿始终，每条线每年都在，只是深度不断加深——这样安排，三年级"脱拼音独立阅读"就不是一次突袭，而是两年识字量的自然结果。</p>
+
+    <nav class="toc">
+      <a href="index.html" style="color:var(--card-bg);background:var(--seal);border-color:var(--seal)">🏠 返回首页</a>
+      <a href="overview-review-plan.html">🗓️ 三科综合复习</a>
+      <a href="mindset-habits-plan.html">📌 学习心态与习惯</a>
+      <a href="#overview">总览</a>
+      <a href="#g1">一年级</a>
+      <a href="#g2">二年级</a>
+      <a href="#g3">三年级</a>
+      <a href="#g4">四年级</a>
+      <a href="#g5">五年级</a>
+      <a href="#g6">六年级</a>
+      <a href="#transition">衔接点</a>
+      <a href="#method">学习方法</a>
+      <a href="#principles">教学原则</a>
+    </nav>
+  </header>
+
+  <section id="overview">
+    <h2>五个领域 · 全年贯穿</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="dot" style="background:var(--thread-lit)"></span><div><b>识字与写字</b><span class="d">识字量与书写规范</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-read)"></span><div><b>阅读</b><span class="d">从跟读到独立理解</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-write)"></span><div><b>写作</b><span class="d">从写话到分文体表达</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-poem)"></span><div><b>古诗文积累</b><span class="d">古诗词与文言启蒙</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-oral)"></span><div><b>口语交际</b><span class="d">表达、讨论与展示</span></div></div>
+    </div>
+    <p class="legend-note">五色取自传统中国画颜料：赭石、石青、石绿、朱磦、藤黄</p>
+  </section>
+
+  <section id="g1">
+    <h2>年级详解</h2>
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">壹</div>
+        <div class="grade-titles"><p class="grade-name">一年级 · 识字启蒙，习惯为先</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">学拼音（声母、韵母、声调、拼读规则），随课文识字约300字，写字约100字，掌握正确坐姿与执笔姿势</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">跟读课文，借助拼音自主阅读，认识常用标点，能看图讲简单故事</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">把一句话说完整、说清楚，从「我说你写」过渡到独立写一两句话</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">跟读背诵短小古诗（如《静夜思》《悯农》），感受韵律</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">礼貌用语，完整表达一件小事</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>拼音是识字的拐杖，不是目的。过度纠结拼音准确率，会挤压孩子认字本身的兴趣和时间，教学重心要尽快转回「字」。</div>
+    </div>
+  </section>
+
+  <section id="g2">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">贰</div>
+        <div class="grade-titles"><p class="grade-name">二年级 · 识字量跃升，为「脱拼」做准备</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">识字量提高到累计约1200字，写字约800字，学习用部首查字典</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">分段朗读课文，简单复述故事情节，尝试阅读带拼音的课外书</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写连贯的几句话（写话训练），看图写话，日记雏形</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">背诵古诗数量增加，初步感知平仄韵律</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">讲述一件事的起因经过，学习简单提问</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>二年级末的识字量是三年级「脱离拼音独立阅读」的门槛。这里若欠账，三年级阅读会寸步难行——这是语文学习真正的第一道坎，比数学的分数坎来得更早。</div>
+    </div>
+  </section>
+
+  <section id="g3">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">叁</div>
+        <div class="grade-titles"><p class="grade-name">三年级 · 阅读理解与习作元年</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">识字量累计约2500字，写字约1600字，能独立使用字典解决生字</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">不依赖拼音独立阅读课文与课外书，理解词语在具体语境中的意思，能概括自然段大意</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">正式习作训练开始（此前是「写话」），能写一件事，做到分段、语句通顺，篇幅约300字</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">古诗积累量继续增加，开始接触简单文言小故事（如寓言体裁）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">转述他人的话，参与小组讨论并发表意见</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>三年级是语文的第一个分水岭——从「学习认字」转向「用文字学习」，阅读理解开始反过来影响数学应用题、科学阅读等其他学科。习作也正式起步，最容易出现「无话可说」，宜先仿写例文，再逐步放手创作。</div>
+    </div>
+  </section>
+
+  <section id="g4">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">肆</div>
+        <div class="grade-titles"><p class="grade-name">四年级 · 篇章结构与条理表达</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">识字量趋于稳定（累计约3000字），书写工整度与速度要求提高</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">能概括文章主要内容，理清叙述顺序（时间顺序、事情发展顺序），初步分析人物形象和情感</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写人记事之外增加简单写景状物，学习列提纲再动笔，篇幅400—450字</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">古诗文比重继续上升，能借助注释读懂简单文言文大意</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">能就一个话题说明观点并给出理由，简单的小组辩论</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>从「写清楚一件事」到「按顺序、有条理地写」，作文开始要求结构意识（开头—经过—结尾），这正是初中议论文、说明文谋篇布局训练的基础。</div>
+    </div>
+  </section>
+
+  <section id="g5">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">伍</div>
+        <div class="grade-titles"><p class="grade-name">五年级 · 文体意识与深度理解</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">识字任务基本完成，重心转向词汇的准确运用与丰富性</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">分辨记叙文、说明文、简单议论文的文体特征，理解常见说明方法（举例子、列数字、作比较、打比方），体会作者情感态度</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写景状物、简单说明文训练，篇幅450—550字，学习自己修改初稿</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">文言文篇幅加长，能借助注释翻译大意，开始鉴赏古诗词的意象与情感</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">小组合作汇报、简单辩论、综合性学习成果展示</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>五年级要建立清晰的「文体意识」——记叙文重情节和情感，说明文重准确和条理，二者写作方法论完全不同。这是初中系统学习记叙文、说明文、议论文三大文体的直接铺垫。</div>
+    </div>
+  </section>
+
+  <section id="g6">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge serif">陆</div>
+        <div class="grade-titles"><p class="grade-name">六年级 · 综合运用与小升初衔接</p></div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-lit)">识字与写字</span><span class="text">以查漏补缺为主，书写规范度对标升学要求</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">综合性阅读理解训练（把握文章结构、提炼主旨、赏析写作手法），课外阅读量提升，开始接触名著导读</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">命题作文、半命题作文综合训练，篇幅550—600字，掌握规范的考场作文结构</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-poem)">古诗文</span><span class="text">对小学阶段古诗文做系统性梳理与总复习，理解文言常见字词与句式规律</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-oral)">口语交际</span><span class="text">演讲、辩论、综合性学习项目化汇报</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>下学期务必做一次系统性总复习，把六年识字、阅读方法、习作类型重新梳理一遍；同时提前适应初中「精读课文 + 批注式阅读」的学习方式。</div>
+    </div>
+  </section>
+
+  <section id="transition">
+    <h2>两个必须重视的衔接点</h2>
+    <div class="transit">
+      <div class="transit-card">
+        <p class="t-name">二升三 · 从「依赖拼音」到「独立阅读 + 正式习作」</p>
+        <div class="transit-grid">
+          <div><span class="k">风险</span><span class="v">拼音依赖没有断奶，识字量不够扎实，三年级阅读理解和作文会同时卡壳</span></div>
+          <div><span class="k">应对</span><span class="v">二年级末重点检测「脱拼音独立阅读」能力；习作从「写话」过渡要「扶着走」——先仿写例文句式，再逐步放手创作</span></div>
+        </div>
+      </div>
+      <div class="transit-card">
+        <p class="t-name">四升五 · 从「记事情」到「分文体」</p>
+        <div class="transit-grid">
+          <div><span class="k">风险</span><span class="v">孩子只会用讲故事的方式写任何题材，遇到说明文、简单议论文不知道换思路</span></div>
+          <div><span class="k">应对</span><span class="v">明确对比记叙文与说明文在目的、方法上的不同，用「同一素材、两种文体」的练习帮孩子切换思维方式</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>贯穿六年的学习方法建议</h2>
+    <div class="methods">
+      <div class="method-item"><span class="box"></span><div class="txt"><b>每天课外阅读 20—30 分钟</b><span>从绘本到桥梁书到整本书阅读，阅读量的积累比任何解题技巧都重要</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>每周至少一次「仿写」</b><span>先模仿课文里好的句式和结构，再过渡到自由创作，降低无话可说的畏难情绪</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>三年级起坚持「好词好句摘抄本」</b><span>阅读时随手记录，为习作积累鲜活素材，而不是临时抱佛脚</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>古诗文「日积月累」，不搞考前突击</b><span>利用碎片时间反复吟诵，语感是磨出来的，不是一次背会的</span></div></div>
+    </div>
+  </section>
+
+  <section id="principles">
+    <h2>语文教学七原则</h2>
+    <div class="principles">
+      <div class="principle"><span class="num">1</span><div class="body"><b>大量阅读优先于讲题技巧</b><span>语感是读出来的，不是靠精讲阅读理解题型练出来的；阅读量不够时，任何解题技巧都是无源之水。</span></div></div>
+      <div class="principle"><span class="num">2</span><div class="body"><b>识字是工具，不是终点</b><span>识字之后要立刻放回具体语境（阅读、写话）里使用，否则会出现「认识却不会用」的悬空识字。</span></div></div>
+      <div class="principle"><span class="num">3</span><div class="body"><b>习作先仿写，后创作</b><span>三年级习作起步阶段，先模仿课文和例文的句式结构，再逐步放手自由表达，避免「无话可说」的畏难情绪一次性打垮兴趣。</span></div></div>
+      <div class="principle"><span class="num">4</span><div class="body"><b>古诗文靠日积月累，不靠考前突击</b><span>语感需要时间发酵，晨读、睡前吟诵这类碎片化重复，比考前集中背诵有效得多。</span></div></div>
+      <div class="principle"><span class="num">5</span><div class="body"><b>文体意识要显性讲透，不能指望孩子自己悟</b><span>记叙文重情节情感、说明文重准确条理，五年级起要拿「同一素材、两种文体」这样的对比练习明确讲清楚，而不是靠多读几篇自然归纳。</span></div></div>
+      <div class="principle"><span class="num">6</span><div class="body"><b>摘抄的好词好句要拿来「用」，否则只是抄写</b><span>摘抄本不是终点，必须在下一次习作里刻意使用摘抄过的词句，才能真正转化成表达能力。</span></div></div>
+      <div class="principle"><span class="num">7</span><div class="body"><b>纠错要顺手，不要留到专项突击</b><span>口语和作文里的语病、错别字，最好在日常批改和交流里随手纠正，而不是等期末一次性「歼灭」，避免打击表达欲望。</span></div></div>
+    </div>
+  </section>
+
+  <footer>识字 · 阅读 · 写作 · 古诗文 · 口语交际 —— 五线并进，六年贯穿</footer>
+
+</div>
+<script src="hpx-page-speech.js"></script>
+<script src="hpx-speech-compat.js"></script>
