@@ -1,55 +1,691 @@
----
-layout: default
-menu: home
-css: ['index.css', 'sidebar-popular-repo.css']
----
-<section class="jumbotron">
-    <div class="container">
-        <h1>{{ site.subtitle }}</h1>
-        <div id="jumbotron-meta-info">
-             {% for nav in site.labels %}
-                <span class="meta-info-index hvr-grow">
-                    <a href="{{ nav.href }}" title="{{ nav.label }}" target="{{ nav.target | default: _self }}">{{ nav.label }}</a>
-                </span>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-<section class="content container">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>慧陪学 — 小学数学英语</title>
+<meta name="description" content="专为小学生设计的互动学习游戏，包含乘法口诀、进位加减法、除法、认识时钟、英语字母等趣味练习。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(145deg,#e0f7fa 0%,#f3e5f5 45%,#fff9c4 100%);
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+}
 
-    <div class="row">
+/* ─ Header ─ */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo { font-size: 3.2rem; margin-bottom: 6px; }
+.header h1 {
+  font-size: 2rem;
+  color: #4a148c;
+  text-shadow: 2px 3px 0 #ce93d8, 4px 6px 0 rgba(0,0,0,.08);
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+}
+.header p { color: #888; font-size: .9rem; }
 
-        <!-- Post List -->
-        <div class="col-md-8">
+/* ─ Grid ─ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto;
+}
 
-            <ol class="post-list">
-                {% for post in paginator.posts %}
-                 {% if  post.category != 'gitchat' and post.category != 'geektime' %}
-                    <li class="post-list-item">
-                        <h2 class="post-list-title">
-                            <a class="hvr-underline-from-center" href="{{ site.url }}{{ post.url }}">{{ post.title }}</a>
-                        </h2>
-                        <p class="post-list-description">
-                            {{ post.excerpt | strip_html | strip }}
-                        </p>
-                        <p class="post-list-meta">
-                            <span class="octicon octicon-calendar"></span> {{ post.date | date: "%Y/%m/%d" }}
-                        </p>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-            </ol>
+/* ─ Card ─ */
+.card {
+  background: rgba(255,255,255,.88);
+  border-radius: 22px;
+  padding: 26px 22px 22px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.10);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform .18s, box-shadow .18s;
+  border-top: 5px solid transparent;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.16);
+}
+.card-icon { font-size: 2.6rem; }
+.card-title {
+  font-size: 1.22rem;
+  font-weight: bold;
+  color: #222;
+}
+.card-desc {
+  font-size: .87rem;
+  color: #777;
+  line-height: 1.55;
+  flex: 1;
+}
+.card-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: .76rem;
+  font-weight: bold;
+  color: #fff;
+  align-self: flex-start;
+}
 
-            <!-- Pagination -->
-            {% include pagination.html %}
+/* colors per card */
+.c1 { border-top-color: #7e57c2; }
+.c1 .card-tag { background: #7e57c2; }
+.c2 { border-top-color: #43a047; }
+.c2 .card-tag { background: #43a047; }
+.c3 { border-top-color: #e53935; }
+.c3 .card-tag { background: #e53935; }
+.c4 { border-top-color: #f57c00; }
+.c4 .card-tag { background: #f57c00; }
+.c5 { border-top-color: #00838f; }
+.c5 .card-tag { background: #00838f; }
+.c6 { border-top-color: #1565c0; }
+.c6 .card-tag { background: #1565c0; }
+.c7 { border-top-color: #ad1457; }
+.c7 .card-tag { background: #ad1457; }
+.c8 { border-top-color: #2e7d32; }
+.c8 .card-tag { background: #2e7d32; }
+.c9 { border-top-color: #6a1b9a; }
+.c9 .card-tag { background: #6a1b9a; }
+.c10{ border-top-color: #00796b; }
+.c10 .card-tag{ background: #00796b; }
+.c11{ border-top-color: #558b2f; }
+.c11 .card-tag{ background: #558b2f; }
 
-        </div>
+/* ─ Footer ─ */
+.footer {
+  text-align: center;
+  margin-top: 36px;
+  color: #bbb;
+  font-size: .8rem;
+}
+.footer a { color: #999; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
 
-        <div class="col-md-4">
-            {% include sidebar-popular-repo.html %}
-        </div>
+/* ─ Filter bar ─ */
+.filter-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:8px 20px;border:2px solid #ce93d8;border-radius:20px;background:#fff;color:#4a148c;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .18s;}
+.filter-btn:hover{background:#f3e5f5;}
+.filter-btn.on{background:#4a148c;color:#fff;border-color:#4a148c;}
 
-    </div>
+@media (max-width: 380px) {
+  .header h1 { font-size: 1.5rem; }
+  .logo { font-size: 2.4rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
 
-</section>
+<div class="header">
+  <div class="logo">🏫</div>
+  <h1>慧陪学</h1>
+  <p>点击卡片，开始今天的练习吧！</p>
+</div>
 
+<div class="filter-bar">
+  <button class="filter-btn on" data-subject="all" onclick="filterSubject(this)">全部学科</button>
+  <button class="filter-btn" data-subject="chinese" onclick="filterSubject(this)">📖 语文</button>
+  <button class="filter-btn" data-subject="english" onclick="filterSubject(this)">🔤 英语</button>
+  <button class="filter-btn" data-subject="math" onclick="filterSubject(this)">🔢 数学</button>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn on" data-filter="all" onclick="filterGrade(this)">全部年级</button>
+  <button class="filter-btn" data-filter="12" onclick="filterGrade(this)">一二年级</button>
+  <button class="filter-btn" data-filter="3" onclick="filterGrade(this)">三年级</button>
+  <button class="filter-btn" data-filter="45" onclick="filterGrade(this)">四五年级</button>
+</div>
+
+<div class="grid">
+
+  <a class="card" href="study-plan.html" data-subject="math" data-grades="1,2,3,4,5,6" style="border-top-color:#2E5A78">
+    <div class="card-icon">🗺️</div>
+    <div class="card-title">六年数学学习地图</div>
+    <div class="card-desc">五条主线（数与运算/图形与几何/量与计量/统计与概率/应用题思维）螺旋上升，一到六年级怎么衔接、每个年级关键点是什么，一页总览。</div>
+    <span class="card-tag" style="background:#2E5A78">一～六年级</span>
+  </a>
+
+  <a class="card" href="chinese-study-plan.html" data-subject="chinese" data-grades="1,2,3,4,5,6" style="border-top-color:#B7382C">
+    <div class="card-icon">🖌️</div>
+    <div class="card-title">六年语文学习地图</div>
+    <div class="card-desc">五条主线（识字写字/阅读/写作/古诗文积累/口语交际）螺旋上升，二升三脱拼音独立阅读、四升五分文体表达两个衔接点一页说清。</div>
+    <span class="card-tag" style="background:#B7382C">一～六年级</span>
+  </a>
+
+  <a class="card" href="english-study-plan.html" data-subject="english" data-grades="1,2,3,4,5,6" style="border-top-color:#1F4E79">
+    <div class="card-icon">✈️</div>
+    <div class="card-title">六年英语学习地图</div>
+    <div class="card-desc">五条主线（语音词汇/听力/口语/阅读/写作）螺旋上升，先输入后输出，二升三零基础起步、四升五时态规则两个衔接点一页说清。</div>
+    <span class="card-tag" style="background:#1F4E79">一～六年级</span>
+  </a>
+
+  <a class="card" href="overview-review-plan.html" data-subject="math,chinese,english" data-grades="1,2,3,4,5,6" style="border-top-color:#A8761F">
+    <div class="card-icon">🗓️</div>
+    <div class="card-title">三科综合复习地图</div>
+    <div class="card-desc">把数学/语文/英语的衔接点合并到同一条时间轴，三年级和五年级是三科同压学期，配套假期任务清单和通用复习方法论。</div>
+    <span class="card-tag" style="background:#A8761F">一～六年级</span>
+  </a>
+
+  <a class="card" href="mindset-habits-plan.html" data-subject="math,chinese,english" data-grades="1,2,3,4,5,6" style="border-top-color:#A6512B">
+    <div class="card-icon">📌</div>
+    <div class="card-title">学习心态与习惯</div>
+    <div class="card-desc">给家长的8条提醒：保护试错权、内在动机、睡眠运动、辅导边界、早期识别学习困难……和学科无关，但更影响孩子六年的学习体验。</div>
+    <span class="card-tag" style="background:#A6512B">给家长</span>
+  </a>
+
+  <a class="card c1" href="multiplication.html" data-subject="math" data-grades="1,2,3">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">九九乘法口诀</div>
+    <div class="card-desc">动画展示计算原理，点击格子看点阵图解，限时闯关测试记忆。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c2" href="carry.html" data-subject="math" data-grades="1,2,3">
+    <div class="card-icon">🧮</div>
+    <div class="card-title">进位加减法</div>
+    <div class="card-desc">逐步动画演示进位与退位过程，配有中文旁白，自动播放或手动翻步。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card" href="addsub10.html" data-subject="math" data-grades="1" style="border-top-color:#ef6c00">
+    <div class="card-icon">🍎</div>
+    <div class="card-title">10以内加减法</div>
+    <div class="card-desc">不是刷题是学过程：加法=合并动画、减法=去掉动画、数轴跳一跳统一理解加减法、10的分成，最后配视觉化综合练习。</div>
+    <span class="card-tag" style="background:#ef6c00">一年级</span>
+  </a>
+
+  <a class="card c3" href="division.html" data-subject="math" data-grades="2,3,4">
+    <div class="card-icon">➗</div>
+    <div class="card-title">除法速算训练</div>
+    <div class="card-desc">从简单整除到带余数除法，限时闯关、连击奖励，边玩边练。</div>
+    <span class="card-tag">二～四年级</span>
+  </a>
+
+  <a class="card c4" href="math1.html" data-subject="math" data-grades="1,2,3">
+    <div class="card-icon">📝</div>
+    <div class="card-title">综合数学练习</div>
+    <div class="card-desc">加减乘除混合练习，自定义范围与难度，记录成绩与连击。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c5" href="clock.html" data-subject="math" data-grades="1,2">
+    <div class="card-icon">🕐</div>
+    <div class="card-title">认识时钟</div>
+    <div class="card-desc">互动时钟拨针练习，学会看时针、分针和秒针，整点与半点。</div>
+    <span class="card-tag">一～二年级</span>
+  </a>
+
+  <a class="card c6" href="math_drill.html" data-subject="math" data-grades="1,2">
+    <div class="card-icon">🌸</div>
+    <div class="card-title">数学小练习</div>
+    <div class="card-desc">趣味题目闯关，图文并茂，适合课后巩固，每次随机出题。</div>
+    <span class="card-tag">一～二年级</span>
+  </a>
+
+  <a class="card c7" href="english.html" data-subject="english" data-grades="1,2,3">
+    <div class="card-icon">🔤</div>
+    <div class="card-title">英语字母与单词</div>
+    <div class="card-desc">字母认读、单词拼写游戏，有趣动画，轻松入门小学英语。</div>
+    <span class="card-tag">一～三年级</span>
+  </a>
+
+  <a class="card c10" href="direction.html" data-subject="math" data-grades="2,3,4">
+    <div class="card-icon">🧭</div>
+    <div class="card-title">方向认识</div>
+    <div class="card-desc">交互指南针学东南西北，格子地图判断相对方向，路线跟踪练习走几步到哪里。</div>
+    <span class="card-tag">二～四年级</span>
+  </a>
+
+  <a class="card c9" href="mixed.html" data-subject="math" data-grades="2,3,4,5">
+    <div class="card-icon">⚙️</div>
+    <div class="card-title">混合运算</div>
+    <div class="card-desc">加减乘除 + 括号，分步高亮演示运算顺序，练习自动出题，测验4选1。</div>
+    <span class="card-tag">二～五年级</span>
+  </a>
+
+  <a class="card c8" href="placevalue.html" data-subject="math" data-grades="1,2,3,4">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">数位认知</div>
+    <div class="card-desc">动画拆解个位到亿位，个十百用实物方块、千及以上用位值筹码，看数字如何组成，演示+练习+测验三合一。</div>
+    <span class="card-tag">一～四年级</span>
+  </a>
+
+  <a class="card" href="shapes.html" data-subject="math" data-grades="1,2,3,4" style="border-top-color:#e65100">
+    <div class="card-icon">🔷</div>
+    <div class="card-title">图形认识</div>
+    <div class="card-desc">正方形/长方形/三角形/圆/梯形/平行四边形，SVG描边动画+属性对比，看图选名+特征问答。</div>
+    <span class="card-tag" style="background:#e65100">一～四年级</span>
+  </a>
+
+  <a class="card" href="length.html" data-subject="math" data-grades="2,3,4" style="border-top-color:#1b5e20">
+    <div class="card-icon">📏</div>
+    <div class="card-title">长度认识</div>
+    <div class="card-desc">毫米/厘米/分米/米/千米，换算填空+生活估算+直尺读数，单位换算不再错。</div>
+    <span class="card-tag" style="background:#1b5e20">二～四年级</span>
+  </a>
+
+  <a class="card" href="hanzi.html" data-subject="chinese" data-grades="1,2,3,4,5,6" style="border-top-color:#e91e63">
+    <div class="card-icon">📖</div>
+    <div class="card-title">趣味汉字</div>
+    <div class="card-desc">从独体字到复杂字，3000常用汉字分关卡学习，含拼音、笔画、例词，闪卡+测验双模式。</div>
+    <span class="card-tag" style="background:#e91e63">一～六年级</span>
+  </a>
+
+  <a class="card" href="decimal_intro.html" data-subject="math" data-grades="4" style="border-top-color:#3949ab">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">小数认识</div>
+    <div class="card-desc">把1分成10份或100份，数轴+方块直观感受0.1和0.01，含大小比较。</div>
+    <span class="card-tag" style="background:#3949ab">四年级</span>
+  </a>
+
+  <a class="card" href="fraction.html" data-subject="math" data-grades="3" style="border-top-color:#ad1457">
+    <div class="card-icon">🍕</div>
+    <div class="card-title">分数初步认识</div>
+    <div class="card-desc">饼图和方块切分演示，拖动分子分母看变化，看图写分数测验。</div>
+    <span class="card-tag" style="background:#ad1457">三年级</span>
+  </a>
+
+  <a class="card" href="perimeter.html" data-subject="math" data-grades="3" style="border-top-color:#2e7d32">
+    <div class="card-icon">📐</div>
+    <div class="card-title">周长计算</div>
+    <div class="card-desc">动画演示围一圈，滑块拖动长宽实时算周长，长方形与正方形公式对比。</div>
+    <span class="card-tag" style="background:#2e7d32">三年级</span>
+  </a>
+
+  <a class="card" href="area.html" data-subject="math" data-grades="3" style="border-top-color:#1565c0">
+    <div class="card-icon">🟦</div>
+    <div class="card-title">面积认识</div>
+    <div class="card-desc">点格子数面积，逐步推导长×宽公式，网格上直观感受面积大小。</div>
+    <span class="card-tag" style="background:#1565c0">三年级</span>
+  </a>
+
+  <a class="card" href="time_calc.html" data-subject="math" data-grades="3" style="border-top-color:#00695c">
+    <div class="card-icon">⏱️</div>
+    <div class="card-title">时间计算</div>
+    <div class="card-desc">双时钟拨针计算经过时间，24小时制对照表，经过时间练习题。</div>
+    <span class="card-tag" style="background:#00695c">三年级</span>
+  </a>
+
+  <a class="card" href="multiply2d.html" data-subject="math" data-grades="3" style="border-top-color:#e65100">
+    <div class="card-icon">✖️</div>
+    <div class="card-title">两位数乘法竖式</div>
+    <div class="card-desc">逐步高亮演示进位过程，两位数×一位数和两位数×两位数两种模式。</div>
+    <span class="card-tag" style="background:#e65100">三年级</span>
+  </a>
+
+  <a class="card" href="barchart.html" data-subject="math" data-grades="3" style="border-top-color:#283593">
+    <div class="card-icon">📊</div>
+    <div class="card-title">条形统计图</div>
+    <div class="card-desc">拖动柱子设数值，自动统计最多最少，读图回答问题，多种生活场景。</div>
+    <span class="card-tag" style="background:#283593">三年级</span>
+  </a>
+
+  <a class="card" href="data-classification.html" data-subject="math" data-grades="1,2" style="border-top-color:#58795d">
+    <div class="card-icon">🗂️</div>
+    <div class="card-title">分类统计小调查</div>
+    <div class="card-desc">按颜色或形状整理卡片，亲手记录数量，再回答最多、最少、相差和总数问题。</div>
+    <span class="card-tag" style="background:#58795d">一～二年级</span>
+  </a>
+
+  <a class="card" href="numbers.html" data-subject="math" data-grades="0,1" style="border-top-color:#e91e63">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">数字乐园 1-100</div>
+    <div class="card-desc">点格子认数字+汉语名称，数苹果练计数，找数字/上下一个游戏，拖拽排序，跟我数彩虹动画，范围均可选10/20/50/100以内。</div>
+    <span class="card-tag" style="background:#e91e63">幼儿园～一年级</span>
+  </a>
+
+  <a class="card c11" href="decimal.html" data-subject="math" data-grades="3,4">
+    <div class="card-icon">🔟</div>
+    <div class="card-title">小数加减法</div>
+    <div class="card-desc">竖式对齐小数点动画，逐位演示进位与退位，支持一位/两位/混合小数练习。</div>
+    <span class="card-tag">三～四年级</span>
+  </a>
+
+  <a class="card" href="olympiad1.html" data-subject="math" data-grades="1" style="border-top-color:#f57f17">
+    <div class="card-icon">🏆</div>
+    <div class="card-title">一年级奥数思维训练</div>
+    <div class="card-desc">找规律、数字谜、巧算、逻辑推理20题，在线计时作答，提交后自动判分并给出解析。</div>
+    <span class="card-tag" style="background:#f57f17">一年级</span>
+  </a>
+
+  <a class="card" href="olympiad2.html" data-subject="math" data-grades="2" style="border-top-color:#6a1b9a">
+    <div class="card-icon">🥇</div>
+    <div class="card-title">二年级奥数思维训练</div>
+    <div class="card-desc">鸡兔同笼、高斯求和、行程问题、数图形，难度分简单/中等/挑战，错题专项练习。</div>
+    <span class="card-tag" style="background:#6a1b9a">二年级</span>
+  </a>
+
+  <a class="card" href="olympiad3.html" data-subject="math" data-grades="3" style="border-top-color:#1b5e20">
+    <div class="card-icon">🌟</div>
+    <div class="card-title">三年级数学思维训练</div>
+    <div class="card-desc">和差倍、相遇追及、分数应用、L形面积、三角形角度，难度分三档，错题专项练习。</div>
+    <span class="card-tag" style="background:#1b5e20">三年级</span>
+  </a>
+
+  <a class="card" href="chinese_poem.html" data-subject="chinese" data-grades="1,2,3" style="border-top-color:#3B536B">
+    <div class="card-icon">📜</div>
+    <div class="card-title">古诗背诵</div>
+    <div class="card-desc">诗词表浏览、翻牌背诵、默写测验三种模式，一年级必背古诗15首，AI讲解诗意与创作故事。</div>
+    <span class="card-tag" style="background:#3B536B">一～三年级</span>
+  </a>
+
+  <a class="card" href="homework_check.html" data-subject="math,chinese,english" data-grades="1,2,3,4,5,6" style="border-top-color:#5e35b1">
+    <div class="card-icon">📷</div>
+    <div class="card-title">作业拍照检查</div>
+    <div class="card-desc">拍照或上传作业照片，AI视觉模型自动识别题目并判断对错，错题给出详细步骤解析，支持标注图点击查看解析。</div>
+    <span class="card-tag" style="background:#5e35b1">一～六年级</span>
+  </a>
+
+  <a class="card" href="homework_checkv2.html" data-subject="math,chinese,english" data-grades="1,2,3,4,5,6" style="border-top-color:#512da8">
+    <div class="card-icon">🔬</div>
+    <div class="card-title">作业拍照检查 v2（OCR实验版）</div>
+    <div class="card-desc">OCR文字识别+大模型判断双段式流程，可查看OCR原始识别结果并人工核对，需先启动 ocr_server.py 本地服务。</div>
+    <span class="card-tag" style="background:#512da8">一～六年级</span>
+  </a>
+
+  <a class="card" href="chinese_line.html" data-subject="chinese" data-grades="1" style="border-top-color:#00838f">
+    <div class="card-icon">🔗</div>
+    <div class="card-title">词语连线</div>
+    <div class="card-desc">点击左边词语，再点击右边的配对词，一笔连线完成配对，一年级语文词语积累练习。</div>
+    <span class="card-tag" style="background:#00838f">一年级</span>
+  </a>
+
+  <a class="card" href="daily-camp.html" data-subject="math" data-grades="0,1,2,3,4,5,6" style="border-top-color:#4d7c52">
+    <div class="card-icon">🌤️</div>
+    <div class="card-title">每日训练营</div>
+    <div class="card-desc">每天自动搭配计算、逻辑和专注3个短任务，也可进入游戏乐园，29个游戏集中选择。</div>
+    <span class="card-tag" style="background:#4d7c52">幼儿园～六年级</span>
+  </a>
+
+  <a class="card" href="angle.html" data-subject="math" data-grades="4" style="border-top-color:#6a1b9a">
+    <div class="card-icon">∠</div>
+    <div class="card-title">角的度量</div>
+    <div class="card-desc">拖动量角器读出角度，锐角/直角/钝角/平角/周角动画演示，读数练习。</div>
+    <span class="card-tag" style="background:#6a1b9a">四年级</span>
+  </a>
+
+  <a class="card" href="bignumber.html" data-subject="math" data-grades="4" style="border-top-color:#37474f">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">大数的认识</div>
+    <div class="card-desc">数位顺序表自动分级，输入数字看个级/万级/亿级，读数写数双向练习。</div>
+    <span class="card-tag" style="background:#37474f">四年级</span>
+  </a>
+
+  <a class="card" href="operationlaws.html" data-subject="math" data-grades="4" style="border-top-color:#5e35b1">
+    <div class="card-icon">⚖️</div>
+    <div class="card-title">运算定律与简便计算</div>
+    <div class="card-desc">加法乘法交换律结合律、乘法分配律，换数字验证定律，简便计算专项练习。</div>
+    <span class="card-tag" style="background:#5e35b1">四年级</span>
+  </a>
+
+  <a class="card" href="triangle.html" data-subject="math" data-grades="4" style="border-top-color:#d84315">
+    <div class="card-icon">🔺</div>
+    <div class="card-title">三角形</div>
+    <div class="card-desc">按边按角分类图鉴，拖动顶点验证内角和180°，三边关系判断能否围成三角形。</div>
+    <span class="card-tag" style="background:#d84315">四年级</span>
+  </a>
+
+  <a class="card" href="chickenrabbit.html" data-subject="math" data-grades="4" style="border-top-color:#558b2f">
+    <div class="card-icon">🐔🐇</div>
+    <div class="card-title">鸡兔同笼</div>
+    <div class="card-desc">数学广角经典题，假设法换脚动画演示，互动调整头数脚数看解法，双主题练习。</div>
+    <span class="card-tag" style="background:#558b2f">四年级</span>
+  </a>
+
+  <a class="card" href="xiezuo.html" data-subject="chinese" data-grades="1,2,3,4" style="border-top-color:#5d4037">
+    <div class="card-icon">✍️</div>
+    <div class="card-title">看图写话与习作引导</div>
+    <div class="card-desc">选词拼句练习看图写话，三步法（审题→构思→成文）引导写一件事，配句子对比与顺序练习。</div>
+    <span class="card-tag" style="background:#5d4037">一～四年级</span>
+  </a>
+
+  <a class="card" href="rhetoric.html" data-subject="chinese" data-grades="3,4" style="border-top-color:#7b1fa2">
+    <div class="card-icon">🎭</div>
+    <div class="card-title">修辞手法练习</div>
+    <div class="card-desc">比喻/拟人/排比/夸张/反问五种修辞图文讲解，本体喻体连线配对游戏，识别修辞选择题。</div>
+    <span class="card-tag" style="background:#7b1fa2">三～四年级</span>
+  </a>
+
+  <a class="card" href="english_grade4.html" data-subject="english" data-grades="4" style="border-top-color:#00838f">
+    <div class="card-icon">👨‍👩‍👧‍👦</div>
+    <div class="card-title">英语：家庭与方位介词</div>
+    <div class="card-desc">点家庭树学family成员，拖场景认识in/on/under/behind/next to，一般现在时第三人称单数变化规则+练习。</div>
+    <span class="card-tag" style="background:#00838f">四年级</span>
+  </a>
+
+  <a class="card" href="equation.html" data-subject="math" data-grades="5" style="border-top-color:#c62828">
+    <div class="card-icon">🎯</div>
+    <div class="card-title">简易方程</div>
+    <div class="card-desc">天平动画演示等式的性质，两边同时加减乘除解方程，自动验证代入原方程，解方程专项练习。</div>
+    <span class="card-tag" style="background:#c62828">五年级</span>
+  </a>
+
+  <a class="card" href="polygonarea.html" data-subject="math" data-grades="5" style="border-top-color:#8e24aa">
+    <div class="card-icon">🔶</div>
+    <div class="card-title">多边形面积</div>
+    <div class="card-desc">拖动顶点探索平行四边形/三角形/梯形，直观感受斜边不影响面积，推导底×高、÷2、上下底相加等公式。</div>
+    <span class="card-tag" style="background:#8e24aa">五年级</span>
+  </a>
+
+  <a class="card" href="factors.html" data-subject="math" data-grades="5" style="border-top-color:#455a64">
+    <div class="card-icon">🔍</div>
+    <div class="card-title">因数与倍数</div>
+    <div class="card-desc">输入数字点亮因数倍数格子，双数对比看公因数公倍数，埃拉托斯特尼筛法动画找质数，综合练习。</div>
+    <span class="card-tag" style="background:#455a64">五年级</span>
+  </a>
+
+  <a class="card" href="wenyanwen.html" data-subject="chinese" data-grades="3,4,5,6" style="border-top-color:#6d4c41">
+    <div class="card-icon">📜</div>
+    <div class="card-title">文言文入门</div>
+    <div class="card-desc">《守株待兔》《杨氏之子》《铁杵成针》等5篇课文，点原文对照今译朗读，字词释义卡片，识别练习。</div>
+    <span class="card-tag" style="background:#6d4c41">三～六年级</span>
+  </a>
+
+  <a class="card" href="shuoshuowen.html" data-subject="chinese" data-grades="4,5,6" style="border-top-color:#00695c">
+    <div class="card-icon">🧩</div>
+    <div class="card-title">说明文结构分析</div>
+    <div class="card-desc">举例子/列数字/作比较/打比方/分类别五种说明方法，总分总/并列式/递进式结构图解，识别练习。</div>
+    <span class="card-tag" style="background:#00695c">四～六年级</span>
+  </a>
+
+  <a class="card" href="english_grade56.html" data-subject="english" data-grades="5,6" style="border-top-color:#00838f">
+    <div class="card-icon">🕰️</div>
+    <div class="card-title">英语：四态对比与阅读理解</div>
+    <div class="card-desc">一般现在/进行/将来/过去四种时态卡片对比，时间词分类小游戏，4关阅读理解闯关，综合练习。</div>
+    <span class="card-tag" style="background:#00838f">五～六年级</span>
+  </a>
+
+  <a class="card" href="probability.html" data-subject="math" data-grades="5" style="border-top-color:#6d4c41">
+    <div class="card-icon">🎲</div>
+    <div class="card-title">可能性与掷一掷</div>
+    <div class="card-desc">一定/可能/不可能判断，摸球实验用分数表示可能性，掷两个骰子看点数和分布，综合练习。</div>
+    <span class="card-tag" style="background:#6d4c41">五年级</span>
+  </a>
+
+  <a class="card" href="linechart.html" data-subject="math" data-grades="5" style="border-top-color:#5c6bc0">
+    <div class="card-icon">📈</div>
+    <div class="card-title">折线统计图</div>
+    <div class="card-desc">单式折线看气温变化趋势，复式折线两组数据对比，读图找最高最低值、判断升降练习。</div>
+    <span class="card-tag" style="background:#5c6bc0">五年级</span>
+  </a>
+
+  <a class="card" href="fraction_ops.html" data-subject="math" data-grades="6" style="border-top-color:#ad1457">
+    <div class="card-icon">🍰</div>
+    <div class="card-title">分数乘法与除法</div>
+    <div class="card-desc">面积模型直观演示分数乘法，除以一个数等于乘以它的倒数，约分至最简分数专项练习。</div>
+    <span class="card-tag" style="background:#ad1457">六年级</span>
+  </a>
+
+  <a class="card" href="circle.html" data-subject="math" data-grades="6" style="border-top-color:#1565c0">
+    <div class="card-icon">⭕</div>
+    <div class="card-title">圆的周长与面积</div>
+    <div class="card-desc">拖动半径实时算周长面积，切割拼接示意图推导πr²公式来源，周长面积计算练习。</div>
+    <span class="card-tag" style="background:#1565c0">六年级</span>
+  </a>
+
+  <a class="card" href="percentage.html" data-subject="math" data-grades="6" style="border-top-color:#e65100">
+    <div class="card-icon">💯</div>
+    <div class="card-title">百分数应用与扇形统计图</div>
+    <div class="card-desc">折扣成数计算器、利息税率计算器，3种扇形统计图读图，打折/利息/占比综合练习。</div>
+    <span class="card-tag" style="background:#e65100">六年级</span>
+  </a>
+
+  <a class="card" href="proportion.html" data-subject="math" data-grades="6" style="border-top-color:#283593">
+    <div class="card-icon">📐</div>
+    <div class="card-title">比例</div>
+    <div class="card-desc">验证/解比例，内项外项交叉相乘，正比例反比例数据表对比，比例尺图上实际距离互算。</div>
+    <span class="card-tag" style="background:#283593">六年级</span>
+  </a>
+
+  <a class="card" href="cuboid.html" data-subject="math" data-grades="5" style="border-top-color:#3949ab">
+    <div class="card-icon">📦</div>
+    <div class="card-title">长方体和正方体</div>
+    <div class="card-desc">拖动长宽高滑块看3D立体图与展开图实时变化，正方体特例讲解，表面积体积综合练习。</div>
+    <span class="card-tag" style="background:#3949ab">五年级</span>
+  </a>
+
+  <a class="card" href="cylinder_cone.html" data-subject="math" data-grades="6" style="border-top-color:#00695c">
+    <div class="card-icon">🥫</div>
+    <div class="card-title">圆柱与圆锥</div>
+    <div class="card-desc">侧面展开成长方形推导表面积公式，倒水动画演示等底等高圆锥体积是圆柱的1/3。</div>
+    <span class="card-tag" style="background:#00695c">六年级</span>
+  </a>
+
+  <a class="card" href="negative.html" data-subject="math" data-grades="6" style="border-top-color:#0d47a1">
+    <div class="card-icon">➖➕</div>
+    <div class="card-title">认识负数</div>
+    <div class="card-desc">收入支出/零上零下等相反意义的量，拖动数轴两点实时比大小，情景转数值练习。</div>
+    <span class="card-tag" style="background:#0d47a1">六年级</span>
+  </a>
+
+  <a class="card" href="threeview.html" data-subject="math" data-grades="5" style="border-top-color:#37474f">
+    <div class="card-icon">🧱</div>
+    <div class="card-title">观察物体：三视图</div>
+    <div class="card-desc">点格子堆方块，3D立体图实时联动正视图/侧视图/俯视图，看积木填三视图数字练习。</div>
+    <span class="card-tag" style="background:#37474f">五年级</span>
+  </a>
+
+  <a class="card" href="mathwide1.html" data-subject="math" data-grades="2,3" style="border-top-color:#4527a0">
+    <div class="card-icon">🧩</div>
+    <div class="card-title">数学广角（一）</div>
+    <div class="card-desc">推理断案（排除法+表格）、集合韦恩图、等量代换连环换算，二三年级思维专项训练。</div>
+    <span class="card-tag" style="background:#4527a0">二～三年级</span>
+  </a>
+
+  <a class="card" href="mathwide2.html" data-subject="math" data-grades="4,5,6" style="border-top-color:#bf360c">
+    <div class="card-icon">🌰</div>
+    <div class="card-title">数学广角（二）</div>
+    <div class="card-desc">沏茶烙饼问题求最优、植树问题四场景、天平找次品互动、数与形规律、鸽巢原理，四五六年级思维专项训练。</div>
+    <span class="card-tag" style="background:#bf360c">四～六年级</span>
+  </a>
+
+  <a class="card" href="decimal_muldiv.html" data-subject="math" data-grades="5" style="border-top-color:#1a237e">
+    <div class="card-icon">✖️➗</div>
+    <div class="card-title">小数乘法与除法</div>
+    <div class="card-desc">把小数变整数来算：乘法数一数小数位数移回小数点，除法把除数变整数、被除数同步移位，逐步演示+综合练习。</div>
+    <span class="card-tag" style="background:#1a237e">五年级</span>
+  </a>
+
+  <a class="card" href="fraction_addsub.html" data-subject="math" data-grades="5" style="border-top-color:#880e4f">
+    <div class="card-icon">🍰</div>
+    <div class="card-title">分数的加法和减法</div>
+    <div class="card-desc">同分母分母不变分子加减，异分母先通分（求最小公倍数作公分母）再加减，结果自动化简至最简分数。</div>
+    <span class="card-tag" style="background:#880e4f">五年级</span>
+  </a>
+
+  <a class="card" href="grade4misc.html" data-subject="math" data-grades="4" style="border-top-color:#4e342e">
+    <div class="card-icon">🧮</div>
+    <div class="card-title">四年级零散知识点</div>
+    <div class="card-desc">公顷和平方千米、三位数乘两位数竖式、平行四边形和梯形认识分类、两位数除法试商，逐步演示+综合练习四合一。</div>
+    <span class="card-tag" style="background:#4e342e">四年级</span>
+  </a>
+
+  <a class="card" href="reading_strategy.html" data-subject="chinese" data-grades="4,5,6" style="border-top-color:#1b5e20">
+    <div class="card-icon">📖</div>
+    <div class="card-title">阅读理解策略训练</div>
+    <div class="card-desc">提取信息、概括中心思想、预测与提问三大阅读策略，4篇短文配套练习，先学策略再练习，综合练习巩固。</div>
+    <span class="card-tag" style="background:#1b5e20">四～六年级</span>
+  </a>
+
+  <a class="card" href="english_grammar_writing.html" data-subject="english" data-grades="5,6" style="border-top-color:#01579b">
+    <div class="card-icon">📝</div>
+    <div class="card-title">英语：比较级最高级与书面表达</div>
+    <div class="card-desc">形容词比较级最高级6种变化规则+练习，选词拼句写英语小短文（我的周末/最喜欢的动物/写信），五六年级语法收尾。</div>
+    <span class="card-tag" style="background:#01579b">五～六年级</span>
+  </a>
+
+  <a class="card" href="pinyin.html" data-subject="chinese" data-grades="1" style="border-top-color:#e65100">
+    <div class="card-icon">🀄</div>
+    <div class="card-title">汉语拼音入门</div>
+    <div class="card-desc">声母23个、韵母24个、声调、整体认读音节16个、拼读练习（声母+韵母=音节），一年级语文地基，含综合练习。</div>
+    <span class="card-tag" style="background:#e65100">一年级</span>
+  </a>
+
+  <a class="card" href="weight.html" data-subject="math" data-grades="2" style="border-top-color:#6d4c41">
+    <div class="card-icon">⚖️</div>
+    <div class="card-title">克和千克</div>
+    <div class="card-desc">质量单位认识、1千克=1000克换算动画、天平比轻重互动、生活重量估算参考，学习+练习+测验三合一。</div>
+    <span class="card-tag" style="background:#6d4c41">二年级</span>
+  </a>
+
+</div>
+
+<script src="feedback.js"></script>
+
+<div class="footer">
+  <p>🌈 快乐学习，每天进步一点点</p>
+  <p><a href="copyright.html">版权与内容来源</a> · <a href="THIRD_PARTY_NOTICES.md">第三方组件与授权说明</a></p>
+</div>
+
+<script>
+let currentGradeFilter = 'all', currentSubjectFilter = 'all';
+
+function filterGrade(btn){
+  btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentGradeFilter = btn.dataset.filter;
+  applyFilters();
+}
+function filterSubject(btn){
+  btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentSubjectFilter = btn.dataset.subject;
+  applyFilters();
+}
+function applyFilters(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const gr = card.dataset.grades || '';
+    const gradeOk = currentGradeFilter==='all'
+      || (currentGradeFilter==='12'?/[012]/.test(gr):currentGradeFilter==='3'?/3/.test(gr):/[45]/.test(gr));
+    const subjects = (card.dataset.subject||'').split(',');
+    const subjectOk = currentSubjectFilter==='all' || subjects.includes(currentSubjectFilter);
+    card.style.display = (gradeOk && subjectOk) ? '' : 'none';
+  });
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
