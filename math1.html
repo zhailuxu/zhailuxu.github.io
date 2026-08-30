@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小学一年级数学练习</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#ffecd2 0%,#fcb69f 50%,#a1c4fd 100%);
+  min-height: 100vh; padding: 20px;
+}
+.container { max-width: 960px; margin: 0 auto; }
+
+/* ── 标题 ── */
+.header { text-align:center; margin-bottom:16px; }
+.header h1 { font-size:2.2rem; color:#fff; text-shadow:2px 3px 0 #e07b54,4px 6px 0 rgba(0,0,0,.15); letter-spacing:4px; }
+.header p  { color:#fff8; font-size:.9rem; margin-top:4px; }
+.timer-bar { display:flex; justify-content:center; align-items:center; gap:10px; margin-top:8px; }
+.timer-display { background:rgba(255,255,255,.85); border-radius:14px; padding:5px 18px; font-size:1.4rem; font-weight:bold; color:#e07b54; min-width:100px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.timer-display.running { color:#2d6a4f; }
+.timer-label { color:#ffffffcc; font-size:.85rem; }
+.streak-bar { display:flex; justify-content:center; gap:5px; margin-top:6px; min-height:26px; }
+.streak-dot { width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:.75rem; }
+.streak-dot.win { background:#ffd700; box-shadow:0 0 5px #ffaa00; }
+
+/* ── 模式标签页 ── */
+.mode-tabs-wrap { overflow-x:auto; margin-bottom:16px; -webkit-overflow-scrolling:touch; }
+.mode-tabs-wrap::-webkit-scrollbar { height:4px; }
+.mode-tabs-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,.4); border-radius:4px; }
+.mode-tabs { display:flex; gap:8px; padding:4px 2px; white-space:nowrap; }
+.mode-tab {
+  border:none; border-radius:20px; padding:8px 16px; font-size:.9rem; font-weight:bold;
+  cursor:pointer; background:rgba(255,255,255,.55); color:#555;
+  transition:all .2s; box-shadow:0 2px 8px rgba(0,0,0,.08); flex-shrink:0;
+}
+.mode-tab:hover { background:rgba(255,255,255,.8); }
+.mode-tab.active { background:#fff; color:#e07b54; box-shadow:0 3px 12px rgba(224,123,84,.35); }
+
+/* ── 控制面板 ── */
+.control-panel {
+  background:#ffffffd9; border-radius:20px; padding:16px 24px; margin-bottom:20px;
+  box-shadow:0 4px 20px rgba(0,0,0,.12); display:flex; flex-wrap:wrap; gap:14px;
+  align-items:center; justify-content:center;
+}
+.ctrl-group { display:flex; align-items:center; gap:8px; }
+.ctrl-group label { font-size:.95rem; color:#555; white-space:nowrap; }
+select, input[type="number"] {
+  border:2px solid #f4a261; border-radius:10px; padding:5px 10px;
+  font-size:.95rem; color:#333; background:#fff; outline:none; cursor:pointer;
+}
+select:focus, input[type="number"]:focus { border-color:#e07b54; }
+input[type="number"] { width:68px; text-align:center; }
+.btn {
+  border:none; border-radius:12px; padding:9px 22px; font-size:1rem; font-weight:bold;
+  cursor:pointer; transition:transform .12s,box-shadow .12s; box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+.btn:active { transform:scale(.96); }
+.btn-generate { background:linear-gradient(135deg,#43e97b,#38f9d7); color:#1a5c3a; }
+.btn-submit   { background:linear-gradient(135deg,#f093fb,#f5576c); color:#fff; }
+.btn-reset    { background:linear-gradient(135deg,#ffeaa7,#fdcb6e); color:#6c4a00; }
+.btn-replay   { background:linear-gradient(135deg,#fd79a8,#e84393); color:#fff; }
+.btn-again    { background:linear-gradient(135deg,#74b9ff,#0984e3); color:#fff; }
+
+/* ── 即时/延迟反馈切换 ── */
+.feedback-toggle { display:flex; border:2px solid #f4a261; border-radius:10px; overflow:hidden; }
+.ftog-btn { -webkit-appearance:none; appearance:none; border:none; padding:5px 13px; font-size:.85rem; font-weight:bold; cursor:pointer; background:#fff; color:#aaa; transition:all .15s; white-space:nowrap; }
+.ftog-btn.active { background:#f4a261; color:#fff; }
+
+/* ── 题目网格 ── */
+.problems-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:14px; margin-bottom:20px;
+}
+.problems-grid.wide  { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); }
+.problems-grid.clock-mode { grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); }
+
+.problem-card {
+  background:#ffffffee; border-radius:16px; padding:16px 18px;
+  box-shadow:0 3px 12px rgba(0,0,0,.09); display:flex; flex-direction:column;
+  align-items:center; gap:10px; transition:transform .15s; position:relative;
+}
+.problem-card:hover { transform:translateY(-2px); }
+.problem-num { position:absolute;top:7px;left:10px;font-size:.72rem;color:#bbb;font-weight:bold; }
+.problem-type-badge { position:absolute;top:7px;right:8px;font-size:.65rem;padding:2px 6px;border-radius:7px;font-weight:bold; }
+.badge-jinwei { background:#ffd6a5;color:#b85c00; }
+.badge-tuiwei { background:#c3f5e8;color:#00775a; }
+.badge-basic  { background:#e8eaf6;color:#3949ab; }
+.badge-add    { background:#e8f5e9;color:#2e7d32; }
+.badge-sub    { background:#e3f2fd;color:#1565c0; }
+.badge-eq     { background:#f3e5f5;color:#7b1fa2; }
+
+.problem-expr { font-size:1.9rem;font-weight:bold;color:#333;letter-spacing:3px;line-height:1; }
+.problem-expr .op-plus  { color:#e76f51; }
+.problem-expr .op-minus { color:#2d6a4f; }
+
+.answer-row { display:flex;align-items:center;gap:7px;font-size:1.5rem;font-weight:bold;color:#555; }
+.answer-input {
+  width:64px;height:46px;border:3px solid #adb5bd;border-radius:10px;
+  text-align:center;font-size:1.5rem;font-weight:bold;color:#222;
+  background:#f8f9fa;outline:none;transition:border-color .2s;
+  -moz-appearance:textfield;
+}
+.answer-input::-webkit-inner-spin-button,
+.answer-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+.answer-input:focus { border-color:#f4a261;background:#fff8f0; }
+.answer-input.wide-input { width:90px; }
+
+.problem-card.correct { background:#d8f5e8;border:2.5px solid #52c41a; }
+.problem-card.wrong   { background:#fff1f0;border:2.5px solid #ff4d4f; }
+.answer-input.correct { border-color:#52c41a;color:#237804;background:#f6ffed; }
+.answer-input.wrong   { border-color:#ff4d4f;color:#cf1322;background:#fff1f0; }
+.result-icon { font-size:1.4rem;display:none; }
+.correct-answer-hint { font-size:.78rem;color:#cf1322;display:none;text-align:center; }
+
+/* ── 比大小 ── */
+.compare-row { display:flex;align-items:center;gap:8px;font-size:1.9rem;font-weight:bold; }
+.cmp-btns { display:flex;gap:5px; }
+.cmp-btn {
+  width:36px;height:36px;border:2px solid #ddd;border-radius:8px;
+  font-size:1.1rem;font-weight:bold;cursor:pointer;background:#f8f9fa;
+  transition:all .15s;
+}
+.cmp-btn:hover { background:#e3f2fd;border-color:#90caf9; }
+.cmp-btn.selected { background:#1565c0;color:#fff;border-color:#1565c0; }
+.cmp-btn.correct-choice { background:#2e7d32;color:#fff;border-color:#2e7d32; }
+.cmp-btn.wrong-choice   { background:#c62828;color:#fff;border-color:#c62828; }
+
+/* ── 数列找规律 ── */
+.seq-row { display:flex;align-items:center;flex-wrap:wrap;gap:4px;font-size:1.5rem;font-weight:bold; }
+.seq-num { color:#333; min-width:28px;text-align:center; }
+.seq-sep { color:#aaa;font-size:1rem; }
+
+/* ── 认时间 ── */
+.clock-face { margin:4px 0; }
+.clock-choices { display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%; }
+.choice-btn {
+  border:2px solid #ddd;border-radius:10px;padding:7px 4px;
+  font-size:1rem;font-weight:bold;cursor:pointer;background:#f8f9fa;
+  transition:all .15s;text-align:center;
+}
+.choice-btn:hover { background:#e3f2fd;border-color:#90caf9; }
+.choice-btn.selected { background:#1565c0;color:#fff;border-color:#1565c0; }
+.choice-btn.correct-choice { background:#2e7d32;color:#fff;border-color:#2e7d32; }
+.choice-btn.wrong-choice   { background:#c62828;color:#fff;border-color:#c62828; }
+
+/* ── 数人民币 ── */
+.money-pieces { display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0; }
+.coin-badge {
+  border-radius:8px;padding:5px 9px;font-size:.88rem;font-weight:bold;
+  box-shadow:0 2px 5px rgba(0,0,0,.15);
+}
+.money-unit { font-size:.75rem;color:#888;margin-top:2px; }
+
+/* ── 应用题 ── */
+.story-text {
+  font-size:.95rem;color:#333;line-height:1.6;text-align:left;
+  background:#fffde7;border-radius:10px;padding:10px 12px;
+  border-left:4px solid #ffc107;width:100%;
+}
+.story-equation { font-size:.85rem;color:#888;margin-top:4px; }
+
+/* ── 操作按钮行 ── */
+.action-row { display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px; }
+
+/* ── 统计面板 ── */
+.stats-panel { background:#ffffffee;border-radius:20px;padding:22px 28px;box-shadow:0 4px 20px rgba(0,0,0,.12);display:none;margin-bottom:20px; }
+.stats-panel.show { display:block; }
+.stats-title { font-size:1.4rem;font-weight:bold;color:#333;text-align:center;margin-bottom:18px; }
+.stats-summary { display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:20px; }
+.stat-box { text-align:center;padding:12px 18px;border-radius:14px;min-width:90px; }
+.stat-box.total { background:#e8eaf6; }
+.stat-box.ok    { background:#d8f5e8; }
+.stat-box.fail  { background:#fff1f0; }
+.stat-box.time  { background:#fff9e6; }
+.stat-box .num  { font-size:2rem;font-weight:bold;line-height:1; }
+.stat-box .label { font-size:.8rem;color:#666;margin-top:3px; }
+.stat-box.total .num { color:#3949ab; }
+.stat-box.ok    .num { color:#237804; }
+.stat-box.fail  .num { color:#cf1322; }
+.stat-box.time  .num { color:#b85c00; }
+.score-bar-wrap { background:#eee;border-radius:99px;height:18px;overflow:hidden;margin-bottom:18px; }
+.score-bar { height:100%;border-radius:99px;background:linear-gradient(90deg,#43e97b,#38f9d7);transition:width .6s ease; }
+.wrong-list-title { font-size:.95rem;color:#cf1322;font-weight:bold;margin-bottom:8px; }
+.wrong-list { display:flex;flex-direction:column;gap:8px; }
+.wrong-item { background:#fff1f0;border:1.5px solid #ffccc7;border-radius:9px;padding:8px 12px;font-size:1rem;color:#cf1322;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap; }
+.wrong-item .correct-val { color:#237804;font-weight:bold; }
+.wrong-item-text { flex:1;min-width:180px; }
+.stats-actions { display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px; }
+
+/* ── AI 解析（错题复习专用）── */
+.m1-ai-btn { flex-shrink:0;border:none;border-radius:10px;padding:5px 12px;font-size:.78rem;font-weight:bold;
+  cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow:0 2px 6px rgba(94,53,177,.3);white-space:nowrap; }
+.m1-ai-btn:active { transform:scale(.95); }
+.m1-ai-btn:disabled { opacity:.6;cursor:default; }
+.m1-ai-box { display:none;width:100%;margin-top:8px;background:linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border:1.5px solid #d1c4e9;border-radius:10px;padding:9px 11px;font-size:.85rem;color:#4527a0;line-height:1.7; }
+.m1-ai-box.show { display:block; }
+.m1-ai-box .m1-ai-tag { font-size:.7rem;font-weight:bold;color:#5e35b1;background:#fff;display:inline-block;
+  border-radius:8px;padding:1px 8px;margin-bottom:6px; }
+.m1-ai-box .m1-ai-loading { color:#7e57c2;font-style:italic; }
+.m1-ai-box .m1-ai-err { color:#c62828;font-size:.78rem; }
+.m1-ai-box .m1-ai-retry { margin-top:6px;border:1.5px solid #9575cd;background:#fff;color:#5e35b1;
+  border-radius:8px;padding:3px 10px;font-size:.74rem;cursor:pointer;font-family:inherit; }
+.m1-ai-bigidea { background:#fff;border-radius:8px;padding:6px 9px;margin-bottom:7px;font-weight:bold; }
+.m1-ai-steps { display:flex;flex-direction:column;gap:6px; }
+.m1-ai-step { display:flex;align-items:flex-start;gap:8px;background:#fff;border-radius:9px;padding:7px 10px;flex-wrap:wrap; }
+.m1-ai-step-n { flex-shrink:0;padding:2px 9px;border-radius:10px;background:linear-gradient(135deg,#9575cd,#5e35b1);
+  color:#fff;font-size:.7rem;font-weight:bold;white-space:nowrap;line-height:1.5; }
+.m1-ai-step-emoji { flex-shrink:0;font-size:1.05rem;line-height:1.5; }
+.m1-ai-step-text { font-size:.84rem;color:#333;line-height:1.5; }
+
+/* ── 历史记录 ── */
+.history-panel { background:#ffffffee;border-radius:20px;padding:18px 24px;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-bottom:20px; }
+.history-title { font-size:1.05rem;font-weight:bold;color:#555;margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+.history-empty { color:#aaa;font-size:.9rem;text-align:center;padding:8px 0; }
+.history-table { width:100%;border-collapse:collapse;font-size:.85rem; }
+.history-table th { background:#f0f4ff;color:#3949ab;padding:7px 8px;text-align:center;font-weight:bold; }
+.history-table td { padding:6px 8px;text-align:center;border-bottom:1px solid #f0f0f0; }
+.history-table tr:last-child td { border-bottom:none; }
+.history-table tr:hover td { background:#fafafa; }
+.score-pill { display:inline-block;border-radius:99px;padding:2px 9px;font-weight:bold;font-size:.8rem; }
+.score-pill.s100 { background:#d8f5e8;color:#237804; }
+.score-pill.s90  { background:#e8f4fd;color:#0984e3; }
+.score-pill.s80  { background:#fff9e6;color:#b85c00; }
+.score-pill.slow { background:#fff1f0;color:#cf1322; }
+.trend-chart { margin-top:10px; }
+.trend-title { font-size:.78rem;color:#aaa;margin-bottom:5px; }
+.trend-bars { display:flex;align-items:flex-end;gap:3px;height:48px;padding:0 2px; }
+.trend-bar-wrap { display:flex;flex-direction:column;align-items:center;flex:1;gap:2px; }
+.trend-bar { width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#74b9ff,#0984e3);min-height:3px; }
+.trend-bar.perfect { background:linear-gradient(180deg,#55efc4,#00b894); }
+.trend-label { font-size:.58rem;color:#aaa; }
+
+/* ── confetti ── */
+#confetti-canvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
+
+/* ── 响应式 ── */
+@media(max-width:480px){
+  .header h1 { font-size:1.7rem; }
+  .problems-grid { grid-template-columns:repeat(2,1fr);gap:10px; }
+  .problems-grid.wide { grid-template-columns:1fr; }
+  .problem-expr { font-size:1.5rem; }
+  .answer-input { width:54px;height:42px;font-size:1.3rem; }
+  .stats-summary { gap:10px; }
+  .stat-box { padding:9px 12px;min-width:76px; }
+  .stat-box .num { font-size:1.7rem; }
+}
+
+.empty-hint { text-align:center;color:#888;font-size:1.05rem;padding:36px 0;display:none; }
+.empty-hint.show { display:block; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div class="container">
+
+  <!-- 标题 -->
+  <div class="header">
+    <h1>🌟 数学小练习 🌟</h1>
+    <p>一年级全科练习</p>
+    <div class="timer-bar">
+      <span class="timer-label">⏱ 用时</span>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+    </div>
+    <div class="streak-bar" id="streakBar"></div>
+  </div>
+
+  <!-- 模式标签 -->
+  <div class="mode-tabs-wrap">
+    <div class="mode-tabs" id="modeTabs">
+      <button class="mode-tab active" onclick="switchMode('addsub')">➕ 加减法</button>
+      <button class="mode-tab" onclick="switchMode('missing')">❓ 填空</button>
+      <button class="mode-tab" onclick="switchMode('compare')">⚖️ 比大小</button>
+      <button class="mode-tab" onclick="switchMode('sequence')">🔢 找规律</button>
+      <button class="mode-tab" onclick="switchMode('clock')">🕐 认时间</button>
+      <button class="mode-tab" onclick="switchMode('money')">💰 数人民币</button>
+      <button class="mode-tab" onclick="switchMode('story')">📖 应用题</button>
+      <button class="mode-tab" onclick="switchMode('decomp')">🔟 凑十法</button>
+      <button class="mode-tab" onclick="switchMode('lessthan')">🔍 比较得数</button>
+    </div>
+  </div>
+
+  <!-- 控制面板 -->
+  <div class="control-panel">
+    <div class="ctrl-group">
+      <label>题目数量</label>
+      <input type="number" id="numQuestions" value="20" min="1" max="50">
+    </div>
+    <!-- 数值范围：加减法/填空/比大小/应用题 -->
+    <div class="ctrl-group ctrl-cond" data-modes="addsub,missing,compare,story">
+      <label>数值范围</label>
+      <select id="rangeSelect">
+        <option value="10">10以内</option>
+        <option value="20" selected>20以内</option>
+        <option value="30">30以内</option>
+        <option value="50">50以内</option>
+        <option value="100">100以内</option>
+      </select>
+    </div>
+    <!-- 题型：加减法 -->
+    <div class="ctrl-group ctrl-cond" data-modes="addsub">
+      <label>题型</label>
+      <select id="typeSelect">
+        <option value="all">全部混合</option>
+        <option value="add">只练加法</option>
+        <option value="sub">只练减法</option>
+        <option value="jinwei">进位加法</option>
+        <option value="tuiwei">退位减法</option>
+        <option value="carry">进位+退位</option>
+      </select>
+    </div>
+    <!-- 运算：填空 -->
+    <div class="ctrl-group ctrl-cond" data-modes="missing">
+      <label>运算</label>
+      <select id="missingOp">
+        <option value="mix">加减混合</option>
+        <option value="add">只练加法</option>
+        <option value="sub">只练减法</option>
+      </select>
+    </div>
+    <!-- 步长：找规律 -->
+    <div class="ctrl-group ctrl-cond" data-modes="sequence">
+      <label>步长</label>
+      <select id="stepSelect">
+        <option value="mix">混合</option>
+        <option value="1">步长 1</option>
+        <option value="2">步长 2</option>
+        <option value="5">步长 5</option>
+        <option value="10">步长 10</option>
+      </select>
+    </div>
+    <!-- 时刻：认时间 -->
+    <div class="ctrl-group ctrl-cond" data-modes="clock">
+      <label>时刻</label>
+      <select id="clockDiff">
+        <option value="mix">整点+半点</option>
+        <option value="hour">只看整点</option>
+        <option value="half">只看半点</option>
+      </select>
+    </div>
+    <!-- 目标数：凑十法 -->
+    <div class="ctrl-group ctrl-cond" data-modes="decomp">
+      <label>目标数</label>
+      <select id="decompTarget">
+        <option value="10" selected>凑十 (=10)</option>
+        <option value="9">凑九 (=9)</option>
+        <option value="8">凑八 (=8)</option>
+        <option value="5">凑五 (=5)</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label>答错提醒</label>
+      <div class="feedback-toggle">
+        <button class="ftog-btn active" id="ftogImmediate" onclick="setFeedback(true)">即时提醒</button>
+        <button class="ftog-btn" id="ftogDefer" onclick="setFeedback(false)">统一提交</button>
+      </div>
+    </div>
+    <button class="btn btn-generate" onclick="generate()">🎲 出题</button>
+  </div>
+
+  <!-- 题目网格 -->
+  <div class="problems-grid" id="problemsGrid"></div>
+  <div class="empty-hint" id="emptyHint">点击「出题」按钮开始练习 ✏️</div>
+
+  <!-- 操作按钮 -->
+  <div class="action-row" id="actionRow" style="display:none">
+    <button class="btn btn-submit" onclick="submit()">✅ 提交答案</button>
+    <button class="btn btn-reset"  onclick="resetAnswers()">🔄 清空答案</button>
+  </div>
+
+  <!-- 统计结果 -->
+  <div class="stats-panel" id="statsPanel">
+    <div class="stats-title" id="statsTitle">🏆 本次成绩</div>
+    <div class="stats-summary">
+      <div class="stat-box total"><div class="num" id="sTotal">0</div><div class="label">共 N 题</div></div>
+      <div class="stat-box ok">  <div class="num" id="sOk">0</div>  <div class="label">✅ 答对</div></div>
+      <div class="stat-box fail"><div class="num" id="sFail">0</div> <div class="label">❌ 答错</div></div>
+      <div class="stat-box time"><div class="num" id="sTime">-</div> <div class="label">⏱ 用时</div></div>
+    </div>
+    <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%"></div></div>
+    <div id="wrongSection"></div>
+    <div class="stats-actions">
+      <button class="btn btn-replay" id="replayBtn" style="display:none" onclick="replayWrong()">🔁 错题重练</button>
+      <button class="btn btn-again" onclick="generate()">⚡ 再来一组</button>
+    </div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div class="history-panel">
+    <div class="history-title">📊 历史成绩
+      <button class="btn" style="font-size:.75rem;padding:3px 10px;background:#f0f4ff;color:#3949ab;box-shadow:none" onclick="clearHistory()">清空</button>
+    </div>
+    <div id="historyContent"><div class="history-empty">还没有练习记录，快去出题吧～</div></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  状态
+// ══════════════════════════════════════════════════
+let currentMode = 'addsub';
+let problems = [];
+let wrongProblems = [];
+let lastWrongItems = []; // 与 wrongProblems 同步的展示数据(idx/expr/userAns/correct)，供 AI 解析读取
+let timerInterval = null, timerSeconds = 0, timerStarted = false;
+let instantFeedback = true;
+const HISTORY_KEY = 'mathPracticeHistory_v3';
+
+const MODE_LABELS = {
+  addsub:'加减法', missing:'填空运算', compare:'比大小',
+  sequence:'找规律', clock:'认时间', money:'数人民币',
+  story:'应用题', decomp:'凑十法', lessthan:'比较得数'
+};
+
+// ══════════════════════════════════════════════════
+//  工具函数
+// ══════════════════════════════════════════════════
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr => arr[rand(0,arr.length-1)];
+const escQ = s => s.replace(/'/g,"\\'"); // onclick属性里的单引号转义
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){const j=rand(0,i);[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+const hasCarry  = (x,y) => (x%10+y%10)>9;
+const hasBorrow = (x,y) => (x%10)<(y%10)&&x>y;
+function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+
+// ══════════════════════════════════════════════════
+//  音效
+// ══════════════════════════════════════════════════
+let audioCtx=null;
+function getACtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}
+function tone(freq,dur,type='sine',vol=0.28){
+  try{const c=getACtx(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.type=type;
+  o.frequency.setValueAtTime(freq,c.currentTime);
+  g.gain.setValueAtTime(vol,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);
+  o.start(c.currentTime);o.stop(c.currentTime+dur);}catch(e){}
+}
+const playCorrect=()=>{tone(523,.12);setTimeout(()=>tone(659,.18),100);};
+const playWrong=()=>{tone(220,.22,'sawtooth',.18);setTimeout(()=>tone(175,.22,'sawtooth',.13),150);};
+const playFanfare=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.2),i*100));
+
+// ══════════════════════════════════════════════════
+//  计时器
+// ══════════════════════════════════════════════════
+function startTimer(){
+  if(timerStarted)return; timerStarted=true; timerSeconds=0;
+  document.getElementById('timerDisplay').classList.add('running');
+  timerInterval=setInterval(()=>{timerSeconds++;document.getElementById('timerDisplay').textContent=formatTime(timerSeconds);},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;document.getElementById('timerDisplay').classList.remove('running');}
+function resetTimer(){stopTimer();timerStarted=false;timerSeconds=0;document.getElementById('timerDisplay').textContent='00:00';}
+
+// ══════════════════════════════════════════════════
+//  模式切换
+// ══════════════════════════════════════════════════
+function switchMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.mode-tab').forEach((t,i)=>{
+    const modes=['addsub','missing','compare','sequence','clock','money','story','decomp'];
+    t.classList.toggle('active',modes[i]===mode);
+  });
+  // 控制条件显示
+  document.querySelectorAll('.ctrl-cond').forEach(el=>{
+    const modes=el.dataset.modes.split(',');
+    el.style.display=modes.includes(mode)?'':'none';
+  });
+  // 根据模式调整网格
+  const grid=document.getElementById('problemsGrid');
+  grid.className='problems-grid';
+  if(mode==='story'||mode==='lessthan'||mode==='compare')grid.classList.add('wide');
+  if(mode==='clock')grid.classList.add('clock-mode');
+  generate();
+}
+
+// ══════════════════════════════════════════════════
+//  题目生成器
+// ══════════════════════════════════════════════════
+
+// —— 加减法 ——
+function makeAddSub(type,maxVal){
+  let a,b,op,kind;
+  if(type==='jinwei'){
+    let t=0; do{a=rand(1,Math.min(maxVal-1,99));const ao=a%10,bO=rand(10-ao,9),bT=rand(0,Math.floor((maxVal-a)/10));b=bT*10+bO;t++;}while((b<=0||a+b>maxVal||!hasCarry(a,b))&&t<30);op='+';kind='jinwei';
+  }else if(type==='tuiwei'){
+    let t=0; do{a=rand(maxVal<=10?10:11,maxVal);const ao=a%10,bm=ao+1;if(bm>9){t++;continue;}const bO=rand(bm,9),bT=rand(0,Math.floor((a-1)/10));b=bT*10+bO;t++;}while((b<=0||b>=a||!hasBorrow(a,b))&&t<30);op='-';kind='tuiwei';
+  }else if(type==='basic_add'){
+    let t=0; do{a=rand(0,maxVal-1);b=rand(0,maxVal-a);t++;}while(hasCarry(a,b)&&t<30);op='+';kind='basic';
+  }else if(type==='basic_sub'){
+    let t=0; do{a=rand(1,maxVal);b=rand(0,a);t++;}while(hasBorrow(a,b)&&t<30);op='-';kind='basic';
+  }else if(type==='add'){a=rand(0,maxVal-1);b=rand(0,maxVal-a);op='+';kind=hasCarry(a,b)?'jinwei':'basic';
+  }else{a=rand(1,maxVal);b=rand(0,a);op='-';kind=hasBorrow(a,b)?'tuiwei':'basic';}
+  return{type:'addsub',a,b,op,answer:op==='+'?a+b:a-b,kind};
+}
+function genAddSub(n,typeVal,maxVal){
+  const qmap={all:['basic_add','basic_sub','jinwei','tuiwei'],add:['basic_add','basic_add','jinwei','jinwei'],sub:['basic_sub','basic_sub','tuiwei','tuiwei'],jinwei:['jinwei'],tuiwei:['tuiwei'],carry:['jinwei','tuiwei']};
+  const slots=qmap[typeVal]||qmap.all;
+  const per=Math.floor(n/slots.length),rem=n%slots.length;
+  const quotas=slots.map((t,i)=>({t,c:per+(i<rem?1:0)}));
+  const list=[];
+  for(const{t,c}of quotas)for(let i=0;i<c;i++){let p,a=0;do{p=makeAddSub(t,maxVal);a++;}while(a<30&&(p.answer<0||p.b<0));if(p.answer>=0&&p.b>=0)list.push(p);}
+  return shuffle(list);
+}
+
+// —— 填空运算 ——
+function genMissing(n,opType,maxVal){
+  const list=[];
+  for(let i=0;i<n;i++){
+    const useAdd=opType==='add'||(opType==='mix'&&rand(0,1)===0);
+    let a,b,op,ans,blank;
+    if(useAdd){
+      a=rand(1,maxVal-1);b=rand(1,maxVal-a);op='+';
+      const r=rand(0,1);
+      if(r===0){blank='a';ans=a;}else{blank='b';ans=b;}
+    }else{
+      a=rand(2,maxVal);b=rand(1,a-1);op='-';
+      const r=rand(0,1);
+      if(r===0){blank='a';ans=a;}else{blank='b';ans=b;}
+    }
+    list.push({type:'missing',a,b,op,blank,answer:ans});
+  }
+  return list;
+}
+
+// —— 比大小 ——
+function genCompare(n,maxVal){
+  const list=[];
+  for(let i=0;i<n;i++){
+    const a=rand(0,maxVal),b=rand(0,maxVal);
+    const ans=a>b?'>':a<b?'<':'=';
+    list.push({type:'compare',a,b,answer:ans});
+  }
+  return list;
+}
+
+// —— 找规律 ——
+function genSequence(n,stepType){
+  const list=[];
+  const STEPS={1:[1],2:[2],5:[5],10:[10],mix:[1,2,5,10]};
+  const steps=STEPS[stepType]||STEPS.mix;
+  for(let i=0;i<n;i++){
+    const step=pick(steps);
+    const start=rand(1,step===10?5:step===5?10:20);
+    const seq=Array.from({length:5},(_,k)=>start+k*step);
+    const bi=rand(1,3); // blank index 1..3 (not first/last)
+    const ans=seq[bi];
+    list.push({type:'sequence',seq,blankIdx:bi,step,answer:ans});
+  }
+  return list;
+}
+
+// —— 认时间 ——
+function fmtTime(h,m){return `${h}:${String(m).padStart(2,'0')}`;}
+function genClock(n,diff){
+  const list=[];
+  for(let i=0;i<n;i++){
+    const useHalf=diff==='half'||(diff==='mix'&&rand(0,1)===0);
+    const h=rand(1,12), m=useHalf?30:0;
+    const ans=fmtTime(h,m);
+    // 3 distractors
+    const pool=new Set([ans]);
+    while(pool.size<4){
+      const dh=rand(1,12),dm=rand(0,1)*30;
+      pool.add(fmtTime(dh,dm));
+    }
+    list.push({type:'clock',h,m,answer:ans,choices:shuffle([...pool])});
+  }
+  return list;
+}
+
+// —— 数人民币 ——
+const DENOMS=[
+  {fen:10, label:'1角',bg:'#ff9800',fg:'#fff'},
+  {fen:50, label:'5角',bg:'#ff5722',fg:'#fff'},
+  {fen:100,label:'1元',bg:'#ffc107',fg:'#333'},
+  {fen:500,label:'5元',bg:'#4caf50',fg:'#fff'},
+  {fen:1000,label:'10元',bg:'#2196f3',fg:'#fff'},
+];
+function fenToStr(fen){
+  const yuan=Math.floor(fen/100), jiao=Math.floor((fen%100)/10);
+  if(yuan&&jiao)return `${yuan}元${jiao}角`;
+  if(yuan)return `${yuan}元`;
+  return `${jiao}角`;
+}
+function genMoney(n){
+  const list=[];
+  for(let i=0;i<n;i++){
+    let total=0; const pieces=[];
+    const cnt=rand(2,5);
+    for(let j=0;j<cnt;j++){const d=pick(DENOMS);pieces.push(d);total+=d.fen;}
+    list.push({type:'money',pieces,answer:total,answerStr:fenToStr(total)});
+  }
+  return list;
+}
+
+// —— 应用题 ——
+const NAMES=['小明','小红','小华','小丽','小强'];
+const ITEMS=['苹果','糖果','气球','铅笔','橘子','本子','贴纸','花朵'];
+const STORY_TEMPLATES=[
+  (maxVal)=>{const a=rand(1,Math.floor(maxVal/2)),b=rand(1,maxVal-a),n1=pick(NAMES),n2=pick(NAMES.filter(x=>x!==n1)),it=pick(ITEMS);return{text:`${n1}有 ${a} 个${it}，${n2}有 ${b} 个${it}，两人一共有多少个${it}？`,eq:`${a} + ${b} = ?`,answer:a+b};},
+  (maxVal)=>{const tot=rand(4,maxVal),tk=rand(1,tot-1),it=pick(ITEMS);return{text:`树上有 ${tot} 只小鸟，飞走了 ${tk} 只，还剩多少只小鸟？`,eq:`${tot} - ${tk} = ?`,answer:tot-tk};},
+  (maxVal)=>{const a=rand(5,maxVal),d=rand(1,Math.min(a-1,10)),n1=pick(NAMES),n2=pick(NAMES.filter(x=>x!==n1)),it=pick(ITEMS);return{text:`${n1}有 ${a} 个${it}，比${n2}多 ${d} 个，${n2}有多少个${it}？`,eq:`${a} - ${d} = ?`,answer:a-d};},
+  (maxVal)=>{const tot=rand(5,maxVal),used=rand(1,tot-1),it=pick(ITEMS);return{text:`小明有 ${tot} 支${it}，用了 ${used} 支，还剩多少支？`,eq:`${tot} - ${used} = ?`,answer:tot-used};},
+  (maxVal)=>{const a=rand(1,Math.floor(maxVal/2)),b=rand(1,maxVal-a),n1=pick(NAMES),it=pick(ITEMS);return{text:`${n1}有 ${a} 个${it}，妈妈又买了 ${b} 个，现在一共有多少个${it}？`,eq:`${a} + ${b} = ?`,answer:a+b};},
+];
+function genStory(n,maxVal){
+  const list=[];
+  for(let i=0;i<n;i++){
+    const t=STORY_TEMPLATES[rand(0,STORY_TEMPLATES.length-1)](maxVal);
+    list.push({type:'story',...t});
+  }
+  return list;
+}
+
+// —— 比较得数（个位填空版）——
+// 格式：1□ + 3 的得数比15小，□填哪个数字（0-9）？
+// 1□ 表示十位为1、个位未知的两位数（10-19）
+function genLessThan(n){
+  const list=[];
+  let tries=0;
+  while(list.length<n&&tries<n*12){
+    tries++;
+    const variant=rand(0,2)===0?'greater':'less';
+    let target,b,correctDigit,wrongDigits=[],exprText;
+
+    if(variant==='less'){
+      // (10+□)+b < target  →  □ < target-b-10
+      // 需要 maxDigit=target-b-10-1 ∈ [0,6]（保证3个错误选项在7-9之间）
+      target=rand(15,20);
+      const minB=Math.max(1,target-17); // 保证 maxDigit<=6
+      const maxB=target-11;             // 保证 maxDigit>=0
+      if(minB>maxB)continue;
+      b=rand(minB,maxB);
+      const maxDigit=target-b-10-1;
+      if(maxDigit<0||maxDigit>6)continue;
+      correctDigit=rand(0,maxDigit);
+      for(let t=0;t<30&&wrongDigits.length<3;t++){
+        const w=rand(maxDigit+1,9);
+        if(!wrongDigits.includes(w))wrongDigits.push(w);
+      }
+    }else{
+      // (10+□)+b > target  →  □ > target-b-10  →  □ >= minDigit=target-b-10+1
+      // 需要 minDigit ∈ [3,8]（保证3个错误选项在0到minDigit-1之间）
+      target=rand(13,18);
+      const maxB=target-12; // 保证 minDigit>=3
+      if(maxB<1)continue;
+      b=rand(1,maxB);
+      const minDigit=target-b-10+1;
+      if(minDigit<3||minDigit>8)continue;
+      correctDigit=rand(minDigit,9);
+      for(let t=0;t<30&&wrongDigits.length<3;t++){
+        const w=rand(0,minDigit-1);
+        if(!wrongDigits.includes(w))wrongDigits.push(w);
+      }
+    }
+
+    if(wrongDigits.length<3)continue;
+    const blankLeft=rand(0,1)===0;
+    exprText=blankLeft?`1□ + ${b}`:`${b} + 1□`;
+    const allChoices=shuffle([correctDigit,...wrongDigits]);
+    list.push({type:'lessthan',target,variant,exprText,choices:allChoices.map(String),answer:String(correctDigit)});
+  }
+  while(list.length<n&&list.length>0)list.push(list[rand(0,list.length-1)]);
+  return list.slice(0,n);
+}
+
+// —— 凑十法 ——
+function genDecomp(n,target){
+  const list=[];
+  for(let i=0;i<n;i++){
+    const a=rand(1,target-1),b=target-a;
+    const blank=rand(0,1)===0?'b':'a';
+    list.push({type:'decomp',a,b,target,blank,answer:blank==='b'?b:a});
+  }
+  return list;
+}
+
+// ══════════════════════════════════════════════════
+//  主生成入口
+// ══════════════════════════════════════════════════
+function generate(){
+  const n=Math.max(1,Math.min(50,parseInt(document.getElementById('numQuestions').value)||20));
+  const maxVal=parseInt(document.getElementById('rangeSelect').value)||20;
+  const typeVal=document.getElementById('typeSelect').value;
+  const missingOp=document.getElementById('missingOp').value;
+  const stepType=document.getElementById('stepSelect').value;
+  const clockDiff=document.getElementById('clockDiff').value;
+  const decompTarget=parseInt(document.getElementById('decompTarget').value)||10;
+
+  switch(currentMode){
+    case 'addsub':   problems=genAddSub(n,typeVal,maxVal); break;
+    case 'missing':  problems=genMissing(n,missingOp,maxVal); break;
+    case 'compare':  problems=genCompare(n,maxVal); break;
+    case 'sequence': problems=genSequence(n,stepType); break;
+    case 'clock':    problems=genClock(n,clockDiff); break;
+    case 'money':    problems=genMoney(n); break;
+    case 'story':    problems=genStory(n,maxVal); break;
+    case 'decomp':   problems=genDecomp(n,decompTarget); break;
+    case 'lessthan': problems=genLessThan(n); break;
+  }
+  wrongProblems=[];
+  render();
+  resetTimer();
+  document.getElementById('statsPanel').classList.remove('show');
+  document.getElementById('actionRow').style.display='flex';
+  document.getElementById('emptyHint').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════
+//  SVG 钟面
+// ══════════════════════════════════════════════════
+function drawClock(hour,minute,size=110){
+  const cx=size/2,cy=size/2,r=size/2-3;
+  function polar(deg,radius){const rad=(deg-90)*Math.PI/180;return[cx+radius*Math.cos(rad),cy+radius*Math.sin(rad)];}
+  const hAngle=((hour%12)+minute/60)*30;
+  const mAngle=minute*6;
+  const[hx,hy]=polar(hAngle,r*.5);
+  const[mx,my]=polar(mAngle,r*.72);
+  let s=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="white" stroke="#444" stroke-width="2.5"/>`;
+  for(let i=0;i<12;i++){const[x1,y1]=polar(i*30,r-1),[x2,y2]=polar(i*30,r-(i%3===0?8:4));s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#444" stroke-width="${i%3===0?2:1}"/>`;}
+  [[0,'12'],[90,'3'],[180,'6'],[270,'9']].forEach(([ang,num])=>{const[x,y]=polar(ang,r-15);s+=`<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="${size/9.5}" font-weight="bold" fill="#333">${num}</text>`;});
+  s+=`<line x1="${cx}" y1="${cy}" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#222" stroke-width="${size/22}" stroke-linecap="round"/>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#555" stroke-width="${size/38}" stroke-linecap="round"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${size/22}" fill="#222"/>`;
+  s+=`</svg>`;
+  return s;
+}
+
+// ══════════════════════════════════════════════════
+//  卡片渲染
+// ══════════════════════════════════════════════════
+const kLabel={jinwei:'进位',tuiwei:'退位',basic:'基础'};
+const kClass={jinwei:'badge-jinwei',tuiwei:'badge-tuiwei',basic:'badge-basic'};
+
+function cardShell(i,badge,inner){
+  return `<div class="problem-card" id="card-${i}">
+    <span class="problem-num">${i+1}</span>
+    ${badge}
+    ${inner}
+    <span class="result-icon" id="icon-${i}"></span>
+    <div class="correct-answer-hint" id="hint-${i}"></div>
+  </div>`;
+}
+
+function inputBox(i,extra=''){return `<input class="answer-input${extra?' '+extra:''}" id="ans-${i}" type="number" inputmode="numeric" placeholder="?" min="-999" max="999" onkeydown="handleKey(event,${i})" oninput="onInput(${i})">`;}
+
+function renderCard(p,i){
+  switch(p.type){
+    case 'addsub':{
+      const op=p.op==='+'?'<span class="op-plus">+</span>':'<span class="op-minus">−</span>';
+      const inner=`<div class="problem-expr">${p.a} ${op} ${p.b}</div>
+        <div class="answer-row"><span>=</span>${inputBox(i)}</div>`;
+      return cardShell(i,`<span class="problem-type-badge ${kClass[p.kind]}">${kLabel[p.kind]}</span>`,inner);
+    }
+    case 'missing':{
+      const op=p.op==='+'?'<span class="op-plus">+</span>':'<span class="op-minus">−</span>';
+      const eq=p.op==='+'?p.a+p.b:p.a-p.b;
+      let expr;
+      if(p.blank==='a') expr=`${inputBox(i)} ${op} ${p.b} <span style="font-size:1.1rem;color:#888">= ${eq}</span>`;
+      else               expr=`${p.a} ${op} ${inputBox(i)} <span style="font-size:1.1rem;color:#888">= ${eq}</span>`;
+      const inner=`<div class="answer-row" style="flex-wrap:wrap;gap:5px;">${expr}</div>`;
+      const badge=`<span class="problem-type-badge ${p.op==='+'?'badge-add':'badge-sub'}">${p.op==='+'?'加法':'减法'}</span>`;
+      return cardShell(i,badge,inner);
+    }
+    case 'compare':{
+      const inner=`<div class="compare-row">
+        <span>${p.a}</span>
+        <div class="cmp-btns">
+          <button class="cmp-btn" data-sym=">" onclick="selectCmp(${i},'>')">&gt;</button>
+          <button class="cmp-btn" data-sym="<" onclick="selectCmp(${i},'<')">&lt;</button>
+          <button class="cmp-btn" data-sym="=" onclick="selectCmp(${i},'=')">=</button>
+        </div>
+        <span>${p.b}</span>
+      </div>`;
+      return cardShell(i,'',inner);
+    }
+    case 'sequence':{
+      const parts=p.seq.map((v,k)=>{
+        if(k===p.blankIdx) return inputBox(i);
+        return `<span class="seq-num">${v}</span>`;
+      }).join('<span class="seq-sep"> , </span>');
+      const inner=`<div class="seq-row">${parts}</div>`;
+      const badge=`<span class="problem-type-badge badge-basic">+${p.step}</span>`;
+      return cardShell(i,badge,inner);
+    }
+    case 'clock':{
+      const clk=drawClock(p.h,p.m,108);
+      const choices=p.choices.map(c=>`<button class="choice-btn" data-choice="${c}" onclick="selectChoice(${i},'${c}')">${c}</button>`).join('');
+      const inner=`<div class="clock-face">${clk}</div><div class="clock-choices">${choices}</div>`;
+      return cardShell(i,'',inner);
+    }
+    case 'money':{
+      const badges=p.pieces.map(d=>`<span class="coin-badge" style="background:${d.bg};color:${d.fg}">${d.label}</span>`).join('');
+      const inner=`<div class="money-pieces">${badges}</div>
+        <div class="money-unit">总金额 = ?</div>
+        <div class="answer-row">${inputBox(i,'wide-input')} <span style="font-size:.9rem;color:#888">元/角</span></div>`;
+      return cardShell(i,`<span class="problem-type-badge badge-basic">人民币</span>`,inner);
+    }
+    case 'story':{
+      const inner=`<div class="story-text">${p.text}</div>
+        <div class="story-equation">${p.eq}</div>
+        <div class="answer-row"><span>=</span>${inputBox(i)}</div>`;
+      return cardShell(i,'',inner);
+    }
+    case 'decomp':{
+      const target=p.target;
+      let expr;
+      if(p.blank==='b') expr=`${p.a} <span class="op-plus">+</span> ${inputBox(i)} <span style="font-size:1.1rem;color:#888">= ${target}</span>`;
+      else               expr=`${inputBox(i)} <span class="op-plus">+</span> ${p.b} <span style="font-size:1.1rem;color:#888">= ${target}</span>`;
+      const inner=`<div class="answer-row" style="flex-wrap:wrap;gap:5px;">${expr}</div>`;
+      const badge=`<span class="problem-type-badge badge-eq">凑${target}</span>`;
+      return cardShell(i,badge,inner);
+    }
+    case 'lessthan':{
+      const rel=p.variant==='less'?'小':'大';
+      // 把 1□ 中的 □ 高亮显示
+      const exprHtml=p.exprText.replace('□','<span style="color:#e07b54;font-weight:900">□</span>');
+      const inner=`
+        <div style="font-size:.85rem;color:#555;text-align:center;line-height:1.6">
+          □ 填哪个数字，使算式得数比
+          <strong style="color:#e07b54">${p.target}</strong> ${rel}？
+        </div>
+        <div style="font-size:2rem;font-weight:900;color:#1565c0;letter-spacing:6px;margin:10px 0;text-align:center">${exprHtml}</div>
+        <div class="clock-choices">${p.choices.map(c=>`<button class="choice-btn" data-choice="${c}" onclick="selectChoice(${i},'${c}')">${c}</button>`).join('')}</div>`;
+      const badge=`<span class="problem-type-badge badge-eq">${rel}于${p.target}</span>`;
+      return cardShell(i,badge,inner);
+    }
+  }
+  return '';
+}
+
+function render(){
+  const grid=document.getElementById('problemsGrid');
+  grid.innerHTML=problems.map((p,i)=>renderCard(p,i)).join('');
+  setTimeout(()=>{const f=document.getElementById('ans-0');if(f)f.focus();},50);
+}
+
+// ══════════════════════════════════════════════════
+//  交互处理
+// ══════════════════════════════════════════════════
+function findNextInput(i){
+  for(let j=i+1;j<problems.length;j++){const nx=document.getElementById(`ans-${j}`);if(nx&&!nx.disabled)return nx;}
+  return null;
+}
+function onInput(i){
+  startTimer();
+  if(i===undefined||i>=problems.length)return;
+  const inp=document.getElementById(`ans-${i}`);
+  if(!inp)return;
+  const val=inp.value.trim();
+  if(val==='')return;
+  const p=problems[i];
+  if(p.type==='money'||p.type==='compare'||p.type==='clock'||p.type==='lessthan')return;
+  const expectedLen=String(Math.abs(p.answer)).length;
+  if(val.replace('-','').length>=expectedLen){
+    const nx=findNextInput(i);
+    if(nx)setTimeout(()=>nx.focus(),80);
+  }
+}
+function handleKey(e,i){if(e.key==='Enter'){const nx=findNextInput(i);if(nx)nx.focus();else submit();}}
+
+function setFeedback(immediate){
+  instantFeedback=immediate;
+  document.getElementById('ftogImmediate').classList[immediate?'add':'remove']('active');
+  document.getElementById('ftogDefer').classList[immediate?'remove':'add']('active');
+}
+
+function applyInstantFeedback(i,val){
+  if(!instantFeedback)return;
+  const p=problems[i];
+  const card=document.getElementById(`card-${i}`);
+  const ok=val===String(p.answer);
+  card.classList.add(ok?'correct':'wrong');
+  const icon=document.getElementById(`icon-${i}`);
+  if(icon){icon.textContent=ok?'✅':'❌';icon.style.display='inline';}
+  if(!ok){
+    const hint=document.getElementById(`hint-${i}`);
+    if(hint){hint.textContent=`正确答案：${p.answer}`;hint.style.display='block';}
+    // 高亮正确选项
+    card.querySelector(`[data-choice="${p.answer}"]`)?.classList.add('correct-choice');
+    card.querySelector(`[data-sym="${p.answer}"]`)?.classList.add('correct-choice');
+    playWrong();
+  }else{
+    playCorrect();
+  }
+  // 答完后禁止再改
+  card.querySelectorAll('.choice-btn,.cmp-btn').forEach(b=>{ b.style.pointerEvents='none'; });
+}
+
+function selectCmp(i,sym){
+  const card=document.getElementById(`card-${i}`);
+  if(card.classList.contains('correct')||card.classList.contains('wrong'))return;
+  card.querySelectorAll('.cmp-btn').forEach(b=>b.classList.remove('selected'));
+  card.querySelector(`[data-sym="${sym}"]`).classList.add('selected');
+  card.dataset.selected=sym;
+  startTimer();
+  applyInstantFeedback(i,sym);
+}
+function selectChoice(i,val){
+  const card=document.getElementById(`card-${i}`);
+  if(card.classList.contains('correct')||card.classList.contains('wrong'))return;
+  card.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  card.querySelector(`[data-choice="${val}"]`).classList.add('selected');
+  card.dataset.selected=val;
+  startTimer();
+  applyInstantFeedback(i,val);
+}
+
+// ══════════════════════════════════════════════════
+//  获取 / 校验答案
+// ══════════════════════════════════════════════════
+function getUserAnswer(p,i){
+  if(p.type==='compare'||p.type==='clock'||p.type==='lessthan'){
+    return document.getElementById(`card-${i}`).dataset.selected||'';
+  }
+  const inp=document.getElementById(`ans-${i}`);
+  return inp?inp.value.trim():'';
+}
+
+function checkAnswer(p,raw){
+  if(raw===''||raw===undefined)return null; // unanswered
+  if(p.type==='compare'||p.type==='clock'||p.type==='lessthan') return raw===String(p.answer);
+  if(p.type==='money'){
+    // accept "1元5角" text OR decimal "1.5" OR integer "15角" — simplest: parse as decimal yuan, convert to fen
+    const str=raw.replace(/[元块]/g,'.').replace(/[角分]/g,'').replace(/\s/g,'');
+    const fen=Math.round(parseFloat(str)||0)*100;
+    // also try raw as direct fen integer
+    const direct=parseInt(raw);
+    return fen===p.answer||(direct*100===p.answer)||(direct*10===p.answer);
+  }
+  return parseInt(raw)===p.answer;
+}
+
+// ══════════════════════════════════════════════════
+//  提交
+// ══════════════════════════════════════════════════
+function submit(){
+  if(!problems.length){alert('请先出题！');return;}
+  // check unanswered
+  const unans=[];
+  problems.forEach((p,i)=>{if(getUserAnswer(p,i)==='')unans.push(i+1);});
+  if(unans.length){alert(`第 ${unans.join('、')} 题还没填写哦～`);return;}
+
+  stopTimer();
+  let correct=0,wrong=0;
+  const wrongItems=[];
+  wrongProblems=[];
+
+  problems.forEach((p,i)=>{
+    const raw=getUserAnswer(p,i);
+    const card=document.getElementById(`card-${i}`);
+    const icon=document.getElementById(`icon-${i}`);
+    const hint=document.getElementById(`hint-${i}`);
+    const ok=checkAnswer(p,raw);
+
+    // disable inputs
+    const inp=document.getElementById(`ans-${i}`);
+    if(inp)inp.disabled=true;
+
+    if(ok){
+      correct++;
+      card.classList.add('correct');
+      if(inp)inp.classList.add('correct');
+      // highlight correct choice button
+      if(p.type==='compare')card.querySelector(`[data-sym="${p.answer}"]`)?.classList.add('correct-choice');
+      if(p.type==='clock')card.querySelector(`[data-choice="${p.answer}"]`)?.classList.add('correct-choice');
+      icon.textContent='✅';icon.style.display='inline';
+      playCorrect();
+    }else{
+      wrong++;
+      card.classList.add('wrong');
+      if(inp){inp.classList.add('wrong');}
+      // show correct on choice buttons
+      if(p.type==='compare'){
+        const sel=card.querySelector('.selected'); if(sel)sel.classList.add('wrong-choice');
+        card.querySelector(`[data-sym="${p.answer}"]`)?.classList.add('correct-choice');
+      }
+      if(p.type==='clock'||p.type==='lessthan'){
+        const sel=card.querySelector('.choice-btn.selected'); if(sel)sel.classList.add('wrong-choice');
+        card.querySelector(`[data-choice="${p.answer}"]`)?.classList.add('correct-choice');
+      }
+      icon.textContent='❌';icon.style.display='inline';
+      const ansDisplay=p.type==='money'?p.answerStr:p.answer;
+      hint.textContent=`正确答案：${ansDisplay}`;hint.style.display='block';
+      const exprMap={addsub:`${p.a}${p.op}${p.b}`,missing:'_□_',compare:`${p.a}□${p.b}`,sequence:'数列',clock:'钟表',money:'人民币',story:'应用题',decomp:`□+_=${p.target}`,lessthan:`比${p.target}${p.variant==='less'?'小':'大'}`};
+      wrongItems.push({idx:i+1,expr:exprMap[p.type]||'?',userAns:raw,correct:ansDisplay});
+      wrongProblems.push(p);
+      setTimeout(()=>playWrong(),wrong*70);
+    }
+  });
+
+  const typeVal=document.getElementById('typeSelect').value;
+  const maxVal=parseInt(document.getElementById('rangeSelect').value)||0;
+  saveHistory(correct,correct+wrong,timerSeconds,currentMode,maxVal);
+  showStats(correct,wrong,wrongItems);
+  renderHistory();
+  renderStreak();
+  const pct=Math.round(correct/(correct+wrong)*100);
+  if(pct>=90)setTimeout(playFanfare,300);
+  if(pct===100)setTimeout(launchConfetti,400);
+}
+
+// ══════════════════════════════════════════════════
+//  统计面板
+// ══════════════════════════════════════════════════
+function showStats(correct,wrong,wrongItems){
+  lastWrongItems=wrongItems; // 供 genM1Analysis() 按下标查找
+  const total=correct+wrong,pct=total?Math.round(correct/total*100):0;
+  document.getElementById('sTotal').textContent=total;
+  document.getElementById('sOk').textContent=correct;
+  document.getElementById('sFail').textContent=wrong;
+  document.getElementById('sTime').textContent=formatTime(timerSeconds);
+  setTimeout(()=>{document.getElementById('scoreBar').style.width=pct+'%';},100);
+  const ttls=[[100,'🏆 满分！太棒了！'],[90,'🌟 非常优秀！'],[80,'😊 做得很好！'],[60,'💪 继续加油！'],[0,'📚 多多练习！']];
+  document.getElementById('statsTitle').textContent=`${ttls.find(([t])=>pct>=t)[1]} （正确率 ${pct}%）`;
+  const ws=document.getElementById('wrongSection');
+  if(wrongItems.length){
+    ws.innerHTML=`<div class="wrong-list-title">❌ 以下 ${wrongItems.length} 题需要复习：</div><div class="wrong-list">${wrongItems.map((w,k)=>`<div class="wrong-item">
+      <span class="wrong-item-text">第${w.idx}题 ${w.expr}：<s style="color:#aaa">${w.userAns}</s> → <span class="correct-val">${w.correct}</span></span>
+      <button class="m1-ai-btn" id="m1aib-${k}" onclick="genM1Analysis(${k})">🤖 AI解析</button>
+      <div class="m1-ai-box" id="m1aibox-${k}"></div>
+    </div>`).join('')}</div>`;
+  }else{
+    ws.innerHTML='<div style="text-align:center;color:#52c41a;font-size:1.1rem;margin-top:6px">🎉 全部答对！太厉害了！</div>';
+  }
+  document.getElementById('replayBtn').style.display=wrongProblems.length?'inline-block':'none';
+  document.getElementById('statsPanel').classList.add('show');
+  document.getElementById('statsPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════════════
+//  AI 错题解析（调用本地 Ollama）
+//  要求：Ollama 需在同一台设备上运行，且已设置
+//  OLLAMA_HOST=0.0.0.0 / OLLAMA_ORIGINS=* 允许跨域访问，
+//  否则浏览器会因 CORS 被拒绝。
+//
+//  采用 Ollama Structured Outputs（format: JSON Schema）强制模型
+//  按"理解题意→列式计算→得出答案"固定三步走模板输出，并对字数
+//  加上限，避免输出一大段看不懂的长文字（复用奥数卷子验证过的做法）。
+// ══════════════════════════════════════════════════
+const M1_OLLAMA_URL='http://localhost:11434/api/generate';
+const M1_OLLAMA_MODEL='qwen2.5:14b';
+const M1_IDEA_MAXLEN=22;
+const M1_STEP_MAXLEN=26;
+const M1_MAX_STEPS=4;
+
+const M1_ANALYSIS_SCHEMA={
+  type:'object',
+  properties:{
+    bigIdea:{type:'string', maxLength:M1_IDEA_MAXLEN, description:`一句话点出核心思路，最多${M1_IDEA_MAXLEN}个字`},
+    steps:{
+      type:'array', minItems:2, maxItems:M1_MAX_STEPS,
+      description:`2到${M1_MAX_STEPS}个解题步骤，按"理解题意→列式计算→得出答案"的顺序`,
+      items:{
+        type:'object',
+        properties:{
+          emoji:{type:'string', maxLength:2, description:'一个emoji表情，比如🤔✏️➕✅'},
+          text:{type:'string', maxLength:M1_STEP_MAXLEN, description:`这一步做什么、算出多少，最多${M1_STEP_MAXLEN}个字`},
+        },
+        required:['emoji','text'],
+      },
+    },
+  },
+  required:['bigIdea','steps'],
+};
+
+// 把9种题型的原始数据(p对象)转成孩子能看懂的题目描述文字
+function m1QuestionText(p){
+  switch(p.type){
+    case 'addsub': return `${p.a} ${p.op} ${p.b} = ?`;
+    case 'missing':{
+      const eq=p.op==='+'?p.a+p.b:p.a-p.b;
+      return p.blank==='a' ? `? ${p.op} ${p.b} = ${eq}` : `${p.a} ${p.op} ? = ${eq}`;
+    }
+    case 'compare': return `比较大小：${p.a} □ ${p.b}`;
+    case 'sequence': return `找规律填空：${p.seq.map((v,i)=>i===p.blankIdx?'__':v).join('，')}`;
+    case 'clock': return `现在钟表指向 ${p.h}时${p.m===30?'半':'整'}，用数字怎么表示？`;
+    case 'money': return `数一数这些人民币一共多少钱：${(p.pieces||[]).map(d=>d.label).join('+')}`;
+    case 'story': return p.text;
+    case 'decomp': return p.blank==='b' ? `${p.a} + ? = ${p.target}` : `? + ${p.b} = ${p.target}`;
+    case 'lessthan': return `${p.exprText} ${p.variant==='less'?'<':'>'} ${p.target}，□里最大能填几？`;
+    default: return '这道数学题';
+  }
+}
+
+function m1EscapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function m1ClampText(s,maxLen){
+  s=String(s||'').trim();
+  return s.length>maxLen ? s.slice(0,maxLen)+'…' : s;
+}
+
+function buildM1Prompt(qtext,answerText){
+  return `你是一名耐心的小学一年级数学老师，正在给学生讲解一道做错的题目。
+题目：${qtext}
+正确答案：${answerText}
+
+请把解题过程拆成"步骤1、步骤2、步骤3…"这样编号的小卡片。
+默认按下面这个固定三步走的模板来写：
+- 步骤1【理解题意】：说清楚题目在问什么、要用哪种运算，emoji用🤔
+- 步骤2【列式计算】：写出具体的算式和结果，emoji用✏️或🔢
+- 步骤3【得出答案】：说出最终答案，emoji用✅
+如果题目需要更多步骤（比如数人民币、比较大小需要先分别算清楚两边），可以在中间插入1-2个额外步骤，但最多不超过${M1_MAX_STEPS}步。
+
+字数要求（重要，但优先保证意思讲清楚，不要为了短而写得看不懂）：
+- bigIdea：最多${M1_IDEA_MAXLEN}个字
+- 每个 step 的 text：最多${M1_STEP_MAXLEN}个字，要包含"做什么+算出多少"
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+async function genM1Analysis(k){
+  const p=wrongProblems[k];
+  const w=lastWrongItems[k];
+  const box=document.getElementById(`m1aibox-${k}`);
+  const btn=document.getElementById(`m1aib-${k}`);
+  if(!p||!box) return;
+
+  btn.disabled=true;
+  box.classList.add('show');
+  box.innerHTML=`<span class="m1-ai-tag">🤖 AI 解析</span><div class="m1-ai-loading">正在生成讲解，请稍候…</div>`;
+
+  const qtext=m1QuestionText(p);
+  const answerText=w?w.correct:p.answer;
+  const prompt=buildM1Prompt(qtext,answerText);
+
+  try{
+    const resp=await fetch(M1_OLLAMA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:M1_OLLAMA_MODEL,prompt,stream:false,format:M1_ANALYSIS_SCHEMA})
+    });
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    const raw=(data.response||'').trim();
+    if(!raw) throw new Error('空响应');
+    let parsed;
+    try{ parsed=JSON.parse(raw); }
+    catch(e){ throw new Error('返回内容不是合法 JSON'); }
+    if(!parsed.bigIdea||!Array.isArray(parsed.steps)||!parsed.steps.length) throw new Error('返回内容缺少讲解字段');
+
+    const bigIdea=m1ClampText(parsed.bigIdea,M1_IDEA_MAXLEN);
+    const steps=parsed.steps.slice(0,M1_MAX_STEPS).map(s=>({
+      emoji:String(s&&s.emoji||'✏️').trim().slice(0,2),
+      text:m1ClampText(s&&s.text,M1_STEP_MAXLEN),
+    })).filter(s=>s.text);
+
+    const stepsHtml=steps.map((s,i)=>`
+      <div class="m1-ai-step">
+        <span class="m1-ai-step-n">步骤${i+1}</span>
+        <span class="m1-ai-step-emoji">${m1EscapeHtml(s.emoji)}</span>
+        <span class="m1-ai-step-text">${m1EscapeHtml(s.text)}</span>
+      </div>`).join('');
+
+    box.innerHTML=`<span class="m1-ai-tag">🤖 AI 详细讲解</span>
+      ${bigIdea?`<div class="m1-ai-bigidea">💡 ${m1EscapeHtml(bigIdea)}</div>`:''}
+      <div class="m1-ai-steps">${stepsHtml}</div>`;
+  }catch(err){
+    box.innerHTML=`<span class="m1-ai-tag">🤖 AI 解析</span>
+      <div class="m1-ai-err">生成失败：无法连接本地 Ollama（${m1EscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${M1_OLLAMA_MODEL}</code>；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问。</div>
+      <button class="m1-ai-retry" onclick="genM1Analysis(${k})">🔄 重试</button>`;
+  }finally{
+    btn.disabled=false;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  错题重练 / 清空
+// ══════════════════════════════════════════════════
+function replayWrong(){
+  if(!wrongProblems.length)return;
+  problems=shuffle([...wrongProblems]);wrongProblems=[];
+  render();resetTimer();
+  document.getElementById('statsPanel').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetAnswers(){
+  problems.forEach((_,i)=>{
+    const inp=document.getElementById(`ans-${i}`),card=document.getElementById(`card-${i}`),icon=document.getElementById(`icon-${i}`),hint=document.getElementById(`hint-${i}`);
+    if(!card)return;
+    if(inp){inp.value='';inp.disabled=false;inp.className='answer-input';}
+    card.classList.remove('correct','wrong');
+    delete card.dataset.selected;
+    card.querySelectorAll('.cmp-btn,.choice-btn').forEach(b=>b.className=b.classList.contains('cmp-btn')?'cmp-btn':'choice-btn');
+    if(icon){icon.style.display='none';}
+    if(hint){hint.style.display='none';}
+  });
+  resetTimer();
+  document.getElementById('statsPanel').classList.remove('show');
+  const f=document.getElementById('ans-0');if(f)f.focus();
+}
+
+// ══════════════════════════════════════════════════
+//  历史记录
+// ══════════════════════════════════════════════════
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||[];}catch(e){return[];}}
+function saveHistory(correct,total,secs,mode,maxVal){
+  const h=loadHistory();
+  const now=new Date();
+  h.push({date:`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,correct,total,secs,mode,maxVal});
+  if(h.length>20)h.splice(0,h.length-20);
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(h));
+}
+function clearHistory(){if(!confirm('确定清空历史记录吗？'))return;localStorage.removeItem(HISTORY_KEY);renderHistory();renderStreak();}
+function spClass(pct){return pct===100?'s100':pct>=90?'s90':pct>=80?'s80':'slow';}
+function renderHistory(){
+  const h=loadHistory(),el=document.getElementById('historyContent');
+  if(!h.length){el.innerHTML='<div class="history-empty">还没有练习记录，快去出题吧～</div>';return;}
+  const r10=h.slice(-10);
+  const bars=r10.map(x=>{const p=Math.round(x.correct/x.total*100);return `<div class="trend-bar-wrap"><div class="trend-bar${p===100?' perfect':''}" style="height:${Math.max(3,p/100*44)}px" title="${x.date} ${p}%"></div><div class="trend-label">${p}%</div></div>`;}).join('');
+  const rows=h.slice().reverse().slice(0,10).map(x=>{const p=Math.round(x.correct/x.total*100);return `<tr><td>${x.date}</td><td>${MODE_LABELS[x.mode]||x.mode}</td><td>${x.total}</td><td><span class="score-pill ${spClass(p)}">${x.correct}/${x.total} (${p}%)</span></td><td>${formatTime(x.secs)}</td></tr>`;}).join('');
+  el.innerHTML=`<div class="trend-chart"><div class="trend-title">近 ${r10.length} 次正确率趋势</div><div class="trend-bars">${bars}</div></div><div style="overflow-x:auto;margin-top:12px"><table class="history-table"><thead><tr><th>时间</th><th>模式</th><th>题数</th><th>成绩</th><th>用时</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderStreak(){
+  const h=loadHistory(),bar=document.getElementById('streakBar');
+  if(!h.length){bar.innerHTML='';return;}
+  bar.innerHTML=h.slice(-5).map(x=>{const ok=x.correct===x.total;return `<div class="streak-dot${ok?' win':''}" title="${x.date} ${x.correct}/${x.total}">${ok?'⭐':'·'}</div>`;}).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  烟花
+// ══════════════════════════════════════════════════
+function launchConfetti(){
+  const cv=document.getElementById('confetti-canvas'),ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const colors=['#f39c12','#e74c3c','#9b59b6','#3498db','#2ecc71','#e91e63','#ff5722'];
+  const ps=Array.from({length:120},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height-cv.height,w:rand(6,14),h:rand(4,9),color:pick(colors),vx:(Math.random()-.5)*3,vy:rand(2,6),angle:Math.random()*Math.PI*2,spin:(Math.random()-.5)*.2,op:1}));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let alive=0;
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.angle+=p.spin;p.op=Math.max(0,1-frame/120);if(p.y<cv.height+20)alive++;ctx.save();ctx.globalAlpha=p.op;ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
+    frame++;
+    if(alive>0&&frame<150)requestAnimationFrame(draw);else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  draw();
+}
+
+// ══════════════════════════════════════════════════
+//  初始化
+// ══════════════════════════════════════════════════
+// 初始化控制条件显示
+document.querySelectorAll('.ctrl-cond').forEach(el=>{
+  const modes=el.dataset.modes.split(',');
+  el.style.display=modes.includes('addsub')?'':'none';
+});
+document.getElementById('emptyHint').classList.add('show');
+renderHistory();
+renderStreak();
+generate();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>

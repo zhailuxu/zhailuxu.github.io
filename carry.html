@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>进位加减法</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#e3f2fd 0%,#f3e5f5 55%,#fff8e1 100%);
+  min-height: 100vh; padding: 16px 12px;
+}
+.container { max-width: 680px; margin: 0 auto; }
+
+/* Header */
+.header { text-align:center; margin-bottom:18px; }
+.header h1 { font-size:1.9rem; color:#1a237e; letter-spacing:3px; }
+.header p  { font-size:.83rem; color:#999; margin-top:4px; }
+
+/* Mode toggle */
+.mode-row { display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
+.mode-btn {
+  padding:10px 28px; border:none; border-radius:25px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  transition:all .2s; box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+.mode-btn.add { background:#e8f5e9; color:#2e7d32; }
+.mode-btn.add.on { background:linear-gradient(135deg,#66bb6a,#2e7d32); color:#fff; box-shadow:0 4px 14px rgba(46,125,50,.4); }
+.mode-btn.sub { background:#fff3e0; color:#e65100; }
+.mode-btn.sub.on { background:linear-gradient(135deg,#ffa726,#e65100); color:#fff; box-shadow:0 4px 14px rgba(230,81,0,.4); }
+
+/* Tabs */
+.tabs { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+.tab-btn {
+  padding:8px 24px; border:none; border-radius:20px;
+  font-size:.95rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.65); color:#666;
+  box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .2s;
+}
+.tab-btn.on { background:#3f51b5; color:#fff; box-shadow:0 4px 14px rgba(63,81,181,.35); }
+
+/* Card */
+.card {
+  background:rgba(255,255,255,.92); border-radius:20px;
+  padding:20px 18px; box-shadow:0 4px 20px rgba(0,0,0,.1);
+  margin-bottom:14px;
+}
+
+/* Difficulty */
+.diff-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.diff-btn {
+  padding:6px 16px; border:2px solid #9fa8da; border-radius:14px;
+  background:#fff; color:#3f51b5; font-size:.88rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.diff-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
+
+/* Input row */
+.input-row { display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+.num-inp {
+  width:84px; height:46px; border:2.5px solid #9fa8da; border-radius:12px;
+  text-align:center; font-size:1.4rem; font-weight:bold; color:#333;
+  background:#f8f9ff; outline:none; -moz-appearance:textfield;
+}
+.num-inp:focus { border-color:#3f51b5; }
+.num-inp::-webkit-inner-spin-button,.num-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.op-label { font-size:1.6rem; color:#888; min-width:24px; text-align:center; }
+
+/* Buttons */
+.btn {
+  border:none; border-radius:12px; padding:9px 20px;
+  font-size:.92rem; font-weight:bold; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+.btn:active { transform:scale(.95); }
+.btn-blue   { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-green  { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; }
+.btn-orange { background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-purple { background:linear-gradient(135deg,#ce93d8,#6a1b9a); color:#fff; }
+.btn-gray   { background:#e0e0e0; color:#555; }
+
+/* ─── Narration ─── */
+.narration {
+  background:linear-gradient(135deg,#e8eaf6,#fce4ec);
+  border-radius:14px; padding:12px 16px;
+  font-size:1rem; color:#333; text-align:center;
+  border-left:4px solid #9c27b0; min-height:50px;
+  margin-bottom:14px; transition:all .3s;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ─── Calculation Board ─── */
+.board-wrap { display:flex; justify-content:center; margin-bottom:14px; }
+.calc-board {
+  display:inline-flex; flex-direction:column; align-items:flex-end;
+  gap:0; position:relative;
+}
+
+.b-row { display:flex; align-items:center; }
+.b-cell {
+  width:60px; height:60px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; font-weight:bold; color:#222;
+  position:relative; border-radius:10px;
+  transition:background .3s;
+}
+.b-cell.active { background:rgba(63,81,181,.15); }
+.b-cell.op    { width:38px; color:#777; font-size:1.8rem; }
+
+/* Carry / borrow row — smaller */
+.b-carry { height:34px; }
+.b-carry .b-cell { height:34px; font-size:1.1rem; color:#e53935; }
+
+/* board line */
+.b-line { height:3px; background:#333; border-radius:2px; margin:3px 0; }
+
+/* Result row */
+.res-digit { opacity:0; transform:translateY(-10px); transition:opacity .4s, transform .4s; }
+.res-digit.show { opacity:1; transform:translateY(0); }
+.b-cell.result { color:#1565c0; }
+
+/* Carry indicator above column */
+.carry-ind {
+  opacity:0; transform:translateY(8px);
+  transition:opacity .35s, transform .35s;
+  color:#e53935; font-weight:bold;
+}
+.carry-ind.show { opacity:1; transform:translateY(0); }
+
+/* Borrowed digit display */
+.orig-dig { color:#bbb; text-decoration:line-through; font-size:1.6rem; }
+.new-dig  { color:#f57c00; font-size:1.4rem; margin-left:2px; }
+
+/* ─── Computation panel ─── */
+.comp-box {
+  min-height:72px; text-align:center; margin-bottom:14px;
+}
+.comp-eq {
+  font-size:1.5rem; font-weight:bold; color:#333;
+  opacity:0; transform:scale(.9);
+  transition:opacity .3s, transform .3s;
+}
+.comp-eq.show { opacity:1; transform:scale(1); }
+.comp-note {
+  font-size:.92rem; color:#9c27b0; margin-top:5px;
+  opacity:0; transition:opacity .3s;
+}
+.comp-note.show { opacity:1; }
+
+/* ─── Controls ─── */
+.ctrl-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.speed-row { display:flex; gap:6px; justify-content:center; align-items:center; font-size:.83rem; color:#888; }
+.sp-btn {
+  padding:4px 12px; border:1.5px solid #bbb; border-radius:10px;
+  background:#fff; color:#555; font-size:.8rem; cursor:pointer; transition:all .15s;
+}
+.sp-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
+
+/* ─── Quiz: editable vertical calculation ─── */
+.q-display { text-align:center; font-size:1.2rem; font-weight:bold; color:#333; margin:10px 0 5px; }
+.q-hint { text-align:center; font-size:.86rem; color:#888; line-height:1.7; margin-bottom:10px; }
+.qv-work {
+  display:inline-flex; flex-direction:column; align-items:flex-end;
+  padding:12px 8px; max-width:100%; overflow-x:auto;
+  font-family:'Courier New',monospace; font-size:1.45rem; font-weight:bold;
+}
+.qv-row { display:flex; justify-content:flex-end; align-items:center; gap:4px; min-height:44px; }
+.qv-op { width:26px; flex:0 0 26px; text-align:center; color:#777; font-size:1.3rem; }
+.qv-cell {
+  width:42px; height:42px; flex:0 0 42px;
+  display:flex; align-items:center; justify-content:center; border-radius:8px;
+}
+.qv-fixed { background:#f3f4ff; color:#303f9f; }
+.qv-input {
+  width:42px; height:42px; flex:0 0 42px;
+  border:2px solid #9fa8da; border-radius:8px; background:#fff;
+  text-align:center; font:700 1.35rem 'Courier New',monospace;
+  color:#333; outline:none; -moz-appearance:textfield;
+}
+.qv-input::-webkit-inner-spin-button,.qv-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.qv-input:focus { border-color:#3f51b5; box-shadow:0 0 0 3px rgba(63,81,181,.14); }
+.qv-input.ok { background:#e8f5e9; border-color:#66bb6a; color:#2e7d32; }
+.qv-input.wrong { background:#ffebee; border-color:#ef5350; color:#c62828; animation:qvShake .22s ease; }
+.qv-line { border-top:3px solid #555; width:calc(100% - 66px); margin:2px 66px 2px 0; }
+.qv-row-label { width:62px; margin-left:4px; text-align:left; color:#aaa; font:400 .75rem sans-serif; }
+@keyframes qvShake { 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
+.check-btn {
+  margin:8px 4px 0; padding:9px 22px; border:none; border-radius:12px;
+  background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff;
+  font-size:.95rem; font-weight:bold; cursor:pointer; font-family:inherit;
+}
+.check-btn:disabled { background:#b0bec5; cursor:not-allowed; }
+.q-fb { min-height:30px; text-align:center; font-size:1rem; font-weight:bold; }
+.q-fb.ok   { color:#2e7d32; }
+.q-fb.fail { color:#c62828; }
+.q-score { text-align:center; color:#888; font-size:.9rem; margin-top:8px; }
+
+.hidden { display:none !important; }
+
+/* Carry float keyframe */
+@keyframes floatCarry {
+  0%   { opacity:0; transform:translateY(14px) scale(.5); }
+  50%  { opacity:1; transform:translateY(-4px) scale(1.3); }
+  100% { opacity:1; transform:translateY(0)   scale(1); }
+}
+.carry-pop { animation:floatCarry .45s ease-out forwards; }
+
+/* Borrow slide keyframe */
+@keyframes borrowSlide {
+  0%   { opacity:0; transform:translateX(16px); }
+  100% { opacity:1; transform:translateX(0); }
+}
+.borrow-appear { animation:borrowSlide .35s ease-out forwards; }
+
+@media(max-width:420px){
+  .b-cell { width:52px; height:52px; font-size:1.9rem; }
+  .b-cell.op { width:32px; }
+  .qv-cell,.qv-input { width:38px; height:38px; flex-basis:38px; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body data-hpx-page style="--hpx-accent:#3f51b5">
+<div class="container">
+
+<div class="header">
+  <h1>🧮 进位加减法</h1>
+  <p>动画逐步演示进位与退位</p>
+</div>
+
+<div class="speak-bar">
+  <button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button>
+</div>
+
+<div class="mode-row">
+  <button class="mode-btn add on" id="modeAdd" onclick="setMode('add')">➕ 进位加法</button>
+  <button class="mode-btn sub"    id="modeSub" onclick="setMode('sub')">➖ 退位减法</button>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" id="tabD" onclick="switchTab('demo')">🎬 动画演示</button>
+  <button class="tab-btn"    id="tabQ" onclick="switchTab('quiz')">✏️ 练习</button>
+</div>
+
+<!-- ══ Demo ══ -->
+<div id="pDemo">
+  <div class="card">
+    <div class="diff-row">
+      <button class="diff-btn on" data-d="1" onclick="setDiff(1)">一年级（两位数）</button>
+      <button class="diff-btn"    data-d="2" onclick="setDiff(2)">二年级（两位数）</button>
+      <button class="diff-btn"    data-d="3" onclick="setDiff(3)">三年级（三位数）</button>
+      <button class="diff-btn"    data-d="4" onclick="setDiff(4)">四年级（四位数）</button>
+      <button class="diff-btn"    data-d="5" onclick="setDiff(5)">五年级（五位数）</button>
+    </div>
+    <div class="input-row">
+      <input class="num-inp" id="inA" type="number" value="38" min="1" max="99999">
+      <span class="op-label" id="opLbl">＋</span>
+      <input class="num-inp" id="inB" type="number" value="47" min="1" max="99999">
+      <button class="btn btn-gray" onclick="randProb()">🎲 随机</button>
+      <button class="btn btn-blue" onclick="initDemo()">▶ 开始</button>
+    </div>
+
+    <div class="narration" id="narr" aria-live="polite">点击「开始」观看动画演示 👆</div>
+
+    <div class="board-wrap" id="boardWrap"></div>
+
+    <div class="comp-box" id="compBox"></div>
+
+    <div class="ctrl-row">
+      <button class="btn btn-green"  id="btnPlay" onclick="togglePlay()">▶ 自动播放</button>
+      <button class="btn btn-purple" onclick="stepFwd()">⏭ 下一步</button>
+      <button class="btn btn-gray"   onclick="resetDemo()">↺ 重置</button>
+    </div>
+    <div class="speed-row">
+      速度：
+      <button class="sp-btn on" data-ms="1600" onclick="setSp(1600,this)">慢</button>
+      <button class="sp-btn"    data-ms="900"  onclick="setSp(900,this)">正常</button>
+      <button class="sp-btn"    data-ms="450"  onclick="setSp(450,this)">快</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Quiz ══ -->
+<div id="pQuiz" class="hidden">
+  <div class="card">
+    <div class="diff-row">
+      <button class="diff-btn on" data-d="1" onclick="setDiff(1)">一年级</button>
+      <button class="diff-btn"    data-d="2" onclick="setDiff(2)">二年级</button>
+      <button class="diff-btn"    data-d="3" onclick="setDiff(3)">三年级</button>
+      <button class="diff-btn"    data-d="4" onclick="setDiff(4)">四年级</button>
+      <button class="diff-btn"    data-d="5" onclick="setDiff(5)">五年级</button>
+    </div>
+    <div class="q-display" id="qDisp">请列竖式计算</div>
+    <div class="q-hint" id="qHint">从个位开始，一格只写一个数字</div>
+    <div style="display:flex;justify-content:center;"><div class="qv-work" id="qWork"></div></div>
+    <div class="q-fb" id="qFb" aria-live="polite"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button class="check-btn" id="checkQBtn" onclick="checkQ()">✅ 检查竖式</button>
+      <button class="btn btn-purple" id="nextBtn" onclick="nextQ()" style="display:none;">下一题</button>
+      <button class="btn btn-orange" onclick="demoThisQ()">🎬 看演示</button>
+    </div>
+    <div class="q-score" id="qScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script src="hpx-core.js"></script>
+<script>
+const speech = Hpx.speech.install({rate:0.88,pitch:1.08,timeoutMs:8000});
+
+// ─────────────────────────────────────
+//  State
+// ─────────────────────────────────────
+let mode   = 'add';
+let diff   = 1;
+let spMs   = 1600;
+let steps  = [];
+let sIdx   = 0;
+let playing = false;
+let pTimer  = null;
+let playRunId = 0;
+let curA = 38, curB = 47;
+let data = null;   // current problem data
+
+// Quiz state
+let qA = 0, qB = 0, qOk = 0, qBad = 0, qDone = false, qWrongRecorded = false;
+
+// ─────────────────────────────────────
+//  Digit utilities
+// ─────────────────────────────────────
+// Returns digits as array: index 0 = ones, 1 = tens, 2 = hundreds
+function digs(n, len) {
+  const s = String(Math.abs(n)).padStart(len, '0');
+  return s.split('').reverse().map(Number);
+}
+function ndig(n) { return String(Math.abs(n)).length; }
+
+// ─────────────────────────────────────
+//  Mode / Tab / Diff
+// ─────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeAdd').className = 'mode-btn add' + (m==='add'?' on':'');
+  document.getElementById('modeSub').className = 'mode-btn sub' + (m==='sub'?' on':'');
+  document.getElementById('opLbl').textContent = m === 'add' ? '＋' : '－';
+  randProb();
+  if (!document.getElementById('pQuiz').classList.contains('hidden')) genQ();
+  speak(m === 'add' ? '已切换到进位加法。满十时，向前一位进一。' : '已切换到退位减法。不够减时，向前一位借一。');
+}
+
+function switchTab(t) {
+  document.getElementById('pDemo').classList.toggle('hidden', t !== 'demo');
+  document.getElementById('pQuiz').classList.toggle('hidden', t !== 'quiz');
+  document.getElementById('tabD').classList.toggle('on', t === 'demo');
+  document.getElementById('tabQ').classList.toggle('on', t === 'quiz');
+  if (t === 'quiz') genQ();
+  else speak('动画演示。从个位开始，一步一步计算。');
+}
+
+function setDiff(d) {
+  diff = d;
+  document.querySelectorAll('[data-d]').forEach(b => b.classList.toggle('on', +b.dataset.d === d));
+  if (!document.getElementById('pQuiz').classList.contains('hidden')) genQ();
+  else randProb();
+}
+
+function setSp(ms, btn) {
+  spMs = ms;
+  document.querySelectorAll('.sp-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ─────────────────────────────────────
+//  Random problem
+// ─────────────────────────────────────
+function ri(lo, hi) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
+
+function hasCarry(a, b) {
+  const len = Math.max(ndig(a), ndig(b));
+  let carry = 0, dA = digs(a,len), dB = digs(b,len);
+  for (let i = 0; i < len; i++) {
+    let s = dA[i] + dB[i] + carry;
+    if (s >= 10) return true;
+    carry = Math.floor(s / 10);
+  }
+  return false;
+}
+
+function hasBorrow(a, b) {
+  const len = Math.max(ndig(a), ndig(b));
+  let dA = digs(a,len), dB = digs(b,len);
+  for (let i = 0; i < len; i++) if (dA[i] < dB[i]) return true;
+  return false;
+}
+
+function randProb() {
+  stopPlay(); resetDemo();
+  let a, b;
+  if (mode === 'add') {
+    do {
+      if      (diff === 5) { a = ri(10000,79999); b = ri(10000, Math.min(89999, 99999-a)); }
+      else if (diff === 4) { a = ri(1000,7999);   b = ri(1000, Math.min(8999, 9999-a)); }
+      else if (diff === 3) { a = ri(100,799);     b = ri(100, Math.min(899, 999-a)); }
+      else                  { a = ri(11,79);       b = ri(11,79); }
+    } while (!hasCarry(a, b) || (mode==='add' && diff<3 && a+b > 199));
+  } else {
+    do {
+      if      (diff === 5) { a = ri(20001,99999); b = ri(10000, a-5000); }
+      else if (diff === 4) { a = ri(2001,9999);   b = ri(1000, a-500); }
+      else if (diff === 3) { a = ri(201,999);     b = ri(100, a-50); }
+      else                  { a = ri(21,99);       b = ri(10, a-10); }
+    } while (!hasBorrow(a, b));
+  }
+  curA = a; curB = b;
+  document.getElementById('inA').value = a;
+  document.getElementById('inB').value = b;
+}
+
+// ─────────────────────────────────────
+//  Build animation steps
+// ─────────────────────────────────────
+function buildAdd(a, b) {
+  const len = Math.max(ndig(a), ndig(b), 2);
+  const dA = digs(a, len), dB = digs(b, len);
+  const result = a + b;
+  const dR = digs(result, len + 1);
+  const carries = new Array(len + 1).fill(0);
+  const resDigs = new Array(len + 1).fill(null);
+  const steps = [];
+  let carry = 0;
+
+  for (let col = 0; col < len; col++) {
+    const da = dA[col]||0, db = dB[col]||0;
+    const sum = da + db + carry;
+    const digit = sum % 10;
+    const nc = Math.floor(sum / 10);
+    carries[col+1] = nc;
+    resDigs[col] = digit;
+    steps.push({ type:'add', col, da, db, carry, sum, digit, nc, len });
+    carry = nc;
+  }
+  if (carry > 0) {
+    resDigs[len] = carry;
+    steps.push({ type:'add_final', col:len, digit:carry, len });
+  }
+  steps.push({ type:'done', result, resDigs, len });
+  return { steps, result, dA, dB, dR, carries, resDigs, len, cols:len+1 };
+}
+
+function buildSub(a, b) {
+  const len = Math.max(ndig(a), ndig(b), 2);
+  const dA = digs(a, len).slice(); // mutable copy
+  const dB = digs(b, len);
+  const result = a - b;
+  const dR = digs(result, len);
+  const resDigs = new Array(len).fill(null);
+  const borrows = new Array(len).fill(0);
+  const adjA = digs(a, len).slice(); // tracks modified A
+  const origA = digs(a, len).slice();
+  const steps = [];
+
+  for (let col = 0; col < len; col++) {
+    let da = adjA[col], db = dB[col];
+    let borrow = 0;
+    if (da < db) {
+      borrow = 1;
+      adjA[col+1] = adjA[col+1] - 1;
+      da += 10;
+    }
+    const digit = da - db;
+    resDigs[col] = digit;
+    borrows[col] = borrow;
+    steps.push({
+      type:'sub', col, daOrig: adjA[col] - (borrow?10:0) + (borrow?0:0),
+      daOrigDisplay: origA[col],
+      adjAcol1Before: adjA[col+1] + (borrow?1:0),
+      adjAcol1After: adjA[col+1],
+      da, db, borrow, digit, len
+    });
+  }
+  steps.push({ type:'done', result, resDigs, len });
+  return { steps, result, dA:origA, dB, dR, borrows, resDigs, len, cols:len+1 };
+}
+
+// ─────────────────────────────────────
+//  Build Board HTML
+// ─────────────────────────────────────
+function buildBoard(d) {
+  const { len, dA, dB, cols } = d;
+  const isAdd = mode === 'add';
+  const cellW = 60;
+
+  let html = '<div class="calc-board" id="calcBoard">';
+
+  // Row 0: carries / borrow row
+  html += '<div class="b-row b-carry">';
+  html += '<div class="b-cell op" style="visibility:hidden">x</div>';
+  for (let c = cols-1; c >= 0; c--) {
+    html += `<div class="b-cell" id="cc-${c}"><span class="carry-ind" id="ci-${c}"></span></div>`;
+  }
+  html += '</div>';
+
+  // Row 1: top number A
+  html += '<div class="b-row">';
+  html += '<div class="b-cell op" style="visibility:hidden">x</div>';
+  for (let c = cols-1; c >= 0; c--) {
+    const dig = (c < len && c < dA.length) ? dA[c] : '';
+    html += `<div class="b-cell" id="ca-${c}">${dig !== '' ? dig : ''}</div>`;
+  }
+  html += '</div>';
+
+  // Row 2: operator + B
+  html += '<div class="b-row">';
+  html += `<div class="b-cell op">${isAdd ? '+' : '−'}</div>`;
+  for (let c = cols-1; c >= 0; c--) {
+    const dig = (c < len && c < dB.length) ? dB[c] : '';
+    html += `<div class="b-cell" id="cb-${c}">${dig !== '' ? dig : ''}</div>`;
+  }
+  html += '</div>';
+
+  // Line
+  const lineW = cols * cellW;
+  html += `<div style="display:flex"><div style="width:38px"></div><div class="b-line" style="width:${lineW}px"></div></div>`;
+
+  // Row 3: result
+  html += '<div class="b-row">';
+  html += '<div class="b-cell op" style="visibility:hidden">x</div>';
+  for (let c = cols-1; c >= 0; c--) {
+    html += `<div class="b-cell result" id="cr-${c}"><span class="res-digit" id="rd-${c}"></span></div>`;
+  }
+  html += '</div>';
+
+  html += '</div>';
+  document.getElementById('boardWrap').innerHTML = html;
+}
+
+// ─────────────────────────────────────
+//  Apply step
+// ─────────────────────────────────────
+const COL_NAME = ['个位','十位','百位','千位','万位','十万位','百万位'];
+
+function clearHL() {
+  document.querySelectorAll('.b-cell').forEach(c => c.classList.remove('active'));
+}
+
+function hlCol(col) {
+  ['cc','ca','cb','cr'].forEach(p => {
+    const el = document.getElementById(`${p}-${col}`);
+    if (el) el.classList.add('active');
+  });
+}
+
+function setNarr(txt) {
+  document.getElementById('narr').textContent = txt;
+}
+
+function setComp(eqHtml, note='') {
+  document.getElementById('compBox').innerHTML =
+    `<div class="comp-eq show">${eqHtml}</div>` +
+    (note ? `<div class="comp-note show">${note}</div>` : '');
+}
+
+function showRD(col, digit) {
+  const rd = document.getElementById(`rd-${col}`);
+  if (rd) { rd.textContent = digit; rd.classList.add('show'); }
+}
+
+function showCI(col, digit) {
+  const ci = document.getElementById(`ci-${col}`);
+  if (ci) { ci.textContent = digit; ci.classList.add('show'); ci.classList.add('carry-pop'); }
+}
+
+function applyStep(step) {
+  clearHL();
+  let voiceText = '';
+
+  if (step.type === 'add') {
+    const { col, da, db, carry, sum, digit, nc } = step;
+    hlCol(col);
+
+    let narr = `${COL_NAME[col]}：${da} + ${db}`;
+    if (carry) narr += ` + 进位${carry}`;
+    narr += ` = ${sum}`;
+    if (nc) narr += `　满十！写 ${digit}，向${COL_NAME[col+1]}进 ${nc}`;
+    setNarr(narr);
+
+    let eq = `<span style="color:#1565c0">${da}</span>`;
+    eq += ` + <span style="color:#c62828">${db}</span>`;
+    if (carry) eq += ` + <span style="color:#f57c00;font-size:1rem">进${carry}</span>`;
+    eq += ` = <span style="color:#2e7d32;font-size:1.8rem">${sum}</span>`;
+
+    const note = nc
+      ? `🎉 ${sum} ≥ 10，<b style="color:#1565c0">写 ${digit}</b>，向${COL_NAME[col+1]}进 <b style="color:#e53935">${nc}</b>`
+      : `写 <b style="color:#1565c0">${digit}</b>`;
+    setComp(eq, note);
+    voiceText = `${COL_NAME[col]}，${da}加${db}${carry ? `，再加进位${carry}` : ''}，等于${sum}。`
+      + (nc ? `满十，写${digit}，向${COL_NAME[col+1]}进${nc}。` : `写${digit}。`);
+
+    setTimeout(() => showRD(col, digit), spMs * 0.45);
+    if (nc) setTimeout(() => showCI(col+1, nc), spMs * 0.72);
+
+  } else if (step.type === 'add_final') {
+    const { col, digit } = step;
+    hlCol(col);
+    setNarr(`${COL_NAME[col-1]}还有进位 ${digit}，直接写在最前面`);
+    setComp(`<span style="color:#e53935">进位 ${digit}</span>`, '直接写在最高位');
+    voiceText = `${COL_NAME[col-1]}计算后还有进位${digit}，把${digit}直接写在最前面。`;
+    setTimeout(() => showRD(col, digit), spMs * 0.4);
+
+  } else if (step.type === 'sub') {
+    const { col, daOrigDisplay, adjAcol1Before, adjAcol1After, da, db, borrow, digit } = step;
+    hlCol(col);
+
+    if (borrow) {
+      setNarr(`${COL_NAME[col]}：${daOrigDisplay} < ${db}，不够减！向${COL_NAME[col+1]}借 1`);
+      const eq = `<span style="color:#f57c00">借1后：</span>`
+        + `<span style="color:#1565c0">${da}</span>`
+        + ` − <span style="color:#c62828">${db}</span>`
+        + ` = <span style="color:#2e7d32;font-size:1.8rem">${digit}</span>`;
+      const note = `${daOrigDisplay} 不够减 ${db}，借来10变成 <b style="color:#1565c0">${da}</b>，再减 ${db} = <b>${digit}</b>`;
+      setComp(eq, note);
+      voiceText = `${COL_NAME[col]}，${daOrigDisplay}比${db}小，不够减，向${COL_NAME[col+1]}借一。借来十以后，${da}减${db}等于${digit}，写${digit}。`;
+
+      // Show borrow: highlight the lending column and update its cell
+      setTimeout(() => {
+        const lendCell = document.getElementById(`ca-${col+1}`);
+        if (lendCell) {
+          lendCell.classList.add('active');
+          lendCell.innerHTML =
+            `<span class="orig-dig borrow-appear">${adjAcol1Before}</span>`
+            + `<span class="new-dig borrow-appear" style="animation-delay:.15s">${adjAcol1After}</span>`;
+        }
+      }, spMs * 0.25);
+    } else {
+      setNarr(`${COL_NAME[col]}：${daOrigDisplay} − ${db} = ${digit}`);
+      const eq = `<span style="color:#1565c0">${daOrigDisplay}</span>`
+        + ` − <span style="color:#c62828">${db}</span>`
+        + ` = <span style="color:#2e7d32;font-size:1.8rem">${digit}</span>`;
+      setComp(eq, `直接写 <b style="color:#1565c0">${digit}</b>`);
+      voiceText = `${COL_NAME[col]}，${daOrigDisplay}减${db}等于${digit}，写${digit}。`;
+    }
+    setTimeout(() => showRD(col, digit), spMs * 0.58);
+
+  } else if (step.type === 'done') {
+    clearHL();
+    const op = mode === 'add' ? '+' : '−';
+    setNarr(`🎉 完成！${curA} ${op} ${curB} = ${step.result}`);
+    setComp(
+      `<span style="color:#4a148c;font-size:1.7rem">${curA} ${op} ${curB} = <b>${step.result}</b></span>`,
+      '✅ 全部计算完毕！'
+    );
+    voiceText = `全部计算完成。${curA}${mode === 'add' ? '加' : '减'}${curB}等于${step.result}。`;
+    // Ensure all result digits visible
+    step.resDigs.forEach((d, i) => {
+      if (d !== null && d !== undefined) showRD(i, d);
+    });
+  }
+  return voiceText ? speak(voiceText) : Promise.resolve();
+}
+
+// ─────────────────────────────────────
+//  Demo control
+// ─────────────────────────────────────
+function initDemo() {
+  const a = parseInt(document.getElementById('inA').value) || curA;
+  const b = parseInt(document.getElementById('inB').value) || curB;
+  curA = a; curB = b;
+  stopPlay();
+
+  if (mode === 'sub' && a <= b) {
+    setNarr('退位减法需要被减数 > 减数，请重新输入或点「随机」');
+    speak('退位减法中，被减数要大于减数。请重新输入，或者点击随机。');
+    return;
+  }
+  if (mode === 'add' && (a < 1 || b < 1)) {
+    setNarr('请输入正整数');
+    speak('请输入正整数。');
+    return;
+  }
+
+  data  = mode === 'add' ? buildAdd(a, b) : buildSub(a, b);
+  steps = data.steps;
+  sIdx  = 0;
+  buildBoard(data);
+  document.getElementById('compBox').innerHTML = '';
+  setNarr(`演示 ${a} ${mode==='add'?'+':'−'} ${b}，从个位开始 →`);
+  speak(`准备演示，${a}${mode === 'add' ? '加' : '减'}${b}。我们从个位开始。`);
+}
+
+function resetDemo() {
+  stopPlay();
+  document.getElementById('boardWrap').innerHTML = '';
+  document.getElementById('compBox').innerHTML = '';
+  setNarr('点击「开始」观看动画演示 👆');
+  steps = []; sIdx = 0; data = null;
+}
+
+function stepFwd() {
+  if (playing) stopPlay();
+  if (!steps.length) { initDemo(); return; }
+  if (sIdx >= steps.length) return;
+  applyStep(steps[sIdx++]);
+}
+
+function togglePlay() {
+  if (playing) stopPlay();
+  else { if (!steps.length) initDemo(); startPlay(); }
+}
+
+function startPlay() {
+  const runId = ++playRunId;
+  playing = true;
+  document.getElementById('btnPlay').textContent = '⏸ 暂停';
+  playNext(runId);
+}
+
+function stopPlay() {
+  playing = false;
+  playRunId++;
+  clearTimeout(pTimer);
+  speech.stop();
+  document.getElementById('btnPlay').textContent = '▶ 自动播放';
+}
+
+async function playNext(runId) {
+  if (!playing || runId !== playRunId) return;
+  if (sIdx >= steps.length) { stopPlay(); return; }
+  const visualDelay = new Promise(resolve => { pTimer = setTimeout(resolve, spMs); });
+  await Promise.all([applyStep(steps[sIdx++]), visualDelay]);
+  if (!playing || runId !== playRunId) return;
+  playNext(runId);
+}
+
+// ─────────────────────────────────────
+//  Quiz
+// ─────────────────────────────────────
+function genQ() {
+  qDone = false;
+  qWrongRecorded = false;
+  let a, b;
+  if (mode === 'add') {
+    do {
+      if      (diff===5){a=ri(10000,79999); b=ri(10000,Math.min(89999,99999-a));}
+      else if (diff===4){a=ri(1000,7999);   b=ri(1000,Math.min(8999,9999-a));}
+      else if (diff===3){a=ri(100,799);     b=ri(100,Math.min(899,999-a));}
+      else               {a=ri(11,79);       b=ri(11,79);}
+    } while (!hasCarry(a,b));
+  } else {
+    do {
+      if      (diff===5){a=ri(20001,99999); b=ri(10000,a-5000);}
+      else if (diff===4){a=ri(2001,9999);   b=ri(1000,a-500);}
+      else if (diff===3){a=ri(201,999);     b=ri(100,a-50);}
+      else               {a=ri(21,99);       b=ri(10,a-10);}
+    } while (!hasBorrow(a,b));
+  }
+  qA=a; qB=b;
+  const op = mode==='add'?'+':'−';
+  const quizData = buildQuizData(a,b);
+  document.getElementById('qDisp').textContent = `${a} ${op} ${b}：请列竖式计算`;
+  document.getElementById('qHint').textContent = mode === 'add'
+    ? '数位要对齐，从个位开始，一格只写一个数字；满十记得向前进一。'
+    : '数位要对齐，从个位开始，一格只写一个数字；不够减时向前一位借一。';
+  renderQuizWork(quizData);
+  document.getElementById('qFb').textContent='';
+  document.getElementById('qFb').className='q-fb';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('checkQBtn').disabled=false;
+  setTimeout(()=>document.querySelector('.qv-input[data-col="0"]')?.focus(),80);
+  speak(`${a}${mode === 'add' ? '加' : '减'}${b}等于多少？请列竖式计算。`);
+}
+
+function buildQuizData(a,b) {
+  const result = mode === 'add' ? a+b : a-b;
+  return {
+    a, b, result,
+    operator: mode === 'add' ? '＋' : '－',
+    width: Math.max(String(a).length,String(b).length,String(result).length),
+    resultDigits: [...String(result)].reverse()
+  };
+}
+
+function fixedQuizRow(value,width,operator='') {
+  const digits = [...String(value)].reverse();
+  let cells = '';
+  for (let col=width-1; col>=0; col--) {
+    cells += `<span class="qv-cell qv-fixed">${digits[col]??''}</span>`;
+  }
+  return `<div class="qv-row"><span class="qv-op">${operator}</span>${cells}<span class="qv-row-label"></span></div>`;
+}
+
+function resultQuizRow(data) {
+  let cells = '';
+  for (let col=data.width-1; col>=0; col--) {
+    if (col >= data.resultDigits.length) {
+      cells += '<span class="qv-cell"></span>';
+      continue;
+    }
+    const place = COL_NAME[col] || `从右数第${col+1}位`;
+    cells += `<input class="qv-input" inputmode="numeric" maxlength="1"
+      aria-label="结果的${place}" data-col="${col}">`;
+  }
+  return `<div class="qv-row"><span class="qv-op"></span>${cells}<span class="qv-row-label">结果</span></div>`;
+}
+
+function renderQuizWork(data) {
+  document.getElementById('qWork').innerHTML = fixedQuizRow(data.a,data.width)
+    + fixedQuizRow(data.b,data.width,data.operator)
+    + '<div class="qv-line"></div>'
+    + resultQuizRow(data);
+}
+
+function checkQ() {
+  if (qDone) return;
+  const correct = mode==='add' ? qA+qB : qA-qB;
+  const fb = document.getElementById('qFb');
+  const inputs = [...document.querySelectorAll('.qv-input')];
+  const firstEmpty = inputs.find(input=>!input.value);
+  if (firstEmpty) {
+    fb.textContent='✏️ 竖式还没填完，一格写一个数字';
+    fb.className='q-fb fail';
+    firstEmpty.focus();
+    speak('竖式还没有填完。一格写一个数字，从个位开始。');
+    return;
+  }
+
+  const expected = [...String(correct)].reverse();
+  const wrong = [];
+  inputs.forEach(input=>{
+    const col = Number(input.dataset.col);
+    const ok = input.value === expected[col];
+    input.classList.toggle('ok',ok);
+    input.classList.toggle('wrong',!ok);
+    if (!ok) wrong.push(input);
+  });
+
+  if (wrong.length) {
+    if (!qWrongRecorded) { qWrongRecorded=true; qBad++; }
+    const col = Number(wrong[0].dataset.col);
+    const place = COL_NAME[col] || `从右数第${col+1}位`;
+    fb.textContent=`❌ 先检查标红的${place}，改好后再检查`;
+    fb.className='q-fb fail';
+    wrong[0].focus();
+    tone(220,.2,'sawtooth');
+    speak(`先检查标红的${place}，改好以后再检查。`);
+    document.getElementById('qScore').textContent=`✅ ${qOk}  ❌ ${qBad}`;
+    return;
+  }
+
+  qDone=true; qOk++;
+  inputs.forEach(input=>input.disabled=true);
+  document.getElementById('checkQBtn').disabled=true;
+  fb.textContent=`✅ 竖式全部正确！${correct}`; fb.className='q-fb ok';
+  tone(523,.1); setTimeout(()=>tone(659,.15),90);
+  speak(`竖式全部正确，答案是${correct}。`);
+  document.getElementById('nextBtn').style.display='inline-block';
+  document.getElementById('qScore').textContent=`✅ ${qOk}  ❌ ${qBad}`;
+}
+
+function nextQ() { genQ(); }
+
+document.getElementById('qWork').addEventListener('input',event=>{
+  const input = event.target.closest('.qv-input');
+  if (!input) return;
+  input.value = input.value.replace(/\D/g,'').slice(-1);
+  input.classList.remove('ok','wrong');
+  document.getElementById('qFb').textContent='';
+  if (input.value) {
+    const nextCol = Number(input.dataset.col)+1;
+    document.querySelector(`.qv-input[data-col="${nextCol}"]`)?.focus();
+  }
+});
+
+document.getElementById('qWork').addEventListener('keydown',event=>{
+  if (event.key==='Enter') { checkQ(); return; }
+  const input = event.target.closest('.qv-input');
+  if (event.key==='Backspace' && input && !input.value) {
+    const prevCol = Number(input.dataset.col)-1;
+    document.querySelector(`.qv-input[data-col="${prevCol}"]`)?.focus();
+  }
+});
+
+function demoThisQ() {
+  switchTab('demo');
+  document.getElementById('inA').value = qA;
+  document.getElementById('inB').value = qB;
+  initDemo();
+  setTimeout(startPlay, 200);
+}
+
+// ─────────────────────────────────────
+//  Audio
+// ─────────────────────────────────────
+let _ac = null;
+function tone(f,d,t='sine',v=.22){
+  try{
+    if(!_ac) _ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended') _ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g); g.connect(_ac.destination);
+    o.type=t; o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start(); o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+
+// ─────────────────────────────────────
+//  Init
+// ─────────────────────────────────────
+randProb();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>
