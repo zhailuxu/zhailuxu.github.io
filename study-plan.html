@@ -1,3 +1,4 @@
+```c
 <title>小学数学六年学习计划 · 螺旋上升</title>
 <style>
   @font-face {
@@ -15,7 +16,7 @@
     font-display: swap;
   }
 
-  :root {
+   :root {
     --bg: #EAEEE4;
     --bg-line: rgba(62, 90, 74, 0.14);
     --card-bg: #FBFBF6;
@@ -25,4 +26,644 @@
     --ink-faint: #8A9285;
     --margin-red: #B8433A;
     --margin-red-soft: rgba(184, 67, 58, 0.14);
- 
+    --accent: #2E5A78;
+    --accent-soft: rgba(46, 90, 120, 0.12);
+    --border: rgba(35, 41, 34, 0.12);
+    --shadow: rgba(35, 41, 34, 0.10);
+
+    --thread-num: #A9791E;    /* 数与运算 · 粉笔黄 */
+    --thread-geo: #2E6C9C;    /* 图形与几何 · 粉笔蓝 */
+    --thread-measure: #3F7A57;/* 量与计量 · 粉笔绿 */
+    --thread-stat: #7B5590;   /* 统计与概率 · 粉笔紫 */
+    --thread-app: #BD5A28;    /* 应用题与思维 · 粉笔橙 */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1B2420;
+      --bg-line: rgba(230, 236, 225, 0.07);
+      --card-bg: #212B24;
+      --card-bg-soft: #25302A;
+      --ink: #E9EBE0;
+      --ink-soft: #AEB8A9;
+      --ink-faint: #7B8579;
+      --margin-red: #E08A72;
+      --margin-red-soft: rgba(224, 138, 114, 0.16);
+      --accent: #8FBBDA;
+      --accent-soft: rgba(143, 187, 218, 0.14);
+      --border: rgba(233, 235, 224, 0.12);
+      --shadow: rgba(0, 0, 0, 0.35);
+
+      --thread-num: #E4C567;
+      --thread-geo: #86BADE;
+      --thread-measure: #8FCBA6;
+      --thread-stat: #CBA6DE;
+      --thread-app: #E8A374;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B2420;
+    --bg-line: rgba(230, 236, 225, 0.07);
+    --card-bg: #212B24;
+    --card-bg-soft: #25302A;
+    --ink: #E9EBE0;
+    --ink-soft: #AEB8A9;
+    --ink-faint: #7B8579;
+    --margin-red: #E08A72;
+    --margin-red-soft: rgba(224, 138, 114, 0.16);
+    --accent: #8FBBDA;
+    --accent-soft: rgba(143, 187, 218, 0.14);
+    --border: rgba(233, 235, 224, 0.12);
+    --shadow: rgba(0, 0, 0, 0.35);
+
+    --thread-num: #E4C567;
+    --thread-geo: #86BADE;
+    --thread-measure: #8FCBA6;
+    --thread-stat: #CBA6DE;
+    --thread-app: #E8A374;
+  }
+  :root[data-theme="light"] {
+    --bg: #EAEEE4;
+    --bg-line: rgba(62, 90, 74, 0.14);
+    --card-bg: #FBFBF6;
+    --card-bg-soft: #F2F3EC;
+    --ink: #232922;
+    --ink-soft: #5B6459;
+    --ink-faint: #8A9285;
+    --margin-red: #B8433A;
+    --margin-red-soft: rgba(184, 67, 58, 0.14);
+    --accent: #2E5A78;
+    --accent-soft: rgba(46, 90, 120, 0.12);
+    --border: rgba(35, 41, 34, 0.12);
+    --shadow: rgba(35, 41, 34, 0.10);
+
+    --thread-num: #A9791E;
+    --thread-geo: #2E6C9C;
+    --thread-measure: #3F7A57;
+    --thread-stat: #7B5590;
+    --thread-app: #BD5A28;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 40px 20px 100px;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--bg-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-line) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    line-height: 1.7;
+    font-variant-numeric: tabular-nums;
+    min-height: 100vh;
+  }
+
+  .mono {
+    font-family: 'JBMono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  a { color: var(--accent); }
+
+  .sheet {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px -20px var(--shadow);
+    padding: 54px 46px 60px 92px;
+  }
+  .sheet::before {
+    /* 装订红线 */
+    content: "";
+    position: absolute;
+    left: 52px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--margin-red);
+    opacity: 0.55;
+  }
+  .sheet::after {
+    /* 装订孔 */
+    content: "";
+    position: absolute;
+    left: 27px;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background-image:
+      radial-gradient(circle, var(--bg) 0 4px, transparent 4.2px);
+    background-repeat: repeat-y;
+    background-position: center 90px;
+    background-size: 10px 190px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    opacity: 0.9;
+  }
+
+  header.cover {
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-family: 'JBMono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--margin-red);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1.title {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    margin: 0 0 12px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 0;
+    padding-top: 22px;
+    border-top: 1px dashed var(--border);
+  }
+  nav.toc a {
+    font-size: 12.5px;
+    font-family: 'JBMono', monospace;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--ink-soft);
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  nav.toc a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  section { margin-top: 52px; scroll-margin-top: 20px; }
+  section > h2 {
+    font-size: 12.5px;
+    font-family: 'JBMono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section > h2::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* 五条主线图例 */
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .dot {
+    flex: none;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+  .legend-item b { font-size: 13.5px; display:block; margin-bottom: 2px; }
+  .legend-item span.d { color: var(--ink-soft); font-size: 12.5px; }
+
+  p.body-text { font-size: 14.5px; color: var(--ink-soft); margin: 14px 0 0; max-width: 64ch; }
+
+  /* 年级卡片 */
+  .grade-card {
+    position: relative;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 24px 22px 24px;
+    margin-top: 18px;
+  }
+  .grade-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+  .badge {
+    flex: none;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2.5px solid var(--margin-red);
+    color: var(--margin-red);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JBMono', monospace;
+    font-weight: 700;
+    font-size: 17px;
+    transform: rotate(-3deg);
+  }
+  .grade-card:nth-of-type(even) .badge { transform: rotate(2.5deg); }
+  .grade-titles { flex: 1; min-width: 0; }
+  .grade-name { font-size: 19px; font-weight: 700; margin: 0; }
+  .grade-eyebrow {
+    font-family: 'JBMono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .grade-theme {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 8px 0 16px;
+    padding-left: 2px;
+  }
+
+  .thread-rows { display: flex; flex-direction: column; gap: 9px; margin-bottom: 6px; }
+  .thread-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  .thread-row .label {
+    flex: none;
+    width: 108px;
+    font-weight: 600;
+    font-size: 13px;
+    padding-top: 1px;
+  }
+  .thread-row .text { color: var(--ink-soft); }
+
+  .keypoint {
+    margin-top: 16px;
+    border-left: 3px solid var(--margin-red);
+    background: var(--margin-red-soft);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .keypoint b {
+    color: var(--margin-red);
+    font-family: 'JBMono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  /* 衔接点 */
+  .transit {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .transit-card {
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .transit-card .t-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0 0 10px;
+    color: var(--accent);
+  }
+  .transit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .transit-grid .k {
+    font-family: 'JBMono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 5px;
+  }
+  .transit-grid .v { font-size: 13.5px; color: var(--ink-soft); }
+  @media (max-width: 520px) {
+    .transit-grid { grid-template-columns: 1fr; }
+  }
+
+  /* 学习方法 */
+  .methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .method-item {
+    display: flex;
+    gap: 10px;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 13px 14px;
+  }
+  .method-item .box {
+    flex: none;
+    width: 17px; height: 17px;
+    margin-top: 2px;
+    border: 2px solid var(--accent);
+    border-radius: 3px;
+  }
+  .method-item .txt b { display: block; font-size: 13.5px; margin-bottom: 3px; }
+  .method-item .txt span { font-size: 12.8px; color: var(--ink-soft); }
+  @media (max-width: 560px) {
+    .methods { grid-template-columns: 1fr; }
+  }
+
+  /* 教学原则 */
+  .principles { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .principle {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px 18px;
+  }
+  .principle .num {
+    flex: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--card-bg);
+    font-family: 'JBMono', monospace;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .principle .body b { display: block; font-size: 14.5px; margin-bottom: 5px; }
+  .principle .body span { font-size: 13.3px; color: var(--ink-soft); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-family: 'JBMono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 20px 10px 70px; }
+    .sheet { padding: 40px 22px 46px 54px; }
+    .sheet::after { display: none; }
+    .sheet::before { left: 24px; }
+    h1.title { font-size: 24px; }
+    .thread-row { flex-direction: column; gap: 2px; }
+    .thread-row .label { width: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>
+
+<div class="sheet">
+
+  <header class="cover">
+    <span class="eyebrow">PRIMARY MATH · GRADE 1 – 6</span>
+    <h1 class="title">小学数学六年学习计划</h1>
+    <p class="subtitle">五条主线，螺旋上升 —— 六年一以贯之，而非六个孤立年级</p>
+    <p class="lede">小学数学不应被拆成六个互不相干的年级任务。本计划以「数与运算」「图形与几何」「量与计量」「统计与概率」「应用题与数学思维」五条主线贯穿始终，每条线在每个年级都会出现，只是难度螺旋上升——这样安排，三年级学分数就不会是一次没有铺垫的断崖。</p>
+
+    <nav class="toc">
+      <a href="index.html" style="color:var(--card-bg);background:var(--margin-red);border-color:var(--margin-red)">🏠 返回首页</a>
+      <a href="overview-review-plan.html">🗓️ 三科综合复习</a>
+      <a href="mindset-habits-plan.html">📌 学习心态与习惯</a>
+      <a href="#overview">总览</a>
+      <a href="#g1">一年级</a>
+      <a href="#g2">二年级</a>
+      <a href="#g3">三年级</a>
+      <a href="#g4">四年级</a>
+      <a href="#g5">五年级</a>
+      <a href="#g6">六年级</a>
+      <a href="#transition">衔接点</a>
+      <a href="#method">学习方法</a>
+      <a href="#principles">教学原则</a>
+    </nav>
+  </header>
+
+  <section id="overview">
+    <h2>五条主线 · 全年贯穿</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="dot" style="background:var(--thread-num)"></span><div><b>数与运算</b><span class="d">核心主线，占比最大</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-geo)"></span><div><b>图形与几何</b><span class="d">先立体后平面</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-measure)"></span><div><b>量与计量</b><span class="d">长度/质量/时间等</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-stat)"></span><div><b>统计与概率</b><span class="d">五年级起系统出现</span></div></div>
+      <div class="legend-item"><span class="dot" style="background:var(--thread-app)"></span><div><b>应用题与思维</b><span class="d">建模能力的载体</span></div></div>
+    </div>
+  </section>
+
+  <section id="g1">
+    <h2>年级详解</h2>
+
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">1</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 01</div>
+          <p class="grade-name">一年级 · 具象认知，建立数感</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">20 以内、100 以内加减法（不进位 → 进位 → 退位），认识「数位」概念</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识长方体、正方体、圆柱、球等立体图形（先立体后平面，符合认知规律）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">认识钟表（整点、半点）、人民币</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维铺垫</span><span class="text">分类、比较大小、简单排序</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>一切用实物、图片、手指辅助，不追求速度，先追求「理解为什么」。</div>
+    </div>
+  </section>
+
+  <section id="g2">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">2</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 02</div>
+          <p class="grade-name">二年级 · 运算体系初步建立</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">表内乘除法（重中之重，必须脱口而出）、万以内加减法（含连续进位 / 退位）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识角（直角、锐角、钝角）、简单图形的周长</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">长度单位（米、厘米）、时分秒的换算</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维</span><span class="text">初步的「平均分」概念（为三年级分数打基础）</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>乘法口诀是全小学数学的地基，必须滚瓜烂熟，否则三、四年级除法、分数会全线吃力。</div>
+    </div>
+  </section>
+
+  <section id="g3">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">3</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 03</div>
+          <p class="grade-name">三年级 · 分数登场，衔接点最关键</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">多位数乘除法（两三位数乘一位数、除以一位数）、分数初步认识（把「平均分」正式符号化）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">面积概念、长方形正方形周长与面积公式</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">质量单位（克、千克、吨）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">两步应用题开始出现</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>这是小学数学第一个真正的分水岭。分数概念若在此时不扎实，会一路影响到六年级分数四则运算乃至初中有理数。建议多用「分蛋糕、分披萨」等实物类比，不要急着做题。</div>
+    </div>
+  </section>
+
+  <section id="g4">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">4</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 04</div>
+          <p class="grade-name">四年级 · 运算法则系统化</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">三位数乘两位数、除数是两位数的除法、四则混合运算与运算律（交换律 / 结合律 / 分配律）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">分数与小数</span><span class="text">小数的意义与加减法，分数的意义深化</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">角的度量、三角形 / 平行四边形 / 梯形的认识</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">行程问题、和差倍问题开始系统出现</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>运算律是简便计算和以后代数式变形的雏形，一定要讲清楚「为什么可以这样交换」，不是死记公式。</div>
+    </div>
+  </section>
+
+  <section id="g5">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">5</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 05</div>
+          <p class="grade-name">五年级 · 分数运算综合，代数思维萌芽</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数四则运算（通分、约分）、小数乘除法、简易方程（用字母表示数，正式代数思维起点）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">多边形面积（三角形、平行四边形、梯形面积公式推导，注意「推导」而非死记）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">条形统计图、折线统计图</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">分数应用题、行程问题升级（相遇、追及）</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>五年级是公认的分水岭年级。方程思想的引入，标志着从「算术思维」（怎么算出答案）向「代数思维」（设未知数、列关系式）过渡，是初中数学的直接铺垫，务必重视。</div>
+    </div>
+  </section>
+
+  <section id="g6">
+    <div class="grade-card">
+      <div class="grade-head">
+        <div class="badge">6</div>
+        <div class="grade-titles">
+          <div class="grade-eyebrow">GRADE 06</div>
+          <p class="grade-name">六年级 · 综合应用与小升初衔接</p>
+        </div>
+      </div>
+      <div class="thread-rows">
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数除法、百分数（与分数、小数三者互化）、比和比例</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">圆的周长与面积、简单立体图形（长方体、圆柱）的表面积与体积</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">扇形统计图、平均数 / 中位数概念</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">工程问题、浓度问题、正反比例应用，综合应用题（融合比例、百分数、几何）</span></div>
+      </div>
+      <div class="keypoint"><b>关键点</b>下学期要做系统性总复习，把六年内容按五条主线重新串一遍，同时提前接触「用字母表示数量关系」的强化训练，为初中一元一次方程做铺垫。</div>
+    </div>
+  </section>
+
+  <section id="transition">
+    <h2>两个必须重视的衔接点</h2>
+    <div class="transit">
+      <div class="transit-card">
+        <p class="t-name">二升三 · 分数出现</p>
+        <div class="transit-grid">
+          <div><span class="k">风险</span><span class="v">「平均分」到「分数符号」的抽象跳跃，孩子容易只会算不理解</span></div>
+          <div><span class="k">应对</span><span class="v">用实物操作反复演示（分蛋糕、分小棒），不急于符号化，确认理解后再引入 1/2、1/4 这类写法</span></div>
+        </div>
+      </div>
+      <div class="transit-card">
+        <p class="t-name">五升六 · 分数运算到百分数 / 比例</p>
+        <div class="transit-grid">
+          <div><span class="k">风险</span><span class="v">抽象程度骤增，且直接决定初中代数适应度</span></div>
+          <div><span class="k">应对</span><span class="v">强调「分数、小数、百分数是同一个数的三种表达」，用互化练习（1/4 = 0.25 = 25%）反复打通</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>贯穿六年的学习方法建议</h2>
+    <div class="methods">
+      <div class="method-item"><span class="box"></span><div class="txt"><b>每天 10 分钟口算 / 心算</b><span>从一年级到六年级不间断，这是数感的根基</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>先问「为什么」，再练「怎么算」</b><span>每学完一个新概念，公式要能推导，不能死记</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>三年级起建立错题本</b><span>按「计算错误 / 理解错误 / 审题错误」分类，便于发现薄弱环节</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>每学期末做一次往年内容抽测</b><span>检验螺旋上升是否真的巩固住了旧知识，而不是学新忘旧</span></div></div>
+    </div>
+  </section>
+
+  <section id="principles">
+    <h2>数学教学七原则</h2>
+    <div class="principles">
+      <div class="principle"><span class="num">1</span><div class="body"><b>具体 → 表象 → 抽象，不要跳步</b><span>先实物操作（分小棒、摆积木），再图示（画图、点阵），最后才落到符号和公式。跳过前两步直接背公式，孩子换个情境就不会迁移——这是三年级分数、五年级方程最容易翻车的地方。</span></div></div>
+      <div class="principle"><span class="num">2</span><div class="body"><b>理解优先于速度，理解之后必须追求熟练</b><span>先讲清楚「为什么」，理解了就要通过重复练习做到自动化（尤其是乘法口诀、进位退位）。基础运算不自动化，做应用题时脑子会被基本计算占满，顾不上分析题意。</span></div></div>
+      <div class="principle"><span class="num">3</span><div class="body"><b>螺旋式复习，而非学完就扔</b><span>新知识要不断在后续内容里被调用（分数在三年级认识、五年级运算、六年级和百分数互化）。每学期末做一次「往年内容抽测」，比只往前赶进度更能巩固长期记忆。</span></div></div>
+      <div class="principle"><span class="num">4</span><div class="body"><b>抓住真正的分水岭年级，别平均用力</b><span>二升三：脱离实物依赖，正式进入抽象运算和分数；五升六：从算术思维过渡到代数思维。这两个坎上多花时间打地基，比其他年级里赶进度更划算。</span></div></div>
+      <div class="principle"><span class="num">5</span><div class="body"><b>错误是诊断工具，不是要消灭的东西</b><span>错题本按「计算错误 / 概念理解错误 / 审题错误」分类。三种错误的根源和对策完全不同——计算错误靠练习量，概念错误要回到第一步重新来，审题错误要专门做「画图翻译题意」训练。</span></div></div>
+      <div class="principle"><span class="num">6</span><div class="body"><b>应用题先教数量关系，再教解法套路</b><span>不要一上来就教「看到"一共"就用加法」这种关键词套路——套路是理解之后自然沉淀出来的副产品，不是捷径。先画线段图、摆实物理清数量关系。</span></div></div>
+      <div class="principle"><span class="num">7</span><div class="body"><b>保护数感和提问的兴趣，不要让刷题淹没它</b><span>低年级宁可少刷题、多玩数字游戏（估算、找规律、生活中的数学），也不要过早进入大量重复刷题——数感和好奇心一旦被磨掉，很难在高年级找补回来。</span></div></div>
+    </div>
+  </section>
+
+  <footer>SPIRAL CURRICULUM · GRADE 01–06 · 五条主线，六年贯穿</footer>
+
+</div>
+<script src="hpx-page-speech.js"></script>
+<script src="hpx-speech-compat.js"></script>
