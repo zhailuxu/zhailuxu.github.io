@@ -1,0 +1,278 @@
+<title>学习心态与习惯 · 家庭提醒板</title>
+<style>
+  :root {
+    --corkboard: #C8A06C;
+    --corkboard-fleck: rgba(90, 60, 25, 0.16);
+    --corkboard-fleck-2: rgba(90, 60, 25, 0.09);
+    --frame: #6B4A2E;
+    --frame-hi: #8A6440;
+    --ink: #2E2417;
+    --ink-soft: #5B4A36;
+    --ink-faint: #8B7A63;
+    --accent: #A6512B;
+    --accent-soft: rgba(166, 81, 43, 0.16);
+    --shadow: rgba(40, 26, 12, 0.35);
+
+    --note-ink: #2E2417;
+    --note-yellow: #F3D77A;
+    --note-blue: #9FC9D9;
+    --note-pink: #E9A8B0;
+    --note-green: #A9CDA0;
+    --note-lavender: #C3AEDA;
+    --note-peach: #EFB98B;
+    --pin: #B23B2E;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --corkboard: #3A2B1C;
+      --corkboard-fleck: rgba(230, 200, 150, 0.09);
+      --corkboard-fleck-2: rgba(230, 200, 150, 0.05);
+      --frame: #201609;
+      --frame-hi: #3A2A17;
+      --ink: #EFE6D4;
+      --ink-soft: #C6B89E;
+      --ink-faint: #8F8069;
+      --accent: #E29A6E;
+      --accent-soft: rgba(226, 154, 110, 0.18);
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --corkboard: #3A2B1C;
+    --corkboard-fleck: rgba(230, 200, 150, 0.09);
+    --corkboard-fleck-2: rgba(230, 200, 150, 0.05);
+    --frame: #201609;
+    --frame-hi: #3A2A17;
+    --ink: #EFE6D4;
+    --ink-soft: #C6B89E;
+    --ink-faint: #8F8069;
+    --accent: #E29A6E;
+    --accent-soft: rgba(226, 154, 110, 0.18);
+    --shadow: rgba(0, 0, 0, 0.5);
+  }
+  :root[data-theme="light"] {
+    --corkboard: #C8A06C;
+    --corkboard-fleck: rgba(90, 60, 25, 0.16);
+    --corkboard-fleck-2: rgba(90, 60, 25, 0.09);
+    --frame: #6B4A2E;
+    --frame-hi: #8A6440;
+    --ink: #2E2417;
+    --ink-soft: #5B4A36;
+    --ink-faint: #8B7A63;
+    --accent: #A6512B;
+    --accent-soft: rgba(166, 81, 43, 0.16);
+    --shadow: rgba(40, 26, 12, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px 100px;
+    background: #EDEAE1;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  @media (prefers-color-scheme: dark) { body { background: #17130D; } }
+  :root[data-theme="dark"] body { background: #17130D; }
+  :root[data-theme="light"] body { background: #EDEAE1; }
+
+  a { color: var(--accent); }
+
+  .board {
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto;
+    background-color: var(--corkboard);
+    background-image:
+      radial-gradient(var(--corkboard-fleck) 1.2px, transparent 1.2px),
+      radial-gradient(var(--corkboard-fleck-2) 1.6px, transparent 1.6px);
+    background-size: 9px 9px, 17px 17px;
+    background-position: 0 0, 5px 8px;
+    border: 14px solid var(--frame);
+    box-shadow: inset 0 0 0 3px var(--frame-hi), 0 24px 50px -22px var(--shadow);
+    border-radius: 4px;
+    padding: 48px 40px 56px;
+  }
+
+  header.cover { margin-bottom: 34px; text-align: center; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+    color: #fff;
+    background: var(--accent);
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+    font-weight: 700;
+    transform: rotate(-2deg);
+  }
+  h1.title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    margin: 0 0 12px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 0 auto 6px;
+    max-width: 56ch;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 13.8px;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin: 14px auto 0;
+  }
+
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 22px 0 0;
+  }
+  nav.toc a {
+    font-size: 12.8px;
+    text-decoration: none;
+    color: var(--ink);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(46,36,23,0.25);
+    border-radius: 999px;
+    padding: 5px 13px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  :root[data-theme="dark"] nav.toc a, @media (prefers-color-scheme: dark) { }
+  nav.toc a:hover { transform: translateY(-2px); background: rgba(255,255,255,0.8); }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 26px 22px;
+    margin-top: 44px;
+  }
+
+  .note {
+    position: relative;
+    background: var(--note-c, var(--note-yellow));
+    color: var(--note-ink);
+    border-radius: 3px;
+    padding: 22px 18px 18px;
+    box-shadow: 0 10px 18px -8px rgba(20,12,4,0.45), 0 1px 0 rgba(255,255,255,0.4) inset;
+    transform: rotate(var(--rot, -2deg));
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .note:hover {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: 0 16px 26px -10px rgba(20,12,4,0.5), 0 1px 0 rgba(255,255,255,0.4) inset;
+  }
+  .note::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #E77462, var(--pin) 60%, #7A2118 100%);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.4);
+  }
+  .note .n-title { font-size: 14.5px; font-weight: 700; margin: 0 0 8px; }
+  .note .n-body { font-size: 13px; line-height: 1.6; }
+
+  .note:nth-child(1) { --note-c: var(--note-yellow); --rot: -2.5deg; }
+  .note:nth-child(2) { --note-c: var(--note-blue); --rot: 1.8deg; }
+  .note:nth-child(3) { --note-c: var(--note-pink); --rot: -1.2deg; }
+  .note:nth-child(4) { --note-c: var(--note-green); --rot: 2.4deg; }
+  .note:nth-child(5) { --note-c: var(--note-lavender); --rot: -2deg; }
+  .note:nth-child(6) { --note-c: var(--note-peach); --rot: 1.4deg; }
+  .note:nth-child(7) { --note-c: var(--note-blue); --rot: -1.6deg; }
+  .note:nth-child(8) { --note-c: var(--note-yellow); --rot: 2deg; }
+
+  footer {
+    margin-top: 46px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 20px 10px 70px; }
+    .board { padding: 34px 18px 42px; border-width: 10px; }
+    h1.title { font-size: 22px; }
+    .notes { grid-template-columns: 1fr 1fr; gap: 30px 14px; }
+  }
+  @media (max-width: 420px) {
+    .notes { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="board">
+
+  <header class="cover">
+    <span class="eyebrow">给家长的提醒板</span>
+    <h1 class="title">学习心态与习惯</h1>
+    <p class="subtitle">和具体学科无关，但可能比任何一个知识点都更影响孩子六年的学习体验</p>
+    <p class="lede">数学、语文、英语各自的学习地图讲的是「教什么、什么时候教」。这块提醒板讲的是更底层的东西——心态、习惯、家庭环境，它们不出现在任何一科的考试里，却在背后决定孩子愿不愿意、能不能一直学下去。</p>
+
+    <nav class="toc">
+      <a href="index.html">🏠 返回首页</a>
+      <a href="study-plan.html">🔢 数学</a>
+      <a href="chinese-study-plan.html">🖌️ 语文</a>
+      <a href="english-study-plan.html">✈️ 英语</a>
+      <a href="overview-review-plan.html">🗓️ 三科综合复习</a>
+    </nav>
+  </header>
+
+  <div class="notes">
+    <div class="note">
+      <p class="n-title">1. 保护「试错权」</p>
+      <p class="n-body">对做错惩罚过重（反复批评、扣分焦虑），孩子会转向「只做有把握的题」，主动思考的意愿被磨掉。允许出错、鼓励说说怎么想的，比对错本身更重要。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">2. 动机要从外部奖励转向内在兴趣</p>
+      <p class="n-body">长期靠贴纸、奖状驱动学习，孩子对学习本身的兴趣会被「奖励」稀释。低年级可以用外部激励起步，但要有意识地引向「这道题真有意思」。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">3. 睡眠和运动的影响被低估</p>
+      <p class="n-body">睡眠不足直接影响记忆巩固，尤其是识字、词汇这类需要大量记忆的内容；运动促进执行功能发展。挤压睡眠运动去换刷题时间，往往是负收益的。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">4. 辅导作业：陪伴不代替，检查不代劳</p>
+      <p class="n-body">家长该做的是「陪着想」，不是「替孩子想」或直接给答案。过度介入会让孩子丧失独立解决问题的机会，也会把责任感转嫁给家长。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">5. 别把学习困难简单归因为「不努力」</p>
+      <p class="n-body">如果某学科长期表现出与努力程度不匹配的困难（朗读总颠倒字词、到高年级仍要数手指计算），要考虑阅读障碍、计算障碍的可能，及早筛查比长期归因态度问题更负责任。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">6. 螺旋上升的节奏因人而异</p>
+      <p class="n-body">六年计划是普适参考框架，每个孩子实际节奏会有差异。适度超前或落后本身不是问题，频繁跟「别人家孩子」比进度才是焦虑的根源。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">7. 家庭阅读环境比课外班更管用</p>
+      <p class="n-body">家里有没有书、大人自己是否也在读书、有没有固定的家庭阅读时间——这个软环境对阅读能力的长期影响，往往比报班更大。</p>
+    </div>
+    <div class="note">
+      <p class="n-title">8. 不要用刷题量衡量努力</p>
+      <p class="n-body">更好的度量是「这周真正弄懂了几个新东西」，而不是「做了多少页」。挤压理解、休息和兴趣空间的刷题，长期是负收益的。</p>
+    </div>
+  </div>
+
+  <footer>MINDSET · HABITS · FAMILY —— 陪孩子走完六年，比赶进度更重要</footer>
+
+</div>
+<script src="hpx-page-speech.js"></script>
+<script src="hpx-speech-compat.js"></script>

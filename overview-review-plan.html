@@ -1,0 +1,436 @@
+<title>小学六年综合复习地图 · 三科整合</title>
+<style>
+  :root {
+    --bg: #EDEAE1;
+    --dot: rgba(43, 38, 30, 0.22);
+    --card-bg: #F8F5EC;
+    --card-bg-soft: #F1EDE0;
+    --ink: #2B2B26;
+    --ink-soft: #665C4C;
+    --ink-faint: #978978;
+    --accent: #A8761F;
+    --accent-soft: rgba(168, 118, 31, 0.14);
+    --border: rgba(43, 38, 30, 0.15);
+    --shadow: rgba(43, 38, 30, 0.14);
+
+    --subj-math: #2E5A78;
+    --subj-chinese: #B7382C;
+    --subj-english: #1F4E79;
+    --subj-math-soft: rgba(46, 90, 120, 0.10);
+    --subj-chinese-soft: rgba(183, 56, 44, 0.10);
+    --subj-english-soft: rgba(31, 78, 121, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #201E19;
+      --dot: rgba(233, 227, 212, 0.16);
+      --card-bg: #28241E;
+      --card-bg-soft: #2E2A22;
+      --ink: #ECE6D9;
+      --ink-soft: #B7AC97;
+      --ink-faint: #857A69;
+      --accent: #D9A54B;
+      --accent-soft: rgba(217, 165, 75, 0.16);
+      --border: rgba(236, 230, 217, 0.13);
+      --shadow: rgba(0, 0, 0, 0.4);
+
+      --subj-math: #7FB2D6;
+      --subj-chinese: #E2836B;
+      --subj-english: #8FBBDA;
+      --subj-math-soft: rgba(127, 178, 214, 0.14);
+      --subj-chinese-soft: rgba(226, 131, 107, 0.14);
+      --subj-english-soft: rgba(143, 187, 218, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #201E19;
+    --dot: rgba(233, 227, 212, 0.16);
+    --card-bg: #28241E;
+    --card-bg-soft: #2E2A22;
+    --ink: #ECE6D9;
+    --ink-soft: #B7AC97;
+    --ink-faint: #857A69;
+    --accent: #D9A54B;
+    --accent-soft: rgba(217, 165, 75, 0.16);
+    --border: rgba(236, 230, 217, 0.13);
+    --shadow: rgba(0, 0, 0, 0.4);
+
+    --subj-math: #7FB2D6;
+    --subj-chinese: #E2836B;
+    --subj-english: #8FBBDA;
+    --subj-math-soft: rgba(127, 178, 214, 0.14);
+    --subj-chinese-soft: rgba(226, 131, 107, 0.14);
+    --subj-english-soft: rgba(143, 187, 218, 0.14);
+  }
+  :root[data-theme="light"] {
+    --bg: #EDEAE1;
+    --dot: rgba(43, 38, 30, 0.22);
+    --card-bg: #F8F5EC;
+    --card-bg-soft: #F1EDE0;
+    --ink: #2B2B26;
+    --ink-soft: #665C4C;
+    --ink-faint: #978978;
+    --accent: #A8761F;
+    --accent-soft: rgba(168, 118, 31, 0.14);
+    --border: rgba(43, 38, 30, 0.15);
+    --shadow: rgba(43, 38, 30, 0.14);
+
+    --subj-math: #2E5A78;
+    --subj-chinese: #B7382C;
+    --subj-english: #1F4E79;
+    --subj-math-soft: rgba(46, 90, 120, 0.10);
+    --subj-chinese-soft: rgba(183, 56, 44, 0.10);
+    --subj-english-soft: rgba(31, 78, 121, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px 100px;
+    background-color: var(--bg);
+    background-image: radial-gradient(var(--dot) 1.3px, transparent 1.3px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  a { color: var(--accent); }
+
+  .sheet {
+    position: relative;
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px -20px var(--shadow);
+    padding: 54px 46px 60px;
+  }
+
+  header.cover { margin-bottom: 40px; }
+  .eyebrow {
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+  h1.title {
+    font-size: 29px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    margin: 0 0 12px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .subtitle { font-size: 15.5px; color: var(--ink-soft); margin: 0 0 18px; text-wrap: balance; }
+  .lede { font-size: 14.5px; color: var(--ink-soft); max-width: 66ch; margin: 0; }
+
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .legend-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.8px;
+    font-weight: 600;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px 5px 8px;
+  }
+  .legend-pill .sw { width: 10px; height: 10px; border-radius: 50%; }
+
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 0;
+    padding-top: 22px;
+    border-top: 1px dashed var(--border);
+  }
+  nav.toc a {
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 13px;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  nav.toc a:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  section { margin-top: 52px; scroll-margin-top: 20px; }
+  section > h2 {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  section > h2::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  section > p.lead { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 20px; max-width: 66ch; }
+
+  /* 时间轴 */
+  .timeline { display: flex; flex-direction: column; gap: 12px; }
+  .tl-row {
+    display: grid;
+    grid-template-columns: 96px repeat(3, 1fr);
+    gap: 10px;
+  }
+  .tl-row.crunch {
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 8px;
+    background: var(--accent-soft);
+  }
+  .tl-row:not(.crunch) { padding: 8px 0; }
+  .tl-grade { display: flex; flex-direction: column; justify-content: center; }
+  .tl-grade b { font-size: 15px; font-weight: 700; }
+  .tl-grade .warn {
+    font-size: 10.5px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .tl-cell {
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 12.8px;
+  }
+  .tl-row.crunch .tl-cell { background: var(--card-bg); }
+  .tl-cell .subj {
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tl-cell .text { color: var(--ink-soft); }
+
+  @media (max-width: 680px) {
+    .tl-row { grid-template-columns: 1fr; gap: 8px; }
+    .tl-grade { flex-direction: row; align-items: center; gap: 10px; }
+    .tl-grade .warn { margin-top: 0; }
+  }
+
+  /* 假期任务清单 */
+  .breaks { display: flex; flex-direction: column; gap: 16px; }
+  .break-card {
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .break-card .b-name {
+    font-weight: 700;
+    font-size: 15.5px;
+    margin: 0 0 12px;
+    color: var(--accent);
+  }
+  .break-tasks { display: flex; flex-direction: column; gap: 9px; }
+  .break-task { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+  .break-task .subj-tag {
+    flex: none;
+    width: 76px;
+    font-weight: 700;
+    font-size: 12px;
+    padding-top: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .break-task .subj-tag .sw { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .break-task .text { color: var(--ink-soft); }
+
+  /* 方法论 */
+  .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .method-item {
+    display: flex;
+    gap: 10px;
+    background: var(--card-bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 13px 14px;
+  }
+  .method-item .box { flex: none; width: 17px; height: 17px; margin-top: 2px; border: 2px solid var(--accent); border-radius: 3px; }
+  .method-item .txt b { display: block; font-size: 13.5px; margin-bottom: 3px; }
+  .method-item .txt span { font-size: 12.8px; color: var(--ink-soft); }
+  @media (max-width: 560px) { .methods { grid-template-columns: 1fr; } }
+
+  /* 时间分配 */
+  .split-bar {
+    display: flex;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin: 16px 0 10px;
+  }
+  .split-seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 20px 10px 70px; }
+    .sheet { padding: 40px 22px 46px; }
+    h1.title { font-size: 23px; }
+    .break-task { flex-direction: column; gap: 3px; }
+    .break-task .subj-tag { width: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="sheet">
+
+  <header class="cover">
+    <span class="eyebrow">数学 · 语文 · 英语 —— 整合视图</span>
+    <h1 class="title">小学六年综合复习地图</h1>
+    <p class="subtitle">三科各自的学习地图讲深度，这一页讲"什么时候三科一起吃紧"</p>
+    <p class="lede">数学、语文、英语各有自己的螺旋上升节奏，但真正影响孩子体感的，往往不是单科的难度，而是好几科的坎恰好落在同一个学期。这一页把三科的关键衔接点摆到同一条时间轴上，再给出对应学期的假期任务清单，以及和学科无关的复习方法论。</p>
+
+    <div class="legend-row">
+      <span class="legend-pill"><span class="sw" style="background:var(--subj-math)"></span>🔢 数学</span>
+      <span class="legend-pill"><span class="sw" style="background:var(--subj-chinese)"></span>🖌️ 语文</span>
+      <span class="legend-pill"><span class="sw" style="background:var(--subj-english)"></span>✈️ 英语</span>
+    </div>
+
+    <nav class="toc">
+      <a href="index.html" style="color:#fff;background:var(--accent);border-color:var(--accent)">🏠 返回首页</a>
+      <a href="mindset-habits-plan.html">📌 学习心态与习惯</a>
+      <a href="#timeline">三科衔接时间轴</a>
+      <a href="#breaks">假期任务清单</a>
+      <a href="#method">复习方法论</a>
+      <a href="#split">时间分配</a>
+    </nav>
+  </header>
+
+  <section id="timeline">
+    <h2>三科衔接点合并时间轴</h2>
+    <p class="lead">标黄边框的是「三科同压」学期——三门学科的关键坎恰好都落在这一年，最容易让孩子突然觉得"跟不上了"，值得提前一个假期准备。</p>
+    <div class="timeline">
+
+      <div class="tl-row">
+        <div class="tl-grade"><b>一年级</b></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">数感启蒙，20/100以内加减法</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">识字启蒙，学拼音，识字约300字</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">语音启蒙，磨耳朵，认读26个字母</div></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-grade"><b>二年级</b></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">乘法口诀，万以内加减法</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">识字量跃升到1200字，为脱拼音做准备</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">词汇积累到150词，简单句型问答</div></div>
+      </div>
+
+      <div class="tl-row crunch">
+        <div class="tl-grade"><b>三年级</b><span class="warn">⚠ 三科同压</span></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">分数登场，第一次真正的抽象运算</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">脱拼音独立阅读 + 正式习作元年</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">多数学校的正式起点，字母关+高频词关</div></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-grade"><b>四年级</b></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">运算律系统化，理解重于记忆</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">篇章结构，学习按顺序有条理地写</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">语法意识萌芽（第三人称单数、方位介词）</div></div>
+      </div>
+
+      <div class="tl-row crunch">
+        <div class="tl-grade"><b>五年级</b><span class="warn">⚠ 三科同压</span></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">简易方程，算术思维过渡到代数思维</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">建立文体意识（记叙/说明/议论方法论不同）</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">时态对比（现在/进行/将来），篇章理解</div></div>
+      </div>
+
+      <div class="tl-row">
+        <div class="tl-grade"><b>六年级</b></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-math)">🔢 数学</div><div class="text">百分数、比例，综合应用+总复习</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-chinese)">🖌️ 语文</div><div class="text">综合阅读与命题作文，古诗文系统总复习</div></div>
+        <div class="tl-cell"><div class="subj" style="color:var(--subj-english)">✈️ 英语</div><div class="text">四态综合运用，词汇总复习，衔接初中节奏</div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="breaks">
+    <h2>两个「三科同压」学期的假期任务清单</h2>
+    <p class="lead">与其等开学后手忙脚乱，不如提前一个假期把最费劲的部分拆开准备。</p>
+    <div class="breaks">
+
+      <div class="break-card">
+        <p class="b-name">二升三暑假 —— 迎接三年级的三科同压</p>
+        <div class="break-tasks">
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-math)"><span class="sw" style="background:var(--subj-math)"></span>数学</span><span class="text">重新过一遍100以内加减法和乘法口诀，查漏补缺；用分蛋糕、分小棒等实物游戏为分数概念做准备</span></div>
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-chinese)"><span class="sw" style="background:var(--subj-chinese)"></span>语文</span><span class="text">重点检测「脱拼音独立阅读」——盖住拼音，看孩子能不能读懂课文和简单课外书</span></div>
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-english)"><span class="sw" style="background:var(--subj-english)"></span>英语</span><span class="text">若此前零基础，集中过一遍26个字母认读书写和自然拼读基础，把起步坡度降下来</span></div>
+        </div>
+      </div>
+
+      <div class="break-card">
+        <p class="b-name">四升五暑假 —— 迎接五年级的三科同压</p>
+        <div class="break-tasks">
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-math)"><span class="sw" style="background:var(--subj-math)"></span>数学</span><span class="text">复习运算律和小数四则运算，用天平实物游戏提前体会「等式两边同时做同一件事」</span></div>
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-chinese)"><span class="sw" style="background:var(--subj-chinese)"></span>语文</span><span class="text">做几次「同一素材、两种文体」的对比练习，提前建立记叙文和说明文的区分意识</span></div>
+          <div class="break-task"><span class="subj-tag" style="color:var(--subj-english)"><span class="sw" style="background:var(--subj-english)"></span>英语</span><span class="text">用时间轴或场景图整理一般现在时/进行时/将来时的区别，不要等开学后现学现用现混淆</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>与学科无关的复习方法论</h2>
+    <p class="lead">这几条对数学、语文、英语同样适用，是「怎么复习」，不是「复习什么」。</p>
+    <div class="methods">
+      <div class="method-item"><span class="box"></span><div class="txt"><b>错题本用统一的三分类标准</b><span>计算/书写错误、概念理解错误、审题错误——三科都套用这个框架，孩子自己也能学会归因</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>每学期末做一次「上学期内容抽测」</b><span>三科各留一次，检验螺旋上升是否真的巩固住了旧知识，而不是只顾往前赶进度</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>三科同压学期提前一个假期准备</b><span>三年级、五年级是三科坎同时出现的学期，暑假的「预习」比开学后的「补救」成本低得多</span></div></div>
+      <div class="method-item"><span class="box"></span><div class="txt"><b>越不容易靠刷题速成的科目，越要天天见</b><span>数学可以靠短期刷题补救，但语文语感和英语语音一旦错过窗口很难速成——分配时间时优先保证语文、英语的「日常量」</span></div></div>
+    </div>
+  </section>
+
+  <section id="split">
+    <h2>三科每周时间分配参考</h2>
+    <p class="lead">仅供参考，不是绝对比例——原则是「三科都不能断」，尤其三、五年级前后不要因为数学作业多就把语文英语的日常输入挤掉。</p>
+    <div class="split-bar">
+      <div class="split-seg" style="background:var(--subj-math);width:38%">数学 38%</div>
+      <div class="split-seg" style="background:var(--subj-chinese);width:34%">语文 34%</div>
+      <div class="split-seg" style="background:var(--subj-english);width:28%">英语 28%</div>
+    </div>
+    <p class="lead" style="margin-top:14px">数学占比略高是因为需要专门的习题练习时间；语文、英语的占比里，日常的阅读磨耳朵时间比做题时间更重要，不要用「刷题时长」衡量投入是否足够。</p>
+  </section>
+
+  <footer>MATH · CHINESE · ENGLISH — 三科整合，六年一张图</footer>
+
+</div>
+<script src="hpx-page-speech.js"></script>
+<script src="hpx-speech-compat.js"></script>
