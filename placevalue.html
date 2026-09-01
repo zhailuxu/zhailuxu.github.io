@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数位认知 — 个位到亿位</title>
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:"华文圆体","微软雅黑","Comic Sans MS",sans-serif;
+  background:linear-gradient(145deg,#e8f5e9 0%,#fff8e1 50%,#e3f2fd 100%);
+  min-height:100vh; padding:16px 14px 40px;
+}
+.container{ max-width:720px; margin:0 auto; }
+
+/* ── header ── */
+.hdr{ text-align:center; padding:16px 0 12px; }
+.hdr h1{ font-size:1.9rem; color:#1b5e20; text-shadow:2px 2px 0 #a5d6a7; letter-spacing:3px; }
+.hdr p{ font-size:.83rem; color:#aaa; margin-top:4px; }
+
+/* ── tabs ── */
+.tabs{ display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+.tab-btn{
+  padding:8px 24px; border:none; border-radius:20px;
+  font-size:.93rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.7); color:#666;
+  box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .18s;
+}
+.tab-btn.on{ background:#2e7d32; color:#fff; box-shadow:0 4px 14px rgba(46,125,50,.38); }
+
+/* ── card ── */
+.card{
+  background:rgba(255,255,255,.9); border-radius:20px;
+  padding:20px 18px; box-shadow:0 4px 20px rgba(0,0,0,.1); margin-bottom:14px;
+}
+
+/* ── number input row ── */
+.input-row{ display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.num-big{
+  width:110px; height:54px; border:3px solid #a5d6a7; border-radius:14px;
+  text-align:center; font-size:1.8rem; font-weight:bold; color:#1b5e20;
+  background:#f1f8e9; outline:none; -moz-appearance:textfield;
+}
+.num-big:focus{ border-color:#2e7d32; }
+.num-big::-webkit-inner-spin-button,.num-big::-webkit-outer-spin-button{-webkit-appearance:none;}
+.btn{ border:none; border-radius:12px; padding:10px 20px; font-size:.93rem; font-weight:bold; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.1); transition:transform .12s; }
+.btn:active{ transform:scale(.95); }
+.btn-green { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; }
+.btn-orange{ background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-blue  { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-purple{ background:linear-gradient(135deg,#ce93d8,#6a1b9a); color:#fff; }
+.btn-gray  { background:#e0e0e0; color:#555; }
+
+/* ── place value board ── */
+.board-wrap{ overflow-x:auto; padding-bottom:4px; margin-bottom:14px; }
+.board{
+  display:grid; gap:8px; min-width:min-content;
+}
+.pv-col{
+  border-radius:16px; padding:10px 6px; min-height:170px; min-width:74px;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.pv-col.lvl-ge  { background:linear-gradient(180deg,#e8f5e9,#c8e6c9); border:2px solid #81c784; }
+.pv-col.lvl-wan { background:linear-gradient(180deg,#e3f2fd,#bbdefb); border:2px solid #64b5f6; }
+.pv-col.lvl-yi  { background:linear-gradient(180deg,#fff3e0,#ffe0b2); border:2px solid #ffb74d; }
+
+.pv-label{ font-size:.76rem; font-weight:bold; color:#555; letter-spacing:1px; white-space:nowrap; }
+.pv-blocks{ display:flex; flex-wrap:wrap; gap:3px; justify-content:center; align-items:flex-end; flex:1; width:100%; align-content:flex-end; }
+.pv-count{
+  font-size:1.7rem; font-weight:bold; min-height:2.1rem;
+  transition:transform .2s;
+}
+.lvl-ge  .pv-count{ color:#2e7d32; }
+.lvl-wan .pv-count{ color:#1565c0; }
+.lvl-yi  .pv-count{ color:#e65100; }
+
+/* ── chip (千位及以上，避免渲染海量小方块) ── */
+.block-chip{
+  min-width:26px; height:22px; padding:0 4px; border-radius:5px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.62rem; font-weight:bold; color:#fff;
+  animation:popIn .25s ease-out;
+}
+.lvl-wan .block-chip{ background:#1565c0; }
+.lvl-yi  .block-chip{ background:#e65100; }
+
+/* ── blocks ── */
+@keyframes popIn{
+  from{ opacity:0; transform:scale(.3) translateY(-20px); }
+  to  { opacity:1; transform:scale(1)  translateY(0); }
+}
+.block-hundred{
+  display:grid; grid-template-columns:repeat(10,6px); gap:1px;
+  background:#e65100; padding:2px; border-radius:3px;
+  animation:popIn .3s ease-out;
+}
+.hcell{ width:6px; height:6px; background:#fff3e0; border-radius:1px; }
+
+.block-ten{
+  display:grid; grid-template-rows:repeat(10,6px); gap:1px;
+  background:#1565c0; padding:2px; border-radius:3px;
+  animation:popIn .25s ease-out; width:10px;
+}
+.tcell{ width:6px; height:6px; background:#e3f2fd; border-radius:1px; }
+
+.block-one{
+  width:12px; height:12px; background:#2e7d32; border-radius:2px;
+  animation:popIn .2s ease-out;
+}
+
+/* ── decomp display ── */
+.decomp{
+  text-align:center; font-size:1.25rem; font-weight:bold;
+  color:#333; background:#f9fbe7; border-radius:14px;
+  padding:12px 16px; margin-bottom:10px; min-height:54px;
+  border:2px dashed #c5e1a5; transition:all .3s;
+}
+.decomp .d-yi{ color:#e65100; }
+.decomp .d-wan{ color:#1565c0; }
+.decomp .d-ge{ color:#2e7d32; }
+.decomp .d-plus{ color:#aaa; margin:0 4px; }
+
+/* ── narration ── */
+.narr{
+  background:linear-gradient(135deg,#f3e5f5,#e8eaf6);
+  border-radius:14px; padding:11px 16px; font-size:.95rem; color:#333;
+  text-align:center; border-left:4px solid #9c27b0; min-height:48px;
+  margin-bottom:12px; display:flex; align-items:center; justify-content:center;
+}
+
+/* ── speed / order ── */
+.speed-row{ display:flex; gap:6px; justify-content:center; margin-bottom:4px; align-items:center; font-size:.82rem; color:#888; }
+.sp-btn{ padding:4px 12px; border:1.5px solid #bbb; border-radius:10px; background:#fff; color:#555; font-size:.78rem; cursor:pointer; transition:all .14s; }
+.sp-btn.on{ background:#2e7d32; color:#fff; border-color:#2e7d32; }
+
+/* ── order toggle ── */
+.order-row{ display:flex; gap:0; justify-content:center; margin-bottom:8px; align-items:center; font-size:.82rem; color:#888; flex-wrap:wrap; gap:6px; }
+.order-pill{
+  display:flex; border:2px solid #b0bec5; border-radius:24px; overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.ord-btn{
+  padding:5px 16px; border:none; background:#fff; color:#666;
+  font-size:.8rem; font-weight:bold; cursor:pointer; transition:all .16s;
+  white-space:nowrap;
+}
+.ord-btn:first-child{ border-right:1.5px solid #b0bec5; }
+.ord-btn.on{ background:linear-gradient(135deg,#7b1fa2,#4a148c); color:#fff; }
+.ord-label-h{ color:#e65100; font-weight:bold; }
+.ord-label-o{ color:#2e7d32; font-weight:bold; }
+
+/* ── number reading ── */
+.reading-box{
+  text-align:center; font-size:1.4rem; font-weight:bold; color:#4a148c;
+  background:#f3e5f5; border-radius:14px; padding:10px;
+  margin-bottom:12px; min-height:48px; letter-spacing:2px;
+}
+
+/* ── practice ── */
+.prac-q{
+  background:#fff; border-radius:16px; padding:18px; margin-bottom:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+.prac-q .q-num{ font-size:2.4rem; font-weight:bold; color:#1b5e20; text-align:center; margin-bottom:12px; }
+.prac-q .q-text{ font-size:1rem; color:#555; text-align:center; margin-bottom:14px; }
+.fill-row{ display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
+.fill-inp{
+  width:72px; height:52px; border:2.5px solid #a5d6a7; border-radius:12px;
+  text-align:center; font-size:1.5rem; font-weight:bold; color:#333;
+  background:#f9fbe7; outline:none; -moz-appearance:textfield;
+}
+.fill-inp:focus{ border-color:#2e7d32; }
+.fill-inp::-webkit-inner-spin-button,.fill-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.fill-inp.ok  { border-color:#43a047; background:#e8f5e9; color:#2e7d32; }
+.fill-inp.bad { border-color:#e53935; background:#ffebee; color:#c62828; }
+.fill-label{ font-size:.9rem; color:#666; }
+.prac-fb{ text-align:center; font-size:1rem; font-weight:bold; min-height:28px; margin-top:10px; }
+.prac-fb.ok  { color:#2e7d32; }
+.prac-fb.bad { color:#c62828; }
+
+/* ── quiz ── */
+.quiz-meta{ display:flex; justify-content:space-between; font-size:.88rem; color:#888; margin-bottom:12px; }
+.quiz-q-box{
+  background:#fff; border-radius:16px; padding:22px 18px; text-align:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.1); margin-bottom:14px; min-height:130px;
+  display:flex; flex-direction:column; justify-content:center; gap:8px;
+}
+.quiz-big  { font-size:3rem; font-weight:bold; color:#1b5e20; }
+.quiz-label{ font-size:.82rem; color:#bbb; }
+.quiz-text { font-size:1.05rem; color:#333; font-weight:bold; }
+.choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.choice-btn{
+  padding:14px 10px; border:2.5px solid #e0e0e0; border-radius:14px;
+  background:#fff; font-size:1.1rem; font-weight:bold; cursor:pointer;
+  transition:all .14s; min-height:58px;
+  display:flex; align-items:center; justify-content:center;
+}
+.choice-btn:hover{ border-color:#a5d6a7; background:#f1f8e9; }
+.choice-btn.correct{ border-color:#43a047; background:#e8f5e9; color:#2e7d32; }
+.choice-btn.wrong  { border-color:#e53935; background:#ffebee; color:#c62828; }
+.quiz-fb{ text-align:center; font-size:1rem; font-weight:bold; min-height:28px; margin-bottom:8px; }
+.quiz-fb.ok  { color:#2e7d32; }
+.quiz-fb.bad { color:#c62828; }
+.quiz-done{ text-align:center; padding:20px 0; }
+.score-big{ font-size:3.2rem; font-weight:bold; color:#1b5e20; }
+
+/* ── toast ── */
+#pvToast{
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:#323232; color:#fff; border-radius:20px; padding:10px 22px;
+  font-size:.88rem; opacity:0; transition:opacity .2s, transform .2s;
+  pointer-events:none; z-index:9999; white-space:nowrap;
+}
+#pvToast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+.hidden{ display:none !important; }
+.gap8{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.mt12{ margin-top:12px; }
+@media(max-width:400px){
+  .pv-count{ font-size:1.6rem; }
+  .board{ gap:6px; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<div class="container">
+
+<div class="hdr">
+  <div style="font-size:2.8rem">🔢</div>
+  <h1>数位认知</h1>
+  <p>个位到亿位，从视觉认识数的组成</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" onclick="switchTab('demo')">🎬 动画演示</button>
+  <button class="tab-btn"   onclick="switchTab('prac')">✏️ 练习</button>
+  <button class="tab-btn"   onclick="switchTab('quiz')">🎯 测验</button>
+</div>
+
+<!-- ══ 演示 ══ -->
+<div id="pgDemo">
+  <div class="card">
+    <div class="input-row">
+      <input id="demoNum" class="num-big" type="number" value="247" min="1" max="100000000" style="width:170px;">
+      <button class="btn btn-orange" onclick="randNum()">🎲 随机</button>
+      <button class="btn btn-green"  onclick="startDemo()">▶ 演示</button>
+    </div>
+    <div class="speed-row">
+      速度：
+      <button class="sp-btn on" data-sp="600" onclick="setSp(600,this)">慢</button>
+      <button class="sp-btn"    data-sp="350" onclick="setSp(350,this)">正常</button>
+      <button class="sp-btn"    data-sp="150" onclick="setSp(150,this)">快</button>
+    </div>
+    <div class="order-row">
+      演示顺序：
+      <div class="order-pill">
+        <button class="ord-btn on" id="ordH2O" onclick="setOrder('h2o')">
+          <span class="ord-label-h">百</span>→<span class="ord-label-o" style="color:#1565c0">十</span>→<span class="ord-label-o">个</span>
+        </button>
+        <button class="ord-btn" id="ordO2H" onclick="setOrder('o2h')">
+          <span class="ord-label-o">个</span>→<span class="ord-label-o" style="color:#1565c0">十</span>→<span class="ord-label-h">百</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="narr" id="narr">点击「演示」，看数字是怎么组成的 👆</div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="decomp" id="decomp">　</div>
+  <div class="reading-box" id="readBox">　</div>
+
+  <div class="gap8">
+    <button class="btn btn-blue" onclick="startDemo()">↺ 重播</button>
+  </div>
+</div>
+
+<!-- ══ 练习 ══ -->
+<div id="pgPrac" class="hidden">
+  <div class="card" id="pracCard"></div>
+  <div class="gap8 mt12" id="pracCtrl">
+    <button class="btn btn-purple" onclick="nextPrac()">下一题 →</button>
+    <button class="btn btn-orange" onclick="pracDemo()">🎬 看演示</button>
+  </div>
+</div>
+
+<!-- ══ 测验 ══ -->
+<div id="pgQuiz" class="hidden">
+  <div class="quiz-meta">
+    <span id="qMeta">第 1 / 10 题</span>
+    <span id="qScore">✅ 0 &nbsp;❌ 0</span>
+  </div>
+  <div class="quiz-q-box" id="quizQBox"></div>
+  <div class="choices" id="choices"></div>
+  <div class="quiz-fb" id="quizFb"></div>
+  <div style="text-align:center">
+    <button class="btn btn-blue" id="qNextBtn" onclick="quizNext()" style="display:none">下一题 →</button>
+  </div>
+  <div class="quiz-done hidden" id="quizDone">
+    <div class="score-big" id="qFinalScore"></div>
+    <p id="qFinalMsg" style="color:#666;margin-top:6px"></p>
+    <div class="gap8 mt12">
+      <button class="btn btn-green"  onclick="startQuiz()">再来一次</button>
+      <button class="btn btn-gray"   onclick="switchTab('prac')">去练习</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<div id="pvToast"></div>
+
+<script src="hpx-core.js"></script>
+<script>
+// ─────────────────────────────────────
+//  语音
+// ─────────────────────────────────────
+Hpx.speech.install({rate:0.85,startDelayMs:50});
+
+// ─────────────────────────────────────
+//  音效
+// ─────────────────────────────────────
+let _ac = null;
+function tone(f, d, t='sine', v=.2) {
+  try {
+    if (!_ac) _ac = new (window.AudioContext||window.webkitAudioContext)();
+    if (_ac.state === 'suspended') _ac.resume();
+    const o = _ac.createOscillator(), g = _ac.createGain();
+    o.connect(g); g.connect(_ac.destination);
+    o.type = t; o.frequency.setValueAtTime(f, _ac.currentTime);
+    g.gain.setValueAtTime(v, _ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, _ac.currentTime + d);
+    o.start(); o.stop(_ac.currentTime + d);
+  } catch(e) {}
+}
+function playPop()  { tone(480, .06); }
+function playOk()   { tone(523, .08); setTimeout(() => tone(659, .14), 80); }
+function playFail() { tone(220, .18, 'sawtooth', .14); }
+
+// ─────────────────────────────────────
+//  数位定义（个位 → 亿位，共9位）
+// ─────────────────────────────────────
+const POSITIONS = [
+  {label:'亿',   factor:1e8, lvl:'yi'},
+  {label:'千万', factor:1e7, lvl:'wan'},
+  {label:'百万', factor:1e6, lvl:'wan'},
+  {label:'十万', factor:1e5, lvl:'wan'},
+  {label:'万',   factor:1e4, lvl:'wan'},
+  {label:'千',   factor:1e3, lvl:'ge'},
+  {label:'百',   factor:100, lvl:'ge'},
+  {label:'十',   factor:10,  lvl:'ge'},
+  {label:'个',   factor:1,   lvl:'ge'},
+];
+// 返回当前数字实际用到的数位（从最高非零位到个位），至少含个位
+function activePositions(n) {
+  n = Math.max(0, Math.floor(n));
+  let startIdx = POSITIONS.length - 1;
+  for (let i = 0; i < POSITIONS.length; i++) {
+    if (n >= POSITIONS[i].factor) { startIdx = i; break; }
+  }
+  return POSITIONS.slice(startIdx);
+}
+function digitAt(n, factor) {
+  return Math.floor(n / factor) % 10;
+}
+
+// ─────────────────────────────────────
+//  中文数字转换（与 bignumber.html 一致的算法）
+// ─────────────────────────────────────
+const CN = ['零','一','二','三','四','五','六','七','八','九'];
+const CN_UNIT_SMALL = ['','十','百','千'];
+const CN_UNIT_BIG = ['','万','亿'];
+function convertGroup(g) {
+  let s = '', pendingZero = false;
+  for (let i = 0; i < 4; i++) {
+    const d = +g[i];
+    const unit = CN_UNIT_SMALL[3-i];
+    if (d === 0) { if (s !== '') pendingZero = true; }
+    else { if (pendingZero) { s += '零'; pendingZero = false; } s += CN[d] + unit; }
+  }
+  return s;
+}
+function readNumber(n) {
+  let numStr = String(Math.max(0, Math.floor(n)));
+  numStr = numStr.replace(/^0+(?=\d)/,'');
+  if (numStr === '0') return '零';
+  const pad = (4 - numStr.length % 4) % 4;
+  const padded = '0'.repeat(pad) + numStr;
+  const groups = [];
+  for (let i = 0; i < padded.length; i += 4) groups.push(padded.slice(i, i+4));
+  const gn = groups.length;
+  let parts = [], anyWritten = false, prevGroupWasZero = true;
+  for (let gi = 0; gi < gn; gi++) {
+    const g = groups[gi], bigIdx = gn - 1 - gi, isAllZero = (g === '0000');
+    if (isAllZero) { prevGroupWasZero = true; continue; }
+    if (anyWritten && (g[0] === '0' || prevGroupWasZero)) parts.push('零');
+    parts.push(convertGroup(g) + (bigIdx > 0 ? CN_UNIT_BIG[bigIdx] : ''));
+    anyWritten = true; prevGroupWasZero = false;
+  }
+  let result = parts.join('').replace(/零+/g,'零').replace(/零$/,'');
+  if (result.startsWith('一十')) result = result.slice(1);
+  return result || '零';
+}
+
+const randInt=Hpx.random.int;
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+let _toast = null;
+function showToast(msg) {
+  const el = document.getElementById('pvToast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toast); _toast = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────
+//  Block builders
+// ─────────────────────────────────────
+function makeHundred() {
+  const d = document.createElement('div');
+  d.className = 'block-hundred';
+  for (let i = 0; i < 100; i++) {
+    const c = document.createElement('div'); c.className = 'hcell'; d.appendChild(c);
+  }
+  return d;
+}
+function makeTen() {
+  const d = document.createElement('div'); d.className = 'block-ten';
+  for (let i = 0; i < 10; i++) {
+    const c = document.createElement('div'); c.className = 'tcell'; d.appendChild(c);
+  }
+  return d;
+}
+function makeOne() {
+  const d = document.createElement('div'); d.className = 'block-one'; return d;
+}
+function makeChip(label) {
+  const d = document.createElement('div'); d.className = 'block-chip'; d.textContent = label; return d;
+}
+
+// ─────────────────────────────────────
+//  Tab / Speed
+// ─────────────────────────────────────
+let curTab = 'demo';
+function switchTab(t) {
+  curTab = t;
+  Hpx.tabs.activate(t,['demo','prac','quiz'],{hiddenClass:'hidden',panelId:id=>'pg'+id.charAt(0).toUpperCase()+id.slice(1)});
+  if (t === 'prac') genPrac();
+  if (t === 'quiz') startQuiz();
+}
+
+let spMs = 600;
+function setSp(ms, btn) {
+  spMs = ms;
+  document.querySelectorAll('.sp-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+let animOrder = 'h2o'; // 'h2o'=百→十→个  'o2h'=个→十→百
+function setOrder(ord) {
+  animOrder = ord;
+  document.getElementById('ordH2O').classList.toggle('on', ord === 'h2o');
+  document.getElementById('ordO2H').classList.toggle('on', ord === 'o2h');
+}
+
+// ─────────────────────────────────────
+//  Demo / Animation
+// ─────────────────────────────────────
+let _animRunning = false;
+let _animId = 0;
+
+function randNum() {
+  const gens = [
+    () => randInt(11, 99),
+    () => randInt(101, 999),
+    () => randInt(1001, 9999),
+    () => randInt(2, 99) * 10000,
+    () => randInt(2, 99) * 1000000,
+    () => randInt(2, 20) * 10000000,
+    () => 100000000,
+  ];
+  document.getElementById('demoNum').value = gens[randInt(0, gens.length-1)]();
+}
+
+function setNarr(txt) { document.getElementById('narr').textContent = txt; }
+
+// 根据当前数字动态搭建数位板（个位到亿位，只显示用得到的列）
+function buildBoard(positions) {
+  const board = document.getElementById('board');
+  board.style.gridTemplateColumns = `repeat(${positions.length}, minmax(74px,1fr))`;
+  board.innerHTML = positions.map((p,idx) => `
+    <div class="pv-col lvl-${p.lvl}">
+      <div class="pv-label">${p.label}位</div>
+      <div class="pv-blocks" id="blk_${idx}"></div>
+      <div class="pv-count" id="cnt_${idx}">—</div>
+    </div>`).join('');
+}
+function makeBlockFor(factor, label) {
+  if (factor === 100) return makeHundred();
+  if (factor === 10) return makeTen();
+  if (factor === 1) return makeOne();
+  return makeChip(label); // 千及以上：位值筹码，不逐个画格子
+}
+
+function setDecomp(digits, positions, n) {
+  const parts = [], expanded = [];
+  digits.forEach((d,i) => {
+    if (!d) return;
+    const p = positions[i];
+    parts.push(`<span class="d-${p.lvl}">${d} 个${p.label === '个' ? '一' : p.label}</span>`);
+    expanded.push(`<span class="d-${p.lvl}">${d * p.factor}</span>`);
+  });
+  if (!parts.length) parts.push('零');
+  document.getElementById('decomp').innerHTML =
+    `${n.toLocaleString('en-US')} &nbsp;=&nbsp; ${parts.join('<span class="d-plus"> + </span>')}` +
+    (expanded.length ? `<br><span style="font-size:.85rem;color:#aaa">&nbsp;= ${expanded.join(' + ')}</span>` : '');
+}
+
+async function startDemo() {
+  const raw = parseInt(document.getElementById('demoNum').value);
+  const n = Math.max(1, Math.min(100000000, raw || 1));
+  document.getElementById('demoNum').value = n;
+
+  _animId++;
+  const myId = _animId;
+  _animRunning = true;
+
+  const positions = activePositions(n);
+  const digits = positions.map(p => digitAt(n, p.factor));
+  buildBoard(positions);
+  document.getElementById('decomp').textContent = '　';
+  document.getElementById('readBox').textContent = '　';
+
+  const orderLabel = animOrder === 'h2o' ? `${positions[0].label} → ${positions[positions.length-1].label}` : `${positions[positions.length-1].label} → ${positions[0].label}`;
+  setNarr(`我们来看 ${n.toLocaleString('en-US')} 是怎么组成的（${orderLabel}）……`);
+  speak(`${n}，读作${readNumber(n)}`);
+  await delay(spMs * 1.2);
+  if (_animId !== myId) return;
+
+  const order = animOrder === 'h2o'
+    ? positions.map((_,i)=>i)
+    : positions.map((_,i)=>i).reverse();
+
+  for (const idx of order) {
+    const p = positions[idx], d = digits[idx];
+    const blkId = 'blk_'+idx, cntId = 'cnt_'+idx;
+    if (d) {
+      const unitWord = p.label === '个' ? '一' : p.label;
+      setNarr(`${p.label}位是 ${d}，表示 ${d} 个${unitWord}，也就是 ${d * p.factor}`);
+      const spFactor = p.factor >= 1000 ? 0.5 : (p.factor === 100 ? 1.0 : p.factor === 10 ? 0.7 : 0.4);
+      for (let i = 0; i < d; i++) {
+        if (_animId !== myId) return;
+        document.getElementById(blkId).appendChild(makeBlockFor(p.factor, p.label));
+        document.getElementById(cntId).textContent = i + 1;
+        playPop();
+        await delay(spMs * spFactor);
+      }
+    } else {
+      document.getElementById(cntId).textContent = '0';
+    }
+    if (_animId !== myId) return;
+  }
+
+  if (_animId !== myId) return;
+
+  // ── 结论 ──
+  setDecomp(digits, positions, n);
+  document.getElementById('readBox').textContent = `读作：${readNumber(n)}`;
+  const sumParts = [];
+  digits.forEach((d,i) => { if (d) sumParts.push(`${d}个${positions[i].label === '个' ? '一' : positions[i].label}`); });
+  const sumStr = sumParts.join('，');
+  setNarr(`所以 ${n.toLocaleString('en-US')} = ${sumStr || '零'}，读作"${readNumber(n)}"`);
+  speak(`${n}由${sumStr || '零'}组成，读作${readNumber(n)}`);
+  tone(392, .06); setTimeout(() => tone(523, .1), 70); setTimeout(() => tone(659, .18), 140);
+  _animRunning = false;
+}
+
+// ─────────────────────────────────────
+//  Practice
+// ─────────────────────────────────────
+let pracN = 0, pracType = 0, pracDone = false, pracPositions = [];
+
+function randMixedNumber() {
+  const tier = randInt(0, 5);
+  let n;
+  if (tier === 0) n = randInt(11, 99);
+  else if (tier === 1) n = randInt(101, 999);
+  else if (tier === 2) n = randInt(1001, 9999);
+  else if (tier === 3) n = randInt(2, 99) * 10000 + (Math.random() < 0.5 ? randInt(1, 999) : 0);
+  else if (tier === 4) n = randInt(2, 99) * 1000000 + (Math.random() < 0.5 ? randInt(1, 9999) : 0);
+  else n = randInt(2, 20) * 10000000 + (Math.random() < 0.5 ? randInt(1, 999999) : 0);
+  return Math.min(100000000, Math.max(1, Math.floor(n)));
+}
+
+function genPrac() {
+  pracDone = false;
+  pracType = randInt(0, 2);
+  const card = document.getElementById('pracCard');
+  card.innerHTML = '';
+
+  if (pracType === 0) {
+    // 分解：位数控制在4位以内，填空数量才不会太多
+    const n = randInt(11, 9999);
+    pracN = n;
+    pracPositions = activePositions(n);
+    card.innerHTML = `
+      <div class="prac-q">
+        <div class="q-num">${n}</div>
+        <div class="q-text">这个数由几个${pracPositions.map(p=>p.label==='个'?'一':p.label).join('、几个')}组成？</div>
+        <div class="fill-row">
+          ${pracPositions.map((p,i) =>
+            `<input class="fill-inp" id="inD${i}" type="number" placeholder="?" min="0" max="9" style="width:56px;">
+             <span class="fill-label">个${p.label==='个'?'一':p.label}</span>${i<pracPositions.length-1?'<span class="fill-label">+</span>':''}`
+          ).join('')}
+        </div>
+        <div class="prac-fb" id="pracFb"></div>
+      </div>`;
+    speak(`${n}，由几个${pracPositions.map(p=>p.label==='个'?'一':p.label).join('，几个')}组成？`);
+
+  } else if (pracType === 1) {
+    // 合成：给出各非零数位的组成，求数字
+    const n = randMixedNumber();
+    pracN = n;
+    const positions = activePositions(n);
+    const parts = positions
+      .map(p => ({p, d: digitAt(n, p.factor)}))
+      .filter(x => x.d);
+    card.innerHTML = `
+      <div class="prac-q">
+        <div class="q-text" style="font-size:1.1rem;margin-bottom:14px;line-height:2;">
+          ${parts.map(x => `<span style="color:${x.p.lvl==='yi'?'#e65100':x.p.lvl==='wan'?'#1565c0':'#2e7d32'};font-weight:bold">${x.d}</span> 个${x.p.label==='个'?'一':x.p.label}`).join(' ＋ ')}
+        </div>
+        <div class="q-text">组成的数是？</div>
+        <div class="fill-row" style="margin-top:12px">
+          <input class="fill-inp" id="inN" type="number" placeholder="?" style="width:170px;font-size:1.6rem">
+        </div>
+        <div class="prac-fb" id="pracFb"></div>
+      </div>`;
+    speak(parts.map(x=>`${x.d}个${x.p.label==='个'?'一':x.p.label}`).join('加')+'，等于几？');
+
+  } else {
+    // 数位判断：只问非零数字，避免歧义
+    const n = randMixedNumber();
+    pracN = n;
+    const positions = activePositions(n);
+    const nonZeroIdx = positions.map((p,i)=>({p,i,d:digitAt(n,p.factor)})).filter(x=>x.d);
+    const pick = nonZeroIdx[randInt(0, nonZeroIdx.length-1)];
+    const asked = pick.d, correctName = pick.p.label + '位';
+    card.innerHTML = `
+      <div class="prac-q">
+        <div class="q-num" style="font-size:1.7rem;">${n.toLocaleString('en-US')}</div>
+        <div class="q-text">数字 <b style="color:#9c27b0;font-size:1.3rem">${asked}</b> 在哪个数位上？</div>
+        <div class="fill-row" style="margin-top:12px;gap:8px;flex-wrap:wrap;">
+          ${positions.map(p => `<button class="btn btn-gray prac-pos-btn" onclick="pickPos('${p.label}位','${correctName}')">${p.label}位</button>`).join('')}
+        </div>
+        <div class="prac-fb" id="pracFb"></div>
+      </div>`;
+    speak(`${n}，数字${asked}在哪个数位？`);
+  }
+
+  if (pracType === 0) {
+    pracPositions.forEach((p, i) => {
+      document.getElementById('inD' + i).addEventListener('input', () => {
+        const allFilled = pracPositions.every((_, j) => document.getElementById('inD' + j).value.length > 0);
+        if (allFilled) checkPrac();
+      });
+    });
+  } else if (pracType === 1) {
+    const inN = document.getElementById('inN');
+    inN.addEventListener('input', () => { if (inN.value.length >= String(pracN).length) checkPrac(); });
+    inN.addEventListener('blur', () => { if (inN.value.length > 0) checkPrac(); });
+  }
+
+  setTimeout(() => {
+    const first = card.querySelector('.fill-inp');
+    if (first) first.focus();
+  }, 80);
+}
+
+async function pickPos(chosen, correct) {
+  if (pracDone) return;
+  pracDone = true;
+  const fb = document.getElementById('pracFb');
+  document.querySelectorAll('.prac-pos-btn').forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    fb.textContent = `✅ 正确！在${correct}上`; fb.className = 'prac-fb ok'; playOk();
+    speak('正确！真棒！');
+    await delay(1200);
+    nextPrac();
+  } else {
+    fb.textContent = `❌ 应该是${correct}`; fb.className = 'prac-fb bad'; playFail();
+  }
+}
+
+async function checkPrac() {
+  if (pracDone) return; // 防止禁用输入框触发的blur等重复判题
+  if (pracType === 0) {
+    const fb = document.getElementById('pracFb');
+    let allOk = true;
+    pracPositions.forEach((p,i) => {
+      const iv = parseInt(document.getElementById('inD'+i)?.value ?? '');
+      const correct = digitAt(pracN, p.factor);
+      const ok = iv === correct;
+      if (!ok) allOk = false;
+      const el = document.getElementById('inD'+i);
+      el.classList.toggle('ok', ok); el.classList.toggle('bad', !ok);
+    });
+    if (allOk) {
+      fb.textContent = `✅ 正确！`;
+      fb.className = 'prac-fb ok'; playOk(); pracDone = true;
+      pracPositions.forEach((_,i) => { document.getElementById('inD'+i).disabled = true; });
+      speak('正确！真棒！');
+      await delay(1200);
+      nextPrac();
+    } else {
+      fb.textContent = '❌ 有填错的地方，再想想'; fb.className = 'prac-fb bad'; playFail();
+    }
+  } else if (pracType === 1) {
+    const inN = document.getElementById('inN');
+    const iv = parseInt(inN?.value ?? '');
+    const fb = document.getElementById('pracFb');
+    if (iv === pracN) {
+      fb.textContent = `✅ 正确！答案是 ${pracN.toLocaleString('en-US')}，读作${readNumber(pracN)}`;
+      fb.className = 'prac-fb ok'; playOk(); pracDone = true;
+      inN.disabled = true;
+      speak(`正确！答案是${pracN}，读作${readNumber(pracN)}`);
+      await delay(1600);
+      nextPrac();
+    } else {
+      fb.textContent = `❌ 不对哦，再算算`; fb.className = 'prac-fb bad'; playFail();
+    }
+  }
+}
+
+function nextPrac() { genPrac(); }
+
+function pracDemo() {
+  switchTab('demo');
+  document.getElementById('demoNum').value = pracN;
+  startDemo();
+}
+
+// ─────────────────────────────────────
+//  Quiz
+// ─────────────────────────────────────
+let quizList = [], qIdx = 0, qOk = 0, qBad = 0, qAns = false;
+
+function perturbDigit(numStr) {
+  for (let tries=0; tries<20; tries++) {
+    const arr = numStr.split('');
+    const idx = randInt(0, arr.length-1);
+    arr[idx] = String(randInt(0,9));
+    const cand = arr.join('').replace(/^0+(?=\d)/,'');
+    if (cand !== numStr && cand !== '0') return cand;
+  }
+  return String(Number(numStr) + randInt(1,9) * Math.pow(10, randInt(1,3)));
+}
+
+function makeQuizItem() {
+  const type = randInt(0, 3);
+  const n = randMixedNumber();
+  const positions = activePositions(n);
+
+  if (type === 0 || type === 1) {
+    // 看数字 → 选某个数位上的数字
+    const pick = positions[randInt(0, positions.length-1)];
+    const correct = digitAt(n, pick.factor);
+    const wrong = shuffle([0,1,2,3,4,5,6,7,8,9].filter(x=>x!==correct)).slice(0,3);
+    return { n, display: n.toLocaleString('en-US'), q: `${n.toLocaleString('en-US')} 的${pick.label}位数字是？`, choices: shuffle([correct,...wrong]).map(String), correct: String(correct), type };
+  } else if (type === 2) {
+    // 给非零数位组成 → 选数字（大数字里答案不能提前显示在题面上）
+    const parts = positions.map(p=>({p,d:digitAt(n,p.factor)})).filter(x=>x.d);
+    const correct = n;
+    const wrongs = [];
+    let guard = 0;
+    while (wrongs.length < 3 && guard < 40) {
+      guard++;
+      const cand = Number(perturbDigit(String(n)));
+      if (cand > 0 && cand <= 100000000 && cand !== correct && !wrongs.includes(cand)) wrongs.push(cand);
+    }
+    while (wrongs.length < 3) wrongs.push(correct + (wrongs.length+1) * 10);
+    const qText = parts.map(x => `${x.d}个${x.p.label==='个'?'一':x.p.label}`).join(' ＋ ') + ' = ?';
+    return { n, display:'', q: qText, choices: shuffle([correct,...wrongs]).map(v=>v.toLocaleString('en-US')), correct: correct.toLocaleString('en-US'), type };
+  } else {
+    // 看数字 → 选读法
+    const correct = readNumber(n);
+    const wrongsSet = new Set([correct]);
+    let guard = 0;
+    while (wrongsSet.size < 4 && guard < 40) {
+      guard++;
+      const cand = perturbDigit(String(n));
+      const r = readNumber(cand);
+      if (!wrongsSet.has(r)) wrongsSet.add(r);
+    }
+    return { n, display: n.toLocaleString('en-US'), q: `${n.toLocaleString('en-US')} 读作？`, choices: shuffle([...wrongsSet]), correct, type };
+  }
+}
+
+function startQuiz() {
+  qOk = 0; qBad = 0; qIdx = 0; qAns = false;
+  quizList = Array.from({length:10}, makeQuizItem);
+  document.getElementById('quizDone').classList.add('hidden');
+  document.getElementById('qNextBtn').style.display = 'none';
+  renderQuiz();
+}
+
+function renderQuiz() {
+  document.getElementById('quizDone').classList.add('hidden');
+  document.getElementById('qNextBtn').style.display = 'none';
+  document.getElementById('quizFb').textContent = '';
+  document.getElementById('quizFb').className = 'quiz-fb';
+  qAns = false;
+
+  const item = quizList[qIdx];
+  document.getElementById('qMeta').textContent = `第 ${qIdx+1} / 10 题`;
+  document.getElementById('qScore').innerHTML = `✅ ${qOk} &nbsp;❌ ${qBad}`;
+
+  document.getElementById('quizQBox').innerHTML = `
+    <div class="quiz-label">请选择正确答案</div>
+    ${item.display ? `<div class="quiz-big">${item.display}</div>` : ''}
+    <div class="quiz-text">${item.q}</div>`;
+
+  speak(item.q);
+
+  const ch = document.getElementById('choices');
+  ch.innerHTML = '';
+  item.choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => pickQ(btn, c, item);
+    ch.appendChild(btn);
+  });
+}
+
+function pickQ(btn, chosen, item) {
+  if (qAns) return;
+  qAns = true;
+  const correct = chosen === item.correct;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === item.correct) b.classList.add('correct');
+    });
+  }
+  const fb = document.getElementById('quizFb');
+  if (correct) {
+    qOk++; fb.textContent = '✅ 正确！'; fb.className = 'quiz-fb ok'; playOk();
+    speak('正确！');
+  } else {
+    qBad++; fb.textContent = `❌ 正确答案是 ${item.correct}`; fb.className = 'quiz-fb bad'; playFail();
+    speak(`正确答案是${item.correct}`);
+  }
+  document.getElementById('qScore').innerHTML = `✅ ${qOk} &nbsp;❌ ${qBad}`;
+
+  if (qIdx + 1 >= quizList.length) {
+    setTimeout(showQuizDone, 1400);
+  } else {
+    document.getElementById('qNextBtn').style.display = 'inline-block';
+  }
+}
+
+function quizNext() { qIdx++; renderQuiz(); }
+
+function showQuizDone() {
+  document.getElementById('quizDone').classList.remove('hidden');
+  document.getElementById('qNextBtn').style.display = 'none';
+  const pct = Math.round(qOk / quizList.length * 100);
+  document.getElementById('qFinalScore').textContent = `${qOk} / ${quizList.length}`;
+  const msgs = ['再多练练，加油！💪','不错，继续加油！😊','很棒！再接再厉！🌟','优秀！你是数学小达人！🏆','满分！超厉害！🎉'];
+  const lv = pct < 40 ? 0 : pct < 60 ? 1 : pct < 80 ? 2 : pct < 100 ? 3 : 4;
+  document.getElementById('qFinalMsg').textContent = msgs[lv];
+  speak(`本次得了${qOk}分，${msgs[lv]}`);
+  if (pct >= 90) { tone(523,.06); setTimeout(()=>tone(659,.08),70); setTimeout(()=>tone(784,.16),140); }
+}
+
+// ─────────────────────────────────────
+//  Init
+// ─────────────────────────────────────
+startDemo();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>
