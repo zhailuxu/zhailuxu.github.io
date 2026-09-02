@@ -15,11 +15,18 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
 .tab-btn{padding:8px 14px;font-size:.82rem;}
 .card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
 .net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.read-mode{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin:0 auto 14px;padding:8px 10px;background:#fff8e1;border-radius:12px;}
+.read-mode-label{font-size:.82rem;font-weight:bold;color:#795548;margin-right:2px;}
+.read-mode-btn{padding:7px 12px;border:2px solid #ffcc80;border-radius:999px;background:#fff;color:#795548;font:inherit;font-size:.8rem;font-weight:bold;cursor:pointer;}
+.read-mode-btn:hover{background:#fff3e0;}
+.read-mode-btn.on{border-color:#e65100;background:#e65100;color:#fff;}
+.read-mode-btn:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
 .group-title{font-size:.95rem;font-weight:bold;color:#e65100;margin:12px 0 8px;}
 .py-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;margin-bottom:8px;}
 .py-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;transition:transform .12s;}
 .py-chip:hover{transform:translateY(-2px);background:#ffe0b2;}
 .py-chip .letter{font-size:1.3rem;font-weight:bold;color:#e65100;}
+.py-chip .syllable{font-size:.8rem;font-weight:bold;color:#ef6c00;margin-top:2px;}
 .py-chip .word{font-size:.78rem;color:#795548;margin-top:4px;}
 .tone-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
 .tone-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:14px 16px;text-align:center;cursor:pointer;min-width:90px;}
@@ -64,7 +71,12 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 声母 -->
   <div id="tab-initial">
     <div class="card">
-      <div class="net-desc">一共23个声母，点一下先听声母读音，再听对应例词，拼音的第一步先认熟它们</div>
+      <div class="net-desc">一共23个声母，点一下依次听“声母 → 拼成的字音 → 例词”，例如：b → bā → 爸爸</div>
+      <div class="read-mode" aria-label="声母朗读模式">
+        <span class="read-mode-label">朗读模式</span>
+        <button type="button" class="read-mode-btn" data-read-kind="initial" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('initial','single')">只读声母</button>
+        <button type="button" class="read-mode-btn on" data-read-kind="initial" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('initial','full')">示例连读</button>
+      </div>
       <div class="py-grid" id="initialGrid"></div>
     </div>
   </div>
@@ -72,7 +84,12 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 韵母 -->
   <div id="tab-final" style="display:none;">
     <div class="card">
-      <div class="net-desc">一共24个韵母，点一下先听韵母读音，再听对应例词；分为单韵母、复韵母、鼻韵母和特殊韵母</div>
+      <div class="net-desc">一共24个韵母，点一下依次听“韵母 → 拼成的字音 → 例词”，例如：a → ā → 阿姨</div>
+      <div class="read-mode" aria-label="韵母朗读模式">
+        <span class="read-mode-label">朗读模式</span>
+        <button type="button" class="read-mode-btn" data-read-kind="final" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('final','single')">只读韵母</button>
+        <button type="button" class="read-mode-btn on" data-read-kind="final" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('final','full')">示例连读</button>
+      </div>
       <div id="finalGroups"></div>
     </div>
   </div>
@@ -80,7 +97,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 声调 -->
   <div id="tab-tone" style="display:none;">
     <div class="card">
-      <div class="net-desc">同一个音，声调不同意思完全不同：妈 麻 马 骂 吗</div>
+      <div class="net-desc">同一个音，声调不同意思完全不同；点卡片依次听“声调 → 单字 → 例词”</div>
       <div class="tone-row" id="toneRow"></div>
       <div class="quiz-q" id="toneQ" style="margin-top:16px;"></div>
       <div class="choice-col" id="toneChoices"></div>
@@ -92,7 +109,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 整体认读音节 -->
   <div id="tab-whole" style="display:none;">
     <div class="card">
-      <div class="net-desc">这16个音节要整体认读，点一下先听音节读音，再听对应例词，不要拆成声母和韵母</div>
+      <div class="net-desc">这16个音节不要拆开拼，点一下依次听“整体音节 → 带调读音 → 例词”</div>
       <div class="py-grid" id="wholeGrid"></div>
     </div>
   </div>
@@ -100,7 +117,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 拼读练习 -->
   <div id="tab-blend" style="display:none;">
     <div class="card">
-      <div class="net-desc">声母读得又轻又短，韵母读得响亮拖长，两个音连起来拼成一个字的音</div>
+      <div class="net-desc">先听声母和韵母，答题后完整回放“声母 → 韵母 → 字音 → 例词”</div>
       <div class="blend-box">
         <div class="blend-expr" id="blendExpr"></div>
         <div class="choice-col" id="blendChoices"></div>
@@ -132,60 +149,100 @@ const pySpeech=Hpx.speech.install({rate:0.85});
 const randInt=Hpx.random.int;
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
+const READING_MODES={initial:'full',final:'full'};
+function setReadingMode(kind,mode){
+  READING_MODES[kind]=mode;
+  document.querySelectorAll(`[data-read-kind="${kind}"]`).forEach(btn=>{
+    const selected=btn.dataset.readMode===mode;
+    btn.classList.toggle('on',selected);
+    btn.setAttribute('aria-pressed',String(selected));
+  });
+  const label=kind==='initial'?'声母':'韵母';
+  speak(mode==='single'?`已切换为只读${label}`:`已切换为${label}示例连读`);
+}
+
 // ── 声母（23个）──
 const INITIALS=[
-  {py:'b',read:'玻',word:'爸爸'},{py:'p',read:'坡',word:'苹果'},{py:'m',read:'摸',word:'妈妈'},{py:'f',read:'佛',word:'飞机'},
-  {py:'d',read:'得',word:'大象'},{py:'t',read:'特',word:'兔子'},{py:'n',read:'讷',word:'牛奶'},{py:'l',read:'勒',word:'老虎'},
-  {py:'g',read:'哥',word:'哥哥'},{py:'k',read:'科',word:'开心'},{py:'h',read:'喝',word:'河流'},
-  {py:'j',read:'基',word:'鸡蛋'},{py:'q',read:'欺',word:'铅笔'},{py:'x',read:'希',word:'西瓜'},
-  {py:'zh',read:'知',word:'桌子'},{py:'ch',read:'吃',word:'吃饭'},{py:'sh',read:'诗',word:'书本'},{py:'r',read:'日',word:'热闹'},
-  {py:'z',read:'资',word:'字典'},{py:'c',read:'雌',word:'草地'},{py:'s',read:'思',word:'数字三'},
-  {py:'y',read:'衣',word:'月亮'},{py:'w',read:'乌',word:'乌龟'},
+  {py:'b',read:'玻',syllable:'爸',syllablePy:'bā',word:'爸爸'},{py:'p',read:'坡',syllable:'苹',syllablePy:'píng',word:'苹果'},
+  {py:'m',read:'摸',syllable:'妈',syllablePy:'mā',word:'妈妈'},{py:'f',read:'佛',syllable:'飞',syllablePy:'fēi',word:'飞机'},
+  {py:'d',read:'得',syllable:'大',syllablePy:'dà',word:'大象'},{py:'t',read:'特',syllable:'兔',syllablePy:'tù',word:'兔子'},
+  {py:'n',read:'讷',syllable:'牛',syllablePy:'niú',word:'牛奶'},{py:'l',read:'勒',syllable:'老',syllablePy:'lǎo',word:'老虎'},
+  {py:'g',read:'哥',syllable:'哥',syllablePy:'gē',word:'哥哥'},{py:'k',read:'科',syllable:'开',syllablePy:'kāi',word:'开心'},
+  {py:'h',read:'喝',syllable:'河',syllablePy:'hé',word:'河流'},{py:'j',read:'基',syllable:'鸡',syllablePy:'jī',word:'鸡蛋'},
+  {py:'q',read:'欺',syllable:'铅',syllablePy:'qiān',word:'铅笔'},{py:'x',read:'希',syllable:'西',syllablePy:'xī',word:'西瓜'},
+  {py:'zh',read:'知',syllable:'桌',syllablePy:'zhuō',word:'桌子'},{py:'ch',read:'吃',syllable:'吃',syllablePy:'chī',word:'吃饭'},
+  {py:'sh',read:'诗',syllable:'书',syllablePy:'shū',word:'书本'},{py:'r',read:'日',syllable:'热',syllablePy:'rè',word:'热闹'},
+  {py:'z',read:'资',syllable:'字',syllablePy:'zì',word:'字典'},{py:'c',read:'雌',syllable:'草',syllablePy:'cǎo',word:'草地'},
+  {py:'s',read:'思',syllable:'三',syllablePy:'sān',word:'数字三'},{py:'y',read:'衣',syllable:'月',syllablePy:'yuè',word:'月亮'},
+  {py:'w',read:'乌',syllable:'乌',syllablePy:'wū',word:'乌龟'},
 ];
-function speakExample(read,word){
+function speakInitial(read,syllable,word){
+  if(READING_MODES.initial==='single'){
+    speak(read);
+    return;
+  }
   pySpeech.sequence([
-    {text:read,gapMs:220},
+    {text:read,gapMs:260},
+    {text:syllable,gapMs:300},
     {text:word}
-  ],{rate:0.8});
+  ],{rate:0.78});
 }
 function renderInitials(){
   document.getElementById('initialGrid').innerHTML=INITIALS.map(it=>
-    `<div class="py-chip" onclick="speakExample('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('');
+    `<div class="py-chip" onclick="speakInitial('${it.read}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
 }
 
 // ── 韵母（24个，分组）──
 const FINAL_GROUPS=[
   { name:'单韵母（6个）', items:[
-    {py:'a',read:'啊',word:'阿姨'},{py:'o',read:'喔',word:'公鸡喔喔叫'},{py:'e',read:'鹅',word:'白鹅'},{py:'i',read:'衣',word:'衣服'},{py:'u',read:'乌',word:'乌鸦'},{py:'ü',read:'迂',word:'小鱼'},
+    {py:'a',read:'啊',syllable:'阿',syllablePy:'ā',word:'阿姨'},{py:'o',read:'喔',syllable:'喔',syllablePy:'ō',word:'公鸡喔喔叫'},
+    {py:'e',read:'鹅',syllable:'鹅',syllablePy:'é',word:'白鹅'},{py:'i',read:'衣',syllable:'衣',syllablePy:'yī',word:'衣服'},
+    {py:'u',read:'乌',syllable:'乌',syllablePy:'wū',word:'乌鸦'},{py:'ü',read:'迂',syllable:'鱼',syllablePy:'yú',word:'小鱼'},
   ]},
   { name:'复韵母（8个）', items:[
-    {py:'ai',read:'哀',word:'爱心'},{py:'ei',read:'诶',word:'黑色'},{py:'ui',read:'威',word:'排队'},{py:'ao',read:'凹',word:'小猫'},
-    {py:'ou',read:'欧',word:'猴子'},{py:'iu',read:'优',word:'小牛'},{py:'ie',read:'耶',word:'姐姐'},{py:'üe',read:'约',word:'月亮'},
+    {py:'ai',read:'哀',syllable:'爱',syllablePy:'ài',word:'爱心'},{py:'ei',read:'诶',syllable:'黑',syllablePy:'hēi',word:'黑色'},
+    {py:'ui',read:'威',syllable:'队',syllablePy:'duì',word:'排队'},{py:'ao',read:'凹',syllable:'猫',syllablePy:'māo',word:'小猫'},
+    {py:'ou',read:'欧',syllable:'猴',syllablePy:'hóu',word:'猴子'},{py:'iu',read:'优',syllable:'牛',syllablePy:'niú',word:'小牛'},
+    {py:'ie',read:'耶',syllable:'姐',syllablePy:'jiě',word:'姐姐'},{py:'üe',read:'约',syllable:'月',syllablePy:'yuè',word:'月亮'},
   ]},
   { name:'前鼻韵母（5个）', items:[
-    {py:'an',read:'安',word:'雨伞'},{py:'en',read:'恩',word:'大门'},{py:'in',read:'因',word:'声音'},{py:'un',read:'温',word:'温暖'},{py:'ün',read:'晕',word:'白云'},
+    {py:'an',read:'安',syllable:'伞',syllablePy:'sǎn',word:'雨伞'},{py:'en',read:'恩',syllable:'门',syllablePy:'mén',word:'大门'},
+    {py:'in',read:'因',syllable:'音',syllablePy:'yīn',word:'声音'},{py:'un',read:'温',syllable:'温',syllablePy:'wēn',word:'温暖'},
+    {py:'ün',read:'晕',syllable:'云',syllablePy:'yún',word:'白云'},
   ]},
   { name:'后鼻韵母（4个）', items:[
-    {py:'ang',read:'肮',word:'山羊'},{py:'eng',read:'鞥',word:'台灯'},{py:'ing',read:'英',word:'星星'},{py:'ong',read:'嗡',word:'红色'},
+    {py:'ang',read:'肮',syllable:'羊',syllablePy:'yáng',word:'山羊'},{py:'eng',read:'鞥',syllable:'灯',syllablePy:'dēng',word:'台灯'},
+    {py:'ing',read:'英',syllable:'星',syllablePy:'xīng',word:'星星'},{py:'ong',read:'嗡',syllable:'红',syllablePy:'hóng',word:'红色'},
   ]},
   { name:'特殊韵母（1个）', items:[
-    {py:'er',read:'儿',word:'耳朵'},
+    {py:'er',read:'儿',syllable:'耳',syllablePy:'ěr',word:'耳朵'},
   ]},
 ];
+function speakFinal(read,syllable,word){
+  if(READING_MODES.final==='single'){
+    speak(read);
+    return;
+  }
+  pySpeech.sequence([
+    {text:read,gapMs:260},
+    {text:syllable,gapMs:300},
+    {text:word}
+  ],{rate:0.78});
+}
 function renderFinals(){
   document.getElementById('finalGroups').innerHTML=FINAL_GROUPS.map(g=>
     `<div class="group-title">${g.name}</div><div class="py-grid">${g.items.map(it=>
-      `<div class="py-chip" onclick="speakExample('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('')}</div>`
+      `<div class="py-chip" onclick="speakFinal('${it.read}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('')}</div>`
   ).join('');
 }
 
 // ── 声调 ──
 const TONE_DEMO=[
-  {py:'mā',char:'妈',tone:1,shape:'高而平 ——'},
-  {py:'má',char:'麻',tone:2,shape:'往上扬 ↗'},
-  {py:'mǎ',char:'马',tone:3,shape:'先降后升 ∨'},
-  {py:'mà',char:'骂',tone:4,shape:'往下降 ↘'},
-  {py:'ma',char:'吗',tone:0,shape:'又轻又短'},
+  {py:'mā',char:'妈',word:'妈妈',tone:1,shape:'高而平 ——'},
+  {py:'má',char:'麻',word:'麻绳',tone:2,shape:'往上扬 ↗'},
+  {py:'mǎ',char:'马',word:'小马',tone:3,shape:'先降后升 ∨'},
+  {py:'mà',char:'骂',word:'骂人',tone:4,shape:'往下降 ↘'},
+  {py:'ma',char:'吗',word:'好吗',tone:0,shape:'又轻又短'},
 ];
 const TONE_BANK=[
   {py:'mā',char:'妈',tone:1},{py:'tiān',char:'天',tone:1},{py:'shū',char:'书',tone:1},{py:'huā',char:'花',tone:1},{py:'fēi',char:'飞',tone:1},
@@ -195,16 +252,17 @@ const TONE_BANK=[
 ];
 function renderTones(){
   document.getElementById('toneRow').innerHTML=TONE_DEMO.map(t=>
-    `<div class="tone-chip" onclick="speakTone('${t.char}',${t.tone})">
+    `<div class="tone-chip" onclick="speakTone('${t.char}',${t.tone},'${t.word}')">
       <div class="letter">${t.py}</div>
       <div class="shape">${t.tone===0?'轻声':'第'+t.tone+'声'}：${t.shape}</div>
-      <div class="char">${t.char}</div>
+      <div class="char">${t.char} · ${t.word}</div>
     </div>`).join('');
 }
-function speakTone(char,tone){
+function speakTone(char,tone,word){
   pySpeech.sequence([
-    {text:char,gapMs:180},
-    {text:tone===0?'轻声':'第'+tone+'声'}
+    {text:tone===0?'轻声':'第'+tone+'声',gapMs:220},
+    {text:char,gapMs:260},
+    {text:word}
   ],{rate:0.82});
 }
 let toneState=null;
@@ -226,20 +284,37 @@ function checkTone(btn,choice){
   });
   if(choice!==correct) btn.classList.add('wrong');
   const msg=document.getElementById('toneMsg');
-  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; speak('正确！真棒！'); }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是第'+correct+'声'; speak('答案是第'+correct+'声，再想想！'); }
+  const ok=choice===correct;
+  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是第'+correct+'声'; }
+  pySpeech.sequence([
+    {text:ok?'答对了':'正确答案',gapMs:160},
+    {text:'第'+correct+'声',gapMs:220},
+    {text:toneState.char}
+  ],{rate:0.82});
 }
 
 // ── 整体认读音节（16个）──
 const WHOLE_SYLLABLES=[
-  {py:'zhi',read:'知',word:'知识'},{py:'chi',read:'吃',word:'吃饭'},{py:'shi',read:'诗',word:'十'},{py:'ri',read:'日',word:'日出'},
-  {py:'zi',read:'资',word:'字'},{py:'ci',read:'雌',word:'词语'},{py:'si',read:'思',word:'数字四'},{py:'yi',read:'衣',word:'数字一'},
-  {py:'wu',read:'乌',word:'数字五'},{py:'yu',read:'迂',word:'鱼'},{py:'ye',read:'耶',word:'叶子'},{py:'yue',read:'约',word:'月亮'},
-  {py:'yuan',read:'冤',word:'圆形'},{py:'yin',read:'因',word:'音乐'},{py:'yun',read:'晕',word:'云朵'},{py:'ying',read:'英',word:'英雄'},
+  {py:'zhi',read:'知',syllablePy:'zhī',word:'知识'},{py:'chi',read:'吃',syllablePy:'chī',word:'吃饭'},
+  {py:'shi',read:'十',syllablePy:'shí',word:'十个'},{py:'ri',read:'日',syllablePy:'rì',word:'日出'},
+  {py:'zi',read:'字',syllablePy:'zì',word:'字典'},{py:'ci',read:'词',syllablePy:'cí',word:'词语'},
+  {py:'si',read:'四',syllablePy:'sì',word:'数字四'},{py:'yi',read:'一',syllablePy:'yī',word:'数字一'},
+  {py:'wu',read:'五',syllablePy:'wǔ',word:'数字五'},{py:'yu',read:'鱼',syllablePy:'yú',word:'小鱼'},
+  {py:'ye',read:'叶',syllablePy:'yè',word:'叶子'},{py:'yue',read:'月',syllablePy:'yuè',word:'月亮'},
+  {py:'yuan',read:'圆',syllablePy:'yuán',word:'圆形'},{py:'yin',read:'音',syllablePy:'yīn',word:'音乐'},
+  {py:'yun',read:'云',syllablePy:'yún',word:'云朵'},{py:'ying',read:'英',syllablePy:'yīng',word:'英雄'},
 ];
+function speakWhole(read,word){
+  pySpeech.sequence([
+    {text:'整体认读音节',gapMs:160},
+    {text:read,gapMs:280},
+    {text:word}
+  ],{rate:0.8});
+}
 function renderWhole(){
   document.getElementById('wholeGrid').innerHTML=WHOLE_SYLLABLES.map(it=>
-    `<div class="py-chip" onclick="speakExample('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="word">${it.word}</div></div>`).join('');
+    `<div class="py-chip" onclick="speakWhole('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
 }
 
 // ── 拼读练习 ──
@@ -283,6 +358,17 @@ function nextBlend(){
     {text:'拼在一起，读什么？'}
   ],{rate:0.84});
 }
+function speakBlendAnswer(item,correct){
+  const initialRead=INITIALS.find(x=>x.py===item.i).read;
+  const finalRead=FINAL_GROUPS.flatMap(g=>g.items).find(x=>x.py===item.f).read;
+  pySpeech.sequence([
+    {text:correct?'答对了':'正确答案',gapMs:180},
+    {text:initialRead,gapMs:220},
+    {text:finalRead,gapMs:260},
+    {text:item.char,gapMs:280},
+    {text:item.word}
+  ],{rate:0.8});
+}
 function checkBlend(btn,choice){
   const correct=blendState.syl;
   document.querySelectorAll('#blendChoices .choice-btn').forEach(b=>{
@@ -291,18 +377,21 @@ function checkBlend(btn,choice){
   });
   if(choice!==correct) btn.classList.add('wrong');
   const msg=document.getElementById('blendMsg');
-  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'+blendState.i+'+'+blendState.f+'='+blendState.syl+'（'+blendState.char+'）'; speak('正确！'+blendState.word); }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+correct+'（'+blendState.char+'）'; speak('答案是'+blendState.char+'，'+blendState.word+'，再想想！'); }
+  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'+blendState.i+'+'+blendState.f+'='+blendState.syl+'（'+blendState.char+'）'; }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+correct+'（'+blendState.char+'）'; }
+  speakBlendAnswer(blendState,choice===correct);
 }
 
 // ── 综合练习 ──
 let qScore={c:0,w:0};
+let quizState=null;
 function nextQ(){
   document.getElementById('quizMsg').textContent='';
   document.getElementById('nextBtn').style.display='none';
   const type=randInt(0,3);
   if(type===0){
     const item=INITIALS[randInt(0,INITIALS.length-1)];
+    quizState={type:'initial',item};
     document.getElementById('quizQ').textContent=`声母 "${item.py}" 对应下面哪个词？`;
     const distractors=shuffle(INITIALS.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
     const opts=shuffle([item.word, ...distractors]);
@@ -312,6 +401,7 @@ function nextQ(){
   } else if(type===1){
     const flat=FINAL_GROUPS.flatMap(g=>g.items);
     const item=flat[randInt(0,flat.length-1)];
+    quizState={type:'final',item};
     document.getElementById('quizQ').textContent=`韵母 "${item.py}" 对应下面哪个词？`;
     const distractors=shuffle(flat.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
     const opts=shuffle([item.word, ...distractors]);
@@ -320,6 +410,7 @@ function nextQ(){
     speak(`韵母${item.read}对应哪个词？`);
   } else if(type===2){
     const item=TONE_BANK[randInt(0,TONE_BANK.length-1)];
+    quizState={type:'tone',item};
     document.getElementById('quizQ').textContent=`"${item.py}"（${item.char}）是第几声？`;
     const opts=shuffle([1,2,3,4]).map(o=>'第'+o+'声');
     document.getElementById('quizChoices').innerHTML=opts.map(o=>
@@ -327,12 +418,27 @@ function nextQ(){
     speak(item.char+'是第几声？');
   } else {
     const item=WHOLE_SYLLABLES[randInt(0,WHOLE_SYLLABLES.length-1)];
+    quizState={type:'whole',item};
     document.getElementById('quizQ').textContent=`整体认读音节 "${item.py}" 对应下面哪个词？`;
     const distractors=shuffle(WHOLE_SYLLABLES.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
     const opts=shuffle([item.word, ...distractors]);
     document.getElementById('quizChoices').innerHTML=opts.map(o=>
       `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
     speak(`整体认读音节${item.read}对应哪个词？`);
+  }
+}
+function speakQuizAnswer(correct){
+  if(!quizState) return;
+  const lead=correct?'答对了':'正确答案';
+  const item=quizState.item;
+  if(quizState.type==='initial'){
+    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:220},{text:item.syllable,gapMs:260},{text:item.word}],{rate:0.8});
+  }else if(quizState.type==='final'){
+    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:220},{text:item.syllable,gapMs:260},{text:item.word}],{rate:0.8});
+  }else if(quizState.type==='whole'){
+    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:260},{text:item.word}],{rate:0.8});
+  }else{
+    pySpeech.sequence([{text:lead,gapMs:160},{text:'第'+item.tone+'声',gapMs:220},{text:item.char}],{rate:0.82});
   }
 }
 function checkQuizChoice(btn,choice,correct){
@@ -346,8 +452,9 @@ function checkQuizChoice(btn,choice,correct){
   document.getElementById('qC').textContent=qScore.c;
   document.getElementById('qW').textContent=qScore.w;
   const msg=document.getElementById('quizMsg');
-  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; speak('正确！真棒！'); }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是：'+correct; speak('答案是'+correct+'，再想想！'); }
+  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; }
+  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是：'+correct; }
+  speakQuizAnswer(ok);
   document.getElementById('nextBtn').style.display='inline-block';
 }
 
@@ -369,5 +476,6 @@ speak('欢迎来到汉语拼音入门！我们先认声母和韵母，再学声�
 
 <script src="feedback.js"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
 </body>
 </html>

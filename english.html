@@ -94,6 +94,13 @@ body {
    TAB 1 — ALPHABET
 ══════════════════════════════════════ */
 .alpha-toolbar { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+.alpha-mode { display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin:0 auto 14px;padding:8px 10px;background:var(--teal-light);border-radius:12px; }
+.alpha-mode-label { margin-right:2px;color:var(--muted);font-size:.82rem;font-weight:800; }
+.alpha-mode-btn { padding:7px 13px;border:2px solid var(--border);border-radius:999px;background:var(--card);color:var(--teal);font:inherit;font-size:.8rem;font-weight:800;cursor:pointer; }
+.alpha-mode-btn:hover { border-color:var(--teal-mid); }
+.alpha-mode-btn.active { border-color:var(--teal);background:var(--teal);color:var(--gold); }
+.alpha-mode-btn:focus-visible { outline:3px solid var(--gold);outline-offset:2px; }
+.alpha-mode-hint { width:100%;text-align:center;color:var(--muted);font-size:.75rem; }
 
 .alpha-grid {
   display: grid;
@@ -345,6 +352,12 @@ input[type=range].speed-slider::-moz-range-thumb {
 <!-- ══ TAB 1: Alphabet ══ -->
 <div id="tab-alpha">
   <div class="card-panel">
+    <div class="alpha-mode" aria-label="字母朗读模式">
+      <span class="alpha-mode-label">朗读模式</span>
+      <button type="button" class="alpha-mode-btn" data-alpha-mode="letter" aria-pressed="false" onclick="setAlphaReadingMode('letter')">只读字母</button>
+      <button type="button" class="alpha-mode-btn active" data-alpha-mode="full" aria-pressed="true" onclick="setAlphaReadingMode('full')">示例连读</button>
+      <span class="alpha-mode-hint" id="alphaModeHint">示例连读：A → apple</span>
+    </div>
     <div class="alpha-toolbar">
       <button class="btn btn-teal" onclick="speakAll()">🔊 朗读全部字母</button>
       <button class="btn btn-ghost" onclick="stopSpeak()">⏹ 停止</button>
@@ -625,6 +638,22 @@ function switchTab(name) {
 // ══════════════════════════════════════════════════════════
 //  TAB 1 — ALPHABET
 // ══════════════════════════════════════════════════════════
+let alphaReadingMode='full';
+
+function alphaSpeechText(item){
+  return alphaReadingMode==='letter'?item.l:`${item.l}. ${item.word}.`;
+}
+
+function setAlphaReadingMode(mode){
+  alphaReadingMode=mode;
+  document.querySelectorAll('[data-alpha-mode]').forEach(button=>{
+    const selected=button.dataset.alphaMode===mode;
+    button.classList.toggle('active',selected);
+    button.setAttribute('aria-pressed',String(selected));
+  });
+  document.getElementById('alphaModeHint').textContent=mode==='letter'?'只读字母：A':'示例连读：A → apple';
+}
+
 function buildAlpha() {
   const grid = document.getElementById('alphaGrid');
   ALPHABET.forEach((item, idx) => {
@@ -640,7 +669,7 @@ function buildAlpha() {
       document.querySelectorAll('.alpha-card.active').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       showPreview(item);
-      speakEn(`${item.l}. ${item.word}.`);
+      speakEn(alphaSpeechText(item));
     };
     card.addEventListener('click', activate);
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
@@ -658,7 +687,7 @@ function showPreview(item) {
 
 function speakAll() {
   const cards = document.querySelectorAll('.alpha-card');
-  const items=ALPHABET.map(item=>({text:`${item.l}. ${item.word}.`,source:item}));
+  const items=ALPHABET.map(item=>({text:alphaSpeechText(item),source:item}));
   return englishSpeech.sequence(items,{
     rate:Math.max(0.4,speechRate-0.05),gapMs:200,
     onItem:(item,i)=>{cards.forEach((c,ci)=>c.classList.toggle('active',ci===i));showPreview(item.source);}
