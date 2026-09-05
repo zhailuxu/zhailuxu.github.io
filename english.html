@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小学英语游戏 — 字母、数字与单词</title>
-<meta name="description" content="小学英语在线游戏：26字母认读、1到20数字练习、单词配图、拼写与句子检查，边玩边学。">
+<meta name="description" content="小学英语在线游戏：26字母认读、1到20数字练习、1–6年级分级单词配图、拼写与句子检查，边玩边学。">
 <style>
 :root {
   --teal:       #0D5C63;
@@ -172,6 +172,7 @@ body {
 }
 .cat-btn:hover { border-color: var(--teal-mid); color: var(--teal); }
 .cat-btn.active { background: var(--teal); color: var(--gold); border-color: var(--teal); }
+.word-bank-summary { text-align:center;color:var(--muted);font-size:.78rem;margin:-9px 0 16px; }
 
 .match-stage { text-align: center; margin-bottom: 20px; }
 .match-emoji { font-size: 6rem; line-height: 1; display: block; margin-bottom: 6px; }
@@ -330,7 +331,7 @@ input[type=range].speed-slider::-moz-range-thumb {
 
 <div class="header">
   <h1>English Playground</h1>
-  <p>字母认读 · 数字 1–20 · 单词配图 · 拼写闯关 — 边玩边学英语</p>
+  <p>字母认读 · 数字 1–20 · 1–6年级单词配图 · 拼写闯关 — 边玩边学英语</p>
 </div>
 
 <div class="tabs">
@@ -397,6 +398,7 @@ input[type=range].speed-slider::-moz-range-thumb {
 <div id="tab-match" class="hidden">
   <div class="card-panel">
     <div class="cat-bar" id="catBar"></div>
+    <p class="word-bank-summary" id="wordBankSummary"></p>
     <div class="hud">
       <span class="hud-score" id="matchScore">✅ 0 &nbsp; ❌ 0</span>
       <span class="hud-streak" id="matchStreak">🔥 连对 0</span>
@@ -420,12 +422,13 @@ input[type=range].speed-slider::-moz-range-thumb {
     <div class="hud">
       <span class="hud-score" id="spellScore">✅ 0 &nbsp; ❌ 0</span>
       <select id="spellCat" class="cat-select" onchange="nextSpell()">
-        <option value="all">全部单词</option>
-        <option value="animals">🐾 动物</option>
-        <option value="colors">🎨 颜色</option>
-        <option value="numbers">🔢 数字</option>
-        <option value="fruits">🍎 水果</option>
-        <option value="school">🎒 文具</option>
+        <option value="all">全部单词（360）</option>
+        <option value="grade1">🌱 一年级（60）</option>
+        <option value="grade2">🌿 二年级（60）</option>
+        <option value="grade3">🌳 三年级（60）</option>
+        <option value="grade4">🚀 四年级（60）</option>
+        <option value="grade5">⭐ 五年级（60）</option>
+        <option value="grade6">🏆 六年级（60）</option>
       </select>
     </div>
     <div class="spell-stage">
@@ -467,6 +470,7 @@ input[type=range].speed-slider::-moz-range-thumb {
 </div><!-- /container -->
 
 <script src="hpx-core.js"></script>
+<script src="english-vocabulary.js"></script>
 <script>
 // ══ DATA ══════════════════════════════════════════════════
 const ALPHABET = [
@@ -503,7 +507,7 @@ const NUMBERS_1_20 = [
   'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'
 ].map((word,index)=>({number:index+1,word}));
 
-const WORDS = {
+const LEGACY_WORDS = {
   animals: [
     { word:'cat',    emoji:'🐱', cn:'猫'   }, { word:'dog',   emoji:'🐶', cn:'狗'     },
     { word:'bird',   emoji:'🐦', cn:'鸟'   }, { word:'fish',  emoji:'🐟', cn:'鱼'     },
@@ -556,7 +560,10 @@ const WORDS = {
   ],
 };
 
-const ALL_WORDS = Object.values(WORDS).flat();
+const WORDS = window.GRADE_WORDS || LEGACY_WORDS;
+const ALL_WORDS = Object.values(WORDS).flat().filter((item,index,items) =>
+  items.findIndex(candidate => candidate.word.toLowerCase() === item.word.toLowerCase()) === index
+);
 
 const FILL = [
   // I am a/an ___
@@ -607,7 +614,15 @@ const FILL = [
   { template:'She is a ___.', answer:'teacher', options:['teacher','jump','fish','red'],     full:'She is a teacher.',cn:'她是一位老师。', emoji:'👩‍🏫' },
   { template:'He is a ___.', answer:'student',  options:['student','fly','big','bag'],       full:'He is a student.', cn:'他是一名学生。', emoji:'👨‍🎓' },
 ];
-const CAT_META  = { animals:'🐾 动物', colors:'🎨 颜色', numbers:'🔢 数字', fruits:'🍎 水果', school:'🎒 文具' };
+const CAT_META  = {
+  all:`📚 全部（${ALL_WORDS.length}）`,
+  grade1:`🌱 一年级（${WORDS.grade1?.length || 0}）`,
+  grade2:`🌿 二年级（${WORDS.grade2?.length || 0}）`,
+  grade3:`🌳 三年级（${WORDS.grade3?.length || 0}）`,
+  grade4:`🚀 四年级（${WORDS.grade4?.length || 0}）`,
+  grade5:`⭐ 五年级（${WORDS.grade5?.length || 0}）`,
+  grade6:`🏆 六年级（${WORDS.grade6?.length || 0}）`
+};
 
 // ══ SPEECH ════════════════════════════════════════════════
 let speechRate = 0.65;
@@ -641,7 +656,9 @@ function switchTab(name) {
 let alphaReadingMode='full';
 
 function alphaSpeechText(item){
-  return alphaReadingMode==='letter'?item.l:`${item.l}. ${item.word}.`;
+  // 部分英文语音会把单独的大写字母读成 “capital A”。
+  // 只读字母时传入小写形式，页面仍然显示大写字母。
+  return alphaReadingMode==='letter'?item.l.toLowerCase():`${item.l}. ${item.word}.`;
 }
 
 function setAlphaReadingMode(mode){
@@ -781,7 +798,7 @@ function updateNumberHud(){
 //  TAB 3 — WORD MATCH
 // ══════════════════════════════════════════════════════════
 let matchInited  = false;
-let matchCat     = 'animals';
+let matchCat     = 'grade1';
 let matchCorrect = 0, matchWrong = 0, matchStreak = 0;
 let matchAnswered = false, matchCurrent = null;
 
@@ -801,12 +818,14 @@ function initMatch() {
     };
     bar.appendChild(btn);
   });
+  document.getElementById('wordBankSummary').textContent =
+    `已收录 ${ALL_WORDS.length} 个 1–6 年级通用核心词汇；点击图片后选择英文。`;
   nextMatch();
 }
 
 function nextMatch() {
   matchAnswered = false;
-  const pool = WORDS[matchCat];
+  const pool = matchCat === 'all' ? ALL_WORDS : WORDS[matchCat];
   matchCurrent = pool[Math.floor(Math.random() * pool.length)];
 
   document.getElementById('matchEmoji').textContent = matchCurrent.emoji;
