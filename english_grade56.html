@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语五六年级：时态对比与阅读理解</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f2f1 0%,#fff3e0 50%,#e3f2fd 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:760px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.6rem;color:#00695c;letter-spacing:1px;text-shadow:2px 3px 0 #80cbc4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.88rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.verb-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.verb-btn{padding:7px 16px;border:2px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;font-size:.88rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.verb-btn.on{background:#00838f;color:#fff;border-color:#00838f;}
+.tense-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tense-card{background:#e0f2f1;border-radius:14px;padding:12px 14px;}
+.tense-card .name{font-weight:bold;color:#00695c;font-size:.95rem;margin-bottom:4px;}
+.tense-card .struct{font-size:.78rem;color:#888;margin-bottom:6px;}
+.tense-card .ex{font-size:.92rem;color:#333;line-height:1.6;}
+.tense-card .markers{font-size:.75rem;color:#00897b;margin-top:6px;}
+.tense-card .speak-mini{margin-top:6px;padding:4px 10px;border:none;border-radius:10px;background:#00838f;color:#fff;font-size:.75rem;cursor:pointer;font-family:inherit;}
+/* 时间词分类游戏 */
+.pool-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;min-height:40px;}
+.word-chip{padding:7px 14px;border-radius:14px;background:#fff;border:2px solid #80cbc4;color:#00695c;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.word-chip.selected{background:#00838f;color:#fff;}
+.bucket-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.bucket{border:2px dashed #80cbc4;border-radius:12px;padding:8px;min-height:70px;}
+.bucket .blabel{font-size:.82rem;font-weight:bold;color:#00695c;margin-bottom:6px;text-align:center;}
+.bucket-items{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+.bucket-items span{padding:3px 8px;border-radius:8px;background:#c8e6c9;color:#1b5e20;font-size:.75rem;font-weight:bold;}
+.game-progress{text-align:center;font-size:.9rem;color:#00695c;font-weight:bold;margin-bottom:10px;}
+.reset-btn{display:block;margin:12px auto 0;padding:7px 20px;border:none;border-radius:14px;background:#8d6e63;color:#fff;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 阅读理解 */
+.level-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.level-btn{padding:7px 16px;border:2px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.level-btn.on{background:#00838f;color:#fff;border-color:#00838f;}
+.level-btn.locked{opacity:.4;cursor:not-allowed;}
+.passage-box{background:#fff8e1;border-radius:14px;padding:14px 18px;font-size:.98rem;color:#4e342e;line-height:1.9;margin-bottom:12px;}
+.passage-speak{display:block;margin:0 auto 14px;padding:7px 20px;border:none;border-radius:14px;background:#00838f;color:#fff;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.rq-block{margin-bottom:14px;}
+.rq-q{font-size:.95rem;color:#333;font-weight:bold;margin-bottom:8px;}
+.rq-choices{display:flex;flex-direction:column;gap:6px;}
+.rq-btn{padding:9px 14px;border:2px solid #b0bec5;border-radius:10px;background:#fff;color:#37474f;font-size:.88rem;cursor:pointer;font-family:inherit;text-align:left;}
+.rq-btn:hover{background:#eceff1;}
+.rq-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.rq-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.next-level-btn{display:block;margin:10px auto 0;padding:9px 26px;border:none;border-radius:14px;background:#2e7d32;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e0f2f1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#00695c;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
+.choice-btn{padding:12px 10px;border:2px solid #80cbc4;border-radius:12px;background:#fff;color:#00695c;font-size:.92rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#e0f2f1;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:12px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#00838f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#00838f">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🕰️</div>
+    <h1>Four Tenses &amp; Reading</h1>
+    <p>一般现在时 · 现在进行时 · 一般将来时 · 一般过去时 · 阅读理解闯关</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('tense')">🕰️ 四态对比</button>
+    <button class="tab-btn" onclick="switchTab('timegame')">🎯 时间词分类</button>
+    <button class="tab-btn" onclick="switchTab('reading')">📖 阅读理解闯关</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 四态对比 -->
+  <div id="tab-tense">
+    <div class="card">
+      <div class="verb-row" id="verbRow"></div>
+      <div class="tense-grid" id="tenseGrid"></div>
+    </div>
+  </div>
+
+  <!-- 时间词分类 -->
+  <div id="tab-timegame" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:.88rem;color:#777;margin-bottom:10px;">先点一个时间词，再点它属于的时态</div>
+      <div class="game-progress" id="gameProgress"></div>
+      <div class="pool-row" id="wordPool"></div>
+      <div class="bucket-row" id="bucketRow"></div>
+      <button class="reset-btn" onclick="initTimeGame()">🔄 重新开始</button>
+    </div>
+  </div>
+
+  <!-- 阅读理解闯关 -->
+  <div id="tab-reading" style="display:none;">
+    <div class="card">
+      <div class="level-row" id="levelRow"></div>
+      <div class="passage-box" id="passageBox"></div>
+      <button class="passage-speak" onclick="speakPassage()">🔊 朗读全文</button>
+      <div id="rqList"></div>
+      <button class="next-level-btn" id="nextLevelBtn" onclick="gotoLevel(curLevel+1)" style="display:none;">下一关 →</button>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-grid" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+const hpxChineseSpeech=Hpx.speech.create({rate:0.88});
+const hpxEnglishSpeech=Hpx.speech.create({lang:"en-US",rate:0.85,buttonId:"secondarySpeechToggle"});
+function speak(text){return hpxChineseSpeech.speak(text);}
+function speakEn(text){return hpxEnglishSpeech.speak(text);}
+function toggleSpeak(){const enabled=hpxChineseSpeech.toggle();hpxEnglishSpeech.setEnabled(enabled,false);}
+const randInt=Hpx.random.int;
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ── 四态对比 ──
+const VERBS=[
+  {base:'play',he:'plays',ing:'playing',past:'played'},
+  {base:'watch',he:'watches',ing:'watching',past:'watched'},
+  {base:'go',he:'goes',ing:'going',past:'went'},
+  {base:'read',he:'reads',ing:'reading',past:'read'},
+  {base:'clean',he:'cleans',ing:'cleaning',past:'cleaned'},
+  {base:'visit',he:'visits',ing:'visiting',past:'visited'}
+];
+const TENSES=[
+  {key:'present',name:'一般现在时',struct:'主语 + 动词原形/第三人称单数',markers:'every day / usually / often',
+   ex:v=>`I ${v.base} every day.\nHe ${v.he} every day.`},
+  {key:'presentcont',name:'现在进行时',struct:'主语 + am/is/are + 动词ing',markers:'now / right now / Look!',
+   ex:v=>`I am ${v.ing} now.\nHe is ${v.ing} now.`},
+  {key:'future',name:'一般将来时',struct:'主语 + will / is going to + 动词原形',markers:'tomorrow / next week / soon',
+   ex:v=>`I will ${v.base} tomorrow.\nHe is going to ${v.base} tomorrow.`},
+  {key:'past',name:'一般过去时',struct:'主语 + 动词过去式',markers:'yesterday / last week / ago',
+   ex:v=>`I ${v.past} yesterday.\nHe ${v.past} yesterday.`}
+];
+let curVerb=0;
+function buildVerbRow(){
+  const row=document.getElementById('verbRow');
+  row.innerHTML='';
+  VERBS.forEach((v,i)=>{
+    const b=document.createElement('button');
+    b.className='verb-btn'+(i===curVerb?' on':'');
+    b.textContent=v.base;
+    b.onclick=()=>{curVerb=i;buildVerbRow();renderTenseGrid();};
+    row.appendChild(b);
+  });
+}
+function renderTenseGrid(){
+  const v=VERBS[curVerb];
+  const grid=document.getElementById('tenseGrid');
+  grid.innerHTML='';
+  TENSES.forEach(t=>{
+    const c=document.createElement('div'); c.className='tense-card';
+    const exText=t.ex(v);
+    c.innerHTML=`<div class="name">${t.name}</div><div class="struct">${t.struct}</div><div class="ex">${exText.replace(/\n/g,'<br>')}</div><div class="markers">⏰ ${t.markers}</div><button class="speak-mini">🔊 读一读</button>`;
+    c.querySelector('.speak-mini').onclick=()=>speakEn(exText.replace(/\n/g,'. '));
+    grid.appendChild(c);
+  });
+  speakEn(v.base);
+}
+
+// ── 时间词分类 ──
+const TIME_WORDS=[
+  {w:'every day',tense:'present'},{w:'usually',tense:'present'},
+  {w:'now',tense:'presentcont'},{w:'right now',tense:'presentcont'},
+  {w:'tomorrow',tense:'future'},{w:'next week',tense:'future'},
+  {w:'yesterday',tense:'past'},{w:'last night',tense:'past'}
+];
+let gamePool=[], gamePlaced=0, gameSelected=null;
+function initTimeGame(){
+  gamePool=shuffleArr(TIME_WORDS);
+  gamePlaced=0; gameSelected=null;
+  const poolEl=document.getElementById('wordPool');
+  poolEl.innerHTML='';
+  gamePool.forEach((item,idx)=>{
+    const chip=document.createElement('span');
+    chip.className='word-chip'; chip.textContent=item.w; chip.dataset.idx=idx;
+    chip.onclick=()=>selectWord(chip,idx);
+    poolEl.appendChild(chip);
+  });
+  const bRow=document.getElementById('bucketRow');
+  bRow.innerHTML='';
+  TENSES.forEach(t=>{
+    const b=document.createElement('div'); b.className='bucket'; b.dataset.tense=t.key;
+    b.innerHTML=`<div class="blabel">${t.name}</div><div class="bucket-items" id="bucket-${t.key}"></div>`;
+    b.onclick=()=>assignWord(t.key);
+    bRow.appendChild(b);
+  });
+  updateGameProgress();
+  speak('先点一个时间词，再点它属于的时态。');
+}
+function selectWord(chip,idx){
+  document.querySelectorAll('#wordPool .word-chip').forEach(c=>c.classList.remove('selected'));
+  chip.classList.add('selected');
+  gameSelected=idx;
+}
+function assignWord(tenseKey){
+  if(gameSelected===null) return;
+  const item=gamePool[gameSelected];
+  const chip=document.querySelector(`#wordPool .word-chip[data-idx="${gameSelected}"]`);
+  if(item.tense===tenseKey){
+    chip.remove();
+    const span=document.createElement('span'); span.textContent=item.w;
+    document.getElementById('bucket-'+tenseKey).appendChild(span);
+    gamePlaced++;
+    speak(item.w+'，正确！');
+    updateGameProgress();
+  } else {
+    chip.style.background='#ffcdd2';
+    setTimeout(()=>{chip.style.background='';chip.classList.remove('selected');},400);
+    speak('再想想看！');
+  }
+  gameSelected=null;
+}
+function updateGameProgress(){
+  document.getElementById('gameProgress').textContent=`已放置 ${gamePlaced} / ${TIME_WORDS.length}`;
+  if(gamePlaced>=TIME_WORDS.length) speak('太棒了，全部分类正确！');
+}
+
+// ── 阅读理解闯关 ──
+const PASSAGES=[
+  {level:1,title:'My Family',
+   text:"My name is Tom. I am ten years old. I have a big family. My father is a doctor. My mother is a teacher. I like playing football.",
+   questions:[
+     {q:'How old is Tom?', choices:['8','9','10','11'], ans:'10'},
+     {q:"What does Tom's father do?", choices:['Teacher','Doctor','Driver','Cook'], ans:'Doctor'}
+   ]},
+  {level:2,title:'Sunday Morning',
+   text:"It's Sunday morning. Look! Lucy is reading a book in the garden. Her brother is playing basketball. Their mother is cooking lunch in the kitchen. Everyone is busy and happy.",
+   questions:[
+     {q:'What is Lucy doing?', choices:['Reading a book','Playing basketball','Cooking lunch','Watching TV'], ans:'Reading a book'},
+     {q:'Who is cooking lunch?', choices:['Lucy','Her brother','Their mother','Their father'], ans:'Their mother'}
+   ]},
+  {level:3,title:'A Rainy Day',
+   text:"Yesterday was a rainy day. Ben didn't go to the park. He stayed at home and read a story book. In the afternoon, he helped his mother clean the house. He felt very happy at the end of the day.",
+   questions:[
+     {q:'What was the weather like yesterday?', choices:['Sunny','Rainy','Windy','Snowy'], ans:'Rainy'},
+     {q:'What did Ben do in the afternoon?', choices:['Went to the park','Read a story book','Helped clean the house','Played football'], ans:'Helped clean the house'}
+   ]},
+  {level:4,title:'A Trip to the Countryside',
+   text:"Next Saturday, Amy is going to visit her grandparents in the countryside. She will take the train with her parents. They are going to stay there for two days. Amy plans to help her grandpa water the flowers and listen to her grandma's stories. She is really looking forward to the trip.",
+   questions:[
+     {q:'How will Amy get to the countryside?', choices:['By bus','By train','By car','By plane'], ans:'By train'},
+     {q:'What does Amy plan to do there?', choices:['Watch TV','Water the flowers','Go swimming','Do homework'], ans:'Water the flowers'}
+   ]}
+];
+let curLevel=1, maxUnlocked=1;
+function buildLevelRow(){
+  const row=document.getElementById('levelRow');
+  row.innerHTML='';
+  PASSAGES.forEach(p=>{
+    const b=document.createElement('button');
+    const locked=p.level>maxUnlocked;
+    b.className='level-btn'+(p.level===curLevel?' on':'')+(locked?' locked':'');
+    b.textContent='第'+p.level+'关';
+    if(!locked) b.onclick=()=>gotoLevel(p.level);
+    row.appendChild(b);
+  });
+}
+function gotoLevel(lv){
+  if(lv>PASSAGES.length) return;
+  if(lv>maxUnlocked) return;
+  curLevel=lv;
+  buildLevelRow();
+  const p=PASSAGES[lv-1];
+  document.getElementById('passageBox').innerHTML=`<b>${p.title}</b><br><br>${p.text}`;
+  document.getElementById('nextLevelBtn').style.display='none';
+  const rqList=document.getElementById('rqList');
+  rqList.innerHTML='';
+  let answered=0;
+  p.questions.forEach((q,qi)=>{
+    const block=document.createElement('div'); block.className='rq-block';
+    block.innerHTML=`<div class="rq-q">${qi+1}. ${q.q}</div><div class="rq-choices"></div>`;
+    rqList.appendChild(block);
+    const choicesEl=block.querySelector('.rq-choices');
+    shuffleArr(q.choices).forEach(c=>{
+      const b=document.createElement('button');
+      b.className='rq-btn'; b.textContent=c;
+      b.onclick=()=>{
+        block.querySelectorAll('.rq-btn').forEach(x=>{x.disabled=true; if(x.textContent===q.ans) x.classList.add('correct');});
+        if(c!==q.ans) b.classList.add('wrong');
+        speak(c===q.ans?'正确！':'答案是'+q.ans);
+        answered++;
+        if(answered>=p.questions.length){
+          if(lv===maxUnlocked && maxUnlocked<PASSAGES.length){ maxUnlocked++; }
+          buildLevelRow();
+          if(lv<PASSAGES.length) document.getElementById('nextLevelBtn').style.display='inline-block';
+        }
+      };
+      choicesEl.appendChild(b);
+    });
+  });
+  speak('第'+lv+'关，先读一读短文，再回答问题。');
+}
+function speakPassage(){speakEn(PASSAGES[curLevel-1].text);}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0};
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const types=['timeword','verbform','reading'];
+  const t=types[randInt(0,2)];
+  if(t==='timeword'){
+    const item=TIME_WORDS[randInt(0,TIME_WORDS.length-1)];
+    const correctTense=TENSES.find(x=>x.key===item.tense).name;
+    document.getElementById('quizQ').innerHTML=`"<b>${item.w}</b>" 通常用在哪种时态？`;
+    shuffleArr(TENSES.map(x=>x.name)).forEach(name=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=name;
+      b.onclick=()=>checkQ(b,name,correctTense); area.appendChild(b);
+    });
+    speakEn(item.w);
+  } else if(t==='verbform'){
+    const v=VERBS[randInt(0,VERBS.length-1)];
+    const tenseIdx=randInt(0,3);
+    const tense=TENSES[tenseIdx];
+    const forms={present:v.he, presentcont:'is '+v.ing, future:'will '+v.base, past:v.past};
+    const correct=forms[tense.key];
+    const wrongPool=Object.values(forms).filter(f=>f!==correct);
+    const opts=shuffleArr([correct,...shuffleArr(wrongPool).slice(0,3)]);
+    document.getElementById('quizQ').innerHTML=`He <b>___</b> (${v.base}) ${tense.markers.split(' / ')[0]}.`;
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o,correct); area.appendChild(b);
+    });
+    speakEn(`He ... ${v.base} ... ${tense.markers.split(' / ')[0]}`);
+  } else {
+    const allQ=PASSAGES.flatMap(p=>p.questions);
+    const item=allQ[randInt(0,allQ.length-1)];
+    document.getElementById('quizQ').textContent=item.q;
+    shuffleArr(item.choices).forEach(c=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=c;
+      b.onclick=()=>checkQ(b,c,item.ans); area.appendChild(b);
+    });
+    speakEn(item.q);
+  }
+}
+function checkQ(btn,chosen,correct){
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===correct) b.classList.add('correct');});
+  if(chosen===correct){
+    qScore.c++;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+correct;
+    speak('再想想看！');
+  }
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['tense','timegame','reading','quiz']);
+  if(t==='tense') speak('四态对比：选一个动词，看看四种时态怎么变化。');
+  if(t==='timegame') initTimeGame();
+  if(t==='reading'){buildLevelRow();gotoLevel(curLevel);}
+  if(t==='quiz') nextQ();
+}
+buildVerbRow();
+renderTenseGrid();
+speak('欢迎来到四态对比与阅读理解闯关！一起复习现在时、进行时、将来时和过去时。');
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语：比较级最高级与书面表达</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e1f5fe 0%,#e8eaf6 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:760px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.55rem;color:#01579b;letter-spacing:1px;text-shadow:2px 3px 0 #b3e5fc;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.rule-table{border-collapse:collapse;margin:10px auto;font-size:.85rem;width:100%;}
+.rule-table th,.rule-table td{border:1px solid #b3e5fc;padding:7px 10px;text-align:center;}
+.rule-table th{background:#e1f5fe;color:#01579b;}
+.calc-box{background:#e1f5fe;border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;}
+.calc-expr{font-size:1.15rem;font-weight:bold;color:#01579b;margin-bottom:10px;}
+.quiz-input{font-size:1.1rem;width:150px;border:2px solid #81d4fa;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#01579b;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#01579b;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#0288d1;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#01579b;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 书面表达 */
+.topic-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
+.opt-btn{padding:6px 16px;border:2px solid #81d4fa;border-radius:14px;background:#fff;color:#01579b;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:3px;}
+.opt-btn.on{background:#01579b;color:#fff;border-color:#01579b;}
+.write-frame{background:#fff8e1;border-radius:14px;padding:16px 18px;margin-bottom:12px;font-size:1.05rem;line-height:2.1;color:#333;}
+.write-frame select{font-size:.95rem;padding:3px 6px;border:2px solid #ffb74d;border-radius:8px;color:#e65100;font-weight:bold;font-family:inherit;background:#fff;}
+.model-box{background:#e8f5e9;border-radius:12px;padding:14px 18px;font-size:1rem;color:#1b5e20;line-height:1.8;display:none;}
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e1f5fe;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#01579b;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#01579b">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📝</div>
+    <h1>英语：比较级最高级与书面表达</h1>
+    <p>形容词的比较级/最高级变化规则 · 看图/主题引导写小短文</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('comp')">📊 比较级与最高级</button>
+    <button class="tab-btn" onclick="switchTab('write')">✏️ 书面表达小作文</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🎯 综合练习</button>
+  </div>
+
+  <!-- 比较级与最高级 -->
+  <div id="tab-comp">
+    <div class="card">
+      <div class="net-desc">形容词变比较级/最高级有几种规律，先看规则表</div>
+      <table class="rule-table">
+        <tr><th>规则</th><th>原级</th><th>比较级</th><th>最高级</th></tr>
+        <tr><td>直接加 -er/-est</td><td>tall</td><td>taller</td><td>tallest</td></tr>
+        <tr><td>以e结尾，只加 -r/-st</td><td>nice</td><td>nicer</td><td>nicest</td></tr>
+        <tr><td>重读闭音节，双写辅音+er/est</td><td>big</td><td>bigger</td><td>biggest</td></tr>
+        <tr><td>辅音+y结尾，变y为i+er/est</td><td>happy</td><td>happier</td><td>happiest</td></tr>
+        <tr><td>多音节（较长）词，前加more/most</td><td>beautiful</td><td>more beautiful</td><td>most beautiful</td></tr>
+        <tr><td>不规则变化</td><td>good / bad</td><td>better / worse</td><td>best / worst</td></tr>
+      </table>
+      <div class="calc-box">
+        <div class="calc-expr" id="compExpr"></div>
+        <input type="text" id="compInput" class="quiz-input" placeholder="type here">
+        <div class="result-msg" id="compMsg"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextComp()">🔄 换一题</button></div>
+    </div>
+  </div>
+
+  <!-- 书面表达小作文 -->
+  <div id="tab-write" style="display:none;">
+    <div class="card">
+      <div class="net-desc">选一个主题，从词库里选词填空，拼出一段小短文，再和范文对照</div>
+      <div class="topic-tabs" id="writeTopicTabs"></div>
+      <div class="write-frame" id="writeFrame"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="toggleModel()" id="modelBtn">💡 查看范文</button></div>
+      <div class="model-box" id="modelBox"></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <input type="text" id="quizInput" class="quiz-input" placeholder="type here">
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 比较级与最高级 ──
+const ADJ_WORDS=[
+  {base:'tall', comp:'taller', sup:'tallest'},
+  {base:'short', comp:'shorter', sup:'shortest'},
+  {base:'long', comp:'longer', sup:'longest'},
+  {base:'fast', comp:'faster', sup:'fastest'},
+  {base:'old', comp:'older', sup:'oldest'},
+  {base:'young', comp:'younger', sup:'youngest'},
+  {base:'small', comp:'smaller', sup:'smallest'},
+  {base:'strong', comp:'stronger', sup:'strongest'},
+  {base:'nice', comp:'nicer', sup:'nicest'},
+  {base:'large', comp:'larger', sup:'largest'},
+  {base:'safe', comp:'safer', sup:'safest'},
+  {base:'big', comp:'bigger', sup:'biggest'},
+  {base:'hot', comp:'hotter', sup:'hottest'},
+  {base:'thin', comp:'thinner', sup:'thinnest'},
+  {base:'sad', comp:'sadder', sup:'saddest'},
+  {base:'happy', comp:'happier', sup:'happiest'},
+  {base:'easy', comp:'easier', sup:'easiest'},
+  {base:'busy', comp:'busier', sup:'busiest'},
+  {base:'heavy', comp:'heavier', sup:'heaviest'},
+  {base:'beautiful', comp:'more beautiful', sup:'most beautiful'},
+  {base:'important', comp:'more important', sup:'most important'},
+  {base:'difficult', comp:'more difficult', sup:'most difficult'},
+  {base:'expensive', comp:'more expensive', sup:'most expensive'},
+  {base:'interesting', comp:'more interesting', sup:'most interesting'},
+  {base:'careful', comp:'more careful', sup:'most careful'},
+  {base:'good', comp:'better', sup:'best'},
+  {base:'bad', comp:'worse', sup:'worst'},
+  {base:'many', comp:'more', sup:'most'},
+  {base:'little', comp:'less', sup:'least'},
+  {base:'far', comp:'farther', sup:'farthest', altComp:'further', altSup:'furthest'},
+];
+let compState=null;
+function genComp(){
+  const w=ADJ_WORDS[randInt(0,ADJ_WORDS.length-1)];
+  const isComp=Math.random()<0.5;
+  return {w,isComp};
+}
+function nextComp(){
+  compState=genComp();
+  const {w,isComp}=compState;
+  document.getElementById('compExpr').textContent = isComp
+    ? `A is ___ (${w.base}) than B.`
+    : `A is the ___ (${w.base}) of all.`;
+  document.getElementById('compInput').value='';
+  document.getElementById('compInput').disabled=false;
+  document.getElementById('compMsg').textContent='';
+  speak(isComp ? `${w.base}的比较级是什么？` : `${w.base}的最高级是什么？`);
+}
+function normalizeAns(s){ return s.trim().toLowerCase(); }
+function checkCompAnswer(input, w, isComp){
+  const ans=normalizeAns(input);
+  const correct=isComp?w.comp:w.sup;
+  const alt=isComp?w.altComp:w.altSup;
+  return ans===correct || (alt && ans===alt);
+}
+function checkComp(){
+  const compInp=document.getElementById('compInput');
+  if(compInp.disabled) return;
+  const v=compInp.value;
+  if(!v.trim()) return;
+  compInp.disabled=true;
+  const {w,isComp}=compState;
+  const ok=checkCompAnswer(v,w,isComp);
+  const correctAns=isComp?w.comp:w.sup;
+  const msg=document.getElementById('compMsg');
+  if(ok){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+correctAns;
+    speak('答案是'+correctAns+'，再想想！');
+  }
+}
+
+// ── 书面表达小作文 ──
+const WRITING_TOPICS=[
+  { title:'My Weekend',
+    parts:['On Saturday, I ', 0, '. In the afternoon, I ', 1, '. I feel ', 2, ' because ', 3, '.'],
+    blanks:[
+      ['played basketball','went swimming','visited my grandma','rode my bike'],
+      ['did my homework','read a book','watched a movie','cleaned my room'],
+      ['happy','tired','excited','relaxed'],
+      ['I had a great weekend','I spent time with my family','I learned something new','I had fun with my friends']
+    ],
+    model:'On Saturday, I played basketball. In the afternoon, I read a book. I feel happy because I had a great weekend.' },
+  { title:'My Favorite Animal',
+    parts:['My favorite animal is a ', 0, '. It is ', 1, ' and ', 2, '. It likes to eat ', 3, '. I like it because ', 4, '.'],
+    blanks:[
+      ['panda','rabbit','dog','cat'],
+      ['black and white','white and soft','brown and small','orange and cute'],
+      ['very big','very small','very friendly','very quick'],
+      ['bamboo','carrots','meat','fish'],
+      ["it's very cute","it's very smart","it's very gentle","it makes me happy"]
+    ],
+    model:'My favorite animal is a panda. It is black and white and very big. It likes to eat bamboo. I like it because it is very cute.' },
+  { title:'A Letter to My Friend',
+    parts:['Dear friend, How are you? I want to tell you about ', 0, '. ', 1, '. Write back soon! Your friend.'],
+    blanks:[
+      ['my new school','my summer holiday','my new hobby','my family trip'],
+      ['It was really exciting','I learned a lot of new things','I made many new friends','We had a wonderful time']
+    ],
+    model:'Dear friend, How are you? I want to tell you about my summer holiday. We had a wonderful time. Write back soon! Your friend.' },
+];
+let writeTopicIdx=0, writeChoices=[];
+function renderWriteTopicTabs(){
+  document.getElementById('writeTopicTabs').innerHTML=WRITING_TOPICS.map((t,i)=>
+    `<button class="opt-btn ${i===writeTopicIdx?'on':''}" onclick="setWriteTopic(${i})">${t.title}</button>`).join('');
+}
+function setWriteTopic(i){
+  writeTopicIdx=i;
+  writeChoices=new Array(WRITING_TOPICS[i].blanks.length).fill(-1);
+  renderWriteTopicTabs();
+  renderWriteFrame();
+  document.getElementById('modelBox').style.display='none';
+  document.getElementById('modelBtn').textContent='💡 查看范文';
+  speak('选一选，拼出你自己的' + WRITING_TOPICS[i].title + '小短文。');
+}
+function renderWriteFrame(){
+  const t=WRITING_TOPICS[writeTopicIdx];
+  const html=t.parts.map(p=>{
+    if(typeof p==='string') return p;
+    const blankIdx=p;
+    const opts=t.blanks[blankIdx];
+    const sel=`<select onchange="setBlank(${blankIdx}, this.value)">
+      <option value="">___</option>
+      ${opts.map(o=>`<option value="${o}">${o}</option>`).join('')}
+    </select>`;
+    return sel;
+  }).join('');
+  document.getElementById('writeFrame').innerHTML=html;
+}
+function setBlank(idx,val){ writeChoices[idx]=val; }
+function toggleModel(){
+  const box=document.getElementById('modelBox');
+  const btn=document.getElementById('modelBtn');
+  const show = box.style.display==='none' || !box.style.display;
+  box.style.display = show ? 'block' : 'none';
+  btn.textContent = show ? '🙈 隐藏范文' : '💡 查看范文';
+  if(show){
+    box.textContent='📝 范文：'+WRITING_TOPICS[writeTopicIdx].model;
+    speak('这是一篇参考范文，读一读，和你写的比一比。');
+  }
+}
+
+// ── 综合练习（比较级/最高级）──
+let qScore={c:0,w:0}, quizState=null, qDone=false;
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  quizState=genComp();
+  const {w,isComp}=quizState;
+  document.getElementById('quizQ').textContent = isComp
+    ? `${w.base} 的比较级是？`
+    : `${w.base} 的最高级是？`;
+  speak(isComp ? `${w.base}的比较级是什么？` : `${w.base}的最高级是什么？`);
+}
+function checkQuiz(){
+  if(qDone) return;
+  const v=document.getElementById('quizInput').value;
+  if(!v.trim()) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  const {w,isComp}=quizState;
+  const ok=checkCompAnswer(v,w,isComp);
+  const correctAns=isComp?w.comp:w.sup;
+  if(ok){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+correctAns;
+    speak('答案是'+correctAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('compInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkComp();});
+document.getElementById('compInput').addEventListener('blur',()=>{if(document.getElementById('compInput').value.trim())checkComp();});
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQuiz();});
+document.getElementById('quizInput').addEventListener('blur',()=>{if(document.getElementById('quizInput').value.trim())checkQuiz();});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['comp','write','quiz']);
+  if(t==='comp') speak('比较级与最高级：先看规则表，再练习填空。');
+  if(t==='write') speak('书面表达：选一个主题，选词拼出你自己的小短文。');
+  if(t==='quiz') nextQ();
+}
+nextComp();
+renderWriteTopicTabs();
+renderWriteFrame();
+writeChoices=new Array(WRITING_TOPICS[0].blanks.length).fill(-1);
+speak('欢迎来到比较级最高级与书面表达！先学规则再练习，还可以拼出自己的小短文。');
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>

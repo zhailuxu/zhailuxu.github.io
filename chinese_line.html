@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>词语连线 — 一年级语文</title>
+<meta name="description" content="一年级语文词语连线游戏：反义词、近义词、词语搭配、古诗对句，点击连线配对。">
+<style>
+:root {
+  --bg:       #EBF5F5;
+  --card:     #FFFFFF;
+  --teal:     #1A5F7A;
+  --teal-mid: #2A7D9A;
+  --teal-lt:  #D6EDF5;
+  --red:      #D64045;
+  --red-lt:   #FBEAEA;
+  --green:    #2E7D52;
+  --green-lt: #E3F4EC;
+  --text:     #0D2B35;
+  --muted:    #5A8A90;
+  --border:   #C2DDE5;
+  --shadow:   0 2px 14px rgba(13,43,53,.09), 0 0 0 1px rgba(13,43,53,.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 18% 75%, rgba(26,95,122,.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 82% 12%, rgba(46,125,82,.05) 0%, transparent 45%);
+  min-height: 100vh;
+  padding: 22px 14px 52px;
+  color: var(--text);
+}
+
+.container { max-width: 680px; margin: 0 auto; }
+
+/* ── Header ── */
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 {
+  font-size: 1.9rem; font-weight: 800; color: var(--teal);
+  letter-spacing: 4px; line-height: 1.1; text-wrap: balance;
+}
+.header p { font-size: .82rem; color: var(--muted); margin-top: 5px; letter-spacing: .4px; }
+
+/* ── Category tabs ── */
+.cat-bar { display: flex; gap: 7px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+.cat-btn {
+  border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 14px;
+  font-size: .82rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: var(--card); color: var(--muted); letter-spacing: .3px; transition: all .15s;
+}
+.cat-btn:hover { border-color: var(--teal-mid); color: var(--teal); }
+.cat-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+.cat-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* ── Card panel ── */
+.card-panel {
+  background: var(--card); border-radius: 18px; padding: 20px 16px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+
+/* ── HUD ── */
+.hud {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.hud-score {
+  font-size: .88rem; font-weight: 800; color: var(--teal);
+  font-variant-numeric: tabular-nums;
+}
+.hud-hint {
+  font-size: .78rem; color: var(--muted); font-style: italic;
+  background: var(--teal-lt); border-radius: 99px; padding: 3px 11px;
+  border: 1px solid var(--border);
+}
+
+/* ── Progress ── */
+.prog-bar { background: var(--teal-lt); border-radius: 99px; height: 5px; margin-bottom: 18px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal-mid), var(--green)); transition: width .35s ease; }
+
+/* ── Game area ── */
+.game-area { position: relative; user-select: none; -webkit-user-select: none; }
+
+.word-columns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.word-col { display: flex; flex-direction: column; gap: 9px; }
+
+/* ── Word cards ── */
+.word-card {
+  padding: 13px 10px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--bg);
+  text-align: center; cursor: pointer;
+  font-family: 'Songti SC', 'STSong', 'NSimSun', 'SimSun', '宋体', serif;
+  font-size: 1.3rem; font-weight: 600; color: var(--text);
+  letter-spacing: 2px; line-height: 1.4;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  position: relative; z-index: 2;
+}
+.word-card:hover:not(.matched-ok):not(.matched-wrong) {
+  border-color: var(--teal-mid);
+  box-shadow: 0 3px 10px rgba(13,43,53,.1);
+}
+.word-card.selected {
+  border-color: var(--red); background: var(--red-lt);
+  color: var(--red); box-shadow: 0 0 0 3px rgba(214,64,69,.15);
+}
+.word-card.matched-ok {
+  border-color: var(--green); background: var(--green-lt);
+  color: var(--green); cursor: default; pointer-events: none;
+}
+.word-card.matched-wrong {
+  border-color: var(--red); background: var(--red-lt); color: var(--red);
+}
+
+/* ── SVG overlay ── */
+.line-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; overflow: visible; z-index: 1;
+}
+
+/* ── Buttons ── */
+.actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.btn {
+  border: none; border-radius: 10px; padding: 9px 22px;
+  font-size: .87rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  letter-spacing: .5px; transition: transform .12s;
+}
+.btn:active { transform: scale(.96); }
+.btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.btn-primary { background: var(--teal); color: #fff; box-shadow: 0 3px 10px rgba(26,95,122,.25); }
+.btn-ghost   { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+
+/* ── Result ── */
+.result-msg {
+  text-align: center; font-size: 1rem; font-weight: 700;
+  color: var(--green); margin-top: 12px; min-height: 26px; letter-spacing: 1px;
+}
+
+/* ── Ghost line animation ── */
+.ghost-path { animation: dashMove .65s linear infinite; }
+@keyframes dashMove { to { stroke-dashoffset: -20; } }
+
+/* ── Confetti canvas ── */
+#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+/* ── Entry animation ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.word-card.new { animation: slideUp .24s ease both; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%  { transform: translateX(-5px); }
+  75%  { transform: translateX(5px); }
+}
+.shake { animation: shake .22s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .word-card.new, .ghost-path, .shake { animation: none; }
+  .word-card, .prog-fill { transition: none; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 460px) {
+  .word-card    { font-size: 1.05rem; padding: 11px 6px; letter-spacing: 1px; }
+  .header h1    { font-size: 1.5rem; letter-spacing: 2px; }
+  .word-columns { gap: 10px; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="container">
+
+<div class="header">
+  <h1>词语连线</h1>
+  <p>点击左边词语，再点击右边的配对词，一笔连线</p>
+</div>
+
+<div class="cat-bar" id="catBar"></div>
+
+<div class="card-panel">
+  <div class="hud">
+    <span class="hud-score" id="hudScore">✅ 0 &nbsp; ❌ 0</span>
+    <span class="hud-hint"  id="hudHint">请选择左侧词语</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+  <div class="game-area" id="gameArea">
+    <svg class="line-canvas" id="lineCanvas"></svg>
+    <div class="word-columns">
+      <div class="word-col" id="leftCol"></div>
+      <div class="word-col" id="rightCol"></div>
+    </div>
+  </div>
+
+  <div class="result-msg" id="resultMsg"></div>
+  <div class="actions">
+    <button class="btn btn-ghost"   onclick="speakSelected()">🔊 朗读</button>
+    <button class="btn btn-primary" onclick="nextRound()">换一组 →</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script src="hpx-core.js"></script>
+<script>
+// ══ DATA ══════════════════════════════════════════════════
+const CATS = {
+  antonyms: {
+    label: '反义词',
+    pairs: [
+      ['大','小'],['多','少'],['冷','热'],['快','慢'],['上','下'],
+      ['黑','白'],['笑','哭'],['远','近'],['长','短'],['高','低'],
+      ['胖','瘦'],['新','旧'],['来','去'],['开','关'],['进','出'],
+      ['早','晚'],['软','硬'],['明','暗'],['动','静'],['强','弱'],
+      ['好','坏'],['真','假'],['是','非'],['收','放'],['轻','重'],
+    ]
+  },
+  synonyms: {
+    label: '近义词',
+    pairs: [
+      ['美丽','漂亮'],['高兴','快乐'],['喜欢','爱好'],['害怕','恐惧'],
+      ['认真','仔细'],['聪明','伶俐'],['干净','整洁'],['安静','宁静'],
+      ['勤劳','勤快'],['难过','伤心'],['强大','强壮'],['快乐','开心'],
+      ['奇怪','奇妙'],['团结','合作'],['勇敢','勇猛'],
+    ]
+  },
+  collocation: {
+    label: '词语搭配',
+    pairs: [
+      ['弯弯的','月亮'],['红红的','苹果'],['绿绿的','草地'],
+      ['圆圆的','太阳'],['小小的','蚂蚁'],['大大的','西瓜'],
+      ['白白的','雪花'],['蓝蓝的','天空'],['甜甜的','蜂蜜'],
+      ['软软的','棉花'],['高高的','山峰'],['清清的','河水'],
+      ['金黄的','稻穗'],['火红的','枫叶'],['碧绿的','荷叶'],
+    ]
+  },
+  poem: {
+    label: '古诗对句',
+    pairs: [
+      ['床前明月光','疑是地上霜'],
+      ['举头望明月','低头思故乡'],
+      ['春眠不觉晓','处处闻啼鸟'],
+      ['夜来风雨声','花落知多少'],
+      ['锄禾日当午','汗滴禾下土'],
+      ['谁知盘中餐','粒粒皆辛苦'],
+      ['远看山有色','近听水无声'],
+      ['春去花还在','人来鸟不惊'],
+      ['欲穷千里目','更上一层楼'],
+      ['野火烧不尽','春风吹又生'],
+    ]
+  },
+};
+
+const CAT_KEYS  = Object.keys(CATS);
+const ROUND_SIZE = 5;
+
+// ══ STATE ═════════════════════════════════════════════════
+let curCat       = 'antonyms';
+let roundPairs   = [];
+let selectedCard = null;
+let matchedCount = 0;
+let totalOK      = 0, totalFail = 0;
+let ghostPath    = null;
+let aCtx         = null;
+
+// ══ BUILD UI ══════════════════════════════════════════════
+function buildCatBar() {
+  const bar = document.getElementById('catBar');
+  CAT_KEYS.forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (key === curCat ? ' active' : '');
+    btn.textContent = CATS[key].label;
+    btn.onclick = () => {
+      curCat = key;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      nextRound();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+// ══ ROUND ═════════════════════════════════════════════════
+function nextRound() {
+  selectedCard = null;
+  matchedCount = 0;
+  ghostPath    = null;
+  document.getElementById('lineCanvas').innerHTML = '';
+  document.getElementById('resultMsg').textContent = '';
+  document.getElementById('progFill').style.width = '0%';
+  document.getElementById('hudHint').textContent = '请选择左侧词语';
+
+  const pool = [...CATS[curCat].pairs];
+  shuffle(pool);
+  roundPairs = pool.slice(0, Math.min(ROUND_SIZE, pool.length));
+
+  const rightWords = roundPairs.map(p => p[1]);
+  shuffle(rightWords);
+
+  renderCol('leftCol',  roundPairs.map(p => p[0]), 'left');
+  renderCol('rightCol', rightWords, 'right');
+  updateHud();
+}
+
+function renderCol(id, words, side) {
+  const col = document.getElementById(id);
+  col.innerHTML = '';
+  words.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'word-card new';
+    card.style.animationDelay = (i * 50) + 'ms';
+    card.textContent = w;
+    card.dataset.word = w;
+    card.onclick = () => handleClick(card, side);
+    col.appendChild(card);
+  });
+}
+
+// ══ INTERACTION ═══════════════════════════════════════════
+function handleClick(card, side) {
+  if (card.classList.contains('matched-ok')) return;
+
+  if (side === 'left') {
+    const prev = selectedCard;
+    clearSelection();
+    if (prev === card) return;
+    selectedCard = card;
+    card.classList.add('selected');
+    document.getElementById('hudHint').textContent = '已选：' + card.dataset.word;
+    speakCN(card.dataset.word);
+  } else {
+    if (!selectedCard) {
+      document.getElementById('hudHint').textContent = '先点左边的词语';
+      return;
+    }
+    attemptMatch(selectedCard, card);
+  }
+}
+
+function attemptMatch(lCard, rCard) {
+  const lw = lCard.dataset.word;
+  const rw = rCard.dataset.word;
+  const ok = roundPairs.some(p => p[0] === lw && p[1] === rw);
+  removeGhost();
+
+  if (ok) {
+    totalOK++;
+    lCard.classList.remove('selected');
+    lCard.classList.add('matched-ok');
+    rCard.classList.add('matched-ok');
+    drawCurve(lCard, rCard, '#2E7D52', false);
+    selectedCard = null;
+    matchedCount++;
+    playOK();
+    speakCN(lw + '，' + rw);
+    document.getElementById('hudHint').textContent = lw + ' — ' + rw + ' ✓';
+    document.getElementById('progFill').style.width = (matchedCount / roundPairs.length * 100) + '%';
+    if (matchedCount === roundPairs.length) setTimeout(roundDone, 450);
+  } else {
+    totalFail++;
+    rCard.classList.add('matched-wrong');
+    lCard.classList.add('shake');
+    drawCurve(lCard, rCard, '#D64045', true);
+    playFail();
+    document.getElementById('hudHint').textContent = '不是这一对，再试试';
+    setTimeout(() => {
+      rCard.classList.remove('matched-wrong');
+      lCard.classList.remove('shake', 'selected');
+      selectedCard = null;
+      removeTempCurves();
+      document.getElementById('hudHint').textContent = '请重新选择左侧词语';
+    }, 860);
+  }
+  updateHud();
+}
+
+function clearSelection() {
+  if (selectedCard) { selectedCard.classList.remove('selected'); selectedCard = null; }
+  removeGhost();
+}
+
+function roundDone() {
+  document.getElementById('resultMsg').textContent = '🎉 全部连对！厉害！';
+  launchConfetti();
+}
+
+// ══ SVG BEZIER CURVES ═════════════════════════════════════
+function cardCoords(el, side) {
+  const ga   = document.getElementById('gameArea').getBoundingClientRect();
+  const rect = el.getBoundingClientRect();
+  return {
+    x: (side === 'left' ? rect.right : rect.left) - ga.left,
+    y: (rect.top + rect.height / 2) - ga.top,
+  };
+}
+
+function bezierPath(x1, y1, x2, y2) {
+  const cx1 = x1 + (x2 - x1) * 0.38;
+  const cx2 = x1 + (x2 - x1) * 0.62;
+  return `M ${x1} ${y1} C ${cx1} ${y1} ${cx2} ${y2} ${x2} ${y2}`;
+}
+
+function drawCurve(lEl, rEl, color, temp) {
+  const svg = document.getElementById('lineCanvas');
+  const a   = cardCoords(lEl, 'left');
+  const b   = cardCoords(rEl, 'right');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y));
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '2.8');
+  path.setAttribute('stroke-linecap', 'round');
+  if (temp) path.dataset.temp = '1';
+  svg.appendChild(path);
+  return path;
+}
+
+function removeTempCurves() {
+  document.querySelectorAll('#lineCanvas path[data-temp]').forEach(p => p.remove());
+}
+
+function removeGhost() {
+  if (ghostPath) { ghostPath.remove(); ghostPath = null; }
+}
+
+// Ghost curve follows mouse after left card is selected
+document.addEventListener('mousemove', e => {
+  if (!selectedCard) { removeGhost(); return; }
+  const ga = document.getElementById('gameArea').getBoundingClientRect();
+  const a  = cardCoords(selectedCard, 'left');
+  const bx = e.clientX - ga.left;
+  const by = e.clientY - ga.top;
+  if (bx <= a.x) { removeGhost(); return; }
+
+  if (!ghostPath) {
+    const svg = document.getElementById('lineCanvas');
+    ghostPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    ghostPath.setAttribute('fill', 'none');
+    ghostPath.setAttribute('stroke', '#D64045');
+    ghostPath.setAttribute('stroke-width', '2');
+    ghostPath.setAttribute('stroke-linecap', 'round');
+    ghostPath.setAttribute('stroke-dasharray', '6 4');
+    ghostPath.classList.add('ghost-path');
+    svg.appendChild(ghostPath);
+  }
+  ghostPath.setAttribute('d', bezierPath(a.x, a.y, bx, by));
+});
+
+document.addEventListener('mouseleave', removeGhost);
+
+// Resize: redraw matched curves
+window.addEventListener('resize', () => {
+  const svg = document.getElementById('lineCanvas');
+  svg.innerHTML = '';
+  ghostPath = null;
+  document.querySelectorAll('#leftCol .matched-ok').forEach(lCard => {
+    const pair  = roundPairs.find(p => p[0] === lCard.dataset.word);
+    if (!pair) return;
+    const rCard = [...document.querySelectorAll('#rightCol .matched-ok')]
+                  .find(c => c.dataset.word === pair[1]);
+    if (rCard) drawCurve(lCard, rCard, '#2E7D52', false);
+  });
+});
+
+// ══ AUDIO ═════════════════════════════════════════════════
+function getACtx() {
+  if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return aCtx;
+}
+function tone(f, d, type = 'sine', v = .16) {
+  try {
+    const ctx = getACtx(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.type = type;
+    o.frequency.setValueAtTime(f, ctx.currentTime);
+    g.gain.setValueAtTime(v, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d);
+    o.start(); o.stop(ctx.currentTime + d);
+  } catch(e) {}
+}
+function playOK()   { tone(659,.09); setTimeout(() => tone(784,.13), 90); }
+function playFail() { tone(220,.22,'sawtooth',.12); }
+
+const chineseLineSpeech=Hpx.speech.create({rate:0.88});
+function speakCN(text){return text?chineseLineSpeech.speak(text):Promise.resolve();}
+
+function speakSelected() {
+  if (selectedCard) speakCN(selectedCard.dataset.word);
+  else {
+    const hint = document.getElementById('hudHint');
+    const prev = hint.textContent;
+    hint.textContent = '先点击一个词语';
+    setTimeout(() => { hint.textContent = prev; }, 1200);
+  }
+}
+
+// ══ CONFETTI ══════════════════════════════════════════════
+function launchConfetti() {
+  const cv = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#1A5F7A','#2E7D52','#D4AC0D','#D64045','#5FB3D4','#80C896'];
+  const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const ps = Array.from({ length: 110 }, () => ({
+    x: Math.random() * cv.width, y: Math.random() * cv.height - cv.height,
+    w: rand(5,12), h: rand(4,8), color: cols[rand(0, cols.length - 1)],
+    vx: (Math.random() - .5) * 3, vy: rand(2, 5),
+    angle: Math.random() * Math.PI * 2, spin: (Math.random() - .5) * .2, op: 1,
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    let alive = 0;
+    ps.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+      p.op = Math.max(0, 1 - frame / 120);
+      if (p.y < cv.height + 20) alive++;
+      ctx.save(); ctx.globalAlpha = p.op;
+      ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive > 0 && frame < 150) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+// ══ UTILS ═════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+function updateHud() {
+  document.getElementById('hudScore').innerHTML = `✅ ${totalOK} &nbsp; ❌ ${totalFail}`;
+}
+
+// ══ INIT ══════════════════════════════════════════════════
+buildCatBar();
+nextRound();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>

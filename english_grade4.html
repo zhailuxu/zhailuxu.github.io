@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语四年级：家庭成员与方位介词</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f2f1 0%,#e3f2fd 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.7rem;color:#00695c;letter-spacing:1px;text-shadow:2px 3px 0 #80cbc4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.88rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* family tree */
+.tree-row{display:flex;gap:14px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.fam-node{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:8px 6px;border-radius:14px;transition:all .15s;border:2px solid transparent;}
+.fam-node:hover{background:#e0f2f1;}
+.fam-node.on{border-color:#00838f;background:#e0f2f1;}
+.fam-node .icon{font-size:2.1rem;}
+.fam-node .word{font-size:.82rem;font-weight:bold;color:#00695c;}
+.detail-box{background:#e0f2f1;border-radius:14px;padding:14px 18px;text-align:center;min-height:60px;}
+.detail-box .big{font-size:1.3rem;font-weight:bold;color:#00695c;}
+.detail-box .zh{font-size:.95rem;color:#5d4037;margin-top:4px;}
+.detail-box .sent{font-size:1rem;color:#333;margin-top:8px;font-style:italic;}
+/* prepositions */
+.scene-wrap{position:relative;width:280px;height:200px;margin:0 auto 14px;background:#fff8e1;border-radius:16px;overflow:hidden;border:2px dashed #ffca28;}
+.scene-box{position:absolute;font-size:4.2rem;transform:translate(-50%,-50%);}
+.scene-cat{position:absolute;font-size:2.6rem;transform:translate(-50%,-50%);transition:all .4s;}
+.prep-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+.prep-btn{padding:7px 14px;border:2px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.prep-btn.on{background:#00838f;color:#fff;border-color:#00838f;}
+.sentence-box{background:#e3f2fd;border-radius:14px;padding:12px 16px;text-align:center;font-size:1.05rem;color:#1565c0;font-weight:bold;}
+/* tense */
+.rule-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.rule-card{background:#fff3e0;border-radius:12px;padding:10px 14px;font-size:.88rem;color:#5d4037;line-height:1.7;}
+.rule-card b{color:#e65100;}
+.drill-box{background:#e0f2f1;border-radius:14px;padding:16px;text-align:center;}
+.drill-verb{font-size:1.4rem;font-weight:bold;color:#00695c;margin-bottom:8px;}
+.drill-input-row{display:flex;gap:8px;justify-content:center;align-items:center;}
+.drill-input{font-size:1.1rem;width:140px;border:2px solid #80cbc4;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.drill-input:focus{border-color:#00838f;}
+.check-btn{padding:8px 20px;border:none;border-radius:10px;background:#00838f;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.hint-btn{margin-top:10px;padding:6px 16px;border:2px solid #80cbc4;border-radius:12px;background:#fff;color:#00695c;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.hint-text{font-size:.85rem;color:#e65100;margin-top:8px;min-height:20px;}
+.next-drill-btn{margin-top:10px;padding:8px 26px;border:none;border-radius:14px;background:#00838f;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e0f2f1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#00695c;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
+.choice-btn{padding:12px 10px;border:2px solid #80cbc4;border-radius:12px;background:#fff;color:#00695c;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#e0f2f1;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:12px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#00838f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#00838f">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">👨‍👩‍👧‍👦</div>
+    <h1>Family &amp; Prepositions</h1>
+    <p>家庭成员 · 方位介词 · 一般现在时第三人称单数</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('family')">👪 家庭成员</button>
+    <button class="tab-btn" onclick="switchTab('prep')">📦 方位介词</button>
+    <button class="tab-btn" onclick="switchTab('tense')">🔤 一般现在时</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 家庭成员 -->
+  <div id="tab-family">
+    <div class="card">
+      <div id="famTree"></div>
+      <div class="detail-box" id="famDetail">点一点家庭树上的成员，听听英语怎么说</div>
+    </div>
+  </div>
+
+  <!-- 方位介词 -->
+  <div id="tab-prep" style="display:none;">
+    <div class="card">
+      <div class="prep-row" id="prepRow"></div>
+      <div class="scene-wrap">
+        <div class="scene-box" id="sceneBox" style="top:45%;left:50%;">📦</div>
+        <div class="scene-cat" id="sceneCat">🐱</div>
+      </div>
+      <div class="sentence-box" id="prepSentence"></div>
+    </div>
+  </div>
+
+  <!-- 一般现在时 -->
+  <div id="tab-tense" style="display:none;">
+    <div class="card">
+      <div class="rule-cards">
+        <div class="rule-card">1️⃣ 一般情况，动词后直接加 <b>-s</b>：like → <b>likes</b>，play → <b>plays</b>，work → <b>works</b></div>
+        <div class="rule-card">2️⃣ 以 <b>o / ch / sh / ss / x</b> 结尾，加 <b>-es</b>：go → <b>goes</b>，watch → <b>watches</b>，wash → <b>washes</b></div>
+        <div class="rule-card">3️⃣ 以"辅音字母+y"结尾，把 y 变 i 再加 -es：study → <b>studies</b>，fly → <b>flies</b>（"元音字母+y"结尾直接加s：play→plays）</div>
+        <div class="rule-card">4️⃣ 特殊变化，要记住：have → <b>has</b></div>
+      </div>
+      <div class="drill-box">
+        <div style="font-size:.85rem;color:#777;margin-bottom:6px;">He / She / It ...</div>
+        <div class="drill-verb" id="drillVerb"></div>
+        <div class="drill-input-row">
+          <input type="text" id="drillInput" class="drill-input" placeholder="输入变化后的动词">
+        </div>
+        <button class="hint-btn" onclick="showDrillHint()">💡 提示</button>
+        <div class="hint-text" id="drillHint"></div>
+        <div class="result-msg" id="drillMsg"></div>
+        <button class="next-drill-btn" onclick="nextDrill()">下一个 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-grid" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+const hpxChineseSpeech=Hpx.speech.create({rate:0.88});
+const hpxEnglishSpeech=Hpx.speech.create({lang:"en-US",rate:0.85,buttonId:"secondarySpeechToggle"});
+function speak(text){return hpxChineseSpeech.speak(text);}
+function speakEn(text){return hpxEnglishSpeech.speak(text);}
+function toggleSpeak(){const enabled=hpxChineseSpeech.toggle();hpxEnglishSpeech.setEnabled(enabled,false);}
+const randInt=Hpx.random.int;
+
+// ── 家庭成员 ──
+const FAMILY=[
+  {icon:'👴',word:'grandpa',alt:'grandfather',zh:'爷爷 / 外公',row:1},
+  {icon:'👵',word:'grandma',alt:'grandmother',zh:'奶奶 / 外婆',row:1},
+  {icon:'👨‍🦱',word:'uncle',zh:'叔叔 / 舅舅',row:2},
+  {icon:'👨',word:'father',alt:'dad',zh:'爸爸',row:2},
+  {icon:'👩',word:'mother',alt:'mom',zh:'妈妈',row:2},
+  {icon:'👩‍🦰',word:'aunt',zh:'阿姨 / 姑姑',row:2},
+  {icon:'👦',word:'brother',zh:'哥哥 / 弟弟',row:3},
+  {icon:'🧒',word:'me',zh:'我',row:3},
+  {icon:'👧',word:'sister',zh:'姐姐 / 妹妹',row:3},
+  {icon:'🧑',word:'cousin',zh:'表/堂兄弟姐妹',row:3}
+];
+function buildFamTree(){
+  const wrap=document.getElementById('famTree');
+  wrap.innerHTML='';
+  [1,2,3].forEach(r=>{
+    const row=document.createElement('div'); row.className='tree-row';
+    FAMILY.filter(f=>f.row===r).forEach(f=>{
+      const node=document.createElement('div');
+      node.className='fam-node';
+      node.innerHTML=`<div class="icon">${f.icon}</div><div class="word">${f.word}</div>`;
+      node.onclick=()=>selectFamily(f,node);
+      row.appendChild(node);
+    });
+    wrap.appendChild(row);
+  });
+}
+function selectFamily(f,node){
+  document.querySelectorAll('.fam-node').forEach(n=>n.classList.remove('on'));
+  node.classList.add('on');
+  const sentence = f.word==='me' ? "That's me!" : `This is my ${f.word}.`;
+  document.getElementById('famDetail').innerHTML=`<div class="big">${f.icon} ${f.word}${f.alt?' / '+f.alt:''}</div><div class="zh">${f.zh}</div><div class="sent">${sentence}</div>`;
+  speakEn(f.word); setTimeout(()=>speakEn(sentence),700);
+}
+
+// ── 方位介词 ──
+const PREPS=[
+  {key:'in',label:'in（在……里面）',pos:{top:'45%',left:'50%'},z:2,scale:.6},
+  {key:'on',label:'on（在……上面）',pos:{top:'14%',left:'50%'},z:2,scale:1},
+  {key:'under',label:'under（在……下面）',pos:{top:'78%',left:'50%'},z:0,scale:1},
+  {key:'behind',label:'behind（在……后面）',pos:{top:'40%',left:'74%'},z:0,scale:.85},
+  {key:'nextto',label:'next to（在……旁边）',pos:{top:'45%',left:'86%'},z:2,scale:1}
+];
+function buildPrepRow(){
+  const row=document.getElementById('prepRow');
+  row.innerHTML='';
+  PREPS.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='prep-btn'+(i===0?' on':'');
+    b.textContent=p.label;
+    b.onclick=()=>{document.querySelectorAll('.prep-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');setScene(p.key);};
+    row.appendChild(b);
+  });
+}
+function setScene(key){
+  const p=PREPS.find(x=>x.key===key);
+  const cat=document.getElementById('sceneCat');
+  cat.style.top=p.pos.top; cat.style.left=p.pos.left;
+  cat.style.zIndex=p.z; cat.style.transform=`translate(-50%,-50%) scale(${p.scale})`;
+  document.getElementById('sceneBox').style.zIndex=1;
+  const sentence=`The cat is <b>${key==='nextto'?'next to':key}</b> the box.`;
+  document.getElementById('prepSentence').innerHTML=sentence;
+  speakEn(`The cat is ${key==='nextto'?'next to':key} the box.`);
+}
+
+// ── 一般现在时 ──
+const VERB_BANK=[
+  {base:'like',form:'likes',rule:'一般动词直接加 s'},
+  {base:'play',form:'plays',rule:'一般动词直接加 s'},
+  {base:'work',form:'works',rule:'一般动词直接加 s'},
+  {base:'read',form:'reads',rule:'一般动词直接加 s'},
+  {base:'go',form:'goes',rule:'以 o 结尾，加 es'},
+  {base:'do',form:'does',rule:'以 o 结尾，加 es'},
+  {base:'watch',form:'watches',rule:'以 ch 结尾，加 es'},
+  {base:'wash',form:'washes',rule:'以 sh 结尾，加 es'},
+  {base:'fix',form:'fixes',rule:'以 x 结尾，加 es'},
+  {base:'miss',form:'misses',rule:'以 ss 结尾，加 es'},
+  {base:'study',form:'studies',rule:'辅音+y结尾，变y为i加es'},
+  {base:'fly',form:'flies',rule:'辅音+y结尾，变y为i加es'},
+  {base:'cry',form:'cries',rule:'辅音+y结尾，变y为i加es'},
+  {base:'try',form:'tries',rule:'辅音+y结尾，变y为i加es'},
+  {base:'enjoy',form:'enjoys',rule:'元音+y结尾，直接加s'},
+  {base:'have',form:'has',rule:'特殊变化，要记住'}
+];
+let drillCur=null;
+function nextDrill(){
+  drillCur=VERB_BANK[randInt(0,VERB_BANK.length-1)];
+  document.getElementById('drillVerb').textContent=drillCur.base;
+  document.getElementById('drillInput').value='';
+  document.getElementById('drillInput').disabled=false;
+  document.getElementById('drillMsg').textContent='';
+  document.getElementById('drillHint').textContent='';
+  speakEn(drillCur.base);
+}
+function showDrillHint(){document.getElementById('drillHint').textContent='💡 '+drillCur.rule;}
+function checkDrill(){
+  const drillInp=document.getElementById('drillInput');
+  if(drillInp.disabled) return;
+  const v=drillInp.value.trim().toLowerCase();
+  if(!v) return;
+  drillInp.disabled=true;
+  const msg=document.getElementById('drillMsg');
+  if(v===drillCur.form){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！He/She/It '+drillCur.form;
+    speak('正确！真棒！'); speakEn(drillCur.form);
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 正确答案是：'+drillCur.form;
+    speak('答案是'+drillCur.form+'，再想想！');
+  }
+}
+document.getElementById('drillInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkDrill();});
+document.getElementById('drillInput').addEventListener('blur',()=>{if(document.getElementById('drillInput').value.trim())checkDrill();});
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, qDone=false;
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const types=['family','prep','tense'];
+  const t=types[randInt(0,2)];
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  if(t==='family'){
+    const item=FAMILY[randInt(0,FAMILY.length-1)];
+    const others=FAMILY.filter(f=>f.zh!==item.zh);
+    const set=new Set([item.zh]);
+    while(set.size<4) set.add(others[randInt(0,others.length-1)].zh);
+    const opts=shuffleArr(Array.from(set));
+    document.getElementById('quizQ').textContent=`"${item.word}" 是什么意思？`;
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o,item.zh); area.appendChild(b);
+    });
+    speakEn(item.word);
+  } else if(t==='prep'){
+    const item=PREPS[randInt(0,PREPS.length-1)];
+    setScene(item.key);
+    const others=PREPS.filter(p=>p.key!==item.key);
+    const set=new Set([item.label]);
+    while(set.size<4) set.add(others[randInt(0,others.length-1)].label);
+    const opts=shuffleArr(Array.from(set));
+    document.getElementById('quizQ').innerHTML='Where is the cat?（切换到"方位介词"标签可看到场景图）';
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o,item.label); area.appendChild(b);
+    });
+  } else {
+    const item=VERB_BANK[randInt(0,VERB_BANK.length-1)];
+    const others=VERB_BANK.filter(v=>v.form!==item.form);
+    const set=new Set([item.form]);
+    while(set.size<4) set.add(others[randInt(0,others.length-1)].form);
+    const opts=shuffleArr(Array.from(set));
+    document.getElementById('quizQ').innerHTML=`He <b>___</b> (${item.base}) every day.`;
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o,item.form); area.appendChild(b);
+    });
+    speakEn(`He ... ${item.base} ... every day.`);
+  }
+}
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function checkQ(btn,chosen,correct){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===correct) b.classList.add('correct');});
+  if(chosen===correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+correct;
+    speak('再想想看！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['family','prep','tense','quiz']);
+  if(t==='family') speak('家庭成员：点一点家庭树上的成员，听听英语怎么说。');
+  if(t==='prep'){speak('方位介词：点击按钮，看看小猫在盒子的什么位置。');}
+  if(t==='tense') speak('一般现在时：主语是他、她或它的时候，动词要加s或es。');
+  if(t==='quiz') nextQ();
+}
+buildFamTree();
+buildPrepRow();
+setScene('in');
+nextDrill();
+speak('欢迎来到家庭成员与方位介词！一起认识英语单词，学习一般现在时的变化规则。');
+</script>
+
+<script src="feedback.js"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+</body>
+</html>
