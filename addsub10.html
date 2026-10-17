@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>10以内加减法：学过程</title>
+<link rel="stylesheet" href="hpx-common.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
@@ -11,9 +12,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
 .header{text-align:center;margin-bottom:20px;}
 .header h1{font-size:1.75rem;color:#ef6c00;letter-spacing:1px;text-shadow:2px 3px 0 #ffe0b2;}
 .header p{font-size:.85rem;color:#999;margin-top:4px;}
-.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
-.tab-btn{padding:8px 14px;border:none;border-radius:20px;font-size:.84rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,.65);color:#666;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;font-family:inherit;}
-.tab-btn.on{background:#ef6c00;color:#fff;box-shadow:0 4px 14px rgba(239,108,0,.35);}
+.tab-btn{padding:8px 14px;font-size:.84rem;}
 .card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
 .net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:12px;}
 .slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
@@ -78,13 +77,9 @@ span.countable.tapped{animation:tapBounce .3s ease;}
 .result-msg.ok{color:#2e7d32;}
 .result-msg.no{color:#c62828;}
 .next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#ef6c00;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
-.back-link{display:block;text-align:center;margin-top:20px;color:#ef6c00;text-decoration:none;font-size:.9rem;}
-.speak-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
-.speak-toggle{padding:7px 18px;border:2px solid #ccc;border-radius:20px;background:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;}
-.speak-toggle.on{background:#ef6c00;color:#fff;}
 </style>
 </head>
-<body>
+<body data-hpx-page style="--hpx-accent:#ef6c00">
 <div class="container">
   <div class="header">
     <div style="font-size:2.4rem;">🍎</div>
@@ -201,30 +196,10 @@ span.countable.tapped{animation:tapBounce .3s ease;}
 
   <a href="index.html" class="back-link">← 返回慧陪学</a>
 </div>
+<script src="hpx-core.js"></script>
 <script>
-let _speakOn=true,_zhVoice=null;
-function _loadVoices(){const vs=speechSynthesis.getVoices();_zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;}
-if(typeof speechSynthesis!=='undefined'){_loadVoices();speechSynthesis.addEventListener('voiceschanged',_loadVoices);}
-// speak() 返回一个 Promise：朗读真正结束（或出错/被禁用）才 resolve，避免下一句话把当前这句打断
-// 注意：部分浏览器的语音引擎闲置一段时间后会静默卡死（既不触发 onend 也不触发 onerror），
-// 加个兜底超时，避免朗读一卡，后面的演示动画跟着永远卡住不出结果
-function speak(text){
-  return new Promise(resolve=>{
-    if(!_speakOn||typeof speechSynthesis==='undefined'){ resolve(); return; }
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    if(_zhVoice){u.voice=_zhVoice;u.lang=_zhVoice.lang;}else{u.lang='zh-CN';}
-    u.rate=0.85;u.pitch=1.1;
-    let done=false;
-    const finish=()=>{ if(done) return; done=true; resolve(); };
-    u.onend=finish;
-    u.onerror=finish;
-    speechSynthesis.speak(u);
-    setTimeout(finish,4000);
-  });
-}
-function toggleSpeak(){_speakOn=!_speakOn;const btn=document.getElementById('speakToggle');btn.textContent=_speakOn?'🔊 声音解说 开':'🔇 声音解说 关';btn.classList.toggle('on',_speakOn);if(!_speakOn) speechSynthesis.cancel();else speak('声音解说已开启。');}
-function randInt(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+Hpx.speech.install({rate:0.85,timeoutMs:4000});
+const randInt=Hpx.random.int;
 function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 let _ac=null;
 function tone(f,d=.1,t='sine',v=.18){
@@ -478,6 +453,17 @@ function renderDecomp(){
 // ── 综合练习 ──
 let qScore={c:0,w:0}, quizAns=0;
 const OBJ_EMOJI=['🍎','🍓','⭐','🎈','🍭','🐟'];
+function focusQuizInput(){
+  // 只在鼠标/触控板设备上自动聚焦，避免手机切换题目时反复弹出软键盘。
+  if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  requestAnimationFrame(()=>{
+    const input=document.getElementById('quizInput');
+    if(!input.disabled && document.getElementById('tab-quiz').style.display!=='none'){
+      input.focus({preventScroll:true});
+      input.select();
+    }
+  });
+}
 function nextQ(){
   document.getElementById('quizMsg').textContent='';
   document.getElementById('nextBtn').style.display='none';
@@ -514,6 +500,7 @@ function nextQ(){
     document.getElementById('quizQ').textContent=`${n} 可以分成 ${a} 和几？`;
     speak(`${n}可以分成${a}和几？`);
   }
+  focusQuizInput();
 }
 async function checkQuiz(){
   const input=document.getElementById('quizInput');
@@ -551,8 +538,7 @@ document.getElementById('quizInput').addEventListener('blur',()=>{
 });
 
 function switchTab(t){
-  ['add','sub','line','decomp','quiz'].forEach(id=>{document.getElementById('tab-'+id).style.display=id===t?'':'none';});
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('on',['add','sub','line','decomp','quiz'][i]===t);});
+  Hpx.tabs.activate(t, ['add','sub','line','decomp','quiz']);
   if(t==='add') speak('加法就是把两堆合起来，一个一个数一数。');
   if(t==='sub') speak('减法就是从一堆里去掉几个，数一数剩下的。');
   if(t==='line') speak('数轴跳一跳：加法往右跳，减法往左跳。');
@@ -568,7 +554,9 @@ renderDecomp();
 speak('欢迎来到10以内加减法！我们先看懂合并和去掉是什么意思，再来做练习。');
 </script>
 
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

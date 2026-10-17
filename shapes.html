@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图形认识 — 认识平面图形</title>
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background:linear-gradient(145deg,#ffe8d6 0%,#ffd6b8 40%,#ffcba4 75%,#ffc08c 100%);
+  min-height:100vh;
+  padding:16px 14px 60px;
+}
+.container{ max-width:700px; margin:0 auto; }
+
+/* ── header ── */
+.hdr{ text-align:center; padding:14px 0 10px; }
+.hdr h1{
+  font-size:1.9rem; color:#b94a00;
+  text-shadow:2px 2px 0 rgba(255,120,0,.22);
+  letter-spacing:3px;
+}
+.hdr p{ font-size:.82rem; color:#c8723a; margin-top:4px; }
+
+/* ── tabs ── */
+.tabs{ display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+.tab-btn{
+  padding:9px 24px; border:none; border-radius:24px;
+  font-family:inherit; font-size:.92rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.72); color:#b94a00;
+  box-shadow:0 2px 8px rgba(180,80,0,.12);
+  transition:all .18s;
+}
+.tab-btn.on{
+  background:linear-gradient(135deg,#ff6b35,#ff9a6c);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(255,107,53,.38);
+  transform:translateY(-1px);
+}
+
+/* ── section ── */
+.section{ display:none; }
+.section.on{ display:block; }
+
+/* ── card grid ── */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+/* ── shape card ── */
+.shape-card{
+  background:rgba(255,255,255,.88);
+  border-radius:22px;
+  padding:18px 14px 14px;
+  box-shadow:0 4px 20px rgba(180,80,0,.12);
+  cursor:pointer;
+  transition:transform .18s, box-shadow .18s;
+  position:relative;
+  overflow:hidden;
+}
+.shape-card::before{
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:4px;
+  border-radius:22px 22px 0 0;
+}
+.shape-card:nth-child(1)::before{ background:#ff6b35; }
+.shape-card:nth-child(2)::before{ background:#ff9a6c; }
+.shape-card:nth-child(3)::before{ background:#ffb347; }
+.shape-card:nth-child(4)::before{ background:#ff6b8a; }
+.shape-card:nth-child(5)::before{ background:#ffa07a; }
+.shape-card:nth-child(6)::before{ background:#ff7043; }
+
+.shape-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 28px rgba(180,80,0,.18);
+}
+.shape-card:active{ transform:translateY(0); }
+
+.shape-svg-wrap{
+  display:flex; justify-content:center; align-items:center;
+  width:90px; height:90px; margin:0 auto 10px;
+}
+.shape-svg-wrap svg{ width:100%; height:100%; overflow:visible; }
+
+/* SVG 描边动画 */
+.shape-path{
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:5;
+  transition:stroke .3s;
+}
+/* 各图形颜色 */
+.c-square .shape-path  { stroke:#ff6b35; }
+.c-rect   .shape-path  { stroke:#ff9a6c; }
+.c-tri    .shape-path  { stroke:#ffb347; }
+.c-circle .shape-path  { stroke:#ff6b8a; }
+.c-trap   .shape-path  { stroke:#ffa07a; }
+.c-para   .shape-path  { stroke:#ff7043; }
+
+/* 填充颜色（浅）*/
+.c-square .shape-fill  { fill:#fff3ee; stroke:none; }
+.c-rect   .shape-fill  { fill:#fff5f0; stroke:none; }
+.c-tri    .shape-fill  { fill:#fffaf0; stroke:none; }
+.c-circle .shape-fill  { fill:#fff0f5; stroke:none; }
+.c-trap   .shape-fill  { fill:#fff4ef; stroke:none; }
+.c-para   .shape-fill  { fill:#fff2ee; stroke:none; }
+
+.shape-card-name{
+  text-align:center; font-size:1.15rem; font-weight:bold;
+  color:#b94a00; margin-bottom:6px;
+}
+.shape-tags{
+  display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.tag{
+  padding:3px 10px; border-radius:12px;
+  font-size:.75rem; font-weight:bold;
+  background:linear-gradient(135deg,#ffe8d6,#ffd6b8);
+  color:#b94a00;
+  border:1.5px solid #ffc08c;
+}
+.shape-rhyme{
+  text-align:center; font-size:.8rem; color:#c8723a;
+  background:rgba(255,200,150,.25);
+  border-radius:10px; padding:5px 8px; line-height:1.5;
+}
+
+/* 展开详情 */
+.shape-detail{
+  display:none; margin-top:10px;
+  border-top:1.5px dashed #ffd4b8;
+  padding-top:10px;
+}
+.shape-card.open .shape-detail{ display:block; }
+.detail-title{
+  font-size:.78rem; font-weight:bold; color:#b94a00;
+  margin-bottom:5px;
+}
+.detail-list{
+  list-style:none; font-size:.78rem; color:#7a3a00; line-height:1.8;
+}
+.detail-list li::before{ content:"✦ "; color:#ff6b35; }
+
+/* ── 练习题 ── */
+.quiz-card{
+  background:rgba(255,255,255,.88);
+  border-radius:22px;
+  padding:22px 18px 18px;
+  box-shadow:0 4px 20px rgba(180,80,0,.12);
+  margin-bottom:14px;
+}
+.quiz-type-badge{
+  display:inline-block; padding:3px 12px; border-radius:12px;
+  font-size:.72rem; font-weight:bold;
+  background:linear-gradient(135deg,#ff6b35,#ff9a6c);
+  color:#fff; margin-bottom:12px;
+}
+.quiz-question{
+  font-size:1.05rem; font-weight:bold; color:#7a3a00;
+  text-align:center; margin-bottom:16px; line-height:1.5;
+}
+.quiz-svg-center{
+  display:flex; justify-content:center; margin-bottom:14px;
+}
+.quiz-svg-center svg{ width:110px; height:110px; }
+.choice-grid{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+}
+.choice-btn{
+  padding:11px 8px; border:2.5px solid #ffd4b8; border-radius:14px;
+  background:rgba(255,255,255,.9); font-family:inherit;
+  font-size:.9rem; font-weight:bold; color:#7a3a00; cursor:pointer;
+  transition:all .16s; text-align:center;
+}
+.choice-btn:hover{ background:#fff3ee; border-color:#ff9a6c; }
+.choice-btn.correct{ background:#e8f8e8; border-color:#66bb6a; color:#2e7d32; }
+.choice-btn.wrong  { background:#fce8e8; border-color:#ef9a9a; color:#c62828; }
+
+.quiz-result{
+  text-align:center; margin-top:12px; font-size:.95rem;
+  font-weight:bold; min-height:26px;
+}
+.quiz-result.ok{ color:#2e7d32; }
+.quiz-result.no{ color:#c62828; }
+.quiz-next-btn{
+  display:block; margin:14px auto 0;
+  padding:10px 28px; border:none; border-radius:20px;
+  background:linear-gradient(135deg,#ff6b35,#ff9a6c);
+  color:#fff; font-family:inherit; font-size:.95rem;
+  font-weight:bold; cursor:pointer;
+  box-shadow:0 4px 14px rgba(255,107,53,.35);
+  transition:transform .15s;
+}
+.quiz-next-btn:hover{ transform:translateY(-1px); }
+
+/* ── 测验 tab ── */
+.exam-header{
+  text-align:center; margin-bottom:16px;
+}
+.exam-progress{
+  font-size:.85rem; color:#b94a00; font-weight:bold; margin-bottom:8px;
+}
+.progress-bar{
+  height:8px; border-radius:4px;
+  background:rgba(255,255,255,.6);
+  overflow:hidden; margin-bottom:4px;
+}
+.progress-fill{
+  height:100%; border-radius:4px;
+  background:linear-gradient(90deg,#ff6b35,#ff9a6c);
+  transition:width .3s;
+}
+
+.exam-card{
+  background:rgba(255,255,255,.88);
+  border-radius:22px;
+  padding:22px 18px 18px;
+  box-shadow:0 4px 20px rgba(180,80,0,.12);
+}
+.exam-q-num{
+  font-size:.78rem; color:#c8723a; font-weight:bold; margin-bottom:8px;
+}
+.exam-q-text{
+  font-size:1.05rem; font-weight:bold; color:#7a3a00;
+  margin-bottom:14px; line-height:1.5; text-align:center;
+}
+.exam-svg-center{
+  display:flex; justify-content:center; margin-bottom:14px;
+}
+.exam-svg-center svg{ width:100px; height:100px; }
+.exam-choices{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.exam-choice{
+  padding:11px 8px; border:2.5px solid #ffd4b8; border-radius:14px;
+  background:rgba(255,255,255,.9); font-family:inherit;
+  font-size:.9rem; font-weight:bold; color:#7a3a00; cursor:pointer;
+  transition:all .16s; text-align:center;
+}
+.exam-choice:hover{ background:#fff3ee; border-color:#ff9a6c; }
+.exam-choice.correct{ background:#e8f8e8; border-color:#66bb6a; color:#2e7d32; }
+.exam-choice.wrong  { background:#fce8e8; border-color:#ef9a9a; color:#c62828; }
+.exam-choice:disabled{ cursor:default; opacity:.85; }
+
+.exam-feedback{ text-align:center; margin-top:10px; min-height:24px; font-weight:bold; font-size:.92rem; }
+.exam-feedback.ok{ color:#2e7d32; }
+.exam-feedback.no{ color:#c62828; }
+.exam-next{ display:block; margin:12px auto 0; padding:10px 28px; border:none; border-radius:20px;
+  background:linear-gradient(135deg,#ff6b35,#ff9a6c); color:#fff; font-family:inherit;
+  font-size:.95rem; font-weight:bold; cursor:pointer; box-shadow:0 4px 14px rgba(255,107,53,.35);
+  transition:transform .15s; }
+.exam-next:hover{ transform:translateY(-1px); }
+
+/* 成绩页 */
+.score-page{
+  text-align:center; padding:32px 20px;
+  background:rgba(255,255,255,.88); border-radius:22px;
+  box-shadow:0 4px 20px rgba(180,80,0,.12);
+}
+.score-emoji{ font-size:3.5rem; margin-bottom:12px; }
+.score-num{ font-size:2.4rem; font-weight:bold; color:#b94a00; margin-bottom:8px; }
+.score-comment{ font-size:1rem; color:#7a3a00; line-height:1.6; margin-bottom:20px; }
+.score-restart{ padding:12px 32px; border:none; border-radius:20px;
+  background:linear-gradient(135deg,#ff6b35,#ff9a6c); color:#fff; font-family:inherit;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  box-shadow:0 4px 14px rgba(255,107,53,.35); }
+
+@media(max-width:480px){
+  .card-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+  .shape-card{ padding:14px 10px 10px; }
+  .shape-svg-wrap{ width:72px; height:72px; }
+  .shape-card-name{ font-size:1rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hdr">
+    <h1>🔷 图形认识</h1>
+    <p>小学平面图形 · 一到四年级</p>
+  </div>
+
+  <!-- tabs -->
+  <div class="tabs">
+    <button class="tab-btn on" onclick="showTab('learn',this)">🔷 学习</button>
+    <button class="tab-btn" onclick="showTab('practice',this)">✏️ 练习</button>
+    <button class="tab-btn" onclick="showTab('exam',this)">🎯 测验</button>
+  </div>
+
+  <!-- ===== 学习 ===== -->
+  <div id="tab-learn" class="section on">
+    <div class="card-grid" id="learnGrid"></div>
+  </div>
+
+  <!-- ===== 练习 ===== -->
+  <div id="tab-practice" class="section">
+    <div class="quiz-card" id="practiceBox">
+      <!-- JS 渲染 -->
+    </div>
+  </div>
+
+  <!-- ===== 测验 ===== -->
+  <div id="tab-exam" class="section">
+    <div class="exam-header">
+      <div class="exam-progress" id="examProgressTxt">第 1 题 / 共 10 题</div>
+      <div class="progress-bar"><div class="progress-fill" id="examProgressBar" style="width:10%"></div></div>
+    </div>
+    <div id="examBox"></div>
+  </div>
+
+</div>
+
+<script src="hpx-core.js"></script>
+<script>
+/* =====================================================================
+   数据
+   ===================================================================== */
+const SHAPES = [
+  {
+    id:'square', name:'正方形',
+    color:'#ff6b35', fillColor:'#fff3ee',
+    sides:4, corners:4,
+    tags:['4条边','4个角'],
+    rhyme:'四边一样长，四角都成方，是它没得跑——正方形！',
+    features:['四条边长度完全相等','四个角都是直角（90°）','对边互相平行','是长方形的特殊情况'],
+    svgPath:'M15,15 L85,15 L85,85 L15,85 Z',
+    perimeter:280, isCircle:false,
+    strokeColor:'#ff6b35',
+  },
+  {
+    id:'rect', name:'长方形',
+    color:'#ff9a6c', fillColor:'#fff5f0',
+    sides:4, corners:4,
+    tags:['4条边','4个角'],
+    rhyme:'两长两短对对齐，四个直角不含糊——长方形！',
+    features:['对边长度相等（两长两短）','四个角都是直角（90°）','对边互相平行','正方形是特殊的长方形'],
+    svgPath:'M5,22 L95,22 L95,78 L5,78 Z',
+    perimeter:280, isCircle:false,
+    strokeColor:'#ff9a6c',
+  },
+  {
+    id:'tri', name:'三角形',
+    color:'#ffb347', fillColor:'#fffaf0',
+    sides:3, corners:3,
+    tags:['3条边','3个角'],
+    rhyme:'三条边三个角，三角之和一百八——三角形！',
+    features:['有三条边和三个角','三个内角之和等于180°','最坚固的平面图形','分等边、等腰、不等边三角形'],
+    svgPath:'M50,8 L92,92 L8,92 Z',
+    perimeter:220, isCircle:false,
+    strokeColor:'#ffb347',
+  },
+  {
+    id:'circle', name:'圆',
+    color:'#ff6b8a', fillColor:'#fff0f5',
+    sides:0, corners:0,
+    tags:['0条边','0个角'],
+    rhyme:'没有边没有角，滚来滚去最圆滑——圆！',
+    features:['没有边也没有角','每一点到圆心的距离都相等（半径相同）','是所有图形里周长最优雅的','直径 = 半径 × 2'],
+    svgPath:'circle', cx:50, cy:50, r:42,
+    perimeter:264, isCircle:true,
+    strokeColor:'#ff6b8a',
+  },
+  {
+    id:'trap', name:'梯形',
+    color:'#ffa07a', fillColor:'#fff4ef',
+    sides:4, corners:4,
+    tags:['4条边','4个角'],
+    rhyme:'一对平行两腰斜，上宽下窄像台阶——梯形！',
+    features:['有且只有一对平行边（上底和下底）','另外两条边叫做腰','四个角不一定是直角','不是平行四边形'],
+    svgPath:'M22,80 L78,80 L62,20 L38,20 Z',
+    perimeter:240, isCircle:false,
+    strokeColor:'#ffa07a',
+  },
+  {
+    id:'para', name:'平行四边形',
+    color:'#ff7043', fillColor:'#fff2ee',
+    sides:4, corners:4,
+    tags:['4条边','4个角'],
+    rhyme:'对边平行又相等，像个斜推的长方形——平行四边形！',
+    features:['两对边分别平行且相等','对角相等（但不一定是直角）','正方形和长方形都是特殊的平行四边形','容易"滑倒"，稳定性不如三角形'],
+    svgPath:'M10,80 L80,80 L90,20 L20,20 Z',
+    perimeter:260, isCircle:false,
+    strokeColor:'#ff7043',
+  },
+];
+
+/* =====================================================================
+   语音
+   ===================================================================== */
+Hpx.speech.install({rate:0.88,startDelayMs:50});
+
+/* =====================================================================
+   音效
+   ===================================================================== */
+const AC = window.AudioContext || window.webkitAudioContext;
+let ac;
+function ensureAC(){ if(!ac && AC) ac = new AC(); }
+
+function playTone(freq, dur, type='sine'){
+  ensureAC(); if(!ac) return;
+  const o = ac.createOscillator();
+  const g = ac.createGain();
+  o.connect(g); g.connect(ac.destination);
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(.35, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + dur);
+  o.start(); o.stop(ac.currentTime + dur);
+}
+function playCorrect(){ playTone(523,.15); setTimeout(()=>playTone(659,.15),100); setTimeout(()=>playTone(784,.2),200); }
+function playWrong(){ playTone(220,.3,'sawtooth'); }
+function playClick(){ playTone(440,.08); }
+
+/* =====================================================================
+   SVG 辅助
+   ===================================================================== */
+function buildSVG(shape, size=100, animated=false){
+  const S = size; const scale = S/100;
+  let inner = '';
+  const strokeW = 5/scale;
+
+  if(shape.isCircle){
+    const cx = 50*scale, cy=50*scale, r=42*scale;
+    const perim = Math.round(2*Math.PI*r);
+    inner = `
+      <circle class="shape-fill c-${shape.id}" cx="${cx}" cy="${cy}" r="${r}"/>
+      <circle class="shape-path c-${shape.id}" cx="${cx}" cy="${cy}" r="${r}"
+        stroke="${shape.strokeColor}" stroke-width="${strokeW}"
+        ${animated
+          ? `stroke-dasharray="${perim}" stroke-dashoffset="${perim}"
+             style="animation:drawPath .7s ease forwards;"`
+          : ''}
+      />`;
+  } else {
+    // scale path points
+    const scaledPath = shape.svgPath.replace(/(-?\d+\.?\d*)/g, n => (parseFloat(n)*scale).toFixed(1));
+    const perim = shape.perimeter * scale;
+    inner = `
+      <path class="shape-fill c-${shape.id}" d="${scaledPath}"/>
+      <path class="shape-path c-${shape.id}" d="${scaledPath}"
+        stroke="${shape.strokeColor}" stroke-width="${strokeW}"
+        ${animated
+          ? `stroke-dasharray="${perim}" stroke-dashoffset="${perim}"
+             style="animation:drawPath .7s ease forwards;"`
+          : ''}
+      />`;
+  }
+  return `<svg viewBox="0 0 ${S} ${S}" width="${S}" height="${S}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+/* =====================================================================
+   学习 Tab
+   ===================================================================== */
+function buildLearnCards(){
+  const grid = document.getElementById('learnGrid');
+  grid.innerHTML = '';
+  SHAPES.forEach(s => {
+    const card = document.createElement('div');
+    card.className = `shape-card c-${s.id}`;
+    card.dataset.id = s.id;
+    card.innerHTML = `
+      <div class="shape-svg-wrap" id="svgWrap_${s.id}">${buildSVG(s,90)}</div>
+      <div class="shape-card-name">${s.name}</div>
+      <div class="shape-tags">
+        ${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+      </div>
+      <div class="shape-rhyme">${s.rhyme}</div>
+      <div class="shape-detail">
+        <div class="detail-title">✦ 图形特征</div>
+        <ul class="detail-list">
+          ${s.features.map(f=>`<li>${f}</li>`).join('')}
+        </ul>
+      </div>`;
+    card.addEventListener('click', ()=>{
+      playClick();
+      const wasOpen = card.classList.contains('open');
+      // 关掉其他
+      document.querySelectorAll('.shape-card.open').forEach(c => c.classList.remove('open'));
+      if(!wasOpen){
+        card.classList.add('open');
+        speak(s.name);
+        // 重新注入带动画的SVG
+        const wrap = document.getElementById(`svgWrap_${s.id}`);
+        wrap.innerHTML = buildSVG(s, 90, true);
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+/* =====================================================================
+   练习 Tab
+   ===================================================================== */
+let practiceAnswered = false;
+
+function getRandomShape(){ return SHAPES[Math.floor(Math.random()*SHAPES.length)]; }
+
+function get4Choices(correct){
+  const others = SHAPES.filter(s=>s.id!==correct.id);
+  shuffle(others);
+  const choices = [correct, ...others.slice(0,3)];
+  shuffle(choices);
+  return choices;
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// 题型 0: 看图选名
+// 题型 1: 看边数角数选名
+// 题型 2: 特征对比
+const PRACTICE_TYPES = [0,1,2];
+
+function buildPracticeQuestion(){
+  practiceAnswered = false;
+  const type = PRACTICE_TYPES[Math.floor(Math.random()*PRACTICE_TYPES.length)];
+  const box = document.getElementById('practiceBox');
+  box.innerHTML = '';
+
+  if(type === 0){
+    // 看图选名
+    const correct = getRandomShape();
+    const choices = get4Choices(correct);
+    box.innerHTML = `
+      <div class="quiz-type-badge">👁️ 看图识形</div>
+      <div class="quiz-question">这是什么图形？</div>
+      <div class="quiz-svg-center">${buildSVG(correct,110,false)}</div>
+      <div class="choice-grid">
+        ${choices.map(c=>`<button class="choice-btn" data-ans="${c.id}" onclick="checkPractice(this,'${correct.id}','${correct.name}')">${c.name}</button>`).join('')}
+      </div>
+      <div class="quiz-result" id="pracResult"></div>
+      <button class="quiz-next-btn" onclick="buildPracticeQuestion()" style="display:none" id="pracNext">换一题 ➜</button>`;
+
+  } else if(type === 1){
+    // 看属性选名
+    const correct = getRandomShape();
+    const choices = get4Choices(correct);
+    let desc = '';
+    if(correct.isCircle){
+      desc = '没有边、没有角的图形是？';
+    } else {
+      desc = `有 <strong>${correct.sides} 条边</strong>、<strong>${correct.corners} 个角</strong>，且${correct.features[0]}的图形是？`;
+    }
+    box.innerHTML = `
+      <div class="quiz-type-badge">🔢 看属性选图形</div>
+      <div class="quiz-question">${desc}</div>
+      <div class="choice-grid">
+        ${choices.map(c=>`<button class="choice-btn" data-ans="${c.id}" onclick="checkPractice(this,'${correct.id}','${correct.name}')">${c.name}</button>`).join('')}
+      </div>
+      <div class="quiz-result" id="pracResult"></div>
+      <button class="quiz-next-btn" onclick="buildPracticeQuestion()" style="display:none" id="pracNext">换一题 ➜</button>`;
+
+  } else {
+    // 特征对比选择题（固定题库）
+    const compQuestions = [
+      {
+        q:'正方形和长方形有什么相同点？',
+        correct:'都有 4 条边和 4 个直角',
+        options:['都有 4 条边和 4 个直角','边长全部相等','只有一对平行边','没有角']
+      },
+      {
+        q:'三角形最稳固的原因是什么？',
+        correct:'三角形不会变形（刚性结构）',
+        options:['边最多','三角形不会变形（刚性结构）','有直角','三条边相等']
+      },
+      {
+        q:'梯形和平行四边形有什么不同？',
+        correct:'梯形只有一对平行边，平行四边形有两对',
+        options:['梯形有5条边','梯形只有一对平行边，平行四边形有两对','梯形没有角','平行四边形是圆形']
+      },
+      {
+        q:'圆和其他图形最大的不同是什么？',
+        correct:'圆没有边和角',
+        options:['圆最大','圆只有1条边','圆没有边和角','圆有6条边']
+      },
+      {
+        q:'正方形是长方形吗？',
+        correct:'是，正方形是特殊的长方形（四边相等）',
+        options:['不是，完全不同','是，正方形是特殊的长方形（四边相等）','不是，正方形没有直角','是，因为都是圆的']
+      },
+    ];
+    const q = compQuestions[Math.floor(Math.random()*compQuestions.length)];
+    const opts = shuffle([...q.options]);
+    box.innerHTML = `
+      <div class="quiz-type-badge">🤔 特征对比</div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="choice-grid" style="grid-template-columns:1fr">
+        ${opts.map(o=>`<button class="choice-btn" onclick="checkPracticeText(this,'${escHtml(q.correct)}','${escHtml(o)}')">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-result" id="pracResult"></div>
+      <button class="quiz-next-btn" onclick="buildPracticeQuestion()" style="display:none" id="pracNext">换一题 ➜</button>`;
+  }
+}
+
+function escHtml(s){ return s.replace(/'/g,"&apos;").replace(/"/g,"&quot;"); }
+
+function checkPractice(btn, correctId, correctName){
+  if(practiceAnswered) return;
+  practiceAnswered = true;
+  const isRight = btn.dataset.ans === correctId;
+  document.querySelectorAll('#practiceBox .choice-btn').forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.ans === correctId) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+  const res = document.getElementById('pracResult');
+  if(isRight){
+    playCorrect();
+    speak(correctName + '，答对了，真棒！');
+    res.className='quiz-result ok'; res.textContent='✅ 太棒了！答对了！';
+  } else {
+    playWrong();
+    speak('答错了，正确答案是' + correctName);
+    res.className='quiz-result no'; res.textContent=`❌ 正确答案是：${correctName}`;
+  }
+  document.getElementById('pracNext').style.display='block';
+}
+
+function checkPracticeText(btn, correctStr, chosenStr){
+  if(practiceAnswered) return;
+  practiceAnswered = true;
+  const isRight = (correctStr === chosenStr);
+  document.querySelectorAll('#practiceBox .choice-btn').forEach(b=>{
+    b.disabled = true;
+    if(b.textContent.trim() === correctStr) b.classList.add('correct');
+    else if(b === btn && !isRight) b.classList.add('wrong');
+  });
+  const res = document.getElementById('pracResult');
+  if(isRight){
+    playCorrect(); speak('答对了，真棒！');
+    res.className='quiz-result ok'; res.textContent='✅ 回答正确！';
+  } else {
+    playWrong(); speak('答错了，再想想哦');
+    res.className='quiz-result no'; res.textContent='❌ 再想想哦，正确答案已标绿！';
+  }
+  document.getElementById('pracNext').style.display='block';
+}
+
+/* =====================================================================
+   测验 Tab
+   ===================================================================== */
+let examQuestions = [];
+let examIndex = 0;
+let examScore = 0;
+let examAnswered = false;
+
+function buildExamQuestions(){
+  const qs = [];
+  // 生成10题：每种题型均匀分布
+  for(let i=0;i<10;i++){
+    const type = i % 3;
+    const correct = SHAPES[i % SHAPES.length];
+    if(type===0){
+      qs.push({ type:0, shape:correct, choices:get4Choices(correct) });
+    } else if(type===1){
+      const s = SHAPES[(i+2)%SHAPES.length];
+      qs.push({ type:1, shape:s, choices:get4Choices(s) });
+    } else {
+      const compQ = [
+        { q:'正方形和长方形的相同点是？', correct:'都有4条边和4个直角', opts:['都有4条边和4个直角','边长全部相等','只有一对平行边','没有边没有角'] },
+        { q:'圆的特点是？', correct:'没有边也没有角', opts:['没有边也没有角','有4条边','有3个角','有1条边'] },
+        { q:'梯形有几对平行边？', correct:'1对', opts:['1对','2对','0对','3对'] },
+        { q:'三角形内角之和是多少度？', correct:'180°', opts:['180°','360°','90°','270°'] },
+      ];
+      const cq = compQ[Math.floor(Math.random()*compQ.length)];
+      qs.push({ type:2, compQ:cq });
+    }
+  }
+  shuffle(qs);
+  return qs;
+}
+
+function startExam(){
+  examQuestions = buildExamQuestions();
+  examIndex = 0; examScore = 0; examAnswered = false;
+  renderExamQ();
+}
+
+function renderExamQ(){
+  const total = examQuestions.length;
+  document.getElementById('examProgressTxt').textContent = `第 ${examIndex+1} 题 / 共 ${total} 题`;
+  document.getElementById('examProgressBar').style.width = ((examIndex+1)/total*100)+'%';
+
+  const box = document.getElementById('examBox');
+  box.innerHTML = '';
+
+  const q = examQuestions[examIndex];
+  examAnswered = false;
+
+  const card = document.createElement('div');
+  card.className = 'exam-card';
+
+  if(q.type===0){
+    const choices = q.choices;
+    card.innerHTML = `
+      <div class="exam-q-num">第 ${examIndex+1} 题</div>
+      <div class="exam-q-text">这是什么图形？</div>
+      <div class="exam-svg-center">${buildSVG(q.shape,100)}</div>
+      <div class="exam-choices">
+        ${choices.map(c=>`<button class="exam-choice" data-ans="${c.id}" onclick="checkExam(this,'${q.shape.id}','${q.shape.name}')">${c.name}</button>`).join('')}
+      </div>
+      <div class="exam-feedback" id="examFB"></div>
+      <button class="exam-next" id="examNextBtn" style="display:none" onclick="nextExam()">下一题 ➜</button>`;
+
+  } else if(q.type===1){
+    const s = q.shape;
+    const desc = s.isCircle ? '没有边、没有角的图形是？'
+      : `有 ${s.sides} 条边、${s.corners} 个角，且${s.features[0]}的图形是？`;
+    card.innerHTML = `
+      <div class="exam-q-num">第 ${examIndex+1} 题</div>
+      <div class="exam-q-text">${desc}</div>
+      <div class="exam-choices">
+        ${q.choices.map(c=>`<button class="exam-choice" data-ans="${c.id}" onclick="checkExam(this,'${s.id}','${s.name}')">${c.name}</button>`).join('')}
+      </div>
+      <div class="exam-feedback" id="examFB"></div>
+      <button class="exam-next" id="examNextBtn" style="display:none" onclick="nextExam()">下一题 ➜</button>`;
+
+  } else {
+    const cq = q.compQ;
+    const opts = shuffle([...cq.opts]);
+    card.innerHTML = `
+      <div class="exam-q-num">第 ${examIndex+1} 题</div>
+      <div class="exam-q-text">${cq.q}</div>
+      <div class="exam-choices" style="grid-template-columns:1fr">
+        ${opts.map(o=>`<button class="exam-choice" onclick="checkExamText(this,'${escHtml(cq.correct)}','${escHtml(o)}')">${o}</button>`).join('')}
+      </div>
+      <div class="exam-feedback" id="examFB"></div>
+      <button class="exam-next" id="examNextBtn" style="display:none" onclick="nextExam()">下一题 ➜</button>`;
+  }
+  box.appendChild(card);
+}
+
+function checkExam(btn, correctId, correctName){
+  if(examAnswered) return;
+  examAnswered = true;
+  const isRight = btn.dataset.ans === correctId;
+  if(isRight) examScore++;
+  document.querySelectorAll('.exam-choice').forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.ans === correctId) b.classList.add('correct');
+    else if(b===btn && !isRight) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('examFB');
+  if(isRight){
+    playCorrect(); speak('答对了！');
+    fb.className='exam-feedback ok'; fb.textContent='✅ 正确！';
+  } else {
+    playWrong(); speak('答错了，正确答案是'+correctName);
+    fb.className='exam-feedback no'; fb.textContent=`❌ 正确答案：${correctName}`;
+  }
+  document.getElementById('examNextBtn').style.display='block';
+}
+
+function checkExamText(btn, correctStr, chosenStr){
+  if(examAnswered) return;
+  examAnswered = true;
+  const isRight = correctStr===chosenStr;
+  if(isRight) examScore++;
+  document.querySelectorAll('.exam-choice').forEach(b=>{
+    b.disabled = true;
+    if(b.textContent.trim()===correctStr) b.classList.add('correct');
+    else if(b===btn && !isRight) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('examFB');
+  if(isRight){
+    playCorrect(); speak('答对了！');
+    fb.className='exam-feedback ok'; fb.textContent='✅ 正确！';
+  } else {
+    playWrong();
+    fb.className='exam-feedback no'; fb.textContent='❌ 已标出正确答案';
+  }
+  document.getElementById('examNextBtn').style.display='block';
+}
+
+function nextExam(){
+  examIndex++;
+  if(examIndex >= examQuestions.length){
+    showScore();
+  } else {
+    renderExamQ();
+  }
+}
+
+function showScore(){
+  const pct = examScore / examQuestions.length;
+  let emoji, comment;
+  if(pct>=.9){ emoji='🏆'; comment='太厉害了！图形全都认识，你是图形小达人！'; speak('恭喜你，答对了'+examScore+'题，你是图形小达人！'); }
+  else if(pct>=.7){ emoji='🌟'; comment='很不错！大部分图形都掌握了，继续加油！'; speak('答对了'+examScore+'题，很不错，继续加油！'); }
+  else if(pct>=.5){ emoji='😊'; comment='还不错，再多练习几次就能全部掌握！'; speak('答对了'+examScore+'题，再练习一下就能全部掌握！'); }
+  else { emoji='💪'; comment='没关系，多去"学习"里看看，再来挑战！'; speak('答对了'+examScore+'题，回去多看看，再来挑战！'); }
+
+  document.getElementById('examProgressTxt').textContent='测验完成！';
+  document.getElementById('examProgressBar').style.width='100%';
+
+  document.getElementById('examBox').innerHTML = `
+    <div class="score-page">
+      <div class="score-emoji">${emoji}</div>
+      <div class="score-num">${examScore} / ${examQuestions.length}</div>
+      <div class="score-comment">${comment}</div>
+      <button class="score-restart" onclick="startExam()">重新测验 🔄</button>
+    </div>`;
+  playCorrect();
+}
+
+/* =====================================================================
+   Tab 切换
+   ===================================================================== */
+function showTab(name, btn){
+  Hpx.tabs.activate(name,['learn','practice','exam'],{panelActiveClass:'on'});
+  playClick();
+  if(name==='practice') buildPracticeQuestion();
+  if(name==='exam') startExam();
+}
+
+/* =====================================================================
+   CSS 动画 for SVG stroke
+   ===================================================================== */
+const styleEl = document.createElement('style');
+styleEl.textContent = `
+@keyframes drawPath {
+  to { stroke-dashoffset: 0; }
+}
+`;
+document.head.appendChild(styleEl);
+
+/* =====================================================================
+   初始化
+   ===================================================================== */
+buildLearnCards();
+buildPracticeQuestion();
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

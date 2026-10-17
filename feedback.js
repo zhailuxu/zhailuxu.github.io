@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+
   const css = `
 #fb-btn {
   position: fixed;
@@ -54,13 +56,14 @@
 
   const html = `
 <style>${css}</style>
-<button id="fb-btn" onclick="document.getElementById('fb-mask').classList.add('show')">
+<button id="fb-btn" type="button" aria-haspopup="dialog" aria-controls="fb-mask" aria-expanded="false"
+        aria-keyshortcuts="Alt+Y" title="意见反馈（Option+Y）">
   💬 意见反馈
 </button>
-<div id="fb-mask" onclick="if(event.target===this)this.classList.remove('show')">
-  <div id="fb-card">
-    <button id="fb-close" onclick="document.getElementById('fb-mask').classList.remove('show')">×</button>
-    <div style="font-size:1.4rem;font-weight:bold;color:#4a148c;margin-bottom:6px;">💬 意见反馈</div>
+<div id="fb-mask" role="dialog" aria-modal="true" aria-labelledby="fb-title" hidden>
+  <div id="fb-card" tabindex="-1">
+    <button id="fb-close" type="button" aria-label="关闭意见反馈">×</button>
+    <div id="fb-title" style="font-size:1.4rem;font-weight:bold;color:#4a148c;margin-bottom:6px;">💬 意见反馈</div>
     <div style="font-size:.85rem;color:#888;margin-bottom:18px;">发现问题或有建议？欢迎联系我！</div>
     <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
       <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
@@ -79,5 +82,57 @@
   </div>
 </div>`;
 
-  document.body.insertAdjacentHTML('beforeend', html);
+  function mountFeedback() {
+    if (!document.body || document.getElementById('fb-btn')) return;
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    const button = document.getElementById('fb-btn');
+    const mask = document.getElementById('fb-mask');
+    const card = document.getElementById('fb-card');
+    const closeButton = document.getElementById('fb-close');
+    let returnFocus = null;
+
+    function openFeedback() {
+      returnFocus = document.activeElement;
+      mask.hidden = false;
+      mask.classList.add('show');
+      button.setAttribute('aria-expanded', 'true');
+      card.focus();
+    }
+
+    function closeFeedback() {
+      mask.classList.remove('show');
+      mask.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+      if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
+    }
+
+    button.addEventListener('click', openFeedback);
+    closeButton.addEventListener('click', closeFeedback);
+    mask.addEventListener('click', function (event) {
+      if (event.target === mask) closeFeedback();
+    });
+    document.addEventListener('keydown', function (event) {
+      const isFeedbackShortcut = event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey &&
+        (event.code === 'KeyY' || String(event.key).toLowerCase() === 'y');
+      if (isFeedbackShortcut) {
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+        if (mask.hidden) openFeedback();
+        return;
+      }
+      if (event.key === 'Escape' && !mask.hidden) closeFeedback();
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountFeedback, { once: true });
+  else mountFeedback();
+
+  // Legacy learning pages without an explicit speech control opt into the
+  // page-specific narration map in hpx-page-speech.js.
+  if (!document.getElementById('speakToggle') && !document.getElementById('hpxPageSpeechScript')) {
+    const speechScript = document.createElement('script');
+    speechScript.id = 'hpxPageSpeechScript';
+    speechScript.src = 'hpx-page-speech.js';
+    document.head.appendChild(speechScript);
+  }
 })();

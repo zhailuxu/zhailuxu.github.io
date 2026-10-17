@@ -70,7 +70,8 @@ el('modeGroup').addEventListener('click',event=>{if(!event.target.dataset.mode)r
 function celebrate(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const colors=['#ef617b','#f4b43a','#48a66b','#4f87c7','#8a68b5'];for(let i=0;i<28;i++){const dot=document.createElement('i');dot.className='confetti';dot.style.left=Math.random()*100+'vw';dot.style.top='-15px';dot.style.background=colors[Math.floor(Math.random()*colors.length)];dot.style.setProperty('--dx',(Math.random()*180-90)+'px');dot.style.animationDelay=Math.random()*.35+'s';document.body.appendChild(dot);setTimeout(()=>dot.remove(),2000)}}
 window.HanziComponents={QUESTIONS,LEVELS,COMPONENTS,createGame,evaluatePick};startGame(false)})();
 </script>
-<script src="hpx-game-progress.js"></script><script src="feedback.js?v=20260816"></script><script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-game-progress.js"></script><script src="feedback.js?v=20260906-2"></script><script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

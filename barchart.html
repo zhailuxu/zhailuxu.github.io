@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>条形统计图</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e0f7fa 50%,#fff9c4 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#283593;letter-spacing:3px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* bar chart */
+.chart-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:10px;}
+.bar-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:10px 0;}
+.bar-ctrl{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:70px;}
+.bar-ctrl label{font-size:.82rem;color:#555;font-weight:bold;}
+.bar-ctrl span{font-size:1rem;font-weight:bold;min-width:24px;text-align:center;}
+input[type=range][orient=vertical]{writing-mode:vertical-lr;direction:rtl;width:28px;height:120px;accent-color:#3949ab;}
+.stats-box{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+.stat-item{background:#e8eaf6;border-radius:10px;padding:8px 16px;font-size:.9rem;font-weight:bold;color:#283593;text-align:center;}
+.stat-item .val{font-size:1.3rem;color:#ad1457;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#283593;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.9;}
+.options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.opt-btn{padding:10px 22px;border:2px solid #9fa8da;border-radius:14px;background:#fff;font-size:1rem;font-weight:bold;color:#283593;cursor:pointer;transition:all .18s;font-family:inherit;}
+.opt-btn:hover{background:#e8eaf6;}
+.opt-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.opt-btn.wrong{background:#ffebee;border-color:#ef9a9a;color:#c62828;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* scenario */
+.scenario-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.sc-btn{padding:7px 16px;border:2px solid #9fa8da;border-radius:12px;background:#fff;color:#283593;font-weight:bold;font-size:.88rem;cursor:pointer;font-family:inherit;}
+.sc-btn.on{background:#283593;color:#fff;border-color:#283593;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#283593">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📊</div>
+    <h1>条形统计图</h1>
+    <p>拖动柱子设数值，自动读图出题</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('build')">🏗️ 动手制图</button>
+    <button class="tab-btn" onclick="switchTab('read')">📖 读图分析</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 动手制图 -->
+  <div id="tab-build">
+    <div class="card">
+      <div class="scenario-btns" id="scBtns"></div>
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:8px;">拖动滑块改变数值，观察柱子变化</div>
+      <div class="bar-controls" id="barCtrls"></div>
+      <div class="chart-wrap"><canvas id="buildCanvas" width="380" height="280"></canvas></div>
+      <div class="stats-box" id="statsBox"></div>
+    </div>
+  </div>
+
+  <!-- 读图分析 -->
+  <div id="tab-read" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:.95rem;color:#555;margin-bottom:10px;">根据图表回答问题</div>
+      <div class="chart-wrap"><canvas id="readCanvas" width="360" height="260"></canvas></div>
+      <div id="readQs" style="font-size:.95rem;color:#555;line-height:2.4;padding:10px 0;"></div>
+      <button onclick="newReadChart()" style="display:block;margin:0 auto;padding:8px 22px;border:none;border-radius:12px;background:#283593;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit;">换一组数据</button>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="chart-wrap"><canvas id="quizCanvas" width="340" height="240"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="options" id="quizOpts"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+let _scSliderTimer=null;
+
+const SCENARIOS=[
+  {name:'🌟 同学喜欢的科目',cats:['语文','数学','英语','体育','美术'],vals:[8,12,6,15,9],colors:['#ef9a9a','#90caf9','#a5d6a7','#ffe082','#ce93d8'],unit:'人'},
+  {name:'📚 图书馆借书数',cats:['周一','周二','周三','周四','周五'],vals:[5,9,7,12,10],colors:['#80cbc4','#90caf9','#a5d6a7','#ffab91','#ce93d8'],unit:'本'},
+  {name:'🌧️ 本周降雨量',cats:['周一','周二','周三','周四','周五'],vals:[3,8,12,6,4],colors:['#64b5f6','#4dd0e1','#81c784','#7986cb','#4fc3f7'],unit:'mm'},
+  {name:'🍎 水果销量',cats:['苹果','香蕉','橙子','葡萄'],vals:[20,14,18,10],colors:['#ef9a9a','#ffe082','#ffb74d','#ce93d8'],unit:'斤'},
+];
+let curSc=0;
+let barVals=[...SCENARIOS[0].vals];
+
+function buildScBtns(){
+  const cont=document.getElementById('scBtns');
+  SCENARIOS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='sc-btn'+(i===0?' on':'');
+    b.textContent=s.name;
+    b.onclick=()=>{
+      curSc=i;
+      barVals=[...SCENARIOS[i].vals];
+      document.querySelectorAll('.sc-btn').forEach((x,j)=>x.classList.toggle('on',j===i));
+      buildCtrls();
+      drawBuildChart();
+      speak(`当前场景：${s.name.replace(/\p{Emoji}/gu,'').trim()}。`);
+    };
+    cont.appendChild(b);
+  });
+}
+
+function buildCtrls(){
+  const sc=SCENARIOS[curSc];
+  const cont=document.getElementById('barCtrls');
+  cont.innerHTML='';
+  sc.cats.forEach((cat,i)=>{
+    const div=document.createElement('div');
+    div.className='bar-ctrl';
+    const valSpan=document.createElement('span');
+    valSpan.id='bval'+i;
+    valSpan.textContent=barVals[i];
+    valSpan.style.color=sc.colors[i];
+    const sl=document.createElement('input');
+    sl.type='range';sl.min=1;sl.max=30;sl.value=barVals[i];
+    sl.setAttribute('orient','vertical');
+    sl.oninput=()=>{barVals[i]=parseInt(sl.value);valSpan.textContent=barVals[i];drawBuildChart();clearTimeout(_scSliderTimer);_scSliderTimer=setTimeout(()=>{speak(`${cat}调整为${barVals[i]}${sc.unit}。`);},600);};
+    const lbl=document.createElement('label');
+    lbl.textContent=cat;lbl.style.color=sc.colors[i];
+    div.appendChild(valSpan);div.appendChild(sl);div.appendChild(lbl);
+    cont.appendChild(div);
+  });
+}
+
+function drawBarChart(canvas,cats,vals,colors,unit,title){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width,H=canvas.height;
+  const ML=44,MR=16,MT=36,MB=48;
+  const cW=W-ML-MR,cH=H-MT-MB;
+  const maxV=Math.max(...vals,1);
+  const step=Math.ceil(maxV/5);
+  const gridMax=step*5;
+
+  // title
+  ctx.fillStyle='#283593';ctx.font=`bold 13px 微软雅黑,sans-serif`;ctx.textAlign='center';
+  ctx.fillText(title||'',W/2,MT-14);
+
+  // y axis grid
+  ctx.strokeStyle='#e8eaf6';ctx.lineWidth=1;
+  ctx.fillStyle='#888';ctx.font='11px sans-serif';ctx.textAlign='right';
+  for(let i=0;i<=5;i++){
+    const y=MT+cH-(i/5)*cH;
+    ctx.beginPath();ctx.moveTo(ML,y);ctx.lineTo(ML+cW,y);ctx.stroke();
+    ctx.fillText(i*step,ML-4,y+4);
+  }
+  // unit
+  ctx.fillStyle='#aaa';ctx.font='10px sans-serif';ctx.textAlign='left';
+  ctx.fillText('('+unit+')',2,MT-2);
+
+  // bars
+  const bW=Math.min(Math.floor(cW/cats.length*0.6),50);
+  const gap=(cW-(bW*cats.length))/(cats.length+1);
+  cats.forEach((cat,i)=>{
+    const x=ML+gap+(bW+gap)*i;
+    const barH=(vals[i]/gridMax)*cH;
+    const y=MT+cH-barH;
+    // bar
+    ctx.fillStyle=colors[i]||'#90caf9';
+    ctx.beginPath();ctx.roundRect(x,y,bW,barH,4);ctx.fill();
+    // value on top
+    ctx.fillStyle='#333';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText(vals[i],x+bW/2,y-4);
+    // label
+    ctx.fillStyle='#555';ctx.font='11px 微软雅黑,sans-serif';ctx.textAlign='center';
+    ctx.fillText(cat,x+bW/2,MT+cH+18);
+  });
+  // axes
+  ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ML,MT);ctx.lineTo(ML,MT+cH);ctx.lineTo(ML+cW,MT+cH);ctx.stroke();
+}
+
+function drawBuildChart(){
+  const sc=SCENARIOS[curSc];
+  drawBarChart(document.getElementById('buildCanvas'),sc.cats,barVals,sc.colors,sc.unit,sc.name);
+  // stats
+  const box=document.getElementById('statsBox');
+  const max=Math.max(...barVals),min=Math.min(...barVals);
+  const sum=barVals.reduce((a,b)=>a+b,0);
+  const maxCat=sc.cats[barVals.indexOf(max)],minCat=sc.cats[barVals.indexOf(min)];
+  box.innerHTML=`
+    <div class="stat-item">最多<br><span class="val">${maxCat} ${max}${sc.unit}</span></div>
+    <div class="stat-item">最少<br><span class="val">${minCat} ${min}${sc.unit}</span></div>
+    <div class="stat-item">总计<br><span class="val">${sum}${sc.unit}</span></div>
+    <div class="stat-item">相差<br><span class="val">${max-min}${sc.unit}</span></div>
+  `;
+}
+
+// read
+let readData=null;
+function newReadChart(){
+  const sc=SCENARIOS[Math.floor(Math.random()*SCENARIOS.length)];
+  const vals=sc.cats.map(()=>2+Math.floor(Math.random()*25));
+  readData={sc,vals};
+  drawBarChart(document.getElementById('readCanvas'),sc.cats,vals,sc.colors,sc.unit,sc.name);
+  const max=Math.max(...vals),min=Math.min(...vals),sum=vals.reduce((a,b)=>a+b,0);
+  const maxCat=sc.cats[vals.indexOf(max)],minCat=sc.cats[vals.indexOf(min)];
+  const i1=Math.floor(Math.random()*vals.length),i2=(i1+1)%vals.length;
+  document.getElementById('readQs').innerHTML=`
+    <div>① 哪个最多？&nbsp;<b style="color:#ad1457">→ ${maxCat}，共 ${max} ${sc.unit}</b></div>
+    <div>② 哪个最少？&nbsp;<b style="color:#ad1457">→ ${minCat}，共 ${min} ${sc.unit}</b></div>
+    <div>③ 一共有多少 ${sc.unit}？&nbsp;<b style="color:#ad1457">→ ${sum} ${sc.unit}</b></div>
+    <div>④ ${sc.cats[i1]} 比 ${sc.cats[i2]} 多（少）几 ${sc.unit}？&nbsp;<b style="color:#ad1457">→ 相差 ${Math.abs(vals[i1]-vals[i2])} ${sc.unit}</b></div>
+  `;
+  speak(`${maxCat}最多，共${max}${sc.unit}；${minCat}最少，共${min}${sc.unit}；总计${sum}${sc.unit}。`);
+}
+
+// quiz
+let qScore={c:0,w:0},qAns=0,qData=null;
+const QTYPES=['max','min','sum','diff'];
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.querySelectorAll('.opt-btn').forEach(b=>{b.disabled=false;b.className='opt-btn';});
+
+  const sc=SCENARIOS[Math.floor(Math.random()*SCENARIOS.length)];
+  const vals=sc.cats.map(()=>2+Math.floor(Math.random()*20));
+  qData={sc,vals};
+  drawBarChart(document.getElementById('quizCanvas'),sc.cats,vals,sc.colors,sc.unit,sc.name);
+
+  const qt=QTYPES[Math.floor(Math.random()*QTYPES.length)];
+  const max=Math.max(...vals),min=Math.min(...vals),sum=vals.reduce((a,b)=>a+b,0);
+  let q='',ans=0;
+  if(qt==='max'){
+    q=`图中数量<b>最多</b>的是哪一项？（填数字）`;ans=max;
+    const wrong=new Set([max]);
+    while(wrong.size<4){wrong.add(vals[Math.floor(Math.random()*vals.length)]);}
+    renderOpts([...wrong].sort(()=>Math.random()-.5).map(String));
+  } else if(qt==='min'){
+    q=`图中数量<b>最少</b>的是哪一项？（填数字）`;ans=min;
+    const wrong=new Set([min]);
+    while(wrong.size<4){wrong.add(vals[Math.floor(Math.random()*vals.length)]);}
+    renderOpts([...wrong].sort(()=>Math.random()-.5).map(String));
+  } else if(qt==='sum'){
+    q=`图中所有数据加起来共多少 ${sc.unit}？`;ans=sum;
+    const wrong=new Set([sum]);
+    while(wrong.size<4){wrong.add(sum+(-3+Math.floor(Math.random()*7)));}
+    renderOpts([...wrong].sort(()=>Math.random()-.5).map(String));
+  } else {
+    const i1=Math.floor(Math.random()*vals.length);
+    const i2=(i1+1+Math.floor(Math.random()*(vals.length-1)))%vals.length;
+    ans=Math.abs(vals[i1]-vals[i2]);
+    q=`<b>${sc.cats[i1]}</b> 和 <b>${sc.cats[i2]}</b> 相差多少 ${sc.unit}？`;
+    const wrong=new Set([ans]);
+    while(wrong.size<4){wrong.add(Math.abs(ans+(-4+Math.floor(Math.random()*9))));}
+    renderOpts([...wrong].sort(()=>Math.random()-.5).map(String));
+  }
+  qAns=String(ans);
+  document.getElementById('quizQ').innerHTML=q;
+  speak(document.getElementById('quizQ').textContent);
+}
+
+function renderOpts(arr){
+  const cont=document.getElementById('quizOpts');
+  cont.innerHTML='';
+  arr.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';b.textContent=o;
+    b.onclick=()=>{
+      document.querySelectorAll('.opt-btn').forEach(x=>x.disabled=true);
+      if(o===qAns){b.classList.add('correct');qScore.c++;document.getElementById('quizMsg').className='result-msg ok';document.getElementById('quizMsg').textContent='✅ 读图正确！';speak('读图正确！真棒！');}
+      else{b.classList.add('wrong');qScore.w++;document.querySelectorAll('.opt-btn').forEach(x=>{if(x.textContent===qAns)x.classList.add('correct');});document.getElementById('quizMsg').className='result-msg no';document.getElementById('quizMsg').textContent='❌ 正确答案是 '+qAns;speak('正确答案是'+qAns+'，仔细看图！');}
+      document.getElementById('qC').textContent=qScore.c;document.getElementById('qW').textContent=qScore.w;
+      document.getElementById('nextBtn').style.display='inline-block';
+    };
+    cont.appendChild(b);
+  });
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['build','read','quiz']);
+  if(t==='build') speak('动手制图：拖动滑块，改变柱子高度，观察变化。');
+  if(t==='read'&&!readData) newReadChart();
+  else if(t==='read') speak('读图分析：仔细看图，回答下面的问题。');
+  if(t==='quiz') nextQ();
+}
+buildScBtns();
+buildCtrls();
+drawBuildChart();
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
+const html=fs.readFileSync(new URL('../color-code.html',import.meta.url),'utf8');const match=html.match(/\(function\(\)\{[\s\S]*?\n<\/script>/);assert.ok(match,'找不到颜色密码主脚本');const script=match[0].replace(/\n<\/script>$/,'');
+class MockElement{constructor(){this.dataset={};this.style={setProperty(){}};this.classList={add(){},remove(){},toggle(){}};this.children=[];this.hidden=false;this.disabled=false}addEventListener(){}appendChild(c){this.children.push(c);return c}setAttribute(){}}
+const elements=new Map(),document={getElementById(id){if(!elements.has(id))elements.set(id,new MockElement());return elements.get(id)},createElement(){return new MockElement()},querySelectorAll(){return[]},body:new MockElement()},window={Hpx:{speech:{create:()=>({speak(){},toggle(){}})}}};
+const context=vm.createContext({window,document,Hpx:window.Hpx,localStorage:{getItem(){return null},setItem(){}},matchMedia:()=>({matches:true}),setTimeout,clearTimeout,Set,Map,Math,console});vm.runInContext(script,context,{filename:'color-code.html'});const api=window.ColorCode;assert.ok(api,'颜色密码测试接口没有初始化');
+assert.equal(JSON.stringify(api.scoreGuess([0,1,2],[0,1,2])),JSON.stringify({exact:3,misplaced:0,miss:0}),'完全正确评分错误');
+assert.equal(JSON.stringify(api.scoreGuess([0,1,2],[2,0,1])),JSON.stringify({exact:0,misplaced:3,miss:0}),'全部错位评分错误');
+assert.equal(JSON.stringify(api.scoreGuess([0,0,1,1],[0,1,0,2])),JSON.stringify({exact:1,misplaced:2,miss:1}),'重复颜色评分错误');
+for(const [level,cfg] of Object.entries(api.LEVELS))for(let i=0;i<1000;i++){const secret=api.generateSecret(cfg);assert.equal(secret.length,cfg.length,`${level} 密码长度错误`);assert.ok(secret.every(c=>c>=0&&c<cfg.colorCount),`${level} 出现无效颜色`);if(!cfg.repeat)assert.equal(new Set(secret).size,secret.length,`${level} 出现重复颜色`);const score=api.scoreGuess(secret,secret);assert.equal(score.exact,cfg.length,`${level} 自身匹配没有全部正确`)}
+assert.equal(document.getElementById('slots').children.length,3,'默认3位密码格没有正确渲染');console.log('颜色密码检查通过：重复颜色评分正确，3000组随机密码均符合难度规则。');

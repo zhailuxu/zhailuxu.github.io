@@ -37,6 +37,13 @@ body {
 
 .container { max-width: 900px; margin: 0 auto; }
 .hidden { display: none !important; }
+.sound-notice {
+  position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 1000; max-width: calc(100% - 28px); padding: 10px 16px;
+  border: 2px solid var(--gold-dark); border-radius: 12px;
+  background: #fff8dc; color: var(--text); box-shadow: var(--shadow);
+  font-size: .86rem; font-weight: 700; transform: translateX(-50%);
+}
 
 /* ── Header ── */
 .header { text-align: center; margin-bottom: 24px; }
@@ -251,6 +258,47 @@ body {
 .fill-cn { font-size: .84rem; color: var(--muted); font-weight: 600; }
 @media (max-width: 480px) { .fill-sentence { font-size: 1.15rem; } }
 
+/* ── TAB 6 — PHONICS ── */
+.phonics-intro { text-align:center; color:var(--muted); font-size:.86rem; line-height:1.7; margin:0 auto 16px; max-width:620px; }
+.phonics-path { display:flex; align-items:center; justify-content:center; gap:7px; flex-wrap:wrap; margin:0 0 16px; color:var(--muted); font-size:.76rem; font-weight:800; }
+.phonics-path span { padding:4px 9px; border-radius:999px; background:var(--teal-light); color:var(--teal); }
+.phonics-path b { color:var(--gold-dark); }
+.phonics-rule-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr)); gap:8px; margin:0 0 18px; }
+.phonics-rule-card { border:2px solid var(--border); border-radius:13px; padding:10px 7px; background:var(--card); color:var(--text); font-family:inherit; cursor:pointer; text-align:center; transition:all .15s; }
+.phonics-rule-card:hover,.phonics-rule-card.active { border-color:var(--teal); background:var(--teal-light); transform:translateY(-2px); }
+.phonics-rule-key { display:block; font-family:Georgia,serif; font-size:1.32rem; font-weight:800; color:var(--teal); line-height:1.1; }
+.phonics-rule-name { display:block; font-size:.72rem; color:var(--muted); font-weight:700; margin-top:4px; }
+.phonics-lesson { border:2px solid var(--border); border-radius:16px; background:linear-gradient(135deg,#f9feff,var(--teal-light)); padding:16px; margin:0 0 20px; }
+.phonics-lesson-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.phonics-lesson-kicker { color:var(--muted); font-size:.74rem; font-weight:800; letter-spacing:.7px; }
+.phonics-lesson-title { color:var(--teal); font-size:1.25rem; margin-top:3px; }
+.phonics-sound { border:2px solid var(--gold-dark); background:var(--gold); border-radius:10px; color:var(--teal); font-family:Georgia,serif; font-size:1.05rem; font-weight:800; padding:8px 12px; cursor:pointer; }
+.phonics-sound:hover { filter:brightness(.98); transform:translateY(-1px); }
+.phonics-sound:focus-visible { outline:3px solid var(--teal); outline-offset:2px; }
+.phonics-guide { margin:12px 0 11px; font-size:.88rem; color:var(--text); line-height:1.65; }
+.phonics-mouth { margin:0 0 11px; padding:9px 11px; border-left:4px solid var(--gold-dark); border-radius:0 9px 9px 0; background:#fff9e7; color:var(--text); font-size:.83rem; line-height:1.65; }
+.phonics-mouth strong { color:var(--teal); }
+.phonics-examples { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:0 0 13px; }
+.phonics-example { border:1.5px solid var(--border); border-radius:10px; padding:7px 10px; cursor:pointer; background:var(--card); color:var(--teal); font-family:Georgia,serif; font-size:1rem; font-weight:800; }
+.phonics-example:hover { border-color:var(--teal); background:#fff; }
+.phonics-example mark { color:var(--teal); background:var(--gold); border-radius:4px; padding:0 2px; }
+.phonics-lesson-actions { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+.phonics-practice-title { text-align:center; color:var(--teal); font-size:1.05rem; margin:2px 0 13px; }
+.phonics-stage { text-align:center; padding:16px 10px 4px; }
+.phonics-emoji { font-size:4.7rem; display:block; line-height:1; margin-bottom:7px; }
+.phonics-word { font-family:Georgia,serif; font-size:2.1rem; font-weight:800; letter-spacing:2px; color:var(--teal); text-transform:lowercase; }
+.phonics-word mark { display:inline-block; padding:0 4px; border-radius:6px; background:var(--gold); color:var(--teal); }
+.phonics-cn { color:var(--muted); font-size:.88rem; font-weight:700; margin:5px 0 14px; }
+.phonics-prompt { text-align:center; font-size:1rem; font-weight:800; color:var(--text); margin:14px 0 12px; }
+.phonics-choices { display:grid; grid-template-columns:1fr 1fr; gap:9px; max-width:520px; margin:0 auto; }
+.phonics-choice { min-height:58px; border:2px solid var(--border); border-radius:13px; background:var(--card); color:var(--text); font-family:inherit; cursor:pointer; padding:8px; transition:all .15s; }
+.phonics-choice:hover { border-color:var(--teal-mid); background:var(--teal-light); }
+.phonics-choice .rule-key { display:block; font-family:Georgia,serif; font-size:1.18rem; font-weight:800; color:var(--teal); }
+.phonics-choice .rule-label { display:block; font-size:.72rem; font-weight:700; color:var(--muted); margin-top:2px; }
+.phonics-choice.correct { border-color:var(--mint); background:#E5FBF4; }
+.phonics-choice.wrong { border-color:var(--coral); background:#FEECF0; }
+@media (max-width:480px) { .phonics-choices { grid-template-columns:1fr; } .phonics-rule-grid { grid-template-columns:repeat(3,1fr); } }
+
 /* ── Speed bar ── */
 .speed-bar {
   display: flex; align-items: center; gap: 10px; justify-content: center;
@@ -327,6 +375,7 @@ input[type=range].speed-slider::-moz-range-thumb {
 </head>
 <body>
 <canvas id="confetti"></canvas>
+<div class="sound-notice hidden" id="soundNotice" role="status" aria-live="polite"></div>
 <div class="container">
 
 <div class="header">
@@ -340,6 +389,7 @@ input[type=range].speed-slider::-moz-range-thumb {
   <button class="tab-btn" onclick="switchTab('match')">🖼️ 单词配图</button>
   <button class="tab-btn" onclick="switchTab('spell')">✏️ 拼写闯关</button>
   <button class="tab-btn" onclick="switchTab('fill')">📝 填空句子</button>
+  <button class="tab-btn" onclick="switchTab('phonics')">🔊 自然拼读</button>
 </div>
 
 <div class="speed-bar">
@@ -467,9 +517,49 @@ input[type=range].speed-slider::-moz-range-thumb {
   </div>
 </div>
 
+<!-- TAB 6: Phonics -->
+<div id="tab-phonics" class="hidden">
+  <div class="card-panel">
+    <p class="phonics-intro">自然拼读不是背单词：先点击规律方块听示例词，再把声音连起来读成单词。</p>
+    <div class="phonics-path" aria-label="学习步骤"><span>1 看规律</span><b>→</b><span>2 听例词</span><b>→</b><span>3 连起来读</span><b>→</b><span>4 做辨析</span></div>
+    <div class="phonics-rule-grid" id="phonicsRuleGrid" aria-label="自然拼读规律卡片"></div>
+    <section class="phonics-lesson" aria-labelledby="phonicsLessonTitle">
+      <div class="phonics-lesson-head">
+        <div><div class="phonics-lesson-kicker">第 1 步 · 学一学</div><h2 class="phonics-lesson-title" id="phonicsLessonTitle"></h2></div>
+        <button type="button" class="phonics-sound" id="phonicsSound" onclick="speakPhonicsSound()"></button>
+      </div>
+      <p class="phonics-guide" id="phonicsGuide"></p>
+      <p class="phonics-mouth" id="phonicsMouth"></p>
+      <div class="phonics-examples" id="phonicsExamples" aria-label="可朗读的示例词"></div>
+      <div class="phonics-lesson-actions">
+        <button class="btn btn-teal" onclick="speakPhonicsExamples()">🔊 依次听例词</button>
+        <button class="btn btn-ghost" onclick="startPhonicsPractice()">开始练这组 →</button>
+      </div>
+    </section>
+    <h2 class="phonics-practice-title">第 2 步 · 练一练</h2>
+    <div class="hud">
+      <span class="hud-score" id="phonicsScore">✅ 0 &nbsp; ❌ 0</span>
+      <span class="hud-streak" id="phonicsStreak">🔥 连对 0</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="phonicsProg" style="width:0%"></div></div>
+    <div class="phonics-stage">
+      <button type="button" class="phonics-emoji" id="phonicsEmoji" aria-label="朗读当前单词" onclick="repeatPhonicsWord()"></button>
+      <button type="button" class="phonics-word" id="phonicsWord" onclick="repeatPhonicsWord()" aria-label="朗读当前单词"></button>
+      <div class="phonics-cn" id="phonicsCn"></div>
+    </div>
+    <p class="phonics-prompt">橙色部分是哪种拼读规律？</p>
+    <div class="phonics-choices" id="phonicsChoices"></div>
+    <div class="match-fb" id="phonicsFb" role="status" aria-live="polite"></div>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-teal" onclick="repeatPhonicsWord()">🔊 再听一遍</button>
+      <button class="btn btn-ghost" onclick="nextPhonics()">换一题 →</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /container -->
 
-<script src="hpx-core.js"></script>
+<script src="hpx-core.js?v=20260910-1"></script>
 <script src="english-vocabulary.js"></script>
 <script>
 // ══ DATA ══════════════════════════════════════════════════
@@ -614,6 +704,32 @@ const FILL = [
   { template:'She is a ___.', answer:'teacher', options:['teacher','jump','fish','red'],     full:'She is a teacher.',cn:'她是一位老师。', emoji:'👩‍🏫' },
   { template:'He is a ___.', answer:'student',  options:['student','fly','big','bag'],       full:'He is a student.', cn:'他是一名学生。', emoji:'👨‍🎓' },
 ];
+
+// 自然拼读练习：本项目按基础拼读规律独立编写的示例词与题目。
+const PHONICS_RULES = [
+  { id:'a',  key:'a',  label:'短元音 a', group:'vowel', sound:'/æ/', hint:'a 在 cat 中的声音', guide:'看到短短的 a，先发 /æ/；把前后的声音连快一些，就能读出完整单词。', mouth:'嘴巴张开一点，嘴角微微向两边拉；像中文“哎”刚起音时的感觉，但不要滑到“衣”。' },
+  { id:'e',  key:'e',  label:'短元音 e', group:'vowel', sound:'/e/', hint:'e 在 bed 中的声音', guide:'看到短短的 e，先发 /e/；把前后的声音连起来读，不要把它读成字母名。', mouth:'嘴巴半开，舌头自然放平；声音短一些，接近中文“诶”的起音。' },
+  { id:'i',  key:'i',  label:'短元音 i', group:'vowel', sound:'/ɪ/', hint:'i 在 pig 中的声音', guide:'看到短短的 i，先发 /ɪ/；指着每个字母慢慢拼，再把声音合在一起。', mouth:'嘴角轻轻向两边拉，嘴巴只开一条小缝；发一个短、松的 /ɪ/。它接近中文“衣”，但更短、更放松；不要读成字母名 I /aɪ/。' },
+  { id:'o',  key:'o',  label:'短元音 o', group:'vowel', sound:'/ɑ/', hint:'o 在 dog 中的声音', guide:'看到短短的 o，先发 /ɑ/；把单词里的声音从左到右连读。', mouth:'嘴巴张圆一些，舌头放低；声音短促，不要读成字母名 O /oʊ/。' },
+  { id:'u',  key:'u',  label:'短元音 u', group:'vowel', sound:'/ʌ/', hint:'u 在 sun 中的声音', guide:'看到短短的 u，先发 /ʌ/；先慢读，再试着一口气读出单词。', mouth:'嘴巴微微张开，舌头放松居中；像中文“啊”很短的一下。' },
+  { id:'sh', key:'sh', label:'组合 sh', group:'pair', sound:'/ʃ/', hint:'sh 连在一起读', guide:'s 和 h 挨在一起时通常合成一个声音 /ʃ/，像安静时的“嘘”。', mouth:'嘴唇微微前伸，牙齿靠近；持续送气，像请人安静时的“嘘”。' },
+  { id:'ch', key:'ch', label:'组合 ch', group:'pair', sound:'/tʃ/', hint:'ch 连在一起读', guide:'c 和 h 挨在一起时通常合成一个声音 /tʃ/；把它当作一个整体来读。', mouth:'先让舌尖轻碰上齿龈，再快速放开送气；声音像中文“吃”的开头。' },
+  { id:'th', key:'th', label:'组合 th', group:'pair', sound:'/θ/', hint:'th 连在一起读', guide:'t 和 h 挨在一起时可以合成 /θ/；轻轻把舌尖放在牙齿间送气。', mouth:'把舌尖轻轻放在上下门牙之间，送出气流；不要读成 /s/ 或 /f/。' },
+  { id:'ck', key:'ck', label:'组合 ck', group:'pair', sound:'/k/', hint:'ck 常在词尾读 /k/', guide:'在这些词的词尾，c 和 k 合起来仍读 /k/；看见 ck 时不要拆成两个声音。', mouth:'舌头后部抬起碰到上颚后部，再快速放开；短促地发 /k/。' },
+  { id:'ng', key:'ng', label:'组合 ng', group:'pair', sound:'/ŋ/', hint:'ng 连在一起读', guide:'n 和 g 挨在一起时常合成鼻音 /ŋ/；声音留在鼻腔里，不要额外加一个 /g/。', mouth:'舌头后部抬起，声音从鼻腔出来；结尾停在 /ŋ/，不要再补一个“格”。' },
+];
+const PHONICS_WORDS = [
+  {word:'cat', cn:'猫', emoji:'🐱', rule:'a'}, {word:'bag', cn:'书包', emoji:'🎒', rule:'a'}, {word:'map', cn:'地图', emoji:'🗺️', rule:'a'},
+  {word:'bed', cn:'床', emoji:'🛏️', rule:'e'}, {word:'hen', cn:'母鸡', emoji:'🐔', rule:'e'}, {word:'pen', cn:'钢笔', emoji:'🖊️', rule:'e'},
+  {word:'pig', cn:'猪', emoji:'🐷', rule:'i'}, {word:'fish', cn:'鱼', emoji:'🐟', rule:'i'}, {word:'sit', cn:'坐', emoji:'🪑', rule:'i'},
+  {word:'dog', cn:'狗', emoji:'🐶', rule:'o'}, {word:'fox', cn:'狐狸', emoji:'🦊', rule:'o'}, {word:'hop', cn:'跳跃', emoji:'🦘', rule:'o'},
+  {word:'sun', cn:'太阳', emoji:'☀️', rule:'u'}, {word:'bus', cn:'公交车', emoji:'🚌', rule:'u'}, {word:'bug', cn:'小虫', emoji:'🐞', rule:'u'},
+  {word:'ship', cn:'轮船', emoji:'🚢', rule:'sh'}, {word:'fish', cn:'鱼', emoji:'🐟', rule:'sh'}, {word:'shell', cn:'贝壳', emoji:'🐚', rule:'sh'},
+  {word:'chat', cn:'聊天', emoji:'💬', rule:'ch'}, {word:'chick', cn:'小鸡', emoji:'🐤', rule:'ch'}, {word:'chin', cn:'下巴', emoji:'🙂', rule:'ch'},
+  {word:'thin', cn:'瘦的', emoji:'📏', rule:'th'}, {word:'bath', cn:'洗澡', emoji:'🛁', rule:'th'}, {word:'thumb', cn:'拇指', emoji:'👍', rule:'th'},
+  {word:'duck', cn:'鸭子', emoji:'🦆', rule:'ck'}, {word:'sock', cn:'袜子', emoji:'🧦', rule:'ck'}, {word:'kick', cn:'踢', emoji:'⚽', rule:'ck'},
+  {word:'sing', cn:'唱歌', emoji:'🎤', rule:'ng'}, {word:'ring', cn:'戒指', emoji:'💍', rule:'ng'}, {word:'king', cn:'国王', emoji:'👑', rule:'ng'},
+];
 const CAT_META  = {
   all:`📚 全部（${ALL_WORDS.length}）`,
   grade1:`🌱 一年级（${WORDS.grade1?.length || 0}）`,
@@ -637,17 +753,40 @@ function updateSpeed(slider) {
 }
 
 const englishSpeech=Hpx.speech.create({lang:'en-US',rate:0.65,pitch:1.05,startDelayMs:50});
+let soundGestureReady=false;
+let speechUnlocked=false;
+let soundNoticeTimer=0;
+function showSoundNotice(message){
+  const notice=document.getElementById('soundNotice');
+  notice.textContent=message;
+  notice.classList.remove('hidden');
+  clearTimeout(soundNoticeTimer);
+  soundNoticeTimer=setTimeout(()=>notice.classList.add('hidden'),3200);
+}
 function speakEn(text) {
-  return text?englishSpeech.speak(text,{rate:speechRate}):Promise.resolve();
+  if(!text)return Promise.resolve();
+  if(soundGestureReady&&!speechUnlocked&&typeof englishSpeech.unlock==='function'){
+    speechUnlocked=true;
+    const started=englishSpeech.unlock(text,{
+      rate:speechRate,
+      onError:()=>{speechUnlocked=false;showSoundNotice('语音启动失败，请检查系统文字转语音设置，或改用 Chrome 浏览器。');}
+    });
+    if(started)return Promise.resolve(true);
+    speechUnlocked=false;
+    showSoundNotice('当前浏览器不支持英语朗读，请改用最新版 Chrome 浏览器。');
+    return Promise.resolve(false);
+  }
+  return englishSpeech.speak(text,{rate:speechRate});
 }
 
 // ══ TABS ══════════════════════════════════════════════════
 function switchTab(name) {
-  Hpx.tabs.activate(name,['alpha','numbers','match','spell','fill'],{activeClass:'active',hiddenClass:'hidden'});
+  Hpx.tabs.activate(name,['alpha','numbers','match','spell','fill','phonics'],{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'numbers' && !numberInited) initNumbers();
   if (name === 'match' && !matchInited) initMatch();
   if (name === 'spell' && !spellInited) { spellInited = true; nextSpell(); }
   if (name === 'fill'  && !fillInited)  { fillInited  = true; nextFill(); }
+  if (name === 'phonics' && !phonicsInited) initPhonics();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -996,6 +1135,12 @@ function updateSpellHud() {
 // ══ SOUND ═════════════════════════════════════════════════
 let aCtx = null;
 function getACtx() { if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)(); if (aCtx.state === 'suspended') aCtx.resume(); return aCtx; }
+function prepareSoundGesture(){
+  soundGestureReady=true;
+  try{getACtx()}catch(error){showSoundNotice('音效启动失败，请检查浏览器设置和媒体音量。');}
+}
+document.addEventListener('pointerdown',prepareSoundGesture,{capture:true,once:true});
+document.addEventListener('keydown',prepareSoundGesture,{capture:true,once:true});
 function tone(f, d, type = 'sine', v = .2) {
   try {
     const ctx = getACtx(), o = ctx.createOscillator(), g = ctx.createGain();
@@ -1120,8 +1265,156 @@ function updateFillHud() {
   document.getElementById('fillStreak').textContent = `🔥 连对 ${fillStreak}`;
 }
 
+// ══════════════════════════════════════════════════════════
+//  TAB 6 — PHONICS
+// ══════════════════════════════════════════════════════════
+let phonicsInited=false;
+let phonicsRuleFilter='all';
+let phonicsLearnRule='a';
+let phonicsCorrect=0, phonicsWrong=0, phonicsStreak=0;
+let phonicsAnswered=false, phonicsCurrent=null;
+
+function phonicsRuleById(id) { return PHONICS_RULES.find(rule => rule.id === id); }
+
+function initPhonics() {
+  phonicsInited=true;
+  const grid=document.getElementById('phonicsRuleGrid');
+  grid.innerHTML=PHONICS_RULES.map(rule =>
+    `<button type="button" class="phonics-rule-card" data-phonics-rule="${rule.id}" onclick="setPhonicsFilter('${rule.id}')"><span class="phonics-rule-key">${rule.key}</span><span class="phonics-rule-name">${rule.label}</span></button>`
+  ).join('');
+  const allButton=document.createElement('button');
+  allButton.type='button';
+  allButton.className='phonics-rule-card';
+  allButton.dataset.phonicsRule='all';
+  allButton.innerHTML='<span class="phonics-rule-key">★</span><span class="phonics-rule-name">全部规律</span>';
+  allButton.onclick=()=>setPhonicsFilter('all');
+  grid.prepend(allButton);
+  setPhonicsFilter('a');
+}
+
+function setPhonicsFilter(ruleId) {
+  phonicsRuleFilter=ruleId;
+  phonicsLearnRule=ruleId;
+  document.querySelectorAll('[data-phonics-rule]').forEach(button =>
+    button.classList.toggle('active',button.dataset.phonicsRule===ruleId)
+  );
+  showPhonicsLesson(ruleId);
+  nextPhonics();
+  if (ruleId !== 'all') {
+    const firstExample=PHONICS_WORDS.find(item=>item.rule===ruleId);
+    if (firstExample) speakEn(firstExample.word);
+  }
+}
+
+function showPhonicsLesson(ruleId) {
+  const rule=ruleId==='all'?null:phonicsRuleById(ruleId);
+  const examples=rule
+    ? PHONICS_WORDS.filter(item=>item.rule===rule.id).slice(0,3)
+    : PHONICS_WORDS.slice(0,3);
+  const soundWord=examples[0]?.word || '';
+  document.getElementById('phonicsLessonTitle').textContent=rule?`${rule.label} · ${rule.key}`:'综合复习 · 轮流听和辨别';
+  const soundButton=document.getElementById('phonicsSound');
+  soundButton.textContent=rule?`🔊 听 ${rule.sound}（${soundWord}）`:'★ 复习';
+  soundButton.setAttribute('aria-label',rule?`朗读示例词 ${soundWord}，听其中的 ${rule.sound}`:'综合复习');
+  soundButton.disabled=!rule;
+  document.getElementById('phonicsGuide').textContent=rule
+    ? rule.guide
+    : '每次选一个规律先学习，再练这一组；熟悉后回到综合复习，练习在不同规律之间快速辨别。';
+  document.getElementById('phonicsMouth').innerHTML=rule
+    ? `<strong>怎么发：</strong>${rule.mouth}`
+    : '<strong>怎么学：</strong>先点选一个规律，读完“怎么发”并听例词；再开始这一组练习。';
+  document.getElementById('phonicsExamples').innerHTML=examples.map(item =>
+    `<button type="button" class="phonics-example" onclick="speakEn('${item.word}')">${item.emoji} ${highlightPhonicsPart(item.word,item.rule)}</button>`
+  ).join('');
+}
+
+function speakPhonicsExamples() {
+  const pool=phonicsLearnRule==='all'
+    ? PHONICS_WORDS.slice(0,3)
+    : PHONICS_WORDS.filter(item=>item.rule===phonicsLearnRule).slice(0,3);
+  englishSpeech.sequence(pool.map(item=>({text:item.word})),{rate:Math.max(.4,speechRate-.08),gapMs:450});
+}
+
+function speakPhonicsSound() {
+  const rule=phonicsLearnRule==='all'?null:phonicsRuleById(phonicsLearnRule);
+  if (!rule) return;
+  const item=PHONICS_WORDS.find(candidate=>candidate.rule===rule.id);
+  if (item) speakEn(`${item.word}. ${item.word}.`);
+}
+
+function startPhonicsPractice() {
+  nextPhonics();
+  document.getElementById('phonicsWord').focus();
+}
+
+function nextPhonics() {
+  if (!phonicsInited) return;
+  phonicsAnswered=false;
+  const pool=phonicsRuleFilter==='all'
+    ? PHONICS_WORDS
+    : PHONICS_WORDS.filter(item => item.rule===phonicsRuleFilter);
+  phonicsCurrent=pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('phonicsEmoji').textContent=phonicsCurrent.emoji;
+  document.getElementById('phonicsWord').innerHTML=highlightPhonicsPart(phonicsCurrent.word,phonicsCurrent.rule);
+  document.getElementById('phonicsCn').textContent=phonicsCurrent.cn;
+  const currentRule=phonicsRuleById(phonicsCurrent.rule);
+  const wrongs=PHONICS_RULES.filter(rule=>rule.id!==currentRule.id).sort(()=>Math.random()-.5).slice(0,3);
+  const options=[currentRule,...wrongs].sort(()=>Math.random()-.5);
+  document.getElementById('phonicsChoices').innerHTML=options.map(rule =>
+    `<button type="button" class="phonics-choice" data-rule="${rule.id}" onclick="checkPhonics(this,'${rule.id}')"><span class="rule-key">${rule.key}</span><span class="rule-label">${rule.label}</span></button>`
+  ).join('');
+  const feedback=document.getElementById('phonicsFb');
+  feedback.textContent=''; feedback.className='match-fb';
+  updatePhonicsHud();
+}
+
+function highlightPhonicsPart(word,ruleId) {
+  const rule=phonicsRuleById(ruleId);
+  const start=word.indexOf(rule.key);
+  if (start<0) return word;
+  return `${word.slice(0,start)}<mark>${rule.key}</mark>${word.slice(start+rule.key.length)}`;
+}
+
+function repeatPhonicsWord() { if (phonicsCurrent) speakEn(phonicsCurrent.word); }
+
+function checkPhonics(button,ruleId) {
+  if (phonicsAnswered) return;
+  phonicsAnswered=true;
+  const correctRule=phonicsRuleById(phonicsCurrent.rule);
+  const ok=ruleId===correctRule.id;
+  document.querySelectorAll('#phonicsChoices .phonics-choice').forEach(choice => {
+    choice.disabled=true;
+    if (choice.dataset.rule===correctRule.id) choice.classList.add('correct');
+  });
+  const feedback=document.getElementById('phonicsFb');
+  if (ok) {
+    phonicsCorrect++; phonicsStreak++;
+    feedback.textContent=phonicsStreak>=3 ? `🎉 连对 ${phonicsStreak} 题！${correctRule.hint}` : `✅ 对啦！${correctRule.hint}`;
+    feedback.className='match-fb fb-ok';
+    playOk();
+    if (phonicsStreak%5===0) launchConfetti();
+  } else {
+    phonicsWrong++; phonicsStreak=0; button.classList.add('wrong');
+    feedback.textContent=`❌ 这个词要注意：${correctRule.hint}`;
+    feedback.className='match-fb fb-fail'; playFail();
+  }
+  speakEn(phonicsCurrent.word);
+  updatePhonicsHud();
+  setTimeout(nextPhonics,ok?1300:2100);
+}
+
+function updatePhonicsHud() {
+  document.getElementById('phonicsScore').innerHTML=`✅ ${phonicsCorrect} &nbsp; ❌ ${phonicsWrong}`;
+  document.getElementById('phonicsStreak').textContent=`🔥 连对 ${phonicsStreak}`;
+  document.getElementById('phonicsProg').style.width=Math.min((phonicsCorrect+phonicsWrong)*4,100)+'%';
+}
+
 // ══ INIT ══════════════════════════════════════════════════
 buildAlpha();
+try {
+  const requestedTab = new URLSearchParams(window.location.search).get('tab');
+  if (['alpha','numbers','match','spell','fill','phonics'].includes(requestedTab)) switchTab(requestedTab);
+} catch (error) {}
 </script>
 <script>
 if ('serviceWorker' in navigator) {
@@ -1129,9 +1422,9 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
-<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

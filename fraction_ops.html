@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分数乘法与除法</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.9rem;color:#880e4f;letter-spacing:2px;text-shadow:2px 3px 0 #f48fb1;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.frac-row{display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.frac-box{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.frac-box .lbl{font-size:.8rem;color:#777;font-weight:bold;}
+.slider-pair{display:flex;flex-direction:column;gap:6px;align-items:center;}
+input[type=range]{width:100px;accent-color:#ad1457;}
+.sl-val{font-size:.85rem;color:#ad1457;font-weight:bold;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:10px;}
+.op-symbol{font-size:2rem;color:#ad1457;font-weight:bold;}
+.formula-box{background:#fce4ec;border-radius:12px;padding:12px 18px;text-align:center;font-size:1.15rem;color:#880e4f;line-height:2;}
+.recip-box{background:#fff3e0;border-radius:12px;padding:10px 16px;text-align:center;font-size:.95rem;color:#5d4037;margin-bottom:10px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fce4ec;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#ad1457;}
+.quiz-q{font-size:1.5rem;color:#333;margin-bottom:14px;font-weight:bold;}
+.dual-input{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.frac-input{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.frac-input input{width:60px;font-size:1.2rem;text-align:center;border:2px solid #f48fb1;border-radius:8px;padding:4px;outline:none;font-family:inherit;}
+.frac-input input:focus{border-color:#ad1457;}
+.frac-line{width:60px;height:2px;background:#880e4f;margin:2px 0;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#ad1457;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#ad1457;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#ad1457">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🍰</div>
+    <h1>分数乘法与除法</h1>
+    <p>用面积模型看懂分数乘除法</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('mul')">✖️ 分数乘法</button>
+    <button class="tab-btn" onclick="switchTab('div')">➗ 分数除法</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 分数乘法 -->
+  <div id="tab-mul">
+    <div class="card">
+      <div class="frac-row">
+        <div class="slider-pair"><span class="sl-val" id="m1nVal">1</span><input type="range" id="m1n" min="1" max="8" value="1" oninput="updateMul()"><span class="lbl">分子1</span></div>
+        <div class="slider-pair"><span class="sl-val" id="m1dVal">3</span><input type="range" id="m1d" min="2" max="8" value="3" oninput="updateMul()"><span class="lbl">分母1</span></div>
+        <div class="op-symbol">×</div>
+        <div class="slider-pair"><span class="sl-val" id="m2nVal">1</span><input type="range" id="m2n" min="1" max="8" value="1" oninput="updateMul()"><span class="lbl">分子2</span></div>
+        <div class="slider-pair"><span class="sl-val" id="m2dVal">4</span><input type="range" id="m2d" min="2" max="8" value="4" oninput="updateMul()"><span class="lbl">分母2</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="mulCanvas" width="280" height="220"></canvas></div>
+      <div class="formula-box" id="mulFormula"></div>
+    </div>
+  </div>
+
+  <!-- 分数除法 -->
+  <div id="tab-div" style="display:none;">
+    <div class="card">
+      <div class="frac-row">
+        <div class="slider-pair"><span class="sl-val" id="d1nVal">1</span><input type="range" id="d1n" min="1" max="8" value="1" oninput="updateDiv()"><span class="lbl">分子1</span></div>
+        <div class="slider-pair"><span class="sl-val" id="d1dVal">2</span><input type="range" id="d1d" min="2" max="8" value="2" oninput="updateDiv()"><span class="lbl">分母1</span></div>
+        <div class="op-symbol">÷</div>
+        <div class="slider-pair"><span class="sl-val" id="d2nVal">1</span><input type="range" id="d2n" min="1" max="8" value="1" oninput="updateDiv()"><span class="lbl">分子2</span></div>
+        <div class="slider-pair"><span class="sl-val" id="d2dVal">3</span><input type="range" id="d2d" min="2" max="8" value="3" oninput="updateDiv()"><span class="lbl">分母2</span></div>
+      </div>
+      <div class="recip-box" id="recipBox"></div>
+      <div class="canvas-wrap"><canvas id="divCanvas" width="280" height="220"></canvas></div>
+      <div class="formula-box" id="divFormula"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+        <div class="frac-input"><input type="number" id="ansN"><div class="frac-line"></div><input type="number" id="ansD"></div>
+      </div>
+      <div style="font-size:.8rem;color:#999;margin-top:6px;">请填写最简分数（约分到不能再约）</div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
+function reduce(n,d){const g=gcd(n,d)||1;return {n:n/g,d:d/g};}
+
+function drawAreaModel(canvas,f1,f2){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const rows=f1.d, cols=f2.d;
+  const cw=Math.min((W-20)/cols,30), ch=Math.min((H-20)/rows,30);
+  const ox=(W-cols*cw)/2, oy=(H-rows*ch)/2;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const x=ox+c*cw,y=oy+r*ch;
+      const inRow=r<f1.n, inCol=c<f2.n;
+      ctx.fillStyle= inRow&&inCol ? 'rgba(173,20,87,.55)' : inRow?'rgba(21,101,192,.28)': inCol?'rgba(230,81,0,.28)':'#fafafa';
+      ctx.fillRect(x,y,cw,ch);
+      ctx.strokeStyle='#ccc';ctx.lineWidth=1;ctx.strokeRect(x,y,cw,ch);
+    }
+  }
+}
+
+// ── 分数乘法 ──
+function getFrac(prefix){
+  const n=parseInt(document.getElementById(prefix+'n').value);
+  const d=parseInt(document.getElementById(prefix+'d').value);
+  return {n:Math.min(n,d),d};
+}
+function updateMul(){
+  ['m1n','m1d','m2n','m2d'].forEach(id=>{document.getElementById(id+'Val').textContent=document.getElementById(id).value;});
+  const f1=getFrac('m1'), f2=getFrac('m2');
+  drawAreaModel(document.getElementById('mulCanvas'),f1,f2);
+  const pn=f1.n*f2.n, pd=f1.d*f2.d, r=reduce(pn,pd);
+  document.getElementById('mulFormula').innerHTML=
+    `${f1.n}/${f1.d} × ${f2.n}/${f2.d} = ${pn}/${pd} = <b style="color:#ad1457">${r.n}/${r.d}</b>`;
+}
+
+// ── 分数除法 ──
+function updateDiv(){
+  ['d1n','d1d','d2n','d2d'].forEach(id=>{document.getElementById(id+'Val').textContent=document.getElementById(id).value;});
+  const f1=getFrac('d1'), f2=getFrac('d2');
+  const recip={n:f2.d,d:f2.n};
+  document.getElementById('recipBox').innerHTML=`💡 除以 ${f2.n}/${f2.d}，就等于乘以它的倒数 <b>${recip.n}/${recip.d}</b>`;
+  drawAreaModel(document.getElementById('divCanvas'),f1,recip);
+  const pn=f1.n*recip.n, pd=f1.d*recip.d, r=reduce(pn,pd);
+  document.getElementById('divFormula').innerHTML=
+    `${f1.n}/${f1.d} ÷ ${f2.n}/${f2.d} = ${f1.n}/${f1.d} × ${recip.n}/${recip.d} = ${pn}/${pd} = <b style="color:#ad1457">${r.n}/${r.d}</b>`;
+}
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns={n:0,d:0}, qDone=false;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('ansN').value=''; document.getElementById('ansD').value='';
+  document.getElementById('ansN').disabled=false; document.getElementById('ansD').disabled=false;
+  qDone=false;
+  const isMul=Math.random()<0.5;
+  const f1={n:randInt(1,6),d:randInt(2,9)};
+  f1.n=Math.min(f1.n,f1.d-1)||1;
+  const f2={n:randInt(1,6),d:randInt(2,9)};
+  f2.n=Math.min(f2.n,f2.d-1)||1;
+  let pn,pd,opText;
+  if(isMul){ pn=f1.n*f2.n; pd=f1.d*f2.d; opText='×'; }
+  else { pn=f1.n*f2.d; pd=f1.d*f2.n; opText='÷'; }
+  qAns=reduce(pn,pd);
+  document.getElementById('quizQ').innerHTML=`${f1.n}/${f1.d} ${opText} ${f2.n}/${f2.d} = ?`;
+  speak('算一算，等于多少？记得约分成最简分数。');
+  const nInp=document.getElementById('ansN'), dInp=document.getElementById('ansD');
+  const maybeCheck=()=>{
+    if(nInp.value.length>=String(qAns.n).length && dInp.value.length>=String(qAns.d).length) checkQ();
+  };
+  nInp.addEventListener('input',maybeCheck);
+  dInp.addEventListener('input',maybeCheck);
+  dInp.addEventListener('blur',()=>{ if(nInp.value.length>0 && dInp.value.length>0) checkQ(); });
+}
+function checkQ(){
+  if(qDone) return;
+  const n=parseInt(document.getElementById('ansN').value), d=parseInt(document.getElementById('ansD').value);
+  if(isNaN(n)||isNaN(d)||d===0) return;
+  qDone=true;
+  document.getElementById('ansN').disabled=true; document.getElementById('ansD').disabled=true;
+  const ok = n===qAns.n && d===qAns.d;
+  if(ok){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent=`❌ 正确答案是 ${qAns.n}/${qAns.d}`;
+    speak(`答案是${qAns.n}分之${qAns.d}，再想想！`);
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['mul','div','quiz']);
+  if(t==='mul'){updateMul();speak('分数乘法：拖动滑块，看看面积模型里紫色部分怎么变化。');}
+  if(t==='div'){updateDiv();speak('分数除法：除以一个数，等于乘以它的倒数。');}
+  if(t==='quiz') nextQ();
+}
+updateMul(); updateDiv();
+speak('欢迎来到分数乘法与除法！用面积模型看懂分数运算的原理。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

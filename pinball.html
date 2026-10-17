@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4b900">
+  <title>恐龙弹珠大冒险</title>
+  <meta name="description" content="按住蓄力、松开发射，让弹珠穿过恐龙乐园并挑战最高分。">
+  <link rel="stylesheet" href="hpx-game-mobile.css">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%}button{font:inherit}
+    :root{--yellow:#ffc91c;--deep:#e49b00;--ink:#332c20;--cream:#fff4b8;--red:#db3e27;--green:#6f9939}
+    body{min-height:100vh;padding:clamp(12px,3vw,28px);overflow-x:hidden;font-family:"Arial Rounded MT Bold","PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:radial-gradient(circle at 50% 0,#fff7b3 0 14%,transparent 45%),linear-gradient(135deg,#f8c20b,#f28e14 56%,#d96712)}
+    .page{width:min(100%,930px);margin:auto}.topbar{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:12px;color:#573400;text-shadow:0 2px rgba(255,255,255,.45)}
+    h1{margin:0;font-size:clamp(1.45rem,4.5vw,2.55rem);letter-spacing:.08em}.subtitle{margin:5px 0 0;font-size:clamp(.72rem,2vw,.9rem);font-weight:750}.top-actions{display:flex;gap:8px}
+    .small-btn{border:2px solid rgba(78,47,0,.24);border-radius:999px;padding:8px 12px;background:rgba(255,248,196,.8);color:#594000;font-weight:900;cursor:pointer;box-shadow:0 3px 0 rgba(113,59,0,.22)}
+    .machine{display:grid;grid-template-columns:minmax(280px,560px) minmax(210px,1fr);gap:18px;padding:clamp(10px,2.4vw,20px);border:4px solid #8e4b00;border-radius:28px;background:linear-gradient(145deg,#ffd92f,#eba400);box-shadow:0 8px 0 #a65a00,0 22px 50px rgba(88,42,0,.4),inset 0 3px #fff68c}
+    .screen-wrap{position:relative;min-width:0;border:5px solid #653e12;border-radius:21px;overflow:hidden;background:#f8dc4b;box-shadow:inset 0 0 0 5px #fff2a2,0 4px 12px rgba(80,40,0,.35);touch-action:none}
+    canvas{display:block;width:100%;height:auto;aspect-ratio:420/700;background:#f7d64b}
+    .shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.38),transparent 18% 74%,rgba(255,255,255,.16));mix-blend-mode:screen}
+    .side{display:flex;min-width:0;flex-direction:column;gap:12px}.scorebox{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:13px;border:3px solid #754407;border-radius:18px;background:#202c2d;color:#8effec;box-shadow:inset 0 0 16px #081314,0 4px 0 #a86300;font-family:ui-monospace,"SFMono-Regular",monospace;text-shadow:0 0 8px #40fff0}
+    .scorebox div{min-width:0}.scorebox span{display:block;color:#9bc8bf;font-size:.65rem;letter-spacing:.08em}.scorebox b{display:block;overflow:hidden;font-size:clamp(1rem,3vw,1.55rem);text-overflow:ellipsis}.scorebox .wide{grid-column:1/-1}.scorebox .wide b{font-size:.9rem;color:#fff4a8;text-shadow:none}
+    .panel{padding:14px;border:3px solid #8e5405;border-radius:18px;background:linear-gradient(#ffdc43,#f7b60a);box-shadow:inset 0 2px #fff286,0 4px 0 #a86300}.panel h2{margin:0 0 9px;font-size:1rem}.panel p{margin:0;color:#694900;font-size:.8rem;line-height:1.65;font-weight:700}
+    .power-label{display:flex;justify-content:space-between;margin:11px 2px 5px;font-size:.7rem;font-weight:900}.meter{height:14px;overflow:hidden;border:2px solid #6d3d00;border-radius:10px;background:#fff2a8}.meter i{display:block;width:0;height:100%;border-radius:7px;background:linear-gradient(90deg,#72b53e 0 38%,#ffcc15 60%,#e63b25);transition:width .04s linear}
+    .launch{position:relative;width:100%;min-height:72px;margin-top:10px;border:3px solid #653800;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff07a 0 8%,#e94726 9% 38%,#a20e0e 40% 59%,#641109 61%);color:white;font-size:clamp(.95rem,2vw,1.15rem);font-weight:950;letter-spacing:.08em;cursor:pointer;box-shadow:0 8px 0 #743100,0 11px 16px rgba(66,31,0,.28);touch-action:none;user-select:none}.launch:active,.launch.charging{transform:translateY(5px);box-shadow:0 3px 0 #743100}.launch:focus-visible,.small-btn:focus-visible{outline:4px solid #1585ff;outline-offset:3px}
+    .tilts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tilt{min-height:45px;border:2px solid #704100;border-radius:13px;background:#fff2a5;color:#634100;font-weight:950;cursor:pointer;box-shadow:0 4px 0 #9f6100}.tilt:active{transform:translateY(3px);box-shadow:0 1px 0 #9f6100}
+    .tips{margin-top:auto}.tips strong{display:block;margin-bottom:5px;font-size:.83rem}.tips ul{margin:0;padding-left:18px;color:#684600;font-size:.75rem;line-height:1.7;font-weight:700}
+    .status{min-height:23px;margin:11px 2px 0;text-align:center;color:#663d00;font-size:.82rem;font-weight:950}.footer{margin:18px 0 4px;text-align:center;font-size:.78rem}.footer a{color:#5d3500;font-weight:900}
+    @media(max-width:720px){body{padding:9px}.topbar{align-items:flex-start}.machine{grid-template-columns:1fr;padding:10px;border-radius:21px}.screen-wrap{max-width:520px;margin:auto}.side{display:grid;grid-template-columns:1fr 1fr}.scorebox,.controls{grid-column:1/-1}.tips{margin:0}.launch{min-height:62px}.panel{padding:11px}}
+    @media(max-width:470px){.topbar{display:block}.top-actions{position:absolute;right:11px;top:9px}.small-btn{padding:7px 9px}.machine{gap:10px}.side{grid-template-columns:1fr}.scorebox,.controls{grid-column:auto}.tips{display:none}.subtitle{padding-right:105px}.footer{font-size:.7rem}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="page">
+  <header class="topbar"><div><h1>🦖 恐龙弹珠大冒险</h1><p class="subtitle">蓄力发射 · 撞亮星星 · 穿过奖励球门</p></div><div class="top-actions"><button class="small-btn" id="speakToggle" type="button" aria-pressed="true">🔊 声音</button><button class="small-btn" id="resetBtn" type="button">重新开始</button></div></header>
+  <section class="machine" aria-label="恐龙弹珠游戏机">
+    <div class="screen-wrap" id="screenWrap"><canvas id="game" width="420" height="700" aria-label="弹珠游戏区：按空格键蓄力并发射"></canvas><div class="shine"></div></div>
+    <aside class="side">
+      <div class="scorebox"><div><span>SCORE 得分</span><b id="score">000000</b></div><div><span>BEST 最高</span><b id="best">000000</b></div><div><span>BALL 弹珠</span><b id="balls">● ● ● ● ●</b></div><div><span>COMBO 连击</span><b id="combo">× 1</b></div><div class="wide"><span>MISSION 状态</span><b id="mission">准备发射第一颗弹珠</b></div></div>
+      <section class="panel controls"><h2>🚀 发射台</h2><p>按住红色按钮蓄力，松开就发射。键盘可按住空格键。</p><div class="power-label"><span>POWER</span><span id="powerText">0%</span></div><div class="meter"><i id="powerBar"></i></div><button class="launch" id="launchBtn" type="button">按住蓄力<br>松开发射</button></section>
+      <div class="tilts"><button class="tilt" id="leftBtn" type="button" aria-label="向左晃动机台">◀ 左晃</button><button class="tilt" id="rightBtn" type="button" aria-label="向右晃动机台">右晃 ▶</button></div>
+      <section class="panel tips"><strong>🎯 得分秘诀</strong><ul><li>蓝色大转盘：500 分</li><li>红色蘑菇灯：200 分</li><li>点亮 3 颗星：奖励 1 球</li><li>快速连续碰撞会提高倍数</li></ul></section>
+    </aside>
+  </section>
+  <p class="status" id="status" role="status" aria-live="polite">按住发射按钮，为弹珠蓄力吧！</p>
+  <footer class="footer"><a href="game-paradise.html">← 返回游戏乐园</a></footer>
+</main>
+<script src="hpx-core.js?v=20260910-1"></script>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),W=420,H=700,$=id=>document.getElementById(id);
+const ui={score:$('score'),best:$('best'),balls:$('balls'),combo:$('combo'),mission:$('mission'),status:$('status'),power:$('powerBar'),powerText:$('powerText'),launch:$('launchBtn')};
+const pinballSpeech=Hpx.speech.create({buttonId:'speakToggle',rate:.96,pitch:1.08});
+let audio=null,soundOn=true,soundUnlockAttempted=false,speechTimer=0,score=0,best=Number(localStorage.getItem('dinoPinballBest')||0),balls=5,combo=1,lastHit=0,lastCollisionSound=0,charging=false,charge=0,chargeDir=1,gameOver=false,bonusStars=new Set(),shake=0,enteredPlayfield=false,noticeText='',noticeUntil=0;
+let ball={x:387,y:610,vx:0,vy:0,r:7,active:false,trail:[]};
+const pegs=[
+ [52,164],[105,138],[160,167],[219,141],[276,171],[331,142],[70,232],[130,211],[191,237],[250,211],[315,238],
+ [45,304],[101,279],[158,312],[218,281],[278,312],[337,284],[77,372],[136,350],[194,382],[255,354],[319,377],
+ [47,444],[105,416],[164,448],[224,420],[282,451],[340,424],[74,505],[130,482],[190,510],[251,484],[313,512]
+].map((p,i)=>({x:p[0],y:p[1],r:i%5===0?5:4,flash:0}));
+const bumpers=[{x:101,y:106,r:31,type:'blue',flash:0},{x:162,y:257,r:18,type:'red',flash:0},{x:266,y:274,r:18,type:'red',flash:0},{x:219,y:398,r:19,type:'red',flash:0}];
+const stars=[{x:84,y:190,on:false},{x:292,y:194,on:false},{x:122,y:333,on:false}];
+const walls=[
+ [20,68,20,145],[20,145,20,562],[20,145,47,120],[47,120,330,78],[369,118,369,590],[401,95,401,615],[401,95,350,75],
+ [20,562,55,625],[365,625,369,590]
+].map(a=>({x1:a[0],y1:a[1],x2:a[2],y2:a[3]}));
+const scoreSlots=[74,113,152,191,230,269,308,347].map((x,i)=>({x,value:[100,200,300,500,500,300,200,100][i]}));
+const lanes=[94,133,172,211,250,289,328].map((x,i)=>({x,y1:532+(i%2)*8,y2:615}));
+function fmt(n){return String(n).padStart(6,'0')}function setStatus(t){ui.status.textContent=t;ui.mission.textContent=t}
+function showNotice(text){noticeText=text;noticeUntil=performance.now()+1400}
+function updateUI(){ui.score.textContent=fmt(score);ui.best.textContent=fmt(best);ui.balls.textContent=balls>0?'● '.repeat(balls).trim():'—';ui.combo.textContent='× '+combo}
+function unlockSound(){if(!soundOn||soundUnlockAttempted)return;soundUnlockAttempted=true;try{const AudioEngine=window.AudioContext||window.webkitAudioContext;if(AudioEngine){audio=audio||new AudioEngine();if(audio.state==='suspended')audio.resume().catch(()=>showNotice('音效启动失败，请检查媒体音量'))}}catch(e){showNotice('音效启动失败，请检查浏览器设置')}if(typeof pinballSpeech.unlock==='function'){const started=pinballSpeech.unlock('声音已开启',{onError:()=>showNotice('语音启动失败，请检查系统文字转语音设置')});if(!started)showNotice('当前浏览器不支持语音朗读')}}
+function tone(freq=440,dur=.06,type='sine',vol=.035){if(!soundOn)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+dur)}catch(e){}}
+function speak(text,important=false){if(!soundOn)return;clearTimeout(speechTimer);const run=()=>pinballSpeech.speak(text,{rate:.96,pitch:1.08});if(important)run();else speechTimer=setTimeout(run,90)}
+function addScore(points,label){const now=performance.now();combo=now-lastHit<1300?Math.min(8,combo+1):1;lastHit=now;const gained=points*combo;score+=gained;if(score>best){best=score;localStorage.setItem('dinoPinballBest',best)}setStatus(`${label} +${gained} 分！`);speak(`${label}，获得${gained}分`);updateUI()}
+function resetBall(){ball={x:387,y:610,vx:0,vy:0,r:7,active:false,trail:[]};charge=0;charging=false;enteredPlayfield=false;ui.launch.classList.remove('charging');setPower()}
+function newGame(){pinballSpeech.stop();clearTimeout(speechTimer);score=0;balls=5;combo=1;gameOver=false;bonusStars.clear();stars.forEach(s=>s.on=false);resetBall();setStatus('准备发射第一颗弹珠');updateUI()}
+function setPower(){const p=Math.round(charge*100);ui.power.style.width=p+'%';ui.powerText.textContent=p+'%'}
+function startCharge(e){if(e)e.preventDefault();if(gameOver)newGame();if(ball.active||balls<=0)return;charging=true;chargeDir=1;ui.launch.classList.add('charging');tone(170,.04,'square',.018)}
+function launch(){if(!charging||ball.active||balls<=0)return;charging=false;ui.launch.classList.remove('charging');const power=.42+.58*charge;ball.active=true;ball.vx=-.12-power*.15;ball.vy=-15-power*9;setStatus('弹珠出发！');tone(180,.11,'sawtooth',.045);charge=0;setPower()}
+function nudge(dir){if(!ball.active)return;ball.vx+=dir*2.1;shake=dir*4;tone(110,.04,'square',.02)}
+function collideCircle(c,reward){const dx=ball.x-c.x,dy=ball.y-c.y,dist=Math.hypot(dx,dy),min=ball.r+c.r;if(dist>=min||dist===0)return false;const nx=dx/dist,ny=dy/dist,over=min-dist;ball.x+=nx*over;ball.y+=ny*over;const dot=ball.vx*nx+ball.vy*ny;if(dot<0){const boost=reward?1.28:.84;ball.vx-= (1+boost)*dot*nx;ball.vy-= (1+boost)*dot*ny;c.flash=1;if(reward){addScore(c.type==='blue'?500:200,c.type==='blue'?'蓝色转盘':'蘑菇灯');tone(c.type==='blue'?740:560,.07,'triangle',.045)}else tone(330,.025,'sine',.018)}return true}
+function collideSegment(s,bounce=.76){const ax=s.x2-s.x1,ay=s.y2-s.y1,l2=ax*ax+ay*ay;let t=((ball.x-s.x1)*ax+(ball.y-s.y1)*ay)/l2;t=Math.max(0,Math.min(1,t));const px=s.x1+t*ax,py=s.y1+t*ay,dx=ball.x-px,dy=ball.y-py,d=Math.hypot(dx,dy),min=ball.r+2;if(d>=min||d===0)return;const nx=dx/d,ny=dy/d;ball.x=px+nx*min;ball.y=py+ny*min;const dot=ball.vx*nx+ball.vy*ny;if(dot<0){ball.vx-=(1+bounce)*dot*nx;ball.vy-=(1+bounce)*dot*ny;const now=performance.now();if(now-lastCollisionSound>80){lastCollisionSound=now;tone(260,.018,'sine',.008)}}}
+function checkStars(){stars.forEach((s,i)=>{if(Math.hypot(ball.x-s.x,ball.y-s.y)<ball.r+13&&!s.on){s.on=true;bonusStars.add(i);addScore(150,'点亮星星');tone(880,.12,'sine',.035)}});if(bonusStars.size===3){balls++;bonusStars.clear();stars.forEach(s=>s.on=false);setStatus('三颗星全部点亮，奖励 1 颗弹珠！');speak('三颗星全部点亮，奖励一颗弹珠',true);tone(1040,.2,'triangle',.05);updateUI()}}
+function drain(){if(!ball.active)return;const slot=scoreSlots.reduce((a,b)=>Math.abs(ball.x-a.x)<Math.abs(ball.x-b.x)?a:b);if(ball.y>610&&ball.x>48&&ball.x<370)addScore(slot.value,'奖励球门');ball.active=false;balls--;combo=1;updateUI();tone(185,.1,'sine',.016);if(balls<=0){gameOver=true;showNotice(`游戏结束 · 最终得分 ${score}`);setStatus(`游戏结束！最终得分 ${score}，点击发射按钮再来一局`);speak(`游戏结束，最终得分${score}分`,true)}else{showNotice(`弹珠掉落 · 还剩 ${balls} 颗`);setStatus(`弹珠掉落，还有 ${balls} 颗弹珠，继续挑战！`);speak(`弹珠掉落，还剩${balls}颗弹珠`,true);setTimeout(()=>{if(!ball.active&&!gameOver)resetBall()},350)}}
+function physics(dt){if(charging){charge+=chargeDir*dt*.78;if(charge>=1){charge=1;chargeDir=-1}else if(charge<=.08){charge=.08;chargeDir=1}setPower()}if(!ball.active)return;const steps=3,step=dt*60/steps;for(let k=0;k<steps;k++){ball.vy+=.19*step;ball.vx*=.999;ball.vy*=.999;ball.x+=ball.vx*step;ball.y+=ball.vy*step;walls.forEach(w=>collideSegment(w));if(!enteredPlayfield&&ball.x<360&&ball.y<150){enteredPlayfield=true;ball.y=Math.max(ball.y,118);ball.vx=Math.min(ball.vx,-3);ball.vy=Math.max(6,Math.abs(ball.vy)*.7)}lanes.forEach(l=>collideSegment({x1:l.x,y1:l.y1,x2:l.x,y2:l.y2},.58));pegs.forEach(p=>collideCircle(p,false));bumpers.forEach(b=>collideCircle(b,true));checkStars();if((enteredPlayfield&&ball.y>625)||ball.y>682||ball.x<-15||ball.x>435){drain();break}}if(ball.active){ball.trail.unshift({x:ball.x,y:ball.y});if(ball.trail.length>9)ball.trail.pop()}}
+function roundedRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+function drawStar(x,y,on){ctx.save();ctx.translate(x,y);ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?5:12;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fillStyle=on?'#fff46b':'#7b943f';ctx.fill();ctx.strokeStyle='#4a5126';ctx.lineWidth=2;ctx.stroke();if(on){ctx.shadowColor='#fff';ctx.shadowBlur=12;ctx.stroke()}ctx.restore()}
+function drawDino(){ctx.save();ctx.globalAlpha=.9;ctx.translate(205,332);ctx.strokeStyle='#46541e';ctx.lineWidth=4;ctx.lineJoin='round';ctx.fillStyle='#78a63c';ctx.beginPath();ctx.ellipse(0,35,73,88,-.15,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(-18,-31,57,52,-.2,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#ef6b2d';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(20+i*18,-67+i*8);ctx.lineTo(29+i*17,-91+i*10);ctx.lineTo(40+i*15,-61+i*11);ctx.closePath();ctx.fill();ctx.stroke()}ctx.fillStyle='#dbeaa3';ctx.beginPath();ctx.ellipse(-4,45,41,54,-.15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-41,-44,13,17,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#202914';ctx.beginPath();ctx.arc(-38,-43,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff7050';ctx.beginPath();ctx.arc(-58,-18,8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(24,-12,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#40501c';ctx.beginPath();ctx.arc(-18,-18,28,.2,2.4);ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(-8,7);ctx.lineTo(-1,20);ctx.lineTo(5,5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+function draw(){ctx.save();ctx.clearRect(0,0,W,H);const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#ffe76b');grad.addColorStop(1,'#eeb928');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,.24)';for(let y=20;y<H;y+=34)for(let x=(y/34%2)*17;x<W;x+=34){ctx.beginPath();ctx.arc(x,y,2,0,7);ctx.fill()}ctx.save();ctx.translate(shake,0);shake*=.8;
+ctx.fillStyle='#c58b14';ctx.fillRect(369,90,32,530);ctx.fillStyle='#fff1a0';ctx.fillRect(377,100,17,510);roundedRect(18,68,350,56,18,'#e5ad22','#765315');ctx.fillStyle='#fff4ad';ctx.font='900 17px Arial';ctx.fillText('DINO PINBALL',40,103);ctx.fillStyle='#5d461a';for(let i=0;i<4;i++)roundedRect(175+i*19,83,8,24,4,'#5e4213');
+drawDino();stars.forEach(s=>drawStar(s.x,s.y,s.on));
+ctx.lineCap='round';walls.forEach(w=>{ctx.strokeStyle='#f7f6d8';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();ctx.strokeStyle='#5d675d';ctx.lineWidth=2;ctx.stroke()});
+lanes.forEach(l=>{ctx.strokeStyle='#e9ede4';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(l.x,l.y1);ctx.lineTo(l.x,l.y2);ctx.stroke();ctx.strokeStyle='#61675b';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#a33120';ctx.beginPath();ctx.arc(l.x,l.y1,6,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()});ctx.fillStyle='#6a430b';ctx.font='bold 8px Arial';scoreSlots.forEach(slot=>ctx.fillText(String(slot.value),slot.x-9,642));
+pegs.forEach(p=>{ctx.shadowColor=p.flash>0?'#fff':'transparent';ctx.shadowBlur=10*p.flash;ctx.fillStyle='#f9fbef';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();ctx.strokeStyle='#667067';ctx.lineWidth=2;ctx.stroke();p.flash=Math.max(0,p.flash-.08)});
+bumpers.forEach(b=>{const blue=b.type==='blue';ctx.shadowColor=b.flash>0?'white':'rgba(0,0,0,.25)';ctx.shadowBlur=b.flash*18;ctx.fillStyle=blue?'#318cbc':'#d83a22';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.strokeStyle=blue?'#183c50':'#7d1b11';ctx.lineWidth=5;ctx.stroke();ctx.fillStyle=blue?'#9ed5ea':'#ffbe3e';ctx.beginPath();ctx.arc(b.x-5,b.y-5,b.r*.45,0,7);ctx.fill();b.flash=Math.max(0,b.flash-.07)});ctx.shadowBlur=0;
+if(!ball.active){ctx.strokeStyle='#6c5020';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(387,618);ctx.lineTo(387,660);ctx.stroke();ctx.fillStyle='#b93220';ctx.fillRect(377,650,20,16)}
+if(ball.active){ball.trail.forEach((p,i)=>{ctx.globalAlpha=(1-i/ball.trail.length)*.22;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,ball.r*(1-i/15),0,7);ctx.fill()});ctx.globalAlpha=1}
+const bg=ctx.createRadialGradient(ball.x-3,ball.y-4,1,ball.x,ball.y,ball.r);bg.addColorStop(0,'#fff');bg.addColorStop(.35,'#dce9e6');bg.addColorStop(1,'#53605e');ctx.fillStyle=bg;ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,7);ctx.fill();ctx.strokeStyle='#3d4746';ctx.lineWidth=1;ctx.stroke();
+if(!gameOver&&performance.now()<noticeUntil){roundedRect(65,285,290,65,16,'rgba(48,39,19,.88)','#fff3a1');ctx.fillStyle='#fff7c7';ctx.textAlign='center';ctx.font='900 18px Arial';ctx.fillText(noticeText,210,325);ctx.textAlign='start'}if(gameOver){ctx.fillStyle='rgba(49,32,7,.7)';ctx.fillRect(20,250,349,140);roundedRect(49,270,290,100,18,'#ffdf42','#6f4000');ctx.fillStyle='#623900';ctx.textAlign='center';ctx.font='900 27px Arial';ctx.fillText('GAME OVER',194,310);ctx.font='bold 16px Arial';ctx.fillText('最终得分 '+score,194,342);ctx.textAlign='start'}ctx.restore();ctx.restore()}
+let last=performance.now();function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;physics(dt);draw();requestAnimationFrame(loop)}
+document.addEventListener('pointerdown',unlockSound,{capture:true,once:true});
+ui.launch.addEventListener('pointerdown',e=>{ui.launch.setPointerCapture(e.pointerId);startCharge(e)});ui.launch.addEventListener('pointerup',launch);ui.launch.addEventListener('pointercancel',launch);
+document.addEventListener('keydown',e=>{unlockSound();if(e.code==='Space'&&!e.repeat){e.preventDefault();startCharge(e)}if(e.key==='ArrowLeft'&&!e.repeat)nudge(-1);if(e.key==='ArrowRight'&&!e.repeat)nudge(1)});document.addEventListener('keyup',e=>{if(e.code==='Space'){e.preventDefault();launch()}});
+$('leftBtn').addEventListener('click',()=>nudge(-1));$('rightBtn').addEventListener('click',()=>nudge(1));$('resetBtn').addEventListener('click',newGame);$('speakToggle').addEventListener('click',e=>{soundOn=!soundOn;pinballSpeech.setEnabled(soundOn,false);e.currentTarget.setAttribute('aria-pressed',String(soundOn));e.currentTarget.textContent=soundOn?'🔊 声音':'🔇 静音';if(soundOn){tone(500,.06);speak('语音和音效已开启',true)}else{clearTimeout(speechTimer);pinballSpeech.stop()}});
+best=Math.max(best,score);updateUI();draw();requestAnimationFrame(loop);
+})();
+</script>
+<script src="hpx-game-progress.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body></html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>认识负数</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e3f2fd 0%,#ede7f6 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#0d47a1;letter-spacing:3px;text-shadow:2px 3px 0 #90caf9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.scenario-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.scenario-btn{padding:7px 14px;border:2px solid #90caf9;border-radius:14px;background:#fff;color:#0d47a1;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.scenario-btn.on{background:#1565c0;color:#fff;border-color:#1565c0;}
+.pair-row{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:10px;}
+.pair-card{flex:1;min-width:140px;max-width:220px;border-radius:14px;padding:16px;text-align:center;}
+.pair-card.pos{background:#e8f5e9;color:#2e7d32;}
+.pair-card.neg{background:#ffebee;color:#c62828;}
+.pair-card .val{font-size:1.6rem;font-weight:bold;margin-bottom:6px;}
+.canvas-wrap{display:flex;justify-content:center;margin:14px 0;}
+canvas{border-radius:10px;touch-action:none;}
+.point-info-row{display:flex;gap:14px;justify-content:center;margin-bottom:10px;}
+.point-tag{border-radius:10px;padding:8px 16px;font-size:1rem;font-weight:bold;}
+.point-tag.a{background:#ffebee;color:#c62828;}
+.point-tag.b{background:#e3f2fd;color:#1565c0;}
+.compare-result{text-align:center;font-size:1.3rem;font-weight:bold;color:#4a148c;margin-bottom:10px;}
+.rule-box{background:#ede7f6;border-radius:12px;padding:12px 16px;font-size:.88rem;color:#4a148c;line-height:1.8;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e3f2fd;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#1565c0;}
+.quiz-q{font-size:1.2rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
+.choice-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.choice-btn{padding:10px 20px;border:2px solid #90caf9;border-radius:14px;background:#fff;color:#0d47a1;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-btn:hover{background:#e3f2fd;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#1565c0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#1565c0">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">➖➕</div>
+    <h1>认识负数</h1>
+    <p>相反意义的量，数轴上比大小</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('scene')">📖 相反意义的量</button>
+    <button class="tab-btn" onclick="switchTab('line')">📏 数轴比大小</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 相反意义的量 -->
+  <div id="tab-scene">
+    <div class="card">
+      <div class="scenario-row" id="scenarioRow"></div>
+      <div class="pair-row" id="pairRow"></div>
+    </div>
+    <div class="rule-box">📌 表示一种量的相反意义，可以用<b>正数</b>和<b>负数</b>：0既不是正数也不是负数，是正数和负数的分界点。</div>
+  </div>
+
+  <!-- 数轴比大小 -->
+  <div id="tab-line" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:.88rem;color:#777;margin-bottom:8px;">拖动红色A点和蓝色B点，比一比谁大谁小</div>
+      <div class="canvas-wrap"><canvas id="lineCanvas" width="320" height="100"></canvas></div>
+      <div class="point-info-row">
+        <div class="point-tag a">A = <span id="valA">3</span></div>
+        <div class="point-tag b">B = <span id="valB">-2</span></div>
+      </div>
+      <div class="compare-result" id="compareResult"></div>
+      <div class="rule-box">📌 数轴上，越往右数越大；正数都大于0，负数都小于0；两个负数比较，离0越近的数越大（比如 -2 > -5）。</div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="canvas-wrap" id="quizCanvasWrap" style="display:none;"><canvas id="quizCanvas" width="300" height="90"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-row" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ── 相反意义的量 ──
+const SCENARIOS=[
+  {name:'收入与支出', pos:'收入500元', neg:'支出500元', posVal:'+500', negVal:'−500'},
+  {name:'温度', pos:'零上5℃', neg:'零下5℃', posVal:'+5', negVal:'−5'},
+  {name:'方向', pos:'向东走20米', neg:'向西走20米', posVal:'+20', negVal:'−20'},
+  {name:'海拔', pos:'高于海平面100米', neg:'低于海平面100米', posVal:'+100', negVal:'−100'},
+  {name:'楼层', pos:'电梯上升3层', neg:'电梯下降3层', posVal:'+3', negVal:'−3'}
+];
+let curScenario=0;
+function buildScenarioRow(){
+  const row=document.getElementById('scenarioRow');
+  row.innerHTML='';
+  SCENARIOS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='scenario-btn'+(i===curScenario?' on':'');
+    b.textContent=s.name;
+    b.onclick=()=>{curScenario=i;buildScenarioRow();renderScenario();};
+    row.appendChild(b);
+  });
+}
+function renderScenario(){
+  const s=SCENARIOS[curScenario];
+  document.getElementById('pairRow').innerHTML=`
+    <div class="pair-card pos"><div class="val">${s.posVal}</div>${s.pos}</div>
+    <div class="pair-card neg"><div class="val">${s.negVal}</div>${s.neg}</div>`;
+  speak(`${s.pos}记作${s.posVal}，${s.neg}记作${s.negVal}。`);
+}
+
+// ── 数轴比大小 ──
+const LINE_MIN=-10, LINE_MAX=10, LINE_OX=30, LINE_OW=260;
+function valToX(v){ return LINE_OX + (v-LINE_MIN)/(LINE_MAX-LINE_MIN)*LINE_OW; }
+function xToVal(x){ return Math.round(LINE_MIN + (x-LINE_OX)/LINE_OW*(LINE_MAX-LINE_MIN)); }
+let ptA=3, ptB=-2, lineDragging=null;
+function drawLine(){
+  const canvas=document.getElementById('lineCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const y=50;
+  ctx.strokeStyle='#666';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(LINE_OX-10,y);ctx.lineTo(LINE_OX+LINE_OW+10,y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(LINE_OX+LINE_OW+10,y);ctx.lineTo(LINE_OX+LINE_OW+2,y-4);ctx.lineTo(LINE_OX+LINE_OW+2,y+4);ctx.closePath();ctx.fillStyle='#666';ctx.fill();
+  for(let v=LINE_MIN;v<=LINE_MAX;v++){
+    const x=valToX(v);
+    ctx.strokeStyle=v===0?'#333':'#aaa'; ctx.lineWidth=v===0?2:1;
+    ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x,y+6);ctx.stroke();
+    if(v%2===0){ ctx.fillStyle='#777';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(v,x,y+20); }
+  }
+  [['A',ptA,'#c62828'],['B',ptB,'#1565c0']].forEach(([label,v,color])=>{
+    const x=valToX(v);
+    ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=color;ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText(label,x,y-14);
+  });
+}
+function updateCompare(){
+  document.getElementById('valA').textContent=ptA;
+  document.getElementById('valB').textContent=ptB;
+  const sym = ptA>ptB?'>':ptA<ptB?'<':'=';
+  document.getElementById('compareResult').textContent=`A ${sym} B  （${ptA} ${sym} ${ptB}）`;
+  drawLine();
+}
+function bindLineDrag(){
+  const canvas=document.getElementById('lineCanvas');
+  function getX(e){
+    const rect=canvas.getBoundingClientRect(); const scale=canvas.width/rect.width;
+    const src=e.touches?e.touches[0]:e;
+    return (src.clientX-rect.left)*scale;
+  }
+  function start(e){
+    e.preventDefault();
+    const x=getX(e);
+    const dA=Math.abs(x-valToX(ptA)), dB=Math.abs(x-valToX(ptB));
+    lineDragging = dA<dB ? 'A' : 'B';
+    if(Math.min(dA,dB)>20) lineDragging=null;
+  }
+  function move(e){
+    if(!lineDragging) return;
+    const x=getX(e);
+    const v=Math.max(LINE_MIN,Math.min(LINE_MAX,xToVal(x)));
+    if(lineDragging==='A') ptA=v; else ptB=v;
+    updateCompare();
+  }
+  function end(){
+    if(lineDragging) speak(`哎是${ptA}，比是${ptB}，${ptA>ptB?'哎大于比':ptA<ptB?'哎小于比':'哎等于比'}。`);
+    lineDragging=null;
+  }
+  canvas.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0};
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizCanvasWrap').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,2);
+  if(type===0){
+    let a=randInt(-10,10), b=randInt(-10,10);
+    while(a===b) b=randInt(-10,10);
+    const ans = a>b?'>':'<';
+    document.getElementById('quizQ').innerHTML=`${a} ___ ${b}`;
+    ['>','<'].forEach(sym=>{
+      const btn=document.createElement('button'); btn.className='choice-btn'; btn.textContent=sym;
+      btn.onclick=()=>checkAns(btn,sym,ans); area.appendChild(btn);
+    });
+    speak(`${a}和${b}，谁大谁小？`);
+  } else if(type===1){
+    const s=SCENARIOS[randInt(0,SCENARIOS.length-1)];
+    const usePos=Math.random()<0.5;
+    const text=usePos?s.pos:s.neg, ans=usePos?s.posVal:s.negVal;
+    const others=[s.posVal,s.negVal].filter(v=>v!==ans);
+    const set=new Set([ans]);
+    while(set.size<4){ const fake=(Math.random()<0.5?'+':'−')+randInt(1,999); set.add(fake); }
+    others.forEach(o=>set.add(o));
+    const opts=shuffleArr(Array.from(set)).slice(0,4);
+    if(!opts.includes(ans)) opts[0]=ans;
+    document.getElementById('quizQ').innerHTML=`"${text}"，用正负数表示是？`;
+    shuffleArr(opts).forEach(o=>{
+      const btn=document.createElement('button'); btn.className='choice-btn'; btn.textContent=o;
+      btn.onclick=()=>checkAns(btn,o,ans); area.appendChild(btn);
+    });
+    speak(`${text}，用正负数怎么表示？`);
+  } else {
+    document.getElementById('quizCanvasWrap').style.display='';
+    const v=randInt(-9,9);
+    const canvas=document.getElementById('quizCanvas'), ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const qmin=-10,qmax=10,ox=30,ow=240,y=45;
+    function vx(vv){return ox+(vv-qmin)/(qmax-qmin)*ow;}
+    ctx.strokeStyle='#666';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ox-10,y);ctx.lineTo(ox+ow+10,y);ctx.stroke();
+    for(let vv=qmin;vv<=qmax;vv+=2){ const x=vx(vv); ctx.strokeStyle=vv===0?'#333':'#aaa'; ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x,y+6);ctx.stroke(); ctx.fillStyle='#777';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(vv,x,y+20); }
+    const px=vx(v);
+    ctx.beginPath();ctx.arc(px,y,7,0,Math.PI*2);ctx.fillStyle='#7b1fa2';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    const ans=String(v);
+    const set=new Set([ans]);
+    while(set.size<4) set.add(String(v+randInt(-3,3)));
+    shuffleArr(Array.from(set)).forEach(o=>{
+      const btn=document.createElement('button'); btn.className='choice-btn'; btn.textContent=o;
+      btn.onclick=()=>checkAns(btn,o,ans); area.appendChild(btn);
+    });
+    document.getElementById('quizQ').textContent='紫色点在数轴上的位置，表示的数是？';
+    speak('紫色点表示的数是多少？');
+  }
+}
+function checkAns(btn,chosen,correct){
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===correct) b.classList.add('correct');});
+  if(chosen===correct){
+    qScore.c++;
+    document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ, 1200);
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;
+    document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+correct;
+    speak('再想想看！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['scene','line','quiz']);
+  if(t==='scene') speak('相反意义的量：用正数和负数表示两种相反的情况。');
+  if(t==='line'){updateCompare();speak('拖动哎点和比点，比一比谁大谁小。');}
+  if(t==='quiz') nextQ();
+}
+buildScenarioRow(); renderScenario();
+bindLineDrag(); updateCompare();
+speak('欢迎来到认识负数！正数和负数，表示相反意义的量。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

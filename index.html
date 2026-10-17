@@ -152,6 +152,7 @@ body {
   <button class="filter-btn" data-filter="12" onclick="filterGrade(this)">一二年级</button>
   <button class="filter-btn" data-filter="3" onclick="filterGrade(this)">三年级</button>
   <button class="filter-btn" data-filter="45" onclick="filterGrade(this)">四五年级</button>
+  <button class="filter-btn" data-filter="6" onclick="filterGrade(this)">六年级</button>
 </div>
 
 <div class="grid">
@@ -163,6 +164,20 @@ body {
     <span class="card-tag" style="background:#2E5A78">一～六年级</span>
   </a>
 
+  <a class="card" href="grade1-daily-math.html" data-subject="math" data-grades="1" style="border-top-color:#397689">
+    <div class="card-icon">🌱</div>
+    <div class="card-title">一年级每日数学练习</div>
+    <div class="card-desc">每天约12～15分钟，依次完成口算、知识、综合应用和数学思维，一周七天轮换，本机保存当天进度。</div>
+    <span class="card-tag" style="background:#397689">一年级</span>
+  </a>
+
+  <a class="card" href="grade2-daily-math.html" data-subject="math" data-grades="2" style="border-top-color:#47715b">
+    <div class="card-icon">🧮</div>
+    <div class="card-title">二年级每日数学训练</div>
+    <div class="card-desc">每天按顺序完成口算、知识、综合应用和数学思维，完成一项再解锁下一项，本机自动保存今日进度。</div>
+    <span class="card-tag" style="background:#47715b">二年级</span>
+  </a>
+
   <a class="card" href="chinese-study-plan.html" data-subject="chinese" data-grades="1,2,3,4,5,6" style="border-top-color:#B7382C">
     <div class="card-icon">🖌️</div>
     <div class="card-title">六年语文学习地图</div>
@@ -170,11 +185,25 @@ body {
     <span class="card-tag" style="background:#B7382C">一～六年级</span>
   </a>
 
+  <a class="card" href="grade1-daily-chinese.html" data-subject="chinese" data-grades="1" style="border-top-color:#a64f48">
+    <div class="card-icon">📖</div>
+    <div class="card-title">一年级每日语文练习</div>
+    <div class="card-desc">每天约12～15分钟，依次完成拼音听读、识字词语、阅读表达和朗读积累，一周轮换并保存本机进度。</div>
+    <span class="card-tag" style="background:#a64f48">一年级</span>
+  </a>
+
   <a class="card" href="english-study-plan.html" data-subject="english" data-grades="1,2,3,4,5,6" style="border-top-color:#1F4E79">
     <div class="card-icon">✈️</div>
     <div class="card-title">六年英语学习地图</div>
     <div class="card-desc">五条主线（语音词汇/听力/口语/阅读/写作）螺旋上升，先输入后输出，二升三零基础起步、四升五时态规则两个衔接点一页说清。</div>
     <span class="card-tag" style="background:#1F4E79">一～六年级</span>
+  </a>
+
+  <a class="card" href="grade1-daily-english.html" data-subject="english" data-grades="1" style="border-top-color:#3568a8">
+    <div class="card-icon">🌈</div>
+    <div class="card-title">一年级每日英语练习</div>
+    <div class="card-desc">每天约12～15分钟，依次完成字母语音、数字词汇、听读认词和启蒙阅读，一周轮换并保存本机进度。</div>
+    <span class="card-tag" style="background:#3568a8">一年级</span>
   </a>
 
   <a class="card" href="overview-review-plan.html" data-subject="math,chinese,english" data-grades="1,2,3,4,5,6" style="border-top-color:#A8761F">
@@ -191,11 +220,18 @@ body {
     <span class="card-tag" style="background:#A6512B">给家长</span>
   </a>
 
-  <a class="card c1" href="multiplication.html" data-subject="math" data-grades="1,2,3">
+  <a class="card" href="numbers.html" data-subject="math" data-grades="0,1" style="border-top-color:#e91e63">
     <div class="card-icon">🔢</div>
-    <div class="card-title">九九乘法口诀</div>
-    <div class="card-desc">动画展示计算原理，点击格子看点阵图解，限时闯关测试记忆。</div>
-    <span class="card-tag">一～三年级</span>
+    <div class="card-title">数字乐园 1-100</div>
+    <div class="card-desc">点格子认数字+汉语名称，数苹果练计数，找数字/上下一个游戏，拖拽排序，跟我数彩虹动画，范围均可选10/20/50/100以内。</div>
+    <span class="card-tag" style="background:#e91e63">幼儿园～一年级</span>
+  </a>
+
+  <a class="card" href="addsub10.html" data-subject="math" data-grades="1" style="border-top-color:#ef6c00">
+    <div class="card-icon">🍎</div>
+    <div class="card-title">10以内加减法</div>
+    <div class="card-desc">不是刷题是学过程：加法=合并动画、减法=去掉动画、数轴跳一跳统一理解加减法、10的分成，最后配视觉化综合练习。</div>
+    <span class="card-tag" style="background:#ef6c00">一年级</span>
   </a>
 
   <a class="card c2" href="carry.html" data-subject="math" data-grades="1,2,3">
@@ -205,11 +241,18 @@ body {
     <span class="card-tag">一～三年级</span>
   </a>
 
-  <a class="card" href="addsub10.html" data-subject="math" data-grades="1" style="border-top-color:#ef6c00">
-    <div class="card-icon">🍎</div>
-    <div class="card-title">10以内加减法</div>
-    <div class="card-desc">不是刷题是学过程：加法=合并动画、减法=去掉动画、数轴跳一跳统一理解加减法、10的分成，最后配视觉化综合练习。</div>
-    <span class="card-tag" style="background:#ef6c00">一年级</span>
+  <a class="card c8" href="placevalue.html" data-subject="math" data-grades="1,2,3,4">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">数位认知</div>
+    <div class="card-desc">动画拆解个位到亿位，个十百用实物方块、千及以上用位值筹码，看数字如何组成，演示+练习+测验三合一。</div>
+    <span class="card-tag">一～四年级</span>
+  </a>
+
+  <a class="card c1" href="multiplication.html" data-subject="math" data-grades="1,2,3">
+    <div class="card-icon">🔢</div>
+    <div class="card-title">九九乘法口诀</div>
+    <div class="card-desc">动画展示计算原理，点击格子看点阵图解，限时闯关测试记忆。</div>
+    <span class="card-tag">一～三年级</span>
   </a>
 
   <a class="card c3" href="division.html" data-subject="math" data-grades="2,3,4">
@@ -247,6 +290,13 @@ body {
     <span class="card-tag">一～三年级</span>
   </a>
 
+  <a class="card c5" href="english-reader-1a.html" data-subject="english" data-grades="1,2">
+    <div class="card-icon">📖</div>
+    <div class="card-title">英语启蒙阅读 1A</div>
+    <div class="card-desc">8个原创英语小故事，逐句跟读、整篇朗读、核心词学习和听音闯关。</div>
+    <span class="card-tag">一～二年级</span>
+  </a>
+
   <a class="card c10" href="direction.html" data-subject="math" data-grades="2,3,4">
     <div class="card-icon">🧭</div>
     <div class="card-title">方向认识</div>
@@ -259,13 +309,6 @@ body {
     <div class="card-title">混合运算</div>
     <div class="card-desc">加减乘除 + 括号，分步高亮演示运算顺序，练习自动出题，测验4选1。</div>
     <span class="card-tag">二～五年级</span>
-  </a>
-
-  <a class="card c8" href="placevalue.html" data-subject="math" data-grades="1,2,3,4">
-    <div class="card-icon">🔢</div>
-    <div class="card-title">数位认知</div>
-    <div class="card-desc">动画拆解个位到亿位，个十百用实物方块、千及以上用位值筹码，看数字如何组成，演示+练习+测验三合一。</div>
-    <span class="card-tag">一～四年级</span>
   </a>
 
   <a class="card" href="shapes.html" data-subject="math" data-grades="1,2,3,4" style="border-top-color:#e65100">
@@ -285,8 +328,22 @@ body {
   <a class="card" href="hanzi.html" data-subject="chinese" data-grades="1,2,3,4,5,6" style="border-top-color:#e91e63">
     <div class="card-icon">📖</div>
     <div class="card-title">趣味汉字</div>
-    <div class="card-desc">从独体字到复杂字，3000常用汉字分关卡学习，含拼音、笔画、例词，闪卡+测验双模式。</div>
+    <div class="card-desc">从独体字到复杂字，3000常用汉字分关卡学习；含拼音、笔画、偏旁与部件组合，支持闪卡、测验和手写练习。</div>
     <span class="card-tag" style="background:#e91e63">一～六年级</span>
+  </a>
+
+  <a class="card" href="pinyin.html" data-subject="chinese" data-grades="1" style="border-top-color:#e65100">
+    <div class="card-icon">🀄</div>
+    <div class="card-title">汉语拼音入门</div>
+    <div class="card-desc">声母23个、韵母24个、声调、整体认读音节16个、拼读练习（声母+韵母=音节），一年级语文地基，含综合练习。</div>
+    <span class="card-tag" style="background:#e65100">一年级</span>
+  </a>
+
+  <a class="card" href="punctuation.html" data-subject="chinese" data-grades="1,2,3,4,5,6" style="border-top-color:#b63c32">
+    <div class="card-icon">，。？！</div>
+    <div class="card-title">标点符号小课堂</div>
+    <div class="card-desc">认识逗号、句号、问号等12种常用标点，按低中高年级学习用法，配选择练习和多空填标点闯关。</div>
+    <span class="card-tag" style="background:#b63c32">一～六年级</span>
   </a>
 
   <a class="card" href="decimal_intro.html" data-subject="math" data-grades="4" style="border-top-color:#3949ab">
@@ -345,13 +402,6 @@ body {
     <span class="card-tag" style="background:#58795d">一～二年级</span>
   </a>
 
-  <a class="card" href="numbers.html" data-subject="math" data-grades="0,1" style="border-top-color:#e91e63">
-    <div class="card-icon">🔢</div>
-    <div class="card-title">数字乐园 1-100</div>
-    <div class="card-desc">点格子认数字+汉语名称，数苹果练计数，找数字/上下一个游戏，拖拽排序，跟我数彩虹动画，范围均可选10/20/50/100以内。</div>
-    <span class="card-tag" style="background:#e91e63">幼儿园～一年级</span>
-  </a>
-
   <a class="card c11" href="decimal.html" data-subject="math" data-grades="3,4">
     <div class="card-icon">🔟</div>
     <div class="card-title">小数加减法</div>
@@ -406,13 +456,6 @@ body {
     <div class="card-title">词语连线</div>
     <div class="card-desc">点击左边词语，再点击右边的配对词，一笔连线完成配对，一年级语文词语积累练习。</div>
     <span class="card-tag" style="background:#00838f">一年级</span>
-  </a>
-
-  <a class="card" href="daily-camp.html" data-subject="math" data-grades="0,1,2,3,4,5,6" style="border-top-color:#4d7c52">
-    <div class="card-icon">🌤️</div>
-    <div class="card-title">每日训练营</div>
-    <div class="card-desc">每天自动搭配计算、逻辑和专注3个短任务，也可进入游戏乐园，29个游戏集中选择。</div>
-    <span class="card-tag" style="background:#4d7c52">幼儿园～六年级</span>
   </a>
 
   <a class="card" href="angle.html" data-subject="math" data-grades="4" style="border-top-color:#6a1b9a">
@@ -632,13 +675,6 @@ body {
     <span class="card-tag" style="background:#01579b">五～六年级</span>
   </a>
 
-  <a class="card" href="pinyin.html" data-subject="chinese" data-grades="1" style="border-top-color:#e65100">
-    <div class="card-icon">🀄</div>
-    <div class="card-title">汉语拼音入门</div>
-    <div class="card-desc">声母23个、韵母24个、声调、整体认读音节16个、拼读练习（声母+韵母=音节），一年级语文地基，含综合练习。</div>
-    <span class="card-tag" style="background:#e65100">一年级</span>
-  </a>
-
   <a class="card" href="weight.html" data-subject="math" data-grades="2" style="border-top-color:#6d4c41">
     <div class="card-icon">⚖️</div>
     <div class="card-title">克和千克</div>
@@ -648,15 +684,24 @@ body {
 
 </div>
 
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 
 <div class="footer">
   <p>🌈 快乐学习，每天进步一点点</p>
-  <p><a href="copyright.html">版权与内容来源</a> · <a href="THIRD_PARTY_NOTICES.md">第三方组件与授权说明</a></p>
+  <p><a href="copyright.html">版权与内容来源</a> · <a href="THIRD_PARTY_NOTICES.html">第三方组件与授权说明</a></p>
 </div>
 
 <script>
 let currentGradeFilter = 'all', currentSubjectFilter = 'all';
+const courseGrid = document.querySelector('.grid');
+const courseCards = Array.from(courseGrid.querySelectorAll('.card'));
+courseCards.forEach((card,index)=>{ card.dataset.originalOrder = String(index); });
+const GRADE_FILTERS = {
+  12: ['0', '1', '2'],
+  3: ['3'],
+  45: ['4', '5'],
+  6: ['6']
+};
 
 function filterGrade(btn){
   btn.closest('.filter-bar').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
@@ -670,11 +715,29 @@ function filterSubject(btn){
   currentSubjectFilter = btn.dataset.subject;
   applyFilters();
 }
+function firstApplicableGrade(card){
+  const grades = (card.dataset.grades || '').split(',')
+    .map(Number)
+    .filter(grade=>grade>=1 && grade<=6);
+  return grades.length ? Math.min(...grades) : 7;
+}
+function sortCourseCards(){
+  courseCards.sort((a,b)=>{
+    if(currentSubjectFilter!=='all'){
+      const gradeDifference = firstApplicableGrade(a) - firstApplicableGrade(b);
+      if(gradeDifference) return gradeDifference;
+    }
+    return Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder);
+  });
+  courseCards.forEach(card=>courseGrid.appendChild(card));
+}
 function applyFilters(){
-  document.querySelectorAll('.card').forEach(card=>{
-    const gr = card.dataset.grades || '';
+  sortCourseCards();
+  courseCards.forEach(card=>{
+    const grades = (card.dataset.grades || '').split(',');
+    const wantedGrades = GRADE_FILTERS[currentGradeFilter] || [];
     const gradeOk = currentGradeFilter==='all'
-      || (currentGradeFilter==='12'?/[012]/.test(gr):currentGradeFilter==='3'?/3/.test(gr):/[45]/.test(gr));
+      || wantedGrades.some(grade=>grades.includes(grade));
     const subjects = (card.dataset.subject||'').split(',');
     const subjectOk = currentSubjectFilter==='all' || subjects.includes(currentSubjectFilter);
     card.style.display = (gradeOk && subjectOk) ? '' : 'none';
@@ -687,5 +750,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

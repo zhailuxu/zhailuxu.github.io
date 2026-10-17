@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>续费解锁 — 慧陪学</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#ffe0b2 0%,#f3e5f5 45%,#e1f5fe 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#fff;border-radius:22px;padding:32px 28px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:380px;width:100%;text-align:center;}
+.logo{font-size:2.4rem;margin-bottom:6px;}
+h1{font-size:1.25rem;color:#e65100;margin-bottom:10px;}
+p.desc{font-size:.88rem;color:#777;line-height:1.7;margin-bottom:18px;}
+.qr-box{width:180px;height:180px;margin:0 auto 14px;border:2px dashed #ffb74d;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:.85rem;background:#fffdf7;}
+.qr-box img{max-width:100%;max-height:100%;border-radius:12px;}
+.steps{text-align:left;background:#fff8e1;border-radius:12px;padding:12px 16px;font-size:.82rem;color:#8d6e00;line-height:1.9;margin-bottom:20px;}
+.field{margin-bottom:14px;text-align:left;}
+.field label{display:block;font-size:.85rem;color:#777;margin-bottom:4px;}
+.field input{width:100%;padding:10px 12px;border:2px solid #ffe0b2;border-radius:12px;font-size:1rem;outline:none;font-family:inherit;text-transform:uppercase;}
+.field input:focus{border-color:#e65100;}
+.submit-btn{width:100%;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#ffa726,#e65100);color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.submit-btn:active{transform:scale(.98);}
+.msg{text-align:center;font-size:.88rem;font-weight:bold;min-height:22px;margin-top:12px;}
+.msg.ok{color:#2e7d32;}
+.msg.no{color:#c62828;}
+.back-link{display:block;margin-top:14px;font-size:.8rem;color:#999;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🔒</div>
+  <h1>试用已到期，付费后即可永久使用</h1>
+  <p class="desc">扫描下方二维码微信转账付款，付款后联系客服获取"授权码"，输入即可永久解锁全部功能。</p>
+  <div class="qr-box" id="qrBox">收款二维码占位<br>（可替换为图片）</div>
+  <div class="steps">
+    ① 微信扫码转账付款<br>
+    ② 联系客服（备注手机号）领取授权码<br>
+    ③ 在下方输入授权码，点击"解锁"
+  </div>
+  <div class="field">
+    <label>授权码</label>
+    <input type="text" id="code" placeholder="例如 A1B2C3D4E5" maxlength="20">
+  </div>
+  <button class="submit-btn" onclick="redeem()">解锁</button>
+  <div class="msg" id="msg"></div>
+  <a class="back-link" href="login.html">换个账号登录</a>
+</div>
+<script src="hpx-config.js"></script>
+<script>
+var API_BASE = (window.HPX_CONFIG && window.HPX_CONFIG.API_BASE) || 'http://localhost:8787';
+var TOKEN_KEY = 'huipeixue_token';
+
+function getRedirectTarget(){
+  var params = new URLSearchParams(location.search);
+  return params.get('redirect') || 'index.html';
+}
+
+(function(){
+  if(!localStorage.getItem(TOKEN_KEY)){
+    location.href = 'login.html?redirect=' + encodeURIComponent(getRedirectTarget());
+  }
+})();
+
+function redeem(){
+  var code = document.getElementById('code').value.trim();
+  var msg = document.getElementById('msg');
+  msg.className = 'msg'; msg.textContent = '';
+  var token = localStorage.getItem(TOKEN_KEY);
+
+  if(!token){ location.href = 'login.html?redirect=' + encodeURIComponent(getRedirectTarget()); return; }
+  if(!code){ msg.className='msg no'; msg.textContent='请输入授权码'; return; }
+
+  fetch(API_BASE + '/api/redeem-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ code: code })
+  }).then(function(r){ return r.json().then(function(data){ return {status:r.status, data:data}; }); })
+    .then(function(res){
+      if(res.status >= 400){
+        if(res.status === 401){
+          localStorage.removeItem(TOKEN_KEY);
+          location.href = 'login.html?redirect=' + encodeURIComponent(getRedirectTarget());
+          return;
+        }
+        msg.className='msg no'; msg.textContent = res.data.error || '解锁失败，请重试';
+        return;
+      }
+      msg.className='msg ok'; msg.textContent = '解锁成功！正在进入…';
+      setTimeout(function(){ location.href = getRedirectTarget(); }, 500);
+    }).catch(function(){
+      msg.className='msg no'; msg.textContent='连不上服务器，请检查网络或稍后再试';
+    });
+}
+document.getElementById('code').addEventListener('keydown', function(e){ if(e.key==='Enter') redeem(); });
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

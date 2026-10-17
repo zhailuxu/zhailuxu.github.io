@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>趣味汉字 — 3000常用字</title>
-<meta name="description" content="从简单到复杂，趣味学习3000常用汉字，含拼音、笔画、例词">
+<meta name="description" content="从简单到复杂，趣味学习3000常用汉字，含拼音、笔画、偏旁、例词与部件组合">
 <style>
 * { box-sizing:border-box; margin:0; padding:0; }
 body {
@@ -280,6 +280,48 @@ body {
 .stroke-entry{display:flex;justify-content:center;margin:14px 0 4px;}
 .stroke-entry-btn{padding:10px 28px;border:none;border-radius:20px;background:linear-gradient(135deg,#ce93d8,#6a1b9a);color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(106,27,154,.32);transition:transform .12s;}
 .stroke-entry-btn:active{transform:scale(.95);}
+.radical-entry-btn{padding:10px 28px;border:none;border-radius:20px;background:linear-gradient(135deg,#4db6ac,#00695c);color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,105,92,.28);transition:transform .12s;}
+.radical-entry-btn:active{transform:scale(.95);}
+.radical-wrap{max-width:880px;margin:0 auto;}
+.radical-intro{background:rgba(255,255,255,.9);border-radius:18px;padding:18px 20px;margin-bottom:16px;box-shadow:0 3px 14px rgba(0,0,0,.08);color:#455a64;line-height:1.75;}
+.radical-intro h2{color:#00695c;font-size:1.25rem;margin-bottom:8px;}
+.radical-intro strong{color:#880e4f;}
+.radical-note{margin-top:9px;padding:9px 12px;border-radius:12px;background:#fff8e1;color:#795548;font-size:.83rem;}
+.radical-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:9px;margin-bottom:16px;}
+.radical-chip{border:2px solid transparent;border-radius:15px;background:rgba(255,255,255,.88);padding:10px 6px;cursor:pointer;font-family:inherit;color:#455a64;box-shadow:0 2px 8px rgba(0,0,0,.07);transition:transform .12s,border-color .12s,background .12s;}
+.radical-chip:hover{transform:translateY(-2px);border-color:#80cbc4;}
+.radical-chip.on{background:#e0f2f1;border-color:#00897b;color:#00695c;}
+.radical-chip .glyph{display:block;font-size:1.9rem;font-weight:bold;line-height:1.15;}
+.radical-chip .r-name{display:block;font-size:.78rem;margin-top:4px;}
+.radical-card{background:#fff;border-radius:22px;padding:22px;box-shadow:0 6px 24px rgba(0,0,0,.1);display:grid;grid-template-columns:190px 1fr;gap:22px;align-items:start;}
+.radical-main{text-align:center;background:linear-gradient(145deg,#e0f2f1,#f3e5f5);border-radius:18px;padding:18px 10px;}
+.radical-big{border:none;background:transparent;font-family:inherit;font-size:5.2rem;line-height:1.1;color:#00695c;font-weight:bold;cursor:pointer;}
+.radical-title{font-size:1.15rem;font-weight:bold;color:#4a148c;margin-top:6px;}
+.radical-py{font-size:.82rem;color:#e91e63;margin-top:2px;}
+.radical-position{display:inline-block;margin-top:9px;padding:3px 10px;border-radius:12px;background:#fff;color:#00695c;font-size:.76rem;font-weight:bold;}
+.radical-detail h3{font-size:1rem;color:#00695c;margin-bottom:6px;}
+#radicalMeaningSection{scroll-margin-top:12px;}
+.radical-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.read-examples-btn{border:1.5px solid #00897b;border-radius:14px;background:#e0f2f1;color:#00695c;padding:6px 11px;font-family:inherit;font-size:.78rem;font-weight:bold;cursor:pointer;}
+.read-examples-btn:hover{background:#b2dfdb;}
+.radical-detail p{color:#546e7a;line-height:1.7;font-size:.9rem;}
+.radical-examples{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px;}
+.radical-char{border:1.5px solid #b2dfdb;border-radius:12px;background:#f5fffe;padding:7px 11px;font-size:1.35rem;cursor:pointer;font-family:inherit;color:#37474f;}
+.radical-char:hover{background:#e0f2f1;border-color:#00897b;}
+.radical-char::after{content:' \1f50a';font-size:.62rem;vertical-align:middle;}
+.combine-box{border:2px dashed #b2dfdb;border-radius:16px;padding:14px;background:#fafefe;text-align:center;overflow:hidden;}
+.combine-equation{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.25rem;color:#78909c;min-height:68px;}
+.combine-part,.combine-result{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:12px;background:#e0f2f1;color:#00695c;font-size:2rem;font-weight:bold;}
+.combine-result{background:#fce4ec;color:#880e4f;font-size:2.35rem;box-shadow:0 3px 10px rgba(136,14,79,.12);}
+.combine-equation.animate .combine-part:first-child{animation:partLeft .35s ease-out;}
+.combine-equation.animate .combine-part:nth-of-type(2){animation:partRight .35s ease-out;}
+@keyframes partLeft{from{transform:translateX(-35px);opacity:.25}to{transform:none;opacity:1}}
+@keyframes partRight{from{transform:translateX(35px);opacity:.25}to{transform:none;opacity:1}}
+.combine-caption{color:#607d8b;font-size:.84rem;margin:7px 0 10px;}
+.radical-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.component-link{display:inline-flex;align-items:center;text-decoration:none;margin-top:16px;padding:9px 16px;border-radius:16px;background:#ede7f6;color:#5e35b1;font-size:.85rem;font-weight:bold;}
+@media(max-width:620px){.radical-card{grid-template-columns:1fr}.radical-main{padding:12px}.radical-big{font-size:4.3rem}.radical-grid{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){.combine-equation.animate .combine-part{animation:none!important}}
 .stroke-wrap{max-width:340px;margin:0 auto;padding:0 12px;}
 .stroke-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
 .stroke-btn{padding:8px 14px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
@@ -308,10 +350,52 @@ body {
   </div>
   <div class="stroke-entry">
     <button class="stroke-entry-btn" onclick="startStroke()">✏️ 笔画练习</button>
+    <button class="radical-entry-btn" onclick="startRadicals()">🧩 偏旁学习</button>
   </div>
   <div class="level-grid" id="levelGrid"></div>
   <div style="text-align:center;margin-top:20px;color:#bbb;font-size:.78rem">
     进度自动保存 · 当前版本收录 <span id="totalCount"></span> 个常用字
+  </div>
+</div>
+
+<!-- ══ Page: Radical Learning ══ -->
+<div id="pgRadical" class="page">
+  <button class="back-btn" onclick="goHome()">← 返回关卡</button>
+  <div class="hdr" style="padding:10px 0 12px">
+    <h1 style="font-size:1.7rem">🧩 偏旁学习</h1>
+    <p>认偏旁 · 找同类字 · 看部件组合</p>
+  </div>
+  <div class="radical-wrap">
+    <section class="radical-intro" aria-labelledby="radicalIntroTitle">
+      <h2 id="radicalIntroTitle">偏旁是什么？</h2>
+      <p><strong>偏旁</strong>是合体字里可以反复出现的构字部件。它常常帮助我们猜测一个字和什么事物有关，或提示读音。比如“亻”常出现在与人有关的字里，“氵”常出现在与水有关的字里。</p>
+      <div class="radical-note"><strong>偏旁和部首不完全一样：</strong>一个合体字可以拆出多个偏旁；查字典时通常选其中一个部件作为部首。本页先学习小学阶段常见偏旁及其组合位置。</div>
+    </section>
+    <div class="radical-grid" id="radicalGrid" aria-label="常见偏旁列表"></div>
+    <section class="radical-card" aria-live="polite">
+      <div class="radical-main">
+        <button type="button" class="radical-big" id="radicalBig" title="点击朗读" aria-label="朗读当前偏旁"></button>
+        <div class="radical-title" id="radicalTitle"></div>
+        <div class="radical-py" id="radicalPy"></div>
+        <span class="radical-position" id="radicalPosition"></span>
+      </div>
+      <div class="radical-detail" id="radicalMeaningSection">
+        <h3>它常表示什么？</h3>
+        <p id="radicalMeaning"></p>
+        <div class="radical-section-head"><h3>哪些字有这个偏旁？</h3><button type="button" class="read-examples-btn" onclick="speakRadicalExamples(false)">🔊 依次朗读这些字</button></div>
+        <div class="radical-examples" id="radicalExamples"></div>
+        <h3>偏旁怎样组合成汉字？</h3>
+        <div class="combine-box">
+          <div class="combine-equation" id="combineEquation"></div>
+          <div class="combine-caption" id="combineCaption"></div>
+          <div class="radical-actions">
+            <button class="btn btn-blue" onclick="nextRadicalBuild()">换一个组合</button>
+            <button class="btn btn-purple" onclick="speakRadicalBuild()">🔊 读一读</button>
+          </div>
+        </div>
+        <a class="component-link" href="hanzi-components.html">继续玩“汉字部件拼装” →</a>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -495,7 +579,7 @@ body {
 
 <script src="lib/hanzi-writer.min.js"></script>
 <script src="hanzi-data.js"></script>
-<script src="hpx-core.js"></script>
+<script src="hpx-core.js?v=20260906-3"></script>
 <script>
 // ─────────────────────────────────────────────────
 //  Character Data
@@ -862,6 +946,31 @@ const LEVELS = [
   { id:6, icon:'🏆', name:'拓展', sub:'进阶常用字', color:'#1565c0', grad:'linear-gradient(135deg,#64b5f6,#0d47a1)' },
 ];
 
+// 常见偏旁学习数据。名称、位置、例字和组合均按通用汉字知识独立整理。
+const RADICALS = [
+  {glyph:'亻',name:'单人旁',pinyin:'dān rén páng',position:'多在左边',meaning:'常提示这个字与人、人的动作或状态有关。',examples:['休','你','他','们','住','体'],builds:[['亻','木','休'],['亻','尔','你']]},
+  {glyph:'氵',name:'三点水',pinyin:'sān diǎn shuǐ',position:'多在左边',meaning:'由“水”变化而来，常提示与水、液体或水边事物有关。',examples:['江','河','海','湖','洗','清'],builds:[['氵','工','江'],['氵','青','清']]},
+  {glyph:'扌',name:'提手旁',pinyin:'tí shǒu páng',position:'多在左边',meaning:'由“手”变化而来，常提示与手的动作有关。',examples:['打','拉','抱','推','提','拍'],builds:[['扌','丁','打'],['扌','包','抱']]},
+  {glyph:'木',name:'木字旁',pinyin:'mù zì páng',position:'多在左边',meaning:'常提示与树木、木材或木制物品有关。',examples:['林','村','校','桥','树','桃'],builds:[['木','木','林'],['木','交','校']]},
+  {glyph:'口',name:'口字旁',pinyin:'kǒu zì páng',position:'多在左边',meaning:'常提示与嘴、说话、声音或进食有关。',examples:['吃','喝','唱','吗','呼','叫'],builds:[['口','乞','吃'],['口','马','吗']]},
+  {glyph:'女',name:'女字旁',pinyin:'nǚ zì páng',position:'多在左边',meaning:'常出现在与女性、亲属称呼等有关的字里。',examples:['好','妈','姐','妹','姓','奶'],builds:[['女','子','好'],['女','马','妈']]},
+  {glyph:'忄',name:'竖心旁',pinyin:'shù xīn páng',position:'多在左边',meaning:'由“心”变化而来，常提示与心情、感受或心理状态有关。',examples:['快','慢','忙','怕','情','性'],builds:[['忄','夬','快'],['忄','青','情']]},
+  {glyph:'讠',name:'言字旁',pinyin:'yán zì páng',position:'多在左边',meaning:'由“言”简化变化而来，常提示与说话、语言或表达有关。',examples:['说','话','语','讲','认','请'],builds:[['讠','兑','说'],['讠','吾','语']]},
+  {glyph:'艹',name:'草字头',pinyin:'cǎo zì tóu',position:'多在上方',meaning:'常提示与花草、植物或植物制品有关。',examples:['花','草','苗','茶','菜','荷'],builds:[['艹','化','花'],['艹','早','草']]},
+  {glyph:'宀',name:'宝盖头',pinyin:'bǎo gài tóu',position:'多在上方',meaning:'形状像屋顶，常提示与房屋、居所或室内有关。',examples:['安','家','室','客','它','宝'],builds:[['宀','女','安'],['宀','豕','家']]},
+  {glyph:'辶',name:'走之',pinyin:'zǒu zhī',position:'多在左下方',meaning:'常提示与行走、移动、道路或距离有关。',examples:['这','过','远','近','还','进'],builds:[['辶','不','还'],['辶','井','进']]},
+  {glyph:'钅',name:'金字旁',pinyin:'jīn zì páng',position:'多在左边',meaning:'由“金”简化变化而来，常提示与金属或金属制品有关。',examples:['钉','钱','铁','钟','铜','银'],builds:[['钅','丁','钉'],['钅','中','钟']]},
+  {glyph:'纟',name:'绞丝旁',pinyin:'jiǎo sī páng',position:'多在左边',meaning:'由“糸”简化变化而来，常提示与丝线、纺织或连接有关。',examples:['红','线','纸','级','组','细'],builds:[['纟','工','红'],['纟','氏','纸']]},
+  {glyph:'禾',name:'禾木旁',pinyin:'hé mù páng',position:'多在左边',meaning:'常提示与庄稼、谷物或生长收获有关。',examples:['秋','种','科','秒','积','和'],builds:[['禾','火','秋'],['禾','中','种']]},
+  {glyph:'礻',name:'示字旁',pinyin:'shì zì páng',position:'多在左边',meaning:'由“示”变化而来，常见于礼仪、祝愿等相关的字。',examples:['礼','祝','神','祖','福','社'],builds:[['礻','兄','祝'],['礻','畐','福']]},
+  {glyph:'衤',name:'衣字旁',pinyin:'yī zì páng',position:'多在左边',meaning:'由“衣”变化而来，常提示与衣服、布料或穿着有关。',examples:['被','裤','衫','裙','袖','补'],builds:[['衤','皮','被'],['衤','由','袖']]},
+  {glyph:'月',name:'月字旁',pinyin:'yuè zì páng',position:'多在左边',meaning:'出现在许多身体相关的字中时，字形“月”常由“肉”演变而来。',examples:['胖','腿','脸','脑','肚','肌'],builds:[['月','半','胖'],['月','退','腿']]},
+  {glyph:'虫',name:'虫字旁',pinyin:'chóng zì páng',position:'多在左边',meaning:'常提示与昆虫、小动物或虫类有关。',examples:['蚂','蚁','蜂','蝶','蜻','蛙'],builds:[['虫','马','蚂'],['虫','青','蜻']]},
+  {glyph:'疒',name:'病字旁',pinyin:'bìng zì páng',position:'多在左上方',meaning:'常提示与疾病、疼痛或身体不适有关。',examples:['病','痛','疼','疗','疾','痒'],builds:[['疒','丙','病'],['疒','甬','痛']]},
+  {glyph:'阝',name:'左耳旁',pinyin:'zuǒ ěr páng',position:'在左边',meaning:'左耳旁由“阜”变化而来，常见于与山地、台阶或地势有关的字。',examples:['院','阳','队','防','陆','降'],builds:[['阝','完','院'],['阝','日','阳']]},
+  {glyph:'阝',name:'右耳旁',pinyin:'yòu ěr páng',position:'在右边',meaning:'右耳旁由“邑”变化而来，常见于与地区、城镇或地点有关的字。',examples:['郊','都','部','邻','邮','那'],builds:[['交','阝','郊'],['由','阝','邮']]},
+];
+
 // ─────────────────────────────────────────────────
 //  State
 // ─────────────────────────────────────────────────
@@ -869,6 +978,8 @@ let learned  = new Set(JSON.parse(localStorage.getItem('hz_learned') || '[]'));
 let curLevel = null;
 let curChars = [];
 let modalIdx = 0;
+let radicalIdx = 0;
+let radicalBuildIdx = 0;
 
 // Flashcard state
 let fcQueue = [], fcIdx = 0, fcFlipped = false;
@@ -902,6 +1013,110 @@ function goLevel() {
   closeModal();
   renderLevel(curLevel);
   show('pgLevel');
+}
+
+// ─────────────────────────────────────────────────
+//  Radical learning
+// ─────────────────────────────────────────────────
+function startRadicals() {
+  renderRadicalGrid();
+  show('pgRadical');
+  selectRadical(radicalIdx, true);
+}
+
+function renderRadicalGrid() {
+  const grid = document.getElementById('radicalGrid');
+  grid.innerHTML = '';
+  RADICALS.forEach((radical, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'radical-chip' + (index === radicalIdx ? ' on' : '');
+    button.innerHTML = `<span class="glyph">${radical.glyph}</span><span class="r-name">${radical.name}</span>`;
+    button.setAttribute('aria-pressed', index === radicalIdx ? 'true' : 'false');
+    button.onclick = () => selectRadical(index, true, true);
+    grid.appendChild(button);
+  });
+}
+
+function selectRadical(index, announce, scrollOnMobile) {
+  radicalIdx = index;
+  radicalBuildIdx = 0;
+  const radical = RADICALS[index];
+  document.querySelectorAll('.radical-chip').forEach((button, buttonIndex) => {
+    const selected = buttonIndex === index;
+    button.classList.toggle('on', selected);
+    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+  const big = document.getElementById('radicalBig');
+  big.textContent = radical.glyph;
+  big.onclick = () => speak(`${radical.glyph}，${radical.name}`);
+  document.getElementById('radicalTitle').textContent = radical.name;
+  document.getElementById('radicalPy').textContent = radical.pinyin;
+  document.getElementById('radicalPosition').textContent = radical.position;
+  document.getElementById('radicalMeaning').textContent = radical.meaning;
+
+  const examples = document.getElementById('radicalExamples');
+  examples.innerHTML = '';
+  radical.examples.forEach(character => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'radical-char';
+    button.textContent = character;
+    button.title = `朗读“${character}”`;
+    button.onclick = () => speak(character);
+    examples.appendChild(button);
+  });
+  renderRadicalBuild();
+  if (announce) speakRadicalExamples(true);
+  if (scrollOnMobile) scrollToRadicalMeaning();
+}
+
+function scrollToRadicalMeaning() {
+  if (!window.matchMedia || !window.matchMedia('(max-width: 620px)').matches) return;
+  const target = document.getElementById('radicalMeaningSection');
+  if (!target) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() => target.scrollIntoView({
+    behavior: reduceMotion ? 'auto' : 'smooth',
+    block: 'start'
+  }));
+}
+
+function speakRadicalExamples(includeIntro) {
+  const radical = RADICALS[radicalIdx];
+  if (!speechAvailable) {
+    showToast('当前浏览器不支持语音朗读，请升级浏览器');
+    return Promise.resolve(false);
+  }
+  const items = includeIntro
+    ? [`${radical.glyph}，${radical.name}。${radical.meaning}`, '下面依次朗读有这个偏旁的字。']
+    : ['依次朗读这些字。'];
+  radical.examples.forEach(character => items.push({text:character, gapMs:220}));
+  return hanziSpeech.sequence(items, {rate:0.78, gapMs:160});
+}
+
+function renderRadicalBuild() {
+  const radical = RADICALS[radicalIdx];
+  const build = radical.builds[radicalBuildIdx];
+  const equation = document.getElementById('combineEquation');
+  equation.classList.remove('animate');
+  equation.innerHTML = `<span class="combine-part">${build[0]}</span><span>＋</span><span class="combine-part">${build[1]}</span><span>→</span><span class="combine-result">${build[2]}</span>`;
+  document.getElementById('combineCaption').textContent = `${build[0]}和${build[1]}组合成“${build[2]}”。${radical.name}${radical.position}。`;
+  void equation.offsetWidth;
+  equation.classList.add('animate');
+}
+
+function nextRadicalBuild() {
+  const builds = RADICALS[radicalIdx].builds;
+  radicalBuildIdx = (radicalBuildIdx + 1) % builds.length;
+  renderRadicalBuild();
+  speakRadicalBuild();
+}
+
+function speakRadicalBuild() {
+  const radical = RADICALS[radicalIdx];
+  const build = radical.builds[radicalBuildIdx];
+  speak(`${build[0]}和${build[1]}组合成${build[2]}。${radical.glyph}叫${radical.name}，${radical.position}。`);
 }
 
 // ─────────────────────────────────────────────────
@@ -1554,7 +1769,17 @@ function showToast(msg) {
 //  Speech (Web Speech API)
 // ─────────────────────────────────────────────────
 const hanziSpeech=Hpx.speech.create({rate:0.85,startDelayMs:50});
-function speak(text,rate=0.85){return hanziSpeech.speak(text,{rate});}
+// 兼容已被浏览器或 CDN 缓存的旧版 hpx-core.js；旧版没有 isAvailable()。
+const speechAvailable=typeof hanziSpeech.isAvailable==='function'
+  ? hanziSpeech.isAvailable()
+  : Boolean(window.speechSynthesis&&typeof window.SpeechSynthesisUtterance!=='undefined');
+function speak(text,rate=0.85){
+  if(!speechAvailable){
+    showToast('当前浏览器不支持语音朗读，请升级浏览器');
+    return Promise.resolve();
+  }
+  return hanziSpeech.speak(text,{rate});
+}
 
 // ═══════════════════════════════════════════════
 //  AI 讲汉字故事（调用本地 Ollama）
@@ -1894,14 +2119,10 @@ function initStrokeCanvas(){
 // ─────────────────────────────────────────────────
 renderHome();
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
-}
-</script>
-
 <a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

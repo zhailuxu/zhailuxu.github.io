@@ -49,6 +49,38 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
 .score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
 .score-item{background:#fff8e1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
 .quiz-q{font-size:1.15rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
+.study-kind-nav{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.study-kind-btn{padding:7px 11px;border:2px solid #ffcc80;border-radius:999px;background:#fff;color:#795548;font:inherit;font-size:.78rem;font-weight:bold;cursor:pointer;}
+.study-kind-btn:hover{background:#fff3e0;}
+.study-kind-btn.on{border-color:#e65100;background:#e65100;color:#fff;}
+.study-kind-btn:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
+.study-progress-row{display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto 12px;color:#795548;font-size:.78rem;font-weight:bold;}
+.study-meter{height:8px;flex:1;overflow:hidden;background:#ffe0b2;border-radius:999px;}
+.study-meter span{display:block;width:0;height:100%;background:linear-gradient(90deg,#fb8c00,#e65100);border-radius:inherit;transition:width .2s;}
+.study-stage{max-width:520px;margin:0 auto 14px;padding:20px;background:linear-gradient(145deg,#fffaf0,#fff3e0);border:2px solid #ffcc80;border-radius:18px;text-align:center;}
+.study-kind{display:inline-block;margin-bottom:8px;padding:3px 10px;background:#ffe0b2;border-radius:999px;color:#bf4b00;font-size:.75rem;font-weight:bold;}
+.study-path{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-height:62px;}
+.study-symbol{font-size:2rem;font-weight:bold;color:#e65100;}
+.study-arrow{color:#bcaaa4;font-weight:bold;}
+.study-example{font-size:1.65rem;font-weight:bold;color:#ef6c00;}
+.study-word{font-size:1.2rem;font-weight:bold;color:#5d4037;}
+.study-tip{min-height:42px;margin-top:12px;color:#8d6e63;font-size:.82rem;line-height:1.55;}
+.study-actions{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;max-width:520px;margin:0 auto;}
+.study-action{min-height:42px;padding:8px 10px;border:2px solid #ffcc80;border-radius:13px;background:#fff;color:#6d4c41;font:inherit;font-size:.82rem;font-weight:bold;cursor:pointer;}
+.study-action.primary{border-color:#e65100;background:#e65100;color:#fff;}
+.study-action:disabled{cursor:not-allowed;opacity:.42;}
+.alphabet-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 auto 14px;}
+.alphabet-action{border:2px solid #ffcc80;border-radius:13px;padding:8px 14px;background:#fff;color:#6d4c41;font:inherit;font-size:.84rem;font-weight:bold;cursor:pointer;}
+.alphabet-action.primary{border-color:#e65100;background:#e65100;color:#fff;}
+.alphabet-group{margin:0 0 14px;}
+.alphabet-group-title{font-size:.9rem;font-weight:bold;color:#bf4b00;margin:0 0 7px;}
+.alphabet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px;}
+.alphabet-chip{min-height:52px;border:2px solid #ffcc80;border-radius:12px;background:#fff8e1;color:#e65100;font:inherit;font-weight:bold;cursor:pointer;line-height:1.15;padding:5px 3px;}
+.alphabet-chip:hover{background:#ffe0b2;transform:translateY(-1px);}
+.alphabet-chip small{display:block;margin-top:3px;font-size:.72rem;color:#795548;font-weight:normal;}
+.alphabet-action:focus-visible,.alphabet-chip:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
+@media(max-width:430px){.study-actions{grid-template-columns:1fr 1fr}.study-action.primary{grid-column:1/-1;grid-row:1}.study-path{gap:7px}.study-symbol{font-size:1.7rem}.study-example{font-size:1.45rem}}
+@media(prefers-reduced-motion:reduce){.study-meter span{transition:none;}}
 </style>
 </head>
 <body data-hpx-page style="--hpx-accent:#e65100">
@@ -64,6 +96,8 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
     <button class="tab-btn" onclick="switchTab('final')">🅰️ 韵母</button>
     <button class="tab-btn" onclick="switchTab('tone')">🎵 声调</button>
     <button class="tab-btn" onclick="switchTab('whole')">🔤 整体认读音节</button>
+    <button class="tab-btn" onclick="switchTab('alphabet')">🎵 字母歌</button>
+    <button class="tab-btn" onclick="switchTab('study')">🪜 拼读学习</button>
     <button class="tab-btn" onclick="switchTab('blend')">🧩 拼读练习</button>
     <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
   </div>
@@ -71,7 +105,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 声母 -->
   <div id="tab-initial">
     <div class="card">
-      <div class="net-desc">一共23个声母，点一下依次听“声母 → 拼成的字音 → 例词”，例如：b → bā → 爸爸</div>
+      <div class="net-desc">一共23个声母，示例连读会接着读拼成的音节和例词，例如：p（坡）→ ping（苹）→ 苹果</div>
       <div class="read-mode" aria-label="声母朗读模式">
         <span class="read-mode-label">朗读模式</span>
         <button type="button" class="read-mode-btn" data-read-kind="initial" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('initial','single')">只读声母</button>
@@ -109,8 +143,58 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <!-- 整体认读音节 -->
   <div id="tab-whole" style="display:none;">
     <div class="card">
-      <div class="net-desc">这16个音节不要拆开拼，点一下依次听“整体音节 → 带调读音 → 例词”</div>
+      <div class="net-desc">这16个音节不要拆开拼；点卡片听音节，示例连读时会接着读例词</div>
+      <div class="read-mode" aria-label="整体认读音节朗读模式">
+        <span class="read-mode-label">朗读模式</span>
+        <button type="button" class="read-mode-btn" data-read-kind="whole" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('whole','single')">只读整体认读音节</button>
+        <button type="button" class="read-mode-btn on" data-read-kind="whole" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('whole','full')">示例连读</button>
+      </div>
       <div class="py-grid" id="wholeGrid"></div>
+    </div>
+  </div>
+
+  <!-- 拼音字母歌 -->
+  <div id="tab-alphabet" style="display:none;">
+    <div class="card">
+      <div class="net-desc">所有拼音字母排成一队：从 a、o、e、i、u、ü 开始，读到 y、w 后，再接复韵母和鼻韵母。</div>
+      <div class="alphabet-actions">
+        <button type="button" class="alphabet-action primary" onclick="speakAlphabetSong()">▶ 从头跟读</button>
+        <button type="button" class="alphabet-action" onclick="pySpeech.stop()">⏹ 停止</button>
+      </div>
+      <div id="alphabetGroups"></div>
+    </div>
+  </div>
+
+  <!-- 拼读学习 -->
+  <div id="tab-study" style="display:none;">
+    <div class="card">
+      <div class="net-desc">按顺序学完23个声母、24个韵母和16个整体认读音节，共63项</div>
+      <div class="study-kind-nav" aria-label="拼读学习范围">
+        <button type="button" class="study-kind-btn on" data-study-kind="all" aria-pressed="true" onclick="setStudyKind('all')">全部 63</button>
+        <button type="button" class="study-kind-btn" data-study-kind="initial" aria-pressed="false" onclick="setStudyKind('initial')">声母 23</button>
+        <button type="button" class="study-kind-btn" data-study-kind="final" aria-pressed="false" onclick="setStudyKind('final')">韵母 24</button>
+        <button type="button" class="study-kind-btn" data-study-kind="whole" aria-pressed="false" onclick="setStudyKind('whole')">整体认读 16</button>
+      </div>
+      <div class="study-progress-row">
+        <span id="studyProgressText">第 1 / 63 项</span>
+        <div class="study-meter" id="studyMeter" role="progressbar" aria-label="拼读学习进度" aria-valuemin="1" aria-valuemax="63" aria-valuenow="1"><span id="studyMeterBar"></span></div>
+      </div>
+      <div class="study-stage" aria-live="polite">
+        <span class="study-kind" id="studyKindText">声母</span>
+        <div class="study-path">
+          <span class="study-symbol" id="studySymbol">b</span>
+          <span class="study-arrow" aria-hidden="true">→</span>
+          <span class="study-example" id="studyExample">bā</span>
+          <span class="study-arrow" aria-hidden="true">→</span>
+          <span class="study-word" id="studyWord">爸爸</span>
+        </div>
+        <p class="study-tip" id="studyTip"></p>
+      </div>
+      <div class="study-actions">
+        <button type="button" class="study-action" id="studyPrev" onclick="moveStudy(-1)">← 上一项</button>
+        <button type="button" class="study-action primary" onclick="speakCurrentStudy()">🔊 朗读本项</button>
+        <button type="button" class="study-action" id="studyNext" onclick="moveStudy(1)">下一项 →</button>
+      </div>
     </div>
   </div>
 
@@ -141,7 +225,6 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
     </div>
   </div>
 
-  <a href="index.html" class="back-link">← 返回慧陪学</a>
 </div>
 <script src="hpx-core.js"></script>
 <script>
@@ -149,7 +232,7 @@ const pySpeech=Hpx.speech.install({rate:0.85});
 const randInt=Hpx.random.int;
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-const READING_MODES={initial:'full',final:'full'};
+const READING_MODES={initial:'full',final:'full',whole:'full'};
 function setReadingMode(kind,mode){
   READING_MODES[kind]=mode;
   document.querySelectorAll(`[data-read-kind="${kind}"]`).forEach(btn=>{
@@ -157,7 +240,7 @@ function setReadingMode(kind,mode){
     btn.classList.toggle('on',selected);
     btn.setAttribute('aria-pressed',String(selected));
   });
-  const label=kind==='initial'?'声母':'韵母';
+  const label={initial:'声母',final:'韵母',whole:'整体认读音节'}[kind]||'';
   speak(mode==='single'?`已切换为只读${label}`:`已切换为${label}示例连读`);
 }
 
@@ -176,20 +259,20 @@ const INITIALS=[
   {py:'s',read:'思',syllable:'三',syllablePy:'sān',word:'数字三'},{py:'y',read:'衣',syllable:'月',syllablePy:'yuè',word:'月亮'},
   {py:'w',read:'乌',syllable:'乌',syllablePy:'wū',word:'乌龟'},
 ];
-function speakInitial(read,syllable,word){
+function speakInitial(py,read,syllablePy,syllable,word){
   if(READING_MODES.initial==='single'){
     speak(read);
     return;
   }
   pySpeech.sequence([
-    {text:read,gapMs:260},
-    {text:syllable,gapMs:300},
+    {text:read,gapMs:360},
+    {text:`${syllablePy}，${syllable}`,gapMs:320},
     {text:word}
   ],{rate:0.78});
 }
 function renderInitials(){
   document.getElementById('initialGrid').innerHTML=INITIALS.map(it=>
-    `<div class="py-chip" onclick="speakInitial('${it.read}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
+    `<div class="py-chip" onclick="speakInitial('${it.py}','${it.read}','${it.syllablePy}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
 }
 
 // ── 韵母（24个，分组）──
@@ -306,8 +389,11 @@ const WHOLE_SYLLABLES=[
   {py:'yun',read:'云',syllablePy:'yún',word:'云朵'},{py:'ying',read:'英',syllablePy:'yīng',word:'英雄'},
 ];
 function speakWhole(read,word){
+  if(READING_MODES.whole==='single'){
+    speak(read);
+    return;
+  }
   pySpeech.sequence([
-    {text:'整体认读音节',gapMs:160},
     {text:read,gapMs:280},
     {text:word}
   ],{rate:0.8});
@@ -316,6 +402,91 @@ function renderWhole(){
   document.getElementById('wholeGrid').innerHTML=WHOLE_SYLLABLES.map(it=>
     `<div class="py-chip" onclick="speakWhole('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
 }
+
+// ── 拼音字母歌：按一条连续的拼音字母顺序跟读 ──
+const ALPHABET_SONG_ORDER=['a','o','e','i','u','ü','b','p','m','f','d','t','n','l','g','k','h','j','q','x','zh','ch','sh','r','z','c','s','y','w','ai','ei','ui','ao','ou','iu','ie','üe','er','an','en','in','un','ün','ang','eng','ing','ong'];
+function getAlphabetSongItems(){
+  const byPy=new Map([
+    ...INITIALS,
+    ...FINAL_GROUPS.flatMap(group=>group.items)
+  ].map(item=>[item.py,item]));
+  return ALPHABET_SONG_ORDER.map(py=>byPy.get(py)).filter(Boolean);
+}
+function renderAlphabetSong(){
+  const wrap=document.getElementById('alphabetGroups');
+  wrap.innerHTML='';
+  const grid=document.createElement('div');
+  grid.className='alphabet-grid';
+  grid.setAttribute('aria-label','拼音字母歌顺序');
+  getAlphabetSongItems().forEach(item=>{
+    const chip=document.createElement('button');
+    chip.type='button';
+    chip.className='alphabet-chip';
+    chip.innerHTML=`${item.py}<small>${item.read}</small>`;
+    chip.setAttribute('aria-label',`${item.py}，读${item.read}`);
+    chip.addEventListener('click',()=>pySpeech.speak(item.read,{rate:.78}));
+    grid.appendChild(chip);
+  });
+  wrap.appendChild(grid);
+}
+function speakAlphabetSong(){
+  const items=getAlphabetSongItems();
+  pySpeech.sequence(items.map(item=>({text:item.read,gapMs:180})),{rate:.76});
+}
+
+// ── 拼读学习：覆盖全部声母、韵母和整体认读音节 ──
+const STUDY_TIPS={
+  initial:'先听声母读音，再听完整拼音和例字，最后读例词。',
+  final:'先听韵母读音，再听完整拼音和例字，最后读例词。',
+  whole:'整体认读音节直接读，不拆成声母和韵母。'
+};
+let studyKind='all',studyIndex=0;
+function getAllStudyItems(){
+  const initials=INITIALS.map(item=>({...item,kind:'initial',kindName:'声母',symbol:item.py,example:item.syllablePy}));
+  const finals=FINAL_GROUPS.flatMap(group=>group.items.map(item=>({...item,kind:'final',kindName:'韵母',symbol:item.py,example:item.syllablePy})));
+  const wholes=WHOLE_SYLLABLES.map(item=>({...item,kind:'whole',kindName:'整体认读音节',symbol:item.py,example:item.syllablePy}));
+  return [...initials,...finals,...wholes];
+}
+function getStudyItems(){
+  const items=getAllStudyItems();
+  return studyKind==='all'?items:items.filter(item=>item.kind===studyKind);
+}
+function setStudyKind(kind){
+  studyKind=kind;
+  studyIndex=0;
+  document.querySelectorAll('[data-study-kind]').forEach(btn=>{
+    const selected=btn.dataset.studyKind===kind;
+    btn.classList.toggle('on',selected);
+    btn.setAttribute('aria-pressed',String(selected));
+  });
+  renderStudy(true);
+}
+function renderStudy(readAloud=false){
+  const items=getStudyItems();
+  studyIndex=Math.max(0,Math.min(studyIndex,items.length-1));
+  const item=items[studyIndex];
+  document.getElementById('studyKindText').textContent=item.kindName;
+  document.getElementById('studySymbol').textContent=item.symbol;
+  document.getElementById('studyExample').textContent=item.example;
+  document.getElementById('studyWord').textContent=item.word;
+  document.getElementById('studyTip').textContent=STUDY_TIPS[item.kind];
+  document.getElementById('studyProgressText').textContent=`第 ${studyIndex+1} / ${items.length} 项`;
+  const meter=document.getElementById('studyMeter');
+  meter.setAttribute('aria-valuemax',String(items.length));
+  meter.setAttribute('aria-valuenow',String(studyIndex+1));
+  document.getElementById('studyMeterBar').style.width=`${(studyIndex+1)/items.length*100}%`;
+  document.getElementById('studyPrev').disabled=studyIndex===0;
+  document.getElementById('studyNext').disabled=studyIndex===items.length-1;
+  if(readAloud) speakStudyItem(item);
+}
+function speakStudyItem(item){
+  const parts=item.kind==='whole'
+    ? [{text:item.read,gapMs:280},{text:item.word}]
+    : [{text:item.read,gapMs:250},{text:`${item.example}，${item.syllable}`,gapMs:280},{text:item.word}];
+  pySpeech.sequence(parts,{rate:0.78});
+}
+function speakCurrentStudy(){speakStudyItem(getStudyItems()[studyIndex]);}
+function moveStudy(step){studyIndex+=step;renderStudy(true);}
 
 // ── 拼读练习 ──
 const BLEND_COMBOS=[
@@ -459,11 +630,13 @@ function checkQuizChoice(btn,choice,correct){
 }
 
 function switchTab(t){
-  Hpx.tabs.activate(t, ['initial','final','tone','whole','blend','quiz']);
+  Hpx.tabs.activate(t, ['initial','final','tone','whole','alphabet','study','blend','quiz']);
   if(t==='initial') speak('声母：点一下听读音，认熟23个声母。');
   if(t==='final') speak('韵母：一共24个，分成单韵母、复韵母、前鼻韵母和后鼻韵母。');
   if(t==='tone') { speak('声调：同一个音，声调不同意思完全不同。'); nextTonePractice(); }
   if(t==='whole') speak('整体认读音节：这16个要整体记住读音。');
+  if(t==='alphabet') speak('拼音字母歌：点卡片单独听，或者从头跟读。');
+  if(t==='study') renderStudy(true);
   if(t==='blend') nextBlend();
   if(t==='quiz') nextQ();
 }
@@ -471,11 +644,14 @@ renderInitials();
 renderFinals();
 renderTones();
 renderWhole();
+renderAlphabetSong();
+renderStudy();
 speak('欢迎来到汉语拼音入门！我们先认声母和韵母，再学声调，最后学拼读。');
 </script>
 
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

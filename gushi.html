@@ -394,6 +394,7 @@ body {
 
 </div><!-- /container -->
 
+<script src="hpx-core.js"></script>
 <script>
 // ══ DATA ══════════════════════════════════════════════════
 const POEMS = [
@@ -425,10 +426,7 @@ let aCtx         = null;
 
 // ══ TABS ══════════════════════════════════════════════════
 function switchTab(name) {
-  ['grid','flash','quiz'].forEach((t, i) => {
-    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
-    document.querySelectorAll('.tab-btn')[i].classList.toggle('active', t === name);
-  });
+  Hpx.tabs.activate(name,['grid','flash','quiz'],{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'flash') renderFlash();
   if (name === 'quiz')  nextQuiz();
 }
@@ -618,13 +616,8 @@ function tone(f, d, type = 'sine', v = .16) {
 function playOK()   { tone(659, .09); setTimeout(() => tone(784, .13), 90); }
 function playFail() { tone(220, .22, 'sawtooth', .12); }
 
-function speakCN(text) {
-  if (!text || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'zh-CN'; u.rate = 0.82;
-  window.speechSynthesis.speak(u);
-}
+const poemSpeech=Hpx.speech.create({rate:0.82});
+function speakCN(text){return text?poemSpeech.speak(text):Promise.resolve();}
 
 // ══ AI 讲诗意（调用本地 Ollama）══════════════════════════════
 // 要求：Ollama 需在同一台设备上运行，且已设置
@@ -767,7 +760,9 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

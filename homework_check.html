@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作业拍照检查 — AI 批改</title>
+<meta name="description" content="拍照或上传作业照片，AI 自动识别题目、判断对错，错题给出详细解析。">
+<style>
+:root {
+  --bg:       #EEF2F7;
+  --card:     #FFFFFF;
+  --ink:      #1C2D3E;
+  --slate:    #3B536B;
+  --slate-lt: #D6E4F0;
+  --purple:   #5e35b1;
+  --purple-lt:#ede7f6;
+  --green:    #3B7558;
+  --green-lt: #E3F2EA;
+  --red:      #C44B3B;
+  --red-lt:   #FBEAEA;
+  --muted:    #6E859A;
+  --border:   #C4D2DF;
+  --shadow:   0 2px 14px rgba(28,45,62,.09), 0 0 0 1px rgba(28,45,62,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 22px 14px 52px;
+  color: var(--ink);
+}
+.container { max-width: 760px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 1.8rem; font-weight: 800; color: var(--slate); letter-spacing: 2px; }
+.header p  { font-size: .82rem; color: var(--muted); margin-top: 5px; }
+
+.card-panel {
+  background: var(--card); border-radius: 18px; padding: 20px 18px;
+  box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px;
+}
+
+/* ── 拍照/上传区 ── */
+.capture-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.capture-tab {
+  flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px;
+  font-size: .85rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: var(--card); color: var(--muted); transition: all .15s;
+}
+.capture-tab.active { background: var(--slate); color: #fff; border-color: var(--slate); }
+
+.cam-wrap { position: relative; border-radius: 14px; overflow: hidden; background: #000; margin-bottom: 12px; }
+#camVideo { width: 100%; display: block; max-height: 420px; object-fit: contain; background:#000; }
+.cam-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 220px; color: #aaa; font-size: .85rem; gap: 8px; padding: 20px;
+}
+.cam-hint { font-size: .78rem; color: var(--muted); text-align: center; margin-bottom: 10px; }
+
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 14px; padding: 34px 16px;
+  text-align: center; cursor: pointer; transition: all .15s; margin-bottom: 12px;
+}
+.upload-zone:hover { border-color: var(--slate); background: var(--slate-lt); }
+.upload-zone .icon { font-size: 2.4rem; margin-bottom: 8px; }
+.upload-zone p { font-size: .88rem; color: var(--muted); }
+
+#previewWrap { display: none; margin-bottom: 12px; }
+#previewWrap.show { display: block; }
+#previewImg { width: 100%; border-radius: 14px; max-height: 420px; object-fit: contain; background:#000; display:block; }
+
+.btn {
+  border: none; border-radius: 10px; padding: 10px 22px;
+  font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: transform .12s;
+}
+.btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-slate  { background: var(--slate); color: #fff; box-shadow: 0 3px 10px rgba(59,83,107,.25); }
+.btn-green  { background: var(--green); color: #fff; box-shadow: 0 3px 10px rgba(59,117,88,.25); }
+.btn-ghost  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-purple { background: var(--purple); color: #fff; box-shadow: 0 3px 10px rgba(94,53,177,.28); }
+.btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── 分析中 ── */
+.analyzing {
+  display: none; text-align: center; padding: 30px 16px;
+}
+.analyzing.show { display: block; }
+.analyzing .spinner {
+  width: 40px; height: 40px; margin: 0 auto 14px; border-radius: 50%;
+  border: 4px solid var(--slate-lt); border-top-color: var(--slate);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.analyzing p { color: var(--muted); font-size: .9rem; }
+
+/* ── 结果面板 ── */
+#resultPanel { display: none; }
+#resultPanel.show { display: block; }
+.result-hud {
+  display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.hud-box { background: var(--bg); border-radius: 12px; padding: 10px 18px; text-align: center; min-width: 74px; }
+.hud-box .num { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.hud-box .label { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.hud-box.ok .num   { color: var(--green); }
+.hud-box.fail .num { color: var(--red); }
+
+/* ── 耗时诊断面板 ── */
+.hw-timing-panel {
+  background: #F3F0FA; border: 1.5px dashed #c4b8e8; border-radius: 12px;
+  padding: 10px 14px; margin-bottom: 14px; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+.hw-timing-title { font-size: .78rem; font-weight: 700; color: var(--purple); margin-bottom: 6px; }
+.hw-timing-row {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: .78rem; color: var(--ink); padding: 2px 0; font-variant-numeric: tabular-nums;
+}
+.hw-timing-row span:first-child { color: var(--muted); }
+.hw-timing-total {
+  margin-top: 5px; padding-top: 6px; border-top: 1px dashed #c4b8e8; font-weight: 700;
+}
+.hw-timing-total span:first-child { color: var(--purple); }
+
+.q-row {
+  border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+}
+.q-row.ok   { border-color: #bfe0cc; background: #f6fbf8; }
+.q-row.fail { border-color: #f0c9c2; background: #fdf7f6; }
+.q-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.q-main { flex: 1; min-width: 200px; }
+.q-badge { flex-shrink: 0; font-size: 1.1rem; }
+.q-text { font-size: .95rem; color: var(--ink); line-height: 1.6; }
+.q-ans-row { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+.q-ans-row .stu-wrong { color: var(--red); text-decoration: line-through; }
+.q-ans-row .correct-val { color: var(--green); font-weight: 700; }
+.q-confirm { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+.q-confirm button {
+  border: 1.5px solid var(--border); background: #fff; border-radius: 8px;
+  padding: 2px 8px; font-size: .72rem; cursor: pointer; font-family: inherit; margin-left: 4px;
+}
+
+/* ── 竖式展示（由代码精确计算，不是AI猜的）── */
+.vcalc-wrap { display: flex; justify-content: center; margin: 10px 0 6px; }
+.vcalc-board { display: inline-flex; flex-direction: column; align-items: flex-end; }
+.vcalc-row { display: flex; align-items: center; }
+.vcalc-cell {
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; font-weight: 700; color: var(--ink); position: relative;
+}
+.vcalc-cell.op { width: 22px; color: var(--muted); font-size: 1.1rem; }
+.vcalc-carry { height: 22px; }
+.vcalc-carry .vcalc-cell { height: 22px; font-size: .78rem; color: var(--red); font-weight: 700; }
+.vcalc-line { height: 2.5px; background: var(--ink); border-radius: 2px; margin: 2px 0; }
+.vcalc-cell.result { color: var(--slate); }
+.vcalc-borrow-orig { color: #bbb; text-decoration: line-through; font-size: .95rem; }
+.vcalc-borrow-new  { color: #e65100; font-size: .95rem; margin-left: 1px; }
+.vcalc-tag {
+  font-size: .68rem; font-weight: 700; color: var(--purple); background: var(--purple-lt);
+  display: inline-block; border-radius: 8px; padding: 1px 8px; margin-bottom: 6px;
+}
+
+.ai-hw-btn {
+  flex-shrink: 0; border: none; border-radius: 10px; padding: 5px 12px; font-size: .78rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; color: #fff; background: linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow: 0 2px 6px rgba(94,53,177,.3); white-space: nowrap; margin-top: 4px;
+}
+.ai-hw-btn:disabled { opacity: .6; cursor: default; }
+.ai-hw-box {
+  display: none; width: 100%; margin-top: 8px; background: linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border: 1.5px solid #d1c4e9; border-radius: 10px; padding: 9px 11px; font-size: .85rem; color: #4527a0; line-height: 1.7;
+}
+.ai-hw-box.show { display: block; }
+.ai-hw-tag {
+  font-size: .7rem; font-weight: 700; color: #5e35b1; background: #fff;
+  display: inline-block; border-radius: 8px; padding: 1px 8px; margin-bottom: 6px;
+}
+.ai-hw-loading { color: #7e57c2; font-style: italic; }
+.ai-hw-err { color: #c62828; font-size: .78rem; }
+.ai-hw-retry {
+  margin-top: 6px; border: 1.5px solid #9575cd; background: #fff; color: #5e35b1;
+  border-radius: 8px; padding: 3px 10px; font-size: .74rem; cursor: pointer; font-family: inherit;
+}
+.ai-hw-bigidea { background: #fff; border-radius: 8px; padding: 6px 9px; margin-bottom: 7px; font-weight: 700; }
+.ai-hw-steps { display: flex; flex-direction: column; gap: 6px; }
+.ai-hw-step { display: flex; align-items: flex-start; gap: 8px; background: #fff; border-radius: 9px; padding: 7px 10px; flex-wrap: wrap; }
+.ai-hw-step-n {
+  flex-shrink: 0; padding: 2px 9px; border-radius: 10px; background: linear-gradient(135deg,#9575cd,#5e35b1);
+  color: #fff; font-size: .7rem; font-weight: 700; white-space: nowrap; line-height: 1.5;
+}
+.ai-hw-step-emoji { flex-shrink: 0; font-size: 1.05rem; line-height: 1.5; }
+.ai-hw-step-text { font-size: .84rem; color: #333; line-height: 1.5; }
+
+.err-panel {
+  display: none; text-align: center; padding: 20px 16px; color: var(--red);
+  background: var(--red-lt); border-radius: 14px; font-size: .88rem; line-height: 1.7;
+}
+.err-panel.show { display: block; }
+.err-panel code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+
+/* ── 标注图视图 ── */
+.anno-hint { font-size: .78rem; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+.anno-canvas-wrap { display: flex; justify-content: center; border-radius: 12px; overflow: hidden; background: #000; }
+#annoCanvas { max-width: 100%; height: auto; display: block; cursor: pointer; }
+.anno-selected-hint { font-size: .8rem; color: var(--slate); font-weight: 700; margin-top: 10px; min-height: 18px; }
+
+.back-link { display: block; text-align: center; margin-top: 14px; color: var(--slate); text-decoration: none; font-size: .88rem; }
+
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.4rem; }
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3B536B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📷 作业拍照检查</h1>
+  <p>拍照或上传作业照片，AI 自动识别批改，错题详细解析</p>
+</div>
+
+<!-- 拍照/上传 面板 -->
+<div class="card-panel" id="capturePanel">
+  <div class="capture-tabs">
+    <button class="capture-tab active" id="tabCam" onclick="switchCaptureTab('cam')">📷 拍照</button>
+    <button class="capture-tab" id="tabUpload" onclick="switchCaptureTab('upload')">🖼️ 上传照片</button>
+  </div>
+
+  <!-- 摄像头模式 -->
+  <div id="camMode">
+    <div class="cam-wrap">
+      <video id="camVideo" class="hidden" autoplay playsinline></video>
+      <div class="cam-placeholder" id="camPlaceholder">
+        <div style="font-size:2.4rem">📷</div>
+        <div>点击下方按钮开启摄像头</div>
+      </div>
+    </div>
+    <div class="cam-hint">若摄像头无法打开（比如直接双击文件打开的页面），请改用"上传照片"</div>
+    <div class="btn-row">
+      <button class="btn btn-slate" id="camStartBtn" onclick="startCamera()">▶ 开启摄像头</button>
+      <button class="btn btn-green hidden" id="camShotBtn" onclick="captureFromCamera()">📸 拍照</button>
+      <button class="btn btn-ghost hidden" id="camStopBtn" onclick="stopCamera()">✕ 关闭摄像头</button>
+    </div>
+  </div>
+
+  <!-- 上传模式 -->
+  <div id="uploadMode" class="hidden">
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">🖼️</div>
+      <p>点击选择作业照片（或手机拍照上传）</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" class="hidden" onchange="handleFileUpload(event)">
+  </div>
+
+  <!-- 预览 + 提交 -->
+  <div id="previewWrap">
+    <img id="previewImg" alt="作业照片预览">
+  </div>
+  <div class="btn-row" id="submitRow" style="display:none;margin-top:10px">
+    <button class="btn btn-ghost" onclick="resetCapture()">↺ 重新拍/传</button>
+    <button class="btn btn-purple" id="analyzeBtn" onclick="analyzeHomework()">🤖 开始 AI 批改</button>
+  </div>
+</div>
+
+<!-- 分析中 -->
+<div class="card-panel analyzing" id="analyzingPanel">
+  <div class="spinner"></div>
+  <p>AI 正在识别作业内容，请稍候…（第一次可能要等久一点）</p>
+</div>
+
+<!-- 错误提示 -->
+<div class="card-panel">
+  <div class="err-panel" id="errPanel"></div>
+</div>
+
+<!-- 结果面板 -->
+<div class="card-panel" id="resultPanel">
+  <div class="result-hud">
+    <div class="hud-box"><div class="num" id="hudTotal">0</div><div class="label">共 N 题</div></div>
+    <div class="hud-box ok"><div class="num" id="hudOk">0</div><div class="label">✅ 正确</div></div>
+    <div class="hud-box fail"><div class="num" id="hudFail">0</div><div class="label">❌ 错误</div></div>
+  </div>
+
+  <div class="capture-tabs" style="margin-bottom:14px">
+    <button class="capture-tab active" id="tabViewList" onclick="switchResultView('list')">📋 列表</button>
+    <button class="capture-tab" id="tabViewAnno" onclick="switchResultView('anno')">🖼️ 标注图</button>
+  </div>
+
+  <!-- 原有的列表视图（保留不变） -->
+  <div id="viewList">
+    <div id="resultList"></div>
+  </div>
+
+  <!-- 新增：在原图上打✓/✗的标注图视图 -->
+  <div id="viewAnno" class="hidden">
+    <div class="anno-hint">📍 点图上的红色标记：✅正确 / ❌错误可查看AI解析（本地视觉模型定位是"大致准确"，不是像素级精确，标记位置仅供参考）</div>
+    <div class="anno-canvas-wrap">
+      <canvas id="annoCanvas" onclick="handleAnnoCanvasClick(event)"></canvas>
+    </div>
+    <div class="anno-selected-hint" id="annoHint"></div>
+    <div class="ai-hw-box" id="annoAiBox"></div>
+  </div>
+
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-slate" onclick="resetCapture(true)">📷 再检查一份作业</button>
+  </div>
+</div>
+
+<a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+
+<script>
+// ══ CONFIG ═══════════════════════════════════════════════
+const HW_OLLAMA_URL = 'http://localhost:11434/api/generate';
+const HW_VISION_MODEL = 'qwen2.5vl:7b';   // 视觉模型：负责"看图识别+判断对错"
+const HW_TEXT_MODEL   = 'qwen2.5:14b';    // 文本模型：负责错题的详细讲解（不需要读图，用普通模型即可）
+
+// AI 讲解字数上限（沿用 math1.html / olympiad 系列验证过的做法）
+const HW_IDEA_MAXLEN = 22;
+const HW_STEP_MAXLEN = 26;
+const HW_MAX_STEPS   = 4;
+
+// ══ STATE ═════════════════════════════════════════════════
+let camStream = null;
+let currentImageBase64 = null; // 不含 data: 前缀的纯 base64，供 API 使用
+let currentResults = [];       // 最近一次批改结果
+
+// ══ 耗时分析：记录列表这条主路径每个阶段花了多少时间 ══════════
+// 用于诊断"为什么这么慢"，展示在结果列表顶部
+let hwTimings = {
+  captureMs:  0,  // 拍照/上传拿到原始图片的耗时
+  compressMs: 0,  // 图片压缩(hwDownscaleImage)耗时
+  modelCallMs: 0, // 最终成功那次请求：fetch()发出到拿到Ollama响应的耗时(含模型推理)
+  parseMs:    0,  // 对模型返回文本做JSON解析的耗时
+  renderMs:   0,  // renderResults()构建/更新DOM的耗时
+  retryCount: 0,  // 列表请求实际重试了几次(0=一次成功)
+  totalListMs: 0, // 从调用hwCallVisionWithRetry(false)到拿到结果的总耗时(含所有重试)
+};
+
+// ══ 拍照 / 上传 切换 ══════════════════════════════════════
+function switchCaptureTab(mode) {
+  document.getElementById('tabCam').classList.toggle('active', mode === 'cam');
+  document.getElementById('tabUpload').classList.toggle('active', mode === 'upload');
+  document.getElementById('camMode').classList.toggle('hidden', mode !== 'cam');
+  document.getElementById('uploadMode').classList.toggle('hidden', mode !== 'upload');
+  if (mode === 'upload') stopCamera();
+}
+
+// ══ 摄像头 ════════════════════════════════════════════════
+async function startCamera() {
+  const errPanel = document.getElementById('errPanel');
+  errPanel.classList.remove('show');
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false,
+    });
+    const video = document.getElementById('camVideo');
+    video.srcObject = camStream;
+    video.classList.remove('hidden');
+    document.getElementById('camPlaceholder').classList.add('hidden');
+    document.getElementById('camStartBtn').classList.add('hidden');
+    document.getElementById('camShotBtn').classList.remove('hidden');
+    document.getElementById('camStopBtn').classList.remove('hidden');
+  } catch (err) {
+    errPanel.classList.add('show');
+    errPanel.innerHTML = `📷 无法打开摄像头：${hwEscapeHtml(err.message)}。<br>
+      常见原因：① 浏览器/系统未授权摄像头权限；② 页面是通过 <code>file://</code> 直接打开的（多数浏览器要求 <code>https://</code> 或 <code>localhost</code> 才允许摄像头）。<br>
+      请改用"🖼️ 上传照片"方式。`;
+  }
+}
+
+function stopCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  const video = document.getElementById('camVideo');
+  video.classList.add('hidden');
+  video.srcObject = null;
+  document.getElementById('camPlaceholder').classList.remove('hidden');
+  document.getElementById('camStartBtn').classList.remove('hidden');
+  document.getElementById('camShotBtn').classList.add('hidden');
+  document.getElementById('camStopBtn').classList.add('hidden');
+}
+
+function captureFromCamera() {
+  const t0 = performance.now();
+  const video = document.getElementById('camVideo');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  hwTimings.captureMs = performance.now() - t0;
+  showPreview(dataUrl);
+  stopCamera();
+}
+
+// ══ 上传照片 ══════════════════════════════════════════════
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const t0 = performance.now();
+  const reader = new FileReader();
+  reader.onload = e => {
+    hwTimings.captureMs = performance.now() - t0;
+    showPreview(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+// 手机拍的原图动辄3000×4000px、好几MB，直接丢给本地视觉模型处理会非常慢
+// （这大概率就是"一直转圈不出结果"的真正原因——不是卡死，是图片太大导致推理时间过长）。
+// 这里统一把图片压缩到"长边不超过1280px"再使用，兼顾识别清晰度和处理速度。
+const HW_MAX_DIM = 1280;
+
+function hwDownscaleImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, HW_MAX_DIM / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(dataUrl); // 压缩失败就退回原图，不阻断流程
+    img.src = dataUrl;
+  });
+}
+
+async function showPreview(dataUrl) {
+  const tCompress0 = performance.now();
+  const scaledUrl = await hwDownscaleImage(dataUrl);
+  hwTimings.compressMs = performance.now() - tCompress0;
+  currentImageBase64 = scaledUrl.split(',')[1] || '';
+  const img = document.getElementById('previewImg');
+  img.src = scaledUrl; // 预览图也用压缩后的版本，让用户看到的和实际送去识别的是同一张
+  document.getElementById('previewWrap').classList.add('show');
+  document.getElementById('submitRow').style.display = 'flex';
+  document.getElementById('errPanel').classList.remove('show');
+}
+
+function resetCapture(fullReset) {
+  currentImageBase64 = null;
+  document.getElementById('previewWrap').classList.remove('show');
+  document.getElementById('submitRow').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('errPanel').classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('capturePanel').classList.remove('hidden');
+  // 重置标注图视图状态，回到默认的"列表"视图，避免下一份作业还残留上一次的标注
+  annoState = 'idle';
+  annoItems = null;
+  annoError = null;
+  updateAnnoTabBadge();
+  switchResultView('list');
+  document.getElementById('annoAiBox').classList.remove('show');
+  document.getElementById('annoAiBox').innerHTML = '';
+  document.getElementById('annoHint').textContent = '';
+  annoScaledBoxes = [];
+  // 标注图区域可能被替换成了loading/error提示文案，重置回原本的canvas标签
+  const annoWrap = document.querySelector('#viewAnno .anno-canvas-wrap');
+  if (annoWrap) annoWrap.innerHTML = '<canvas id="annoCanvas" onclick="handleAnnoCanvasClick(event)"></canvas>';
+  // 恢复"识别中"面板的默认文案，避免下次打开时还残留上一次的"已等待XX秒"文字
+  const analyzingP = document.getElementById('analyzingPanel').querySelector('p');
+  if (analyzingP) analyzingP.textContent = 'AI 正在识别作业内容，请稍候…（第一次可能要等久一点）';
+  if (fullReset) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══ AI 批改（调用本地 Ollama 视觉模型）═══════════════════════
+// 要求：Ollama 需在同一台设备上运行，且已设置
+// OLLAMA_HOST=0.0.0.0 / OLLAMA_ORIGINS=* 允许跨域访问，否则浏览器会因 CORS 被拒绝。
+// 需要先执行：ollama pull qwen2.5vl:7b
+// 列表视图和标注图视图，各自用独立的一次 Ollama 调用，互不阻塞：
+// - LIST 版schema更简单（不含bbox），作为"保底能看到结果"的主路径
+// - ANNO 版schema多了bbox字段，专供标注图使用，就算它慢或失败，也不影响列表视图
+// 实测过"加不加bbox对耗时的影响"，结论是：耗时主要受图片复杂度/本地推理的随机波动影响，
+// bbox字段本身不是耗时的主要原因；但拆成两个独立请求依然有意义——
+// 任何一个变慢或失败，都不会拖累另一个的展示。
+const HW_ITEM_BASE_PROPS = {
+  question:      { type: 'string', description: '题目内容（尽量还原原文，包含数字和运算符）' },
+  studentAnswer: { type: 'string', description: '学生在作业上写的答案，如果看不清写"看不清"' },
+  correctAnswer: { type: 'string', description: '这道题真正正确的答案' },
+  isCorrect:     { type: 'boolean', description: '学生的答案是否正确' },
+};
+
+const HW_CHECK_SCHEMA_LIST = {
+  type: 'object',
+  properties: {
+    items: {
+      type: 'array',
+      description: '图片里识别出的每一道题目',
+      items: { type: 'object', properties: HW_ITEM_BASE_PROPS,
+        required: ['question','studentAnswer','correctAnswer','isCorrect'] },
+    },
+  },
+  required: ['items'],
+};
+
+const HW_CHECK_SCHEMA_ANNO = {
+  type: 'object',
+  properties: {
+    items: {
+      type: 'array',
+      description: '图片里识别出的每一道题目',
+      items: {
+        type: 'object',
+        properties: {
+          ...HW_ITEM_BASE_PROPS,
+          bbox: {
+            type: 'array',
+            description: '这道题在图片中的位置，[x1,y1,x2,y2]，采用0-1000归一化坐标（不是像素），(0,0)是图片左上角，(1000,1000)是图片右下角，框要能大致覆盖这道题的文字所在行',
+            items: { type: 'integer' },
+            minItems: 4, maxItems: 4,
+          },
+        },
+        required: ['question','studentAnswer','correctAnswer','isCorrect','bbox'],
+      },
+    },
+  },
+  required: ['items'],
+};
+
+function buildHwCheckPrompt(withBbox) {
+  const bboxSection = withBbox ? `
+5. bbox：这道题在图片里的位置，用 [x1,y1,x2,y2] 表示，坐标归一化到0-1000范围（不是像素值），
+   (0,0)代表图片左上角，(1000,1000)代表图片右下角，框要大致框住这道题所在的那一行文字。` : '';
+  return `你是一名小学老师，正在批改学生拍照上传的一份数学/语文作业照片。
+
+请你仔细看图，找出图片里的**每一道题目**，对每一道题：
+1. question：识别出题目本身的内容（尽量还原原文文字/算式）
+2. studentAnswer：识别学生手写的答案是什么（如果字迹实在看不清，就写"看不清"）
+3. correctAnswer：你自己算出/判断出的正确答案
+4. isCorrect：学生写的答案是否等于正确答案（看不清的情况请标记为 false，并在 correctAnswer 里正常给出正确答案）${bboxSection}
+
+注意：
+- 如果图片里完全没有可识别的题目，items 返回空数组即可，不要编造。
+- 数字类题目要自己认真计算，不要直接照抄学生的答案当正确答案。
+- 按图片里题目出现的顺序返回（一般是从上到下）。`;
+}
+
+// 本地量化视觉模型偶尔会输出格式不完全规范的JSON（这是概率性问题，不是每次都发生），
+// 做两层兜底：① 先尝试直接解析；② 失败了就从原始文本里"抠出"看起来像JSON的那一段再解析一次
+// （防止模型在JSON前后多输出了几个字，比如"好的，这是结果：{...}"这种情况）。
+function hwParseJsonLoose(raw) {
+  try { return JSON.parse(raw); }
+  catch (e) { /* fall through */ }
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(raw.slice(start, end + 1)); }
+    catch (e2) { /* fall through */ }
+  }
+  return null;
+}
+
+// 请求超时上限：本地视觉模型处理一张图片正常情况下几秒到几十秒，
+// 超过这个时间大概率是真的卡住了（而不是"还在算"），主动掐断比让用户
+// 一直盯着转圈图标、不知道要不要再等下去要好。
+const HW_TIMEOUT_MS = 90 * 1000;
+
+// 单次调用视觉模型；返回 {items} 或抛出错误，供 analyzeHomework 做重试
+// withBbox=false 用于列表视图（schema更简单，作为主路径，优先保证能看到结果）
+// withBbox=true  用于标注图视图（多了bbox字段，独立请求，慢/失败都不影响列表视图）
+async function hwCallVisionOnce(withBbox) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), HW_TIMEOUT_MS);
+  let resp;
+  const tModelStart = performance.now();
+  try {
+    resp = await fetch(HW_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: HW_VISION_MODEL,
+        prompt: buildHwCheckPrompt(withBbox),
+        images: [currentImageBase64],
+        stream: false,
+        format: withBbox ? HW_CHECK_SCHEMA_ANNO : HW_CHECK_SCHEMA_LIST,
+      })
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`超过${HW_TIMEOUT_MS / 1000}秒未返回结果，可能是图片过大或模型处理太慢，已自动放弃本次请求`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  // 只记录"列表"请求(withBbox=false)的耗时，因为这是用户体感"要等多久"的那条主路径；
+  // 每次调用都会覆盖上一次的值，所以最终留下的是"最后一次(成功那次)"的耗时明细
+  if (!withBbox) hwTimings.modelCallMs = performance.now() - tModelStart;
+
+  const raw = (data.response || '').trim();
+  if (!raw) throw new Error('空响应');
+
+  const tParseStart = performance.now();
+  const parsed = hwParseJsonLoose(raw);
+  if (!withBbox) hwTimings.parseMs = performance.now() - tParseStart;
+
+  if (!parsed) {
+    const preview = hwClampText(raw, 120);
+    const err = new Error(`返回内容不是合法 JSON，模型原始输出预览："${preview}"`);
+    err.rawPreview = preview;
+    throw err;
+  }
+  if (!parsed.items || !Array.isArray(parsed.items)) throw new Error('返回内容缺少 items 字段');
+  return parsed;
+}
+
+const HW_MAX_RETRY = 2; // 识别失败自动重试次数（本地模型的JSON格式问题多数是偶发性的，重试一次通常就好了）
+
+// 带自动重试的调用封装，withBbox 决定走哪条 schema/prompt
+async function hwCallVisionWithRetry(withBbox, onRetry) {
+  let lastErr = null;
+  for (let attempt = 1; attempt <= HW_MAX_RETRY; attempt++) {
+    if (attempt > 1 && onRetry) onRetry(attempt);
+    if (!withBbox) hwTimings.retryCount = attempt - 1; // 0=第一次就成功，1=重试了1次才成功...
+    try {
+      const parsed = await hwCallVisionOnce(withBbox);
+      return parsed.items;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
+}
+
+// ══ 标注图数据的独立状态（与列表视图的 currentResults 分开管理）══
+// annoState: 'idle' | 'pending' | 'ready' | 'error'
+let annoState = 'idle';
+let annoItems = null;
+let annoError = null;
+
+// 列表和标注图两路独立并行请求：谁先回来就先展示谁，互不阻塞、互不等待。
+// - 列表(无bbox)通常更简单可靠，大概率先完成，是"保底能看到结果"的主路径
+// - 标注图(带bbox)在后台并行跑，好了就自动填充"标注图"tab；没好之前那个tab显示"处理中"
+//   慢/失败都不会影响已经展示出来的列表结果
+async function analyzeHomework() {
+  if (!currentImageBase64) return;
+  document.getElementById('capturePanel').classList.add('hidden');
+  document.getElementById('errPanel').classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('analyzingPanel').classList.add('show');
+
+  annoState = 'pending';
+  annoItems = null;
+  annoError = null;
+  updateAnnoTabBadge();
+
+  const startedAt = Date.now();
+  const pEl = document.getElementById('analyzingPanel').querySelector('p');
+  let listStatus = 'AI 正在识别作业内容';
+  const tickTimer = setInterval(() => {
+    if (!document.getElementById('analyzingPanel').classList.contains('show')) return;
+    const secs = Math.floor((Date.now() - startedAt) / 1000);
+    pEl.textContent = `${listStatus}，已等待 ${secs} 秒…（最长约${HW_TIMEOUT_MS / 1000}秒会自动放弃重试）`;
+  }, 1000);
+
+  // 注意：本地Ollama服务是"-np 1"配置，同一时间只能处理1个请求，
+  // 客户端同时发出两个fetch()并不会被服务端真并行处理，而是排队串行执行。
+  // 之前"同时发出列表+标注图两个请求"的写法，如果标注图（bbox更复杂、通常更慢）
+  // 恰好被服务端先处理，会导致列表被迫"陪绑"多等一段时间——这正是"列表变慢"的根因。
+  //
+  // 修复方式：**列表请求必须第一个发出、且独占等待，标注图请求等列表彻底结束
+  // （不管成功失败）之后才发出**，保证列表永远不会排在标注图后面等待。
+  // 代价是：标注图会比以前更晚才开始处理，但这本来就是"锦上添花"的次要功能，
+  // 慢一点可以接受，列表这条主路径的速度和可预测性优先级更高。
+
+  const tListStart = performance.now();
+  try {
+    const listItems = await hwCallVisionWithRetry(false, (attempt) => {
+      listStatus = `第一次识别结果格式有点问题，正在自动重试（第${attempt}次）`;
+    });
+    hwTimings.totalListMs = performance.now() - tListStart; // 含所有重试在内的总耗时
+    clearInterval(tickTimer);
+    document.getElementById('analyzingPanel').classList.remove('show');
+    currentResults = listItems;
+    renderResults(listItems);
+  } catch (err) {
+    clearInterval(tickTimer);
+    document.getElementById('analyzingPanel').classList.remove('show');
+    document.getElementById('capturePanel').classList.remove('hidden');
+    const errPanel = document.getElementById('errPanel');
+    errPanel.classList.add('show');
+    errPanel.innerHTML = `😵 批改失败：已自动重试${HW_MAX_RETRY}次仍未成功（${hwEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${HW_VISION_MODEL}</code>（视觉模型下载较大，请耐心等待）；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问；④ 照片是否清晰、字迹是否可辨认、题目是否过多。<br>
+      <button class="btn btn-purple" style="margin-top:8px" onclick="analyzeHomework()">🔄 手动重试</button>`;
+    // 列表都失败了，标注图大概率也够呛，直接跳过，避免再占一次Ollama的处理队列
+    annoState = 'error';
+    annoError = new Error('列表识别已失败，未尝试生成标注图');
+    updateAnnoTabBadge();
+    return;
+  }
+
+  // 列表已经展示出来了，现在才发起标注图请求（这时候它排队/独占都不会影响用户已经看到的结果）
+  try {
+    const annoResultItems = await hwCallVisionWithRetry(true);
+    annoState = 'ready';
+    annoItems = annoResultItems;
+    updateAnnoTabBadge();
+    if (!document.getElementById('viewAnno').classList.contains('hidden')) renderAnnotatedView();
+  } catch (err) {
+    annoState = 'error';
+    annoError = err;
+    updateAnnoTabBadge();
+    if (!document.getElementById('viewAnno').classList.contains('hidden')) renderAnnoTabContent();
+  }
+}
+
+// 标注图tab上的小圆点提示：处理中/已就绪/失败，不用切进去也能看到状态
+function updateAnnoTabBadge() {
+  const tab = document.getElementById('tabViewAnno');
+  if (!tab) return;
+  const dot = { pending: '⏳', ready: '', error: '⚠️', idle: '' }[annoState] || '';
+  tab.textContent = `🖼️ 标注图${dot ? ' ' + dot : ''}`;
+}
+
+// ══ 结果渲染 ══════════════════════════════════════════════
+function renderResults(items) {
+  document.getElementById('analyzingPanel').classList.remove('show');
+
+  if (!items.length) {
+    document.getElementById('errPanel').classList.add('show');
+    document.getElementById('errPanel').innerHTML = '🤔 没有从照片里识别出题目，试试换一张更清晰、光线更好的照片。';
+    document.getElementById('capturePanel').classList.remove('hidden');
+    return;
+  }
+
+  const tRenderStart = performance.now();
+
+  const ok = items.filter(it => it.isCorrect).length;
+  const fail = items.length - ok;
+  document.getElementById('hudTotal').textContent = items.length;
+  document.getElementById('hudOk').textContent = ok;
+  document.getElementById('hudFail').textContent = fail;
+
+  const itemsHtml = items.map((it, i) => `
+    <div class="q-row ${it.isCorrect ? 'ok' : 'fail'}">
+      <div class="q-head">
+        <div class="q-main">
+          <div class="q-text">${hwEscapeHtml(it.question || '（未识别到题目文字）')}</div>
+          <div class="q-ans-row">
+            你写的：<span class="${it.isCorrect ? '' : 'stu-wrong'}">${hwEscapeHtml(it.studentAnswer || '（未识别）')}</span>
+            ${it.isCorrect ? '' : ` → 正确答案：<span class="correct-val">${hwEscapeHtml(it.correctAnswer || '')}</span>`}
+          </div>
+          ${it.studentAnswer === '看不清' ? '<div class="q-confirm">⚠️ AI 没看清这题的手写答案，建议自己核对一下</div>' : ''}
+        </div>
+        <div>
+          <div class="q-badge">${it.isCorrect ? '✅' : '❌'}</div>
+          ${it.isCorrect ? '' : `<button class="ai-hw-btn" id="hwaib-${i}" onclick="genHwAnalysis(${i})">🤖 AI解析</button>`}
+        </div>
+      </div>
+      ${it.isCorrect ? '' : `<div class="ai-hw-box" id="hwaibox-${i}"></div>`}
+    </div>`).join('');
+
+  // renderMs 在这里统计的是"构建结果卡片HTML"的耗时，
+  // 时间面板本身的构建耗时可忽略不计（拼字符串，量级在微秒级）
+  hwTimings.renderMs = performance.now() - tRenderStart;
+
+  const list = document.getElementById('resultList');
+  list.innerHTML = buildTimingPanelHtml() + itemsHtml;
+
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 各阶段耗时汇总面板，插在结果列表最顶端，方便分析"60秒到底花在哪一步"
+function buildTimingPanelHtml() {
+  const t = hwTimings;
+  const fmtS = (ms) => (ms / 1000).toFixed(2) + 's';
+  const fmtMs = (ms) => ms.toFixed(1) + 'ms';
+  const retryNote = t.retryCount > 0 ? `（含${t.retryCount}次重试）` : '（一次成功，无重试）';
+  return `<div class="hw-timing-panel">
+    <div class="hw-timing-title">⏱️ 各阶段耗时（诊断用，可对照分析卡顿点）</div>
+    <div class="hw-timing-row"><span>① 拍照/上传获取原图</span><span>${fmtS(t.captureMs)}</span></div>
+    <div class="hw-timing-row"><span>② 图片压缩(长边≤${HW_MAX_DIM}px)</span><span>${fmtS(t.compressMs)}</span></div>
+    <div class="hw-timing-row"><span>③ 大模型识别(单次请求，含网络+推理)</span><span>${fmtS(t.modelCallMs)}</span></div>
+    <div class="hw-timing-row"><span>④ 解析模型返回的JSON</span><span>${fmtMs(t.parseMs)}</span></div>
+    <div class="hw-timing-row"><span>⑤ 渲染结果列表(DOM)</span><span>${fmtMs(t.renderMs)}</span></div>
+    <div class="hw-timing-row hw-timing-total"><span>列表总耗时 ${retryNote}</span><span>${fmtS(t.totalListMs)}</span></div>
+  </div>`;
+}
+
+// ══ 错题 AI 详细解析（用普通文本模型，不需要再读图）═══════════
+const HW_ANALYSIS_SCHEMA = {
+  type: 'object',
+  properties: {
+    bigIdea: { type: 'string', maxLength: HW_IDEA_MAXLEN, description: `一句话点出核心思路，最多${HW_IDEA_MAXLEN}个字` },
+    steps: {
+      type: 'array', minItems: 2, maxItems: HW_MAX_STEPS,
+      description: `2到${HW_MAX_STEPS}个解题步骤，按"理解题意→列式计算→得出答案"的顺序`,
+      items: {
+        type: 'object',
+        properties: {
+          emoji: { type: 'string', maxLength: 2, description: '一个emoji表情，比如🤔✏️➕✅' },
+          text:  { type: 'string', maxLength: HW_STEP_MAXLEN, description: `这一步做什么、算出多少，最多${HW_STEP_MAXLEN}个字` },
+        },
+        required: ['emoji','text'],
+      },
+    },
+  },
+  required: ['bigIdea','steps'],
+};
+
+function buildHwAnalysisPrompt(it) {
+  return `你是一名耐心的小学老师，正在给学生讲解一道做错的作业题。
+题目：${it.question}
+学生写的答案：${it.studentAnswer}
+正确答案：${it.correctAnswer}
+
+请把解题过程拆成"步骤1、步骤2、步骤3…"这样编号的小卡片，目标是让孩子看完真正明白"怎么算的"，
+而不是简单重复题目或算式。
+
+**最重要的一条规则**：如果这道题涉及"进位"（加法：个位相加满10）或"退位"（减法：个位不够减，要向十位借1），
+必须把"进位/退位"这个具体过程单独列成一步详细讲出来，不能跳过、也不能只写最终算式。
+- 退位减法例子（54-6）的正确讲法：
+  bigIdea："个位不够减，要向十位借1"
+  步骤1 🤔："个位4减6，不够减"
+  步骤2 🔄："向十位借1，变成14减6"
+  步骤3 ✏️："14减6等于8，十位5减1等于4"
+  步骤4 ✅："答案是48"
+- 错误示范（不要这样写，太空洞）：
+  步骤1："题目要求算出54-6的结果"（这是废话，没有讲解任何东西）
+  步骤2："列出算式：54-6=48"（跳过了怎么算的过程，孩子看了还是不会）
+
+如果题目**不涉及**进位/退位（比如两位数直接相加减、没有借位的情况），可以简化成：
+- 步骤1【理解题意】🤔：说清楚要用哪种运算
+- 步骤2【列式计算】✏️：写出算式和结果
+- 步骤3【得出答案】✅：说出最终答案
+
+步骤数量最多不超过${HW_MAX_STEPS}步。
+
+字数与格式要求（严格遵守）：
+- bigIdea：最多${HW_IDEA_MAXLEN}个字
+- 每个 step 的 text：最多${HW_STEP_MAXLEN}个字，只写这一步该讲的内容，句子写完就结束，
+  **禁止在句子末尾额外添加"数学题""加油"之类的无关词语**
+- 每个 emoji 字段只能是1个标准emoji字符（比如🤔🔄✏️✅➕➖），不要输出乱码或多个符号
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+function hwEscapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function hwClampText(s, maxLen) {
+  s = String(s || '').trim();
+  return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+}
+
+// ══ 竖式展示（纯代码计算，不依赖 AI，保证100%准确）══════════
+// 逻辑改编自 carry.html 的 buildAdd/buildSub，只取"最终结果状态"，
+// 不做逐步动画，用于在 AI 解析框里给数学加减法题配一个直观的竖式图。
+
+// 把题目文本解析成 {a, b, op}，只认"两个数 + 一个运算符"的简单算式，
+// 认不出来（比如应用题、比大小、找规律）就返回 null，不显示竖式。
+function hwParseArithmetic(qtext) {
+  const s = String(qtext || '').replace(/[=？?]/g, '').trim();
+  const m = s.match(/^(\d+)\s*([+\-－])\s*(\d+)$/);
+  if (!m) return null;
+  const a = parseInt(m[1], 10);
+  const op = (m[2] === '+') ? '+' : '-';
+  const bNum = parseInt(m[3], 10);
+  if (Number.isNaN(a) || Number.isNaN(bNum)) return null;
+  // 减法不支持负数结果的场景（小学阶段不涉及负数，出现就不画竖式，交给文字讲解）
+  if (op === '-' && a < bNum) return null;
+  return { a, b: bNum, op };
+}
+
+function hwDigs(n, len) {
+  const s = String(Math.abs(n)).padStart(len, '0');
+  return s.split('').reverse().map(Number);
+}
+function hwNdig(n) { return String(Math.abs(n)).length; }
+
+// 计算加法：返回每一列的进位情况
+function hwComputeAdd(a, b) {
+  const len = Math.max(hwNdig(a), hwNdig(b), 1);
+  const dA = hwDigs(a, len), dB = hwDigs(b, len);
+  const carries = new Array(len + 1).fill(0);
+  const resDigs = new Array(len).fill(0);
+  let carry = 0;
+  for (let col = 0; col < len; col++) {
+    const sum = (dA[col]||0) + (dB[col]||0) + carry;
+    resDigs[col] = sum % 10;
+    carry = Math.floor(sum / 10);
+    carries[col + 1] = carry;
+  }
+  let finalLen = len;
+  if (carry > 0) { resDigs[len] = carry; finalLen = len + 1; }
+  return { dA, dB, carries, resDigs, len: finalLen, inLen: len };
+}
+
+// 计算减法：返回每一列的退位情况
+function hwComputeSub(a, b) {
+  const len = Math.max(hwNdig(a), hwNdig(b), 1);
+  const dA = hwDigs(a, len).slice();
+  const dB = hwDigs(b, len);
+  const origA = hwDigs(a, len).slice();
+  const adjA = hwDigs(a, len).slice();
+  const borrows = new Array(len).fill(0);
+  const resDigs = new Array(len).fill(0);
+  for (let col = 0; col < len; col++) {
+    let da = adjA[col], db = dB[col] || 0;
+    let borrow = 0;
+    if (da < db) { borrow = 1; adjA[col + 1] = (adjA[col + 1] || 0) - 1; da += 10; }
+    resDigs[col] = da - db;
+    borrows[col] = borrow;
+  }
+  return { dA: origA, dB, adjA, borrows, resDigs, len };
+}
+
+// 渲染静态竖式 HTML（不含动画，一次性展示最终状态）
+function hwRenderVertical(a, b, op) {
+  const cellW = 34;
+  if (op === '+') {
+    const d = hwComputeAdd(a, b);
+    const { dA, dB, carries, resDigs, len, inLen } = d;
+    let html = '<div class="vcalc-board">';
+    // 进位行
+    html += '<div class="vcalc-row vcalc-carry"><div class="vcalc-cell op" style="visibility:hidden">+</div>';
+    for (let c = len - 1; c >= 0; c--) {
+      html += `<div class="vcalc-cell">${carries[c] ? carries[c] : ''}</div>`;
+    }
+    html += '</div>';
+    // 数字A
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${c < inLen ? dA[c] : ''}</div>`;
+    html += '</div>';
+    // 数字B + 运算符
+    html += '<div class="vcalc-row"><div class="vcalc-cell op">+</div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${c < inLen ? (dB[c] ?? '') : ''}</div>`;
+    html += '</div>';
+    html += `<div class="vcalc-line" style="width:${(len + 1) * cellW}px"></div>`;
+    // 结果
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell result">${resDigs[c] ?? 0}</div>`;
+    html += '</div></div>';
+    return html;
+  } else {
+    const d = hwComputeSub(a, b);
+    const { dA, dB, adjA, borrows, resDigs, len } = d;
+    let html = '<div class="vcalc-board">';
+    // 退位标记行（显示被借走后十位的新值）
+    html += '<div class="vcalc-row vcalc-carry"><div class="vcalc-cell op" style="visibility:hidden">-</div>';
+    for (let c = len - 1; c >= 0; c--) {
+      const nextBorrowed = borrows[c - 1]; // 这一列是否被"下一位"借走了1
+      html += `<div class="vcalc-cell">${nextBorrowed ? `<span class="vcalc-borrow-new">${adjA[c]}</span>` : ''}</div>`;
+    }
+    html += '</div>';
+    // 数字A（被借位的显示删除线+新值）
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) {
+      const nextBorrowed = borrows[c - 1];
+      const val = nextBorrowed ? `<span class="vcalc-borrow-orig">${dA[c]}</span>` : dA[c];
+      html += `<div class="vcalc-cell">${val}</div>`;
+    }
+    html += '</div>';
+    // 数字B + 运算符
+    html += '<div class="vcalc-row"><div class="vcalc-cell op">－</div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${dB[c] ?? ''}</div>`;
+    html += '</div>';
+    html += `<div class="vcalc-line" style="width:${(len + 1) * cellW}px"></div>`;
+    // 结果
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell result">${resDigs[c] ?? 0}</div>`;
+    html += '</div></div>';
+    return html;
+  }
+}
+
+function hwBuildVerticalBlock(qtext) {
+  const parsed = hwParseArithmetic(qtext);
+  if (!parsed) return '';
+  const board = hwRenderVertical(parsed.a, parsed.b, parsed.op);
+  return `<div><span class="vcalc-tag">🧮 竖式计算</span><div class="vcalc-wrap">${board}</div></div>`;
+}
+
+// ══ AI 解析核心逻辑（列表视图 / 标注图视图共用）═══════════════
+// retryFnName：重试按钮要调用的函数名（不同视图入口不同，比如 genHwAnalysis(i) 或 genAnnoAnalysis(i)）
+async function hwRunAnalysis(it, box, btn, retryFnName) {
+  if (!it || !box) return;
+
+  // 竖式是纯代码计算，瞬间可得，不用等 AI；数学题（能解析出"数字 运算符 数字"）才会有
+  const vBlock = hwBuildVerticalBlock(it.question);
+
+  if (btn) btn.disabled = true;
+  box.classList.add('show');
+  box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 解析</span><div class="ai-hw-loading">正在生成讲解，请稍候…</div>`;
+
+  const prompt = buildHwAnalysisPrompt(it);
+
+  try {
+    const resp = await fetch(HW_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: HW_TEXT_MODEL, prompt, stream: false, format: HW_ANALYSIS_SCHEMA })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const raw = (data.response || '').trim();
+    if (!raw) throw new Error('空响应');
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch (e) { throw new Error('返回内容不是合法 JSON'); }
+    if (!parsed.bigIdea || !Array.isArray(parsed.steps) || !parsed.steps.length) throw new Error('返回内容缺少讲解字段');
+
+    const bigIdea = hwClampText(parsed.bigIdea, HW_IDEA_MAXLEN);
+    const steps = parsed.steps.slice(0, HW_MAX_STEPS).map(s => ({
+      emoji: String(s && s.emoji || '✏️').trim().slice(0, 2),
+      text: hwClampText(s && s.text, HW_STEP_MAXLEN),
+    })).filter(s => s.text);
+
+    const stepsHtml = steps.map((s, idx) => `
+      <div class="ai-hw-step">
+        <span class="ai-hw-step-n">步骤${idx + 1}</span>
+        <span class="ai-hw-step-emoji">${hwEscapeHtml(s.emoji)}</span>
+        <span class="ai-hw-step-text">${hwEscapeHtml(s.text)}</span>
+      </div>`).join('');
+
+    box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 详细讲解</span>
+      ${bigIdea ? `<div class="ai-hw-bigidea">💡 ${hwEscapeHtml(bigIdea)}</div>` : ''}
+      <div class="ai-hw-steps">${stepsHtml}</div>`;
+  } catch (err) {
+    box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 解析</span>
+      <div class="ai-hw-err">生成失败：无法连接本地 Ollama（${hwEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${HW_TEXT_MODEL}</code>；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问。</div>
+      <button class="ai-hw-retry" onclick="${retryFnName}">🔄 重试</button>`;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function genHwAnalysis(i) {
+  const it = currentResults[i];
+  const box = document.getElementById(`hwaibox-${i}`);
+  const btn = document.getElementById(`hwaib-${i}`);
+  await hwRunAnalysis(it, box, btn, `genHwAnalysis(${i})`);
+}
+
+// ══ 标注图视图（在原图上打✓/✗）═══════════════════════════
+// 位置来自视觉模型返回的 bbox（0-1000归一化坐标），本地7B视觉模型的
+// 定位精度是"大致准确、能分清上下顺序"级别，不是像素级精确定位，
+// 所以标记做得比较大、留了容错空间，不追求刚好卡在文字正中央。
+let annoScaledBoxes = []; // 每项 {x1,y1,x2,y2,isCorrect,idx} 已经换算成canvas像素坐标，供点击检测使用
+
+function switchResultView(mode) {
+  document.getElementById('tabViewList').classList.toggle('active', mode === 'list');
+  document.getElementById('tabViewAnno').classList.toggle('active', mode === 'anno');
+  document.getElementById('viewList').classList.toggle('hidden', mode !== 'list');
+  document.getElementById('viewAnno').classList.toggle('hidden', mode !== 'anno');
+  if (mode === 'anno') renderAnnoTabContent();
+}
+
+// 根据 annoState 决定"标注图"tab里展示什么：加载中 / 已就绪 / 失败
+function renderAnnoTabContent() {
+  const wrap = document.querySelector('#viewAnno .anno-canvas-wrap');
+  const hint = document.getElementById('annoHint');
+  if (annoState === 'pending') {
+    wrap.innerHTML = `<div style="padding:40px 16px;text-align:center;color:var(--muted);width:100%">
+      <div class="spinner" style="margin:0 auto 12px"></div>标注图正在后台生成中，可以先看"列表"结果，好了会自动出现…</div>`;
+    hint.textContent = '';
+    return;
+  }
+  if (annoState === 'error') {
+    wrap.innerHTML = `<div style="padding:24px 16px;text-align:center;width:100%">
+      <div class="err-panel show" style="background:none;color:var(--red)">
+        😵 标注图生成失败（${hwEscapeHtml(annoError ? annoError.message : '未知错误')}），不影响"列表"结果的查看。<br>
+        <button class="btn btn-purple" style="margin-top:8px" onclick="retryAnnoOnly()">🔄 只重试标注图</button>
+      </div></div>`;
+    hint.textContent = '';
+    return;
+  }
+  if (annoState === 'ready') {
+    // 确保canvas标签存在（如果之前渲染过loading/error文案把它替换掉了，要放回canvas）
+    if (!document.getElementById('annoCanvas')) {
+      wrap.innerHTML = '<canvas id="annoCanvas" onclick="handleAnnoCanvasClick(event)"></canvas>';
+    }
+    renderAnnotatedView();
+    return;
+  }
+  // idle：还没开始分析
+  wrap.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--muted);width:100%">请先完成作业批改</div>`;
+}
+
+async function retryAnnoOnly() {
+  annoState = 'pending';
+  annoError = null;
+  updateAnnoTabBadge();
+  renderAnnoTabContent();
+  try {
+    const items = await hwCallVisionWithRetry(true);
+    annoState = 'ready';
+    annoItems = items;
+  } catch (err) {
+    annoState = 'error';
+    annoError = err;
+  }
+  updateAnnoTabBadge();
+  if (!document.getElementById('viewAnno').classList.contains('hidden')) renderAnnoTabContent();
+}
+
+function renderAnnotatedView() {
+  const canvas = document.getElementById('annoCanvas');
+  const img = document.getElementById('previewImg');
+  if (!canvas || !img || !img.src || !annoItems) return;
+
+  const srcImg = new Image();
+  srcImg.onload = () => {
+    // 按图片原始比例设置canvas尺寸（限制最大宽度避免超出屏幕）
+    const maxW = Math.min(srcImg.naturalWidth, 720);
+    const scale = maxW / srcImg.naturalWidth;
+    canvas.width = maxW;
+    canvas.height = srcImg.naturalHeight * scale;
+
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(srcImg, 0, 0, canvas.width, canvas.height);
+
+    annoScaledBoxes = [];
+    annoItems.forEach((it, idx) => {
+      const bbox = Array.isArray(it.bbox) && it.bbox.length === 4 ? it.bbox : null;
+      if (!bbox) return;
+      // bbox 是 0-1000 归一化坐标，换算成当前canvas像素坐标
+      const x1 = Math.max(0, Math.min(1000, bbox[0])) / 1000 * canvas.width;
+      const y1 = Math.max(0, Math.min(1000, bbox[1])) / 1000 * canvas.height;
+      const x2 = Math.max(0, Math.min(1000, bbox[2])) / 1000 * canvas.width;
+      const y2 = Math.max(0, Math.min(1000, bbox[3])) / 1000 * canvas.height;
+
+      // 标记画在这一行的右侧外沿，避免遮住手写字迹本身
+      const markX = Math.min(canvas.width - 16, x2 + 14);
+      const markY = (y1 + y2) / 2;
+      drawMark(ctx, markX, markY, it.isCorrect);
+
+      // 点击命中区域：整行bbox范围 + 标记本身，给一点容错空间（本地视觉模型定位不是像素级精确）
+      annoScaledBoxes.push({
+        idx, isCorrect: it.isCorrect,
+        x1: x1 - 10, y1: y1 - 12, x2: markX + 16, y2: y2 + 12,
+      });
+    });
+  };
+  srcImg.src = img.src;
+}
+
+function drawMark(ctx, x, y, isCorrect) {
+  ctx.save();
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  if (isCorrect) {
+    ctx.strokeStyle = '#e53935'; // 传统红笔批改配色：对号也用红色
+    ctx.beginPath();
+    ctx.moveTo(x - 9, y);
+    ctx.lineTo(x - 2, y + 8);
+    ctx.lineTo(x + 10, y - 10);
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = '#e53935';
+    ctx.beginPath();
+    ctx.moveTo(x - 9, y - 9); ctx.lineTo(x + 9, y + 9);
+    ctx.moveTo(x + 9, y - 9); ctx.lineTo(x - 9, y + 9);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function handleAnnoCanvasClick(evt) {
+  const canvas = document.getElementById('annoCanvas');
+  const rect = canvas.getBoundingClientRect();
+  // canvas 的 CSS 显示尺寸可能和实际像素尺寸不同（响应式缩放），要换算回真实像素坐标
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clickX = (evt.clientX - rect.left) * scaleX;
+  const clickY = (evt.clientY - rect.top) * scaleY;
+
+  const hit = annoScaledBoxes.find(b => clickX >= b.x1 && clickX <= b.x2 && clickY >= b.y1 && clickY <= b.y2);
+  if (!hit) return;
+  if (hit.isCorrect) {
+    showAnnoInfo(`✅ 第${hit.idx + 1}题：答对了，真棒！`);
+    return;
+  }
+  genAnnoAnalysis(hit.idx);
+}
+
+function showAnnoInfo(text) {
+  const box = document.getElementById('annoAiBox');
+  box.classList.add('show');
+  box.innerHTML = `<div style="text-align:center;color:var(--green);font-weight:700">${hwEscapeHtml(text)}</div>`;
+}
+
+async function genAnnoAnalysis(idx) {
+  const it = annoItems ? annoItems[idx] : null;
+  const box = document.getElementById('annoAiBox');
+  document.getElementById('annoHint').textContent = `第${idx + 1}题：${it ? it.question : ''}`;
+  await hwRunAnalysis(it, box, null, `genAnnoAnalysis(${idx})`);
+}
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

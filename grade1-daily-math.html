@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>一年级每日数学练习｜慧陪学</title>
+<meta name="description" content="一年级每日数学练习：按顺序完成口算、知识、综合应用和数学思维，每天约12至15分钟。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+:root{--ink:#39484a;--muted:#718084;--blue:#397689;--blue-soft:#e2f1f3;--yellow:#d39a35;--line:#d8e6e4;--paper:rgba(255,255,253,.96);--shadow:0 8px 28px rgba(44,83,86,.11)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px 13px 52px;background:linear-gradient(145deg,#ddf1ef,#fff3d5 54%,#f4dfd6);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}button,a{font:inherit}.wrap{max-width:880px;margin:auto}.hero,.overview,.task,.week-preview{border:1px solid rgba(255,255,255,.8);background:var(--paper);box-shadow:var(--shadow)}
+.hero{padding:24px 20px;border-radius:27px;text-align:center}.hero-icon{font-size:2.5rem}.hero h1{margin:5px 0 7px;color:#3d7080;font-size:clamp(1.75rem,6vw,2.55rem);letter-spacing:3px}.hero p{max-width:620px;margin:auto;color:var(--muted);font-size:.88rem;line-height:1.7}.hero-tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{border:1px solid #bdd8da;border-radius:999px;background:#f5fbfa;padding:7px 12px;color:#51757b;font-size:.76rem;font-weight:850}.chip.button{cursor:pointer}.chip.button:hover{border-color:var(--blue);color:var(--blue)}
+.overview{margin:14px 0;padding:17px 19px;border-radius:21px}.overview-head{display:flex;justify-content:space-between;align-items:flex-start;gap:13px}.date{color:#65777a;font-size:.8rem;font-weight:800}.overview h2{margin:4px 0 0;font-size:1.15rem}.count{color:var(--blue);font-size:.87rem;font-weight:900}.meter{height:11px;margin-top:13px;border-radius:99px;background:#dbe8e6;overflow:hidden}.meter span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5fa0aa,#e0ae51);transition:width .3s}.overview-note{margin:9px 0 0;color:var(--muted);font-size:.76rem;line-height:1.6}
+.tasks{position:relative;display:grid;gap:12px}.task{--accent:#4f8791;position:relative;display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:14px;padding:17px;border-left:7px solid var(--accent);border-radius:20px}.task::before{content:"";position:absolute;left:20px;top:-13px;width:3px;height:13px;background:#bed1d0}.task:first-child::before{display:none}.task-icon{display:grid;width:49px;height:49px;place-items:center;border-radius:16px;background:color-mix(in srgb,var(--accent) 14%,white);font-size:1.6rem}.task-step{color:var(--accent);font-size:.71rem;font-weight:950;letter-spacing:1px}.task h3{margin:3px 0 5px;font-size:1.05rem}.task p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.55}.task-meta{margin-top:6px;color:#7f8c8c;font-size:.69rem;font-weight:750}.task-action{min-width:116px;border:0;border-radius:13px;background:var(--accent);padding:10px 13px;color:#fff;cursor:pointer;font-size:.78rem;font-weight:900}.task-action:hover{filter:brightness(.95)}.task.current{outline:3px solid rgba(211,154,53,.22);outline-offset:1px}.task.done{background:rgba(235,248,244,.96)}.task.done .task-icon{background:#d7ece4;color:#39745d}.task.done .task-action{background:#e0e9e7;color:#577170}.task.locked{opacity:.58}.task.locked .task-action{background:#d6dddc;color:#75807f;cursor:not-allowed}.task:focus-within{outline:3px solid rgba(57,118,137,.25);outline-offset:2px}
+.complete{display:none;margin-top:14px;padding:23px;border-radius:22px;background:linear-gradient(135deg,#d9eeea,#fff0c9);text-align:center;box-shadow:var(--shadow)}.complete.show{display:block}.complete strong{display:block;color:#397584;font-size:1.25rem}.complete p{margin:7px 0 0;color:#66797a;font-size:.82rem;line-height:1.65}.streak{display:inline-block;margin-top:10px;border-radius:999px;background:#fff;padding:7px 12px;color:#956d2d;font-size:.78rem;font-weight:900}
+.week-preview{margin-top:15px;padding:17px;border-radius:21px}.week-preview summary{cursor:pointer;color:#526c70;font-weight:900}.week-list{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:13px}.day{min-width:0;border-radius:13px;background:#eaf3f1;padding:9px 5px;text-align:center}.day.today{background:#d7ebea;box-shadow:inset 0 0 0 2px #66949a}.day b{display:block;color:#506d70;font-size:.76rem}.day span{display:block;margin-top:4px;color:#738184;font-size:.64rem;line-height:1.4}.principle{margin:15px 0 0;padding:13px 15px;border-radius:16px;background:rgba(255,248,228,.88);color:#75644b;font-size:.77rem;line-height:1.7}.back{display:block;margin:19px auto 0;text-align:center;color:#46727a;text-decoration:none;font-size:.84rem;font-weight:850}
+dialog{width:min(980px,100vw);height:min(820px,100dvh);max-width:none;max-height:none;border:0;border-radius:23px;padding:0;background:#f5f9f8;box-shadow:0 20px 70px rgba(31,46,46,.35)}dialog::backdrop{background:rgba(30,39,39,.62)}.practice-shell{height:100%;display:grid;grid-template-rows:auto 1fr auto}.practice-head,.practice-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#f5faf9}.practice-head{border-bottom:1px solid #d9e6e4}.practice-head strong{font-size:.9rem}.practice-close,.practice-done{border:0;border-radius:11px;padding:9px 13px;cursor:pointer;font-weight:850}.practice-close{background:#e3ecea;color:#596d6d}.practice-done{background:var(--blue);color:#fff}.practice-frame{width:100%;height:100%;border:0;background:#fff}.practice-foot{border-top:1px solid #d9e6e4}.practice-tip{color:#718084;font-size:.73rem}button:focus-visible,a:focus-visible,summary:focus-visible{outline:4px solid rgba(57,118,137,.28);outline-offset:2px}
+@media(max-width:650px){body{padding:11px 10px 42px}.hero{padding:20px 14px}.overview{padding:15px}.task{grid-template-columns:45px 1fr;padding:14px 12px;gap:10px}.task-icon{width:43px;height:43px}.task-action{grid-column:1/-1;width:100%}.week-list{grid-template-columns:repeat(2,1fr)}.day:last-child{grid-column:1/-1}dialog{width:100vw;height:100dvh;border-radius:0}.practice-tip{display:none}.practice-head,.practice-foot{padding:max(9px,env(safe-area-inset-top)) 10px 9px}.practice-foot{padding:9px 10px max(9px,env(safe-area-inset-bottom))}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#397689">
+<main class="wrap">
+  <header class="hero"><div class="hero-icon" aria-hidden="true">🌱</div><h1>一年级每日数学练习</h1><p>每天约 12～15 分钟，按顺序完成口算、知识、综合应用和数学思维。先理解，再练熟，不用和别人比速度。</p><div class="hero-tools"><span class="chip" id="dayTheme"></span><button class="chip button" type="button" id="speakToggle" aria-pressed="true">🔊 声音解说 开</button></div></header>
+  <section class="overview" aria-labelledby="todayTitle"><div class="overview-head"><div><div class="date" id="dateText"></div><h2 id="todayTitle">今天的四项练习</h2></div><span class="count" id="progressText">0 / 4</span></div><div class="meter" role="progressbar" aria-label="今日训练进度" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span id="progressBar"></span></div><p class="overview-note" id="nextHint" role="status" aria-live="polite"></p></section>
+  <section class="tasks" id="taskList" aria-label="今日顺序练习"></section>
+  <section class="complete" id="completePanel" aria-live="polite"><strong>今天的一年级数学练习完成啦！</strong><p>数感、计算、应用和思考都练到了。明天会自动换一组内容。</p><span class="streak" id="streakText">连续完成 1 天</span></section>
+  <details class="week-preview"><summary>查看一周练习安排</summary><div class="week-list" id="weekList"></div><p class="principle">安排原则：数数和加减法反复出现，数位、钟表、图形和生活数学轮换练习；规律、分类和观察帮助孩子学会说清“为什么”。遇到困难可以停下来，不为打卡赶进度。</p></details>
+  <a class="back" href="index.html">← 返回慧陪学</a>
+</main>
+<dialog id="practiceDialog" aria-labelledby="practiceTitle"><div class="practice-shell"><header class="practice-head"><strong id="practiceTitle">今日练习</strong><button type="button" class="practice-close" id="closePractice">暂时返回</button></header><iframe class="practice-frame" id="practiceFrame" title="当前数学练习"></iframe><footer class="practice-foot"><span class="practice-tip">完成页面中的一轮练习后，再点击右侧按钮。</span><button type="button" class="practice-done" id="finishTask">完成这项，学习下一项</button></footer></div></dialog>
+<script src="hpx-core.js"></script>
+<script>
+(function(){
+'use strict';
+const STORE='hpx_grade1_daily_math_v1';
+const WEEK_PLAN=[
+ {day:'星期一',theme:'数数与10以内加法',tasks:[
+  {track:'口算与运算',icon:'🍎',title:'10以内加减法',href:'addsub10.html',minutes:'3～4分钟',description:'用合并、去掉和数轴理解加减法，先看懂过程再计算。'},
+  {track:'当日知识',icon:'🔢',title:'数字乐园',href:'numbers.html',minutes:'3分钟',description:'认读数字、数一数、找相邻数，建立数字与数量的联系。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'3～4分钟',description:'选择一年级范围完成一轮练习，读清题目再动手。'},
+  {track:'数学思维',icon:'👀',title:'数量闪视',href:'quantity-flash.html',minutes:'2～3分钟',description:'快速观察点子的数量，尝试分组看，而不是一个个慢慢数。'}]},
+ {day:'星期二',theme:'减法与数位',tasks:[
+  {track:'口算与运算',icon:'🍎',title:'10以内加减法',href:'addsub10.html',minutes:'3～4分钟',description:'重点练习减法，说一说从原来的数量中去掉了多少。'},
+  {track:'当日知识',icon:'🔟',title:'数位认知',href:'placevalue.html',minutes:'3分钟',description:'分清个位和十位，看看一个数由几个十和几个一组成。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'3～4分钟',description:'完成一轮趣味练习，错题先想原因再重做。'},
+  {track:'数学思维',icon:'🗂️',title:'分类统计',href:'data-classification.html',minutes:'3分钟',description:'按照共同特点整理卡片，再比较多少、相差和总数。'}]},
+ {day:'星期三',theme:'进位与钟表',tasks:[
+  {track:'口算与运算',icon:'🧮',title:'进位加减法',href:'carry.html',minutes:'3～4分钟',description:'从简单范围开始，用小棒和数位理解满十进一。'},
+  {track:'当日知识',icon:'🕐',title:'认识时钟',href:'clock.html',minutes:'3分钟',description:'观察时针和分针，练习认整时与半时。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'3～4分钟',description:'做一轮加减法和生活应用题，算完主动检查。'},
+  {track:'数学思维',icon:'🔶',title:'图案接龙',href:'pattern-sequence.html',minutes:'2～3分钟',description:'找出图案怎样重复或变化，再判断下一个是什么。'}]},
+ {day:'星期四',theme:'加减法与图形',tasks:[
+  {track:'口算与运算',icon:'🍎',title:'10以内加减法',href:'addsub10.html',minutes:'3～4分钟',description:'把加法和减法放在一起练，观察它们之间的联系。'},
+  {track:'当日知识',icon:'🔷',title:'图形认识',href:'shapes.html',minutes:'3分钟',description:'认一认常见图形，观察它们的边、角和外形。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'3～4分钟',description:'完成一轮综合巩固，先想方法再选择答案。'},
+  {track:'数学思维',icon:'🪞',title:'镜像拼图',href:'mirror-puzzle.html',minutes:'2～3分钟',description:'沿着对称轴观察另一边，练习空间想象和仔细比较。'}]},
+ {day:'星期五',theme:'进退位与生活数学',tasks:[
+  {track:'口算与运算',icon:'🧮',title:'进位加减法',href:'carry.html',minutes:'3～4分钟',description:'练习进位和退位，每一步都注意个位与十位对齐。'},
+  {track:'当日知识',icon:'🛍️',title:'货币商店',href:'money-shop.html',minutes:'3～4分钟',description:'在购物情境中认识元、角、分，练习简单付款。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'3～4分钟',description:'完成一轮一年级综合题，用画图或摆一摆帮助理解。'},
+  {track:'数学思维',icon:'🔢',title:'数字迷宫',href:'number-maze.html',minutes:'2～3分钟',description:'边计算边寻找正确路线，走错了就回到上一步。'}]},
+ {day:'星期六',theme:'数感与分类',tasks:[
+  {track:'口算与运算',icon:'🔢',title:'数字乐园',href:'numbers.html',minutes:'3分钟',description:'选择合适范围练习数数、找数、比较和排序。'},
+  {track:'当日知识',icon:'🗂️',title:'分类统计',href:'data-classification.html',minutes:'3分钟',description:'按颜色或形状分类，记录每一类有多少个。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'3～4分钟',description:'做一轮周末综合练习，遇到不会的题慢慢读。'},
+  {track:'数学思维',icon:'🥇',title:'一年级思维训练',href:'olympiad1.html',minutes:'3～4分钟',description:'选择适合的题目，用画图、尝试或排除法解决问题。'}]},
+ {day:'星期日',theme:'轻松复习与整理',tasks:[
+  {track:'口算与运算',icon:'🍎',title:'10以内加减法',href:'addsub10.html',minutes:'3分钟',description:'复习本周容易停顿的加减法，不追求速度。'},
+  {track:'当日知识',icon:'🔟',title:'数位认知',href:'placevalue.html',minutes:'3分钟',description:'再看一遍个位和十位，用自己的话说出数字组成。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'3～4分钟',description:'做一轮轻量综合练习，把本周知识串起来。'},
+  {track:'数学思维',icon:'👀',title:'数量闪视',href:'quantity-flash.html',minutes:'2～3分钟',description:'用分组观察的方法判断数量，感受整体与部分。'}]}
+];
+const COLORS=['#397b8b','#4d8568','#9a6f3e','#755f8c'];
+const $=id=>document.getElementById(id);const speech=window.Hpx&&Hpx.speech?Hpx.speech.create({buttonId:'speakToggle',rate:.88,pitch:1.05}):null;const say=text=>speech&&speech.speak(text);let activeTaskIndex=-1;
+function localDateKey(date){return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');}
+function loadState(){try{const value=JSON.parse(localStorage.getItem(STORE)||'{"days":{}}');return value&&value.days?value:{days:{}};}catch(error){return {days:{}};}}
+function saveState(state){const keys=Object.keys(state.days).sort().slice(-60),trimmed={days:{}};keys.forEach(key=>{trimmed.days[key]=state.days[key];});try{localStorage.setItem(STORE,JSON.stringify(trimmed));}catch(error){}return trimmed;}
+function todayContext(){const now=new Date(),dateKey=localDateKey(now),planIndex=(now.getDay()+6)%7,state=loadState();if(!state.days[dateKey])state.days[dateKey]={done:[]};return {now,dateKey,planIndex,plan:WEEK_PLAN[planIndex],state,record:state.days[dateKey]};}
+function completedStreak(state,date){let total=0,cursor=new Date(date.getFullYear(),date.getMonth(),date.getDate());for(let index=0;index<365;index++){const record=state.days[localDateKey(cursor)];if(!record||new Set(record.done||[]).size<4)break;total++;cursor.setDate(cursor.getDate()-1);}return total;}
+function renderWeek(todayIndex){$('weekList').innerHTML=WEEK_PLAN.map((plan,index)=>`<div class="day${index===todayIndex?' today':''}"><b>${plan.day.replace('星期','周')}</b><span>${plan.theme}</span></div>`).join('');}
+function render(){const context=todayContext(),done=new Set(context.record.done||[]),doneCount=Math.min(4,done.size),nextIndex=context.plan.tasks.findIndex((_,index)=>!done.has(index));$('dateText').textContent=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(context.now);$('dayTheme').textContent=`今日主题 · ${context.plan.theme}`;$('progressText').textContent=`${doneCount} / 4`;$('progressBar').style.width=`${doneCount/4*100}%`;document.querySelector('.meter').setAttribute('aria-valuenow',String(doneCount));$('taskList').innerHTML=context.plan.tasks.map((task,index)=>{const isDone=done.has(index),isCurrent=index===nextIndex,isLocked=!isDone&&!isCurrent,status=isDone?'done':isCurrent?'current':'locked',buttonText=isDone?'再练一次':isCurrent?'开始练习 →':'完成上一项后解锁';return `<article class="task ${status}" style="--accent:${COLORS[index]}"><span class="task-icon" aria-hidden="true">${isDone?'✓':task.icon}</span><div><div class="task-step">第 ${index+1} 项 · ${task.track}</div><h3>${task.title}</h3><p>${task.description}</p><div class="task-meta">约 ${task.minutes}</div></div><button type="button" class="task-action" data-task="${index}" ${isLocked?'disabled':''}>${buttonText}</button></article>`;}).join('');const complete=doneCount===4;$('completePanel').classList.toggle('show',complete);$('nextHint').textContent=complete?'今天四项都完成了，可以安心休息。':`下一项：${context.plan.tasks[nextIndex].track} · ${context.plan.tasks[nextIndex].title}`;if(complete)$('streakText').textContent=`连续完成 ${completedStreak(context.state,context.now)} 天`;renderWeek(context.planIndex);}
+function openTask(index){const context=todayContext(),task=context.plan.tasks[index],dialog=$('practiceDialog');activeTaskIndex=index;$('practiceTitle').textContent=`第 ${index+1} 项 · ${task.title}`;$('practiceFrame').src=task.href;$('practiceFrame').title=task.title;const alreadyDone=(context.record.done||[]).includes(index);$('finishTask').textContent=alreadyDone?'结束复习，返回计划':'完成这项，学习下一项';if(typeof dialog.showModal==='function')dialog.showModal();else window.location.href=task.href;}
+function closeTask(){const dialog=$('practiceDialog');if(dialog.open)dialog.close();$('practiceFrame').src='about:blank';activeTaskIndex=-1;}
+function finishTask(){if(activeTaskIndex<0)return;const context=todayContext(),done=new Set(context.record.done||[]),wasDone=done.has(activeTaskIndex);done.add(activeTaskIndex);context.record.done=[...done].sort((a,b)=>a-b);context.record.updatedAt=new Date().toISOString();saveState(context.state);closeTask();render();if(!wasDone){const next=document.querySelector('.task.current');if(next)next.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});say(done.size===4?'今天四项数学练习全部完成！':`完成了。下一项，${context.plan.tasks[done.size].track}。`);}}
+$('taskList').addEventListener('click',event=>{const button=event.target.closest('[data-task]');if(button&&!button.disabled)openTask(Number(button.dataset.task));});$('closePractice').addEventListener('click',closeTask);$('finishTask').addEventListener('click',finishTask);$('speakToggle').addEventListener('click',()=>speech&&speech.toggle());$('practiceDialog').addEventListener('close',()=>{$('practiceFrame').src='about:blank';activeTaskIndex=-1;});window.addEventListener('pageshow',render);window.addEventListener('storage',render);render();
+}());
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

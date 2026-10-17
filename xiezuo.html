@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>看图写话与习作引导</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff8e1 0%,#efebe9 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#5d4037;letter-spacing:2px;text-shadow:2px 3px 0 #d7ccc8;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.scene-box{text-align:center;font-size:3rem;letter-spacing:6px;background:#fff8e1;border-radius:16px;padding:22px 10px;margin-bottom:14px;}
+.scene-switch{display:block;margin:0 auto 16px;padding:7px 20px;border:none;border-radius:14px;background:#8d6e63;color:#fff;font-size:.88rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.q-group{margin-bottom:14px;}
+.q-label{font-size:.85rem;color:#795548;font-weight:bold;margin-bottom:6px;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+.chip-btn{padding:7px 14px;border:2px solid #d7ccc8;border-radius:14px;background:#fff;color:#5d4037;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.chip-btn.on{background:#5d4037;color:#fff;border-color:#5d4037;}
+.sentence-box{background:#fffde7;border-radius:14px;padding:16px 18px;font-size:1.1rem;color:#4e342e;text-align:center;line-height:1.9;margin-top:10px;min-height:50px;}
+.speak-btn2{display:block;margin:10px auto 0;padding:7px 20px;border:none;border-radius:14px;background:#5d4037;color:#fff;font-size:.88rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 习作训练 */
+.step-tabs{display:flex;gap:6px;justify-content:center;margin-bottom:14px;}
+.step-btn{padding:6px 16px;border-radius:14px;border:2px solid #d7ccc8;background:#fff;color:#8d6e63;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.step-btn.on{background:#8d6e63;color:#fff;}
+.step-btn.done{border-color:#2e7d32;color:#2e7d32;}
+.topic-box{background:#fff3e0;border-radius:14px;padding:14px 18px;font-size:1rem;color:#5d4037;text-align:center;margin-bottom:12px;line-height:1.7;}
+.tip-box{background:#e8f5e9;border-radius:12px;padding:10px 16px;font-size:.85rem;color:#33691e;line-height:1.7;margin-bottom:12px;}
+.outline-grid{display:flex;flex-direction:column;gap:10px;}
+.outline-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.outline-item label{font-size:.9rem;color:#5d4037;font-weight:bold;min-width:70px;}
+.outline-item input{flex:1;min-width:140px;font-size:.95rem;border:2px solid #d7ccc8;border-radius:10px;padding:7px 10px;outline:none;font-family:inherit;}
+.outline-item input:focus{border-color:#8d6e63;}
+.opening-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.draft-box{background:#fffde7;border-radius:14px;padding:16px 18px;font-size:1rem;color:#4e342e;line-height:2;margin-top:10px;}
+.compare-box{display:flex;flex-direction:column;gap:6px;font-size:.88rem;margin-top:10px;}
+.compare-box .plain{color:#999;}
+.compare-box .better{color:#c2185b;font-weight:bold;}
+.nav-row{display:flex;justify-content:center;gap:10px;margin-top:14px;}
+.nav-btn{padding:8px 22px;border:none;border-radius:14px;background:#8d6e63;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed;}
+.completion-box{margin-top:14px;padding:14px 18px;border:2px solid #81c784;border-radius:14px;background:#e8f5e9;color:#2e7d32;text-align:center;font-size:.95rem;font-weight:bold;line-height:1.7;}
+.completion-box[hidden]{display:none;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#efebe9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#5d4037;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-col{display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;}
+.choice-btn2{padding:12px 16px;border:2px solid #d7ccc8;border-radius:12px;background:#fff;color:#5d4037;font-size:.95rem;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
+.choice-btn2:hover{background:#efebe9;}
+.choice-btn2.correct{border-color:#66bb6a;background:#e8f5e9;color:#2e7d32;font-weight:bold;}
+.choice-btn2.wrong{border-color:#ef5350;background:#ffebee;color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#5d4037;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.quiz-tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.quiz-tool-btn{padding:7px 13px;border:1px solid #bcaaa4;border-radius:14px;background:#fff;color:#5d4037;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.quiz-tool-btn:hover{background:#efebe9;}
+.quiz-mode{margin-bottom:12px;color:#8d6e63;font-size:.84rem;font-weight:bold;}
+.wrong-panel{max-width:560px;margin:0 auto 14px;padding:12px;border:2px solid #ffcc80;border-radius:14px;background:#fff8e1;text-align:left;}
+.wrong-panel[hidden]{display:none;}
+.wrong-empty{text-align:center;color:#999;padding:8px;}
+.wrong-item{padding:10px 8px;border-bottom:1px dashed #d7ccc8;font-size:.82rem;line-height:1.65;color:#5d4037;}
+.wrong-item:last-child{border-bottom:none;}
+.wrong-item .wrong-meta{color:#999;font-size:.76rem;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#5d4037">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">✍️</div>
+    <h1>看图写话与习作引导</h1>
+    <p>先说完整的一句话，再学会写一件事</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('pic')">🖼️ 看图写话</button>
+    <button class="tab-btn" onclick="switchTab('write')">📝 习作训练</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 看图写话 -->
+  <div id="tab-pic">
+    <div class="card">
+      <div class="scene-box" id="sceneBox"></div>
+      <button class="scene-switch" onclick="nextScene()">🔄 换一张图</button>
+      <div id="qGroups"></div>
+      <div class="sentence-box" id="sentencePreview">选一选下面的词语，拼出一句完整的话吧</div>
+      <button class="speak-btn2" onclick="speakSentence()">🔊 读一读</button>
+    </div>
+    <div class="tip-box">📌 写好一句话要包含：<b>什么时候</b> + <b>谁</b> + <b>在哪里</b> + <b>做什么</b> + <b>心情怎么样</b></div>
+  </div>
+
+  <!-- 习作训练 -->
+  <div id="tab-write" style="display:none;">
+    <div class="card">
+      <div class="step-tabs" id="stepTabs"></div>
+      <div id="stepContent"></div>
+      <div class="completion-box" id="writingComplete" hidden>🎉 习作训练完成！你已经走完“审题—构思—成文”三步，可以读一读自己的段落，再继续修改细节。</div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevStepBtn" onclick="gotoStep(curStep-1)">← 上一步</button>
+        <button class="nav-btn" id="nextStepBtn" onclick="handleNextStep()">下一步 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-tools">
+        <button class="quiz-tool-btn" onclick="toggleWrongBook()">📕 错题本（<span id="wrongCount">0</span>）</button>
+        <button class="quiz-tool-btn" onclick="startWrongPractice()">🎯 只练错题</button>
+        <button class="quiz-tool-btn" onclick="clearWrongBook()">🗑 清空错题</button>
+      </div>
+      <div class="wrong-panel" id="wrongPanel" hidden><div id="wrongList"></div></div>
+      <div class="quiz-mode" id="quizModeLabel"></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-col" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.85});
+const randInt=Hpx.random.int;
+
+// ── 看图写话 ──
+const SCENES=[
+  {emoji:'🌳🐶🧒☀️', when:['星期天','放学后','清晨'], who:['一个男孩','小明','两个小朋友'], where:['大树下','公园里','草地上'], what:['和小狗玩耍','给小狗喂食','追着小狗跑'], mood:['非常开心','笑得合不拢嘴','特别兴奋']},
+  {emoji:'🏫📚🧑‍🎓🔔', when:['开学第一天','早上','上课铃响时'], who:['小红','新来的同学','全班同学'], where:['教室里','学校门口','操场上'], what:['认真听讲','排队做操','和同学打招呼'], mood:['有点紧张','充满好奇','非常认真']},
+  {emoji:'🏠👵🍲🍚', when:['周末','晚饭时','放假的时候'], who:['奶奶','妈妈','一家人'], where:['厨房里','餐桌旁','家里'], what:['做了一顿丰盛的饭菜','包饺子','一起吃晚饭'], mood:['温暖又幸福','其乐融融','非常满足']},
+  {emoji:'🏖️🌊👦🏄', when:['暑假','夏天的一天','海边度假时'], who:['我','弟弟','一群小朋友'], where:['沙滩上','大海边','海浪里'], what:['堆沙堡','捡贝壳','和海浪嬉戏'], mood:['开心极了','兴奋得直叫','留下了美好的回忆']},
+  {emoji:'⛄❄️🧣🧒', when:['下雪天','冬天的早晨','放假那天'], who:['小伙伴们','我和哥哥','邻居家的孩子'], where:['院子里','雪地上','小区广场'], what:['堆雪人','打雪仗','滑雪橇'], mood:['冻红了脸也很开心','笑声不断','觉得特别有趣']},
+  {emoji:'🎂🎈👨‍👩‍👧🎁', when:['生日那天','周末晚上','一个特别的日子'], who:['我','妹妹','全家人'], where:['家里','客厅里','餐厅里'], what:['吹蜡烛许愿','拆礼物','唱生日歌'], mood:['幸福得快要哭出来','开心得跳了起来','觉得自己是世界上最幸运的人']}
+];
+let curScene=0, sel={when:0,who:0,where:0,what:0,mood:0};
+function nextScene(){curScene=(curScene+1)%SCENES.length; sel={when:0,who:0,where:0,what:0,mood:0}; renderScene();}
+function renderScene(){
+  const s=SCENES[curScene];
+  document.getElementById('sceneBox').textContent=s.emoji;
+  const groups=document.getElementById('qGroups');
+  groups.innerHTML='';
+  const labels={when:'什么时候？',who:'谁？',where:'在哪里？',what:'做什么？',mood:'心情怎么样？'};
+  Object.keys(labels).forEach(key=>{
+    const wrap=document.createElement('div'); wrap.className='q-group';
+    wrap.innerHTML=`<div class="q-label">${labels[key]}</div><div class="chip-row" id="chip-${key}"></div>`;
+    groups.appendChild(wrap);
+    const row=wrap.querySelector('.chip-row');
+    s[key].forEach((opt,i)=>{
+      const b=document.createElement('button');
+      b.className='chip-btn'+(i===sel[key]?' on':'');
+      b.textContent=opt;
+      b.onclick=()=>{sel[key]=i;renderScene();};
+      row.appendChild(b);
+    });
+  });
+  updateSentence();
+}
+function currentSentence(){
+  const s=SCENES[curScene];
+  return `${s.when[sel.when]}，${s.who[sel.who]}在${s.where[sel.where]}${s.what[sel.what]}，心情${s.mood[sel.mood]}。`;
+}
+function updateSentence(){document.getElementById('sentencePreview').textContent=currentSentence();}
+function speakSentence(){speak(currentSentence());}
+
+// ── 习作训练：三步法 ──
+const STEPS=['审题','构思','成文'];
+let curStep=0;
+let writingCompleted=false;
+const TOPIC={title:'写一件让你难忘的事', tips:'📌 审题小贴士：只选一件印象最深的事，不要贪多；想清楚这件事让你"难忘"的原因是什么（开心、感动、后悔、惊喜……）。'};
+let outline={time:'',place:'',people:'',cause:'',process:'',result:''};
+let openingIdx=0;
+const OPENINGS=[
+  {name:'直接叙述式', tpl:o=>`${o.time}，我和${o.people}在${o.place}，发生了一件让我难忘的事。`},
+  {name:'环境描写式', tpl:o=>`${o.time}，阳光洒在${o.place}上，我和${o.people}正在那里，谁也没想到接下来会发生这样的事。`},
+  {name:'心理描写式', tpl:o=>`直到现在，我还清楚地记得${o.time}发生的那件事——那天我和${o.people}在${o.place}。`}
+];
+function buildStepTabs(){
+  const wrap=document.getElementById('stepTabs'); wrap.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='step-btn'+(i===curStep?' on':'')+(i<curStep?' done':'');
+    b.textContent=(i+1)+'. '+s;
+    b.onclick=()=>gotoStep(i);
+    wrap.appendChild(b);
+  });
+}
+function gotoStep(i){
+  if(i<0||i>=STEPS.length) return;
+  curStep=i;
+  buildStepTabs();
+  renderStepContent();
+  document.getElementById('prevStepBtn').disabled=(i===0);
+  const nextBtn=document.getElementById('nextStepBtn');
+  const completeBox=document.getElementById('writingComplete');
+  const onLastStep=i===STEPS.length-1;
+  nextBtn.textContent=onLastStep?(writingCompleted?'✓ 已完成':'✓ 完成'):'下一步 →';
+  nextBtn.disabled=onLastStep&&writingCompleted;
+  completeBox.hidden=!(onLastStep&&writingCompleted);
+}
+function handleNextStep(){
+  if(curStep===STEPS.length-1){
+    finishWriting();
+    return;
+  }
+  gotoStep(curStep+1);
+}
+function finishWriting(){
+  writingCompleted=true;
+  const nextBtn=document.getElementById('nextStepBtn');
+  nextBtn.textContent='✓ 已完成';
+  nextBtn.disabled=true;
+  document.getElementById('writingComplete').hidden=false;
+  speak('恭喜你完成习作训练！读一读自己的段落，再看看还能补充哪些生动的细节。');
+}
+function renderStepContent(){
+  const el=document.getElementById('stepContent');
+  if(curStep===0){
+    el.innerHTML=`<div class="topic-box"><b>题目：</b>${TOPIC.title}</div><div class="tip-box">${TOPIC.tips}</div>
+      <div class="tip-box">✅ 可以问自己：这件事的时间、地点、人物是谁？事情的起因、经过、结果分别是什么？想清楚了就点"下一步"去列提纲吧。</div>`;
+    speak('审题：先想清楚要写的是哪一件事，为什么让你难忘。');
+  } else if(curStep===1){
+    el.innerHTML=`<div class="tip-box">📌 构思：像列提纲一样，先把六个要素写清楚，之后就能连成一段话。</div>
+      <div class="outline-grid">
+        <div class="outline-item"><label>时间</label><input id="o-time" value="${outline.time}" placeholder="例如：上个星期六"></div>
+        <div class="outline-item"><label>地点</label><input id="o-place" value="${outline.place}" placeholder="例如：学校操场上"></div>
+        <div class="outline-item"><label>人物</label><input id="o-people" value="${outline.people}" placeholder="例如：我的好朋友小林"></div>
+        <div class="outline-item"><label>起因</label><input id="o-cause" value="${outline.cause}" placeholder="例如：因为一场突然的大雨"></div>
+        <div class="outline-item"><label>经过</label><input id="o-process" value="${outline.process}" placeholder="例如：我们一起躲在树下，分享一把小伞"></div>
+        <div class="outline-item"><label>结果</label><input id="o-result" value="${outline.result}" placeholder="例如：我们淋湿了一半，却笑得很开心"></div>
+      </div>`;
+    ['time','place','people','cause','process','result'].forEach(k=>{
+      document.getElementById('o-'+k).addEventListener('input', e=>{outline[k]=e.target.value;});
+    });
+    speak('构思：把时间、地点、人物、起因、经过、结果填进去，像列提纲一样。');
+  } else {
+    const filled={time:outline.time||'那一天',place:outline.place||'学校里',people:outline.people||'同学'};
+    el.innerHTML=`<div class="tip-box">📌 成文：选一种开头方式，看看提纲自动连成什么样的段落。</div>
+      <div class="opening-row" id="openingRow"></div>
+      <div class="draft-box" id="draftBox"></div>
+      <div class="compare-box">
+        <div>💡 加细节更生动：</div>
+        <div class="plain">原句：他很着急。</div>
+        <div class="better">改进：他急得直冒汗，一遍又一遍地看着手表。</div>
+        <div style="color:#999;font-size:.82rem;">试着在"经过"里加入动作、语言或心理描写，会让故事更精彩！</div>
+      </div>
+      <button class="speak-btn2" onclick="speakDraft()">🔊 读一读</button>`;
+    const row=document.getElementById('openingRow');
+    OPENINGS.forEach((o,i)=>{
+      const b=document.createElement('button');
+      b.className='chip-btn'+(i===openingIdx?' on':'');
+      b.textContent=o.name;
+      b.onclick=()=>{openingIdx=i;renderStepContent();};
+      row.appendChild(b);
+    });
+    const draft=OPENINGS[openingIdx].tpl(filled)+`起因是${outline.cause||'……'}，经过是${outline.process||'……'}，最后${outline.result||'……'}。这件事让我久久不能忘记。`;
+    document.getElementById('draftBox').textContent=draft;
+    speak('成文：选一种开头方式，看看自动连成的段落，再想想怎么加入细节描写。');
+  }
+}
+function speakDraft(){const b=document.getElementById('draftBox'); if(b) speak(b.textContent);}
+
+// ── 练习 ──
+let qScore={c:0,w:0};
+const COMPARE_BANK=[
+  {plain:'他很高兴。', detailed:'他一蹦三尺高，眼睛笑成了月牙。'},
+  {plain:'雨下得很大。', detailed:'雨点像黄豆一样，噼里啪啦地砸在窗户上。'},
+  {plain:'妈妈很生气。', detailed:'妈妈的眉毛一下子竖了起来，声音也提高了八度。'},
+  {plain:'小狗很可爱。', detailed:'小狗摇着尾巴，一双圆溜溜的眼睛盯着我，好像在说"陪我玩吧"。'},
+  {plain:'教室很安静。', detailed:'教室里安静得能听见笔尖划过纸张的声音。'},
+  {plain:'他跑得很快。', detailed:'他像离弦的箭一样冲了出去，转眼就不见了踪影。'}
+];
+const MISSING_BANK=[
+  {text:'小明在公园里踢足球。', missing:'时间'},
+  {text:'星期天，弟弟在看动画片。', missing:'地点'},
+  {text:'早上，图书馆里静悄悄的。', missing:'人物'},
+  {text:'小华在花园里。', missing:'事情'}
+];
+const ORDER_BANK=[
+  ['早上，小明起床晚了。','接着，他匆忙穿好衣服。','然后，他顾不上吃早饭就往外跑。','最后，他终于赶上了校车。'],
+  ['妈妈买回来一袋面粉。','接着，她把面粉揉成面团。','然后，她包好了一个个饺子。','最后，一盘热气腾腾的饺子端上了桌。'],
+  ['天空渐渐暗了下来。','接着，乌云越积越厚。','然后，豆大的雨点落了下来。','最后，一场大雨倾盆而下。']
+];
+const QUIZ_BANK=[
+  ...COMPARE_BANK.map((item,i)=>({
+    id:'compare-'+i,
+    type:'compare',
+    prompt:'哪一句写得更具体生动？',
+    recordPrompt:'比较句子：“'+item.plain+'”',
+    choices:[item.plain,item.detailed],
+    correct:item.detailed,
+    speech:'哪一句写得更具体生动？'
+  })),
+  ...MISSING_BANK.map((item,i)=>({
+    id:'missing-'+i,
+    type:'missing',
+    prompt:'“'+item.text+'”\n这句话缺少了哪个要素？',
+    recordPrompt:'“'+item.text+'”缺少哪个要素？',
+    choices:['时间','地点','人物','事情'],
+    correct:item.missing,
+    speech:item.text+'，这句话缺少了哪个要素？'
+  })),
+  ...ORDER_BANK.map((seq,i)=>({
+    id:'order-'+i,
+    type:'order',
+    prompt:'下面四句话按事情发展顺序排列，哪一句应该排在最前面？',
+    recordPrompt:'事情排序：'+seq.join(' '),
+    choices:[...seq],
+    correct:seq[0],
+    speech:'下面四句话，哪一句应该排在最前面？'
+  }))
+];
+
+const WRONG_KEY='hpx-xiezuo-wrong-book-v1';
+let wrongBook=loadWrongBook();
+let quizMode='all';
+let quizQueue=[];
+let quizCurrent=null;
+let roundTotal=0;
+let roundAnswered=0;
+let lastQuestionId='';
+
+function shuffled(items){
+  const result=[...items];
+  for(let i=result.length-1;i>0;i--){
+    const j=randInt(0,i);
+    [result[i],result[j]]=[result[j],result[i]];
+  }
+  return result;
+}
+function makeQueue(items){
+  const result=shuffled(items);
+  if(result.length>1&&result[0].id===lastQuestionId){
+    [result[0],result[1]]=[result[1],result[0]];
+  }
+  return result;
+}
+function loadWrongBook(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(WRONG_KEY)||'{}');
+    return saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
+  }catch(e){
+    return {};
+  }
+}
+function saveWrongBook(){
+  try{localStorage.setItem(WRONG_KEY,JSON.stringify(wrongBook));}catch(e){}
+}
+function addWrongQuestion(question,chosen){
+  const old=wrongBook[question.id];
+  wrongBook[question.id]={
+    id:question.id,
+    type:question.type,
+    prompt:question.recordPrompt,
+    correct:question.correct,
+    lastChosen:chosen,
+    count:(old&&old.count||0)+1,
+    lastAt:Date.now()
+  };
+  saveWrongBook();
+  renderWrongBook();
+}
+function removeWrongQuestion(id){
+  if(!wrongBook[id]) return false;
+  delete wrongBook[id];
+  saveWrongBook();
+  renderWrongBook();
+  return true;
+}
+function renderWrongBook(){
+  const entries=Object.values(wrongBook).sort((a,b)=>b.count-a.count||b.lastAt-a.lastAt);
+  document.getElementById('wrongCount').textContent=entries.length;
+  const list=document.getElementById('wrongList');
+  list.innerHTML='';
+  if(!entries.length){
+    const empty=document.createElement('div');
+    empty.className='wrong-empty';
+    empty.textContent='还没有错题，继续保持！🎉';
+    list.appendChild(empty);
+    return;
+  }
+  entries.forEach(item=>{
+    const row=document.createElement('div');
+    row.className='wrong-item';
+    const question=document.createElement('div');
+    question.textContent=item.prompt;
+    const answer=document.createElement('div');
+    answer.textContent='正确答案：'+item.correct+'；上次选择：'+item.lastChosen;
+    const meta=document.createElement('div');
+    meta.className='wrong-meta';
+    meta.textContent='累计答错 '+item.count+' 次 · '+new Date(item.lastAt).toLocaleString('zh-CN');
+    row.append(question,answer,meta);
+    list.appendChild(row);
+  });
+}
+function toggleWrongBook(){
+  const panel=document.getElementById('wrongPanel');
+  panel.hidden=!panel.hidden;
+  if(!panel.hidden) renderWrongBook();
+}
+function clearWrongBook(){
+  if(!Object.keys(wrongBook).length) return;
+  if(!confirm('确定清空习作训练的全部错题记录吗？')) return;
+  wrongBook={};
+  saveWrongBook();
+  renderWrongBook();
+  if(quizMode==='wrong') startPractice('all');
+}
+function startWrongPractice(){
+  if(!Object.keys(wrongBook).length){
+    document.getElementById('wrongPanel').hidden=false;
+    renderWrongBook();
+    speak('错题本还是空的，先完成几道练习吧。');
+    return;
+  }
+  startPractice('wrong');
+}
+function startPractice(mode){
+  const source=mode==='wrong'
+    ?Object.keys(wrongBook).map(id=>QUIZ_BANK.find(q=>q.id===id)).filter(Boolean)
+    :QUIZ_BANK;
+  if(!source.length){
+    if(mode==='wrong') startPractice('all');
+    return;
+  }
+  quizMode=mode;
+  quizQueue=makeQueue(source);
+  quizCurrent=null;
+  roundTotal=quizQueue.length;
+  roundAnswered=0;
+  qScore={c:0,w:0};
+  document.getElementById('qC').textContent='0';
+  document.getElementById('qW').textContent='0';
+  document.getElementById('wrongPanel').hidden=true;
+  nextQ();
+}
+function updateQuizModeLabel(){
+  const modeName=quizMode==='wrong'?'错题专项':'不重复练习';
+  const number=Math.min(roundAnswered+1,roundTotal);
+  document.getElementById('quizModeLabel').textContent=modeName+' · 本轮第 '+number+' / '+roundTotal+' 题';
+}
+function nextQ(){
+  if(!quizQueue.length){
+    if(quizMode==='wrong') finishWrongRound();
+    else startPractice('all');
+    return;
+  }
+  quizCurrent=quizQueue.shift();
+  lastQuestionId=quizCurrent.id;
+  document.getElementById('quizMsg').className='result-msg';
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizQ').textContent=quizCurrent.prompt;
+  const area=document.getElementById('quizArea');
+  area.innerHTML='';
+  shuffled(quizCurrent.choices).forEach(choice=>{
+    const button=document.createElement('button');
+    button.className='choice-btn2';
+    button.textContent=choice;
+    button.onclick=()=>checkAns(button,choice);
+    area.appendChild(button);
+  });
+  updateQuizModeLabel();
+  speak(quizCurrent.speech);
+}
+function checkAns(selectedButton,chosen){
+  if(!quizCurrent) return;
+  const correct=quizCurrent.correct;
+  document.querySelectorAll('#quizArea .choice-btn2').forEach(button=>{
+    button.disabled=true;
+    if(button.textContent===correct) button.classList.add('correct');
+  });
+  roundAnswered++;
+  const message=document.getElementById('quizMsg');
+  if(chosen===correct){
+    qScore.c++;
+    selectedButton.classList.add('correct');
+    const corrected=removeWrongQuestion(quizCurrent.id);
+    message.className='result-msg ok';
+    message.textContent=corrected?'✅ 正确！已从错题本移除。':'✅ 正确！';
+    speak(corrected?'正确！这道题已经移出错题本。':'正确！真棒！');
+  }else{
+    qScore.w++;
+    selectedButton.classList.add('wrong');
+    addWrongQuestion(quizCurrent,chosen);
+    message.className='result-msg no';
+    message.textContent='❌ 正确答案：'+correct+'（已加入错题本）';
+    speak('正确答案是'+correct+'，这道题已经加入错题本。');
+  }
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  const nextButton=document.getElementById('nextBtn');
+  nextButton.textContent=quizQueue.length?'下一题 →':(quizMode==='wrong'?'完成本轮 →':'开始新一轮 →');
+  nextButton.style.display='inline-block';
+}
+function finishWrongRound(){
+  quizCurrent=null;
+  document.getElementById('quizArea').innerHTML='';
+  document.getElementById('nextBtn').style.display='none';
+  const remaining=Object.keys(wrongBook).length;
+  document.getElementById('quizModeLabel').textContent='错题专项 · 本轮完成';
+  document.getElementById('quizQ').textContent=remaining
+    ?'本轮错题练习完成，还剩 '+remaining+' 道错题需要继续巩固。'
+    :'🎉 错题已全部订正完成！';
+  const button=document.createElement('button');
+  button.className='quiz-tool-btn';
+  button.textContent=remaining?'再练一轮错题':'返回不重复练习';
+  button.onclick=()=>remaining?startWrongPractice():startPractice('all');
+  document.getElementById('quizArea').appendChild(button);
+  speak(remaining?'本轮错题练习完成，再练一轮巩固一下吧。':'太棒了，错题已经全部订正完成！');
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['pic','write','quiz']);
+  if(t==='pic') speak('看图写话：选一选下面的词语，拼出一句完整的话。');
+  if(t==='write'){buildStepTabs();gotoStep(0);}
+  if(t==='quiz'&&!quizCurrent&&!quizQueue.length) startPractice('all');
+}
+renderScene();
+renderWrongBook();
+speak('欢迎来到看图写话与习作引导！先练习说完整的一句话，再学习怎么写一件事。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

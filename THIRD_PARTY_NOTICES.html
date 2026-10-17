@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第三方组件与授权说明 — 慧陪学</title>
+<meta name="description" content="慧陪学使用的第三方组件、字体、数据、服务及对应许可证说明。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f4fb;color:#312d38;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75;padding:28px 16px 56px}
+.page{max-width:960px;margin:auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(74,20,140,.08)}
+h1{margin:0 0 6px;color:#4a148c;font-size:1.8rem}
+h2{margin:30px 0 10px;color:#6a1b9a;font-size:1.18rem}
+p,li,th,td{font-size:.92rem}
+.meta{color:#777;font-size:.82rem}
+.notice{background:#f3e5f5;border-left:4px solid #7e57c2;padding:12px 15px;border-radius:8px}
+.table-wrap{overflow-x:auto;border:1px solid #e7dff0;border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:11px 12px;text-align:left;vertical-align:top;border-bottom:1px solid #eee7f4}
+th{background:#f8f3fb;color:#4a148c;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+code{background:#f4f1f6;border-radius:5px;padding:1px 5px;font-size:.86em}
+a{color:#6a1b9a;overflow-wrap:anywhere}
+.links{padding-left:22px}
+.back{display:inline-block;margin-top:30px;text-decoration:none;font-weight:700}
+.source-note{margin-top:28px;padding-top:18px;border-top:1px solid #eee;color:#777;font-size:.82rem}
+@media(max-width:520px){body{padding:14px 10px 40px}.page{padding:24px 18px;border-radius:16px}h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>第三方组件与授权说明</h1>
+  <p class="meta">最后核对：2026年8月9日</p>
+  <p class="notice">本项目使用下列第三方组件、字体和数据。它们不按网站访问量收取版权费，但使用和再分发仍须遵守各自许可证。项目随附的许可证原文可通过下表直接查看。</p>
+
+  <h2>一、随网站分发的组件</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>组件</th><th>使用位置</th><th>版本 / 来源</th><th>许可证</th><th>许可证文件</th></tr></thead>
+      <tbody>
+        <tr><td>JetBrains Mono</td><td><code>study-plan.html</code> 内嵌 WOFF2</td><td>JetBrains Mono 2.305</td><td>SIL Open Font License 1.1</td><td><a href="licenses/JetBrains-Mono-OFL-1.1.txt">查看许可证</a></td></tr>
+        <tr><td>Special Elite</td><td><code>english-study-plan.html</code> 内嵌 WOFF2</td><td>Special Elite 1.001；Copyright © 2010 Brian J. Bonislawsky DBA Astigmatic (AOETI)</td><td>Apache License 2.0</td><td><a href="licenses/Special-Elite-Apache-2.0.txt">查看许可证</a></td></tr>
+        <tr><td>Hanzi Writer</td><td><code>lib/hanzi-writer.min.js</code></td><td>Hanzi Writer 3.7.3</td><td>MIT</td><td><a href="licenses/Hanzi-Writer-MIT.txt">查看许可证</a></td></tr>
+        <tr><td>Hanzi Writer Character Data</td><td><code>hanzi-data.js</code></td><td>Hanzi Writer Data / Make Me A Hanzi；原始字形来自 Arphic Technology，本站转换为单个离线 JavaScript 数据文件</td><td>Arphic Public License</td><td><a href="licenses/Hanzi-Writer-Data-Arphic.txt">查看许可证</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>字体可以嵌入和商用，但不得脱离软件单独销售，并应继续携带相应许可证。Apache 2.0、MIT 和 Arphic Public License 组件再分发时也必须保留版权及许可声明。</p>
+  <p><code>hanzi-data.js</code> 仅对上游公开字符数据进行了打包和格式转换，没有修改单字笔画轮廓。接收者可依据 Arphic Public License 继续复制和修改；以后如改动笔画轮廓，应记录改动日期与内容。</p>
+
+  <h2>二、服务端直接依赖</h2>
+  <p>版本以 <code>server/package-lock.json</code> 为准。传递依赖由 npm 安装，每个包自带许可证；若打包为单文件、容器镜像或安装包，仍须保留这些许可证。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>包</th><th>当前版本</th><th>许可证</th><th>许可证文件</th></tr></thead>
+      <tbody>
+        <tr><td>bcryptjs</td><td>3.0.3</td><td>BSD-3-Clause</td><td><a href="licenses/server/bcryptjs-BSD-3-Clause.txt">查看许可证</a></td></tr>
+        <tr><td>better-sqlite3</td><td>13.0.2</td><td>MIT</td><td><a href="licenses/server/better-sqlite3-MIT.txt">查看许可证</a></td></tr>
+        <tr><td>cors</td><td>2.8.6</td><td>MIT</td><td><a href="licenses/server/cors-MIT.txt">查看许可证</a></td></tr>
+        <tr><td>dotenv</td><td>17.4.2</td><td>BSD-2-Clause</td><td><a href="licenses/server/dotenv-BSD-2-Clause.txt">查看许可证</a></td></tr>
+        <tr><td>express</td><td>5.2.1</td><td>MIT</td><td><a href="licenses/server/express-MIT.txt">查看许可证</a></td></tr>
+        <tr><td>jsonwebtoken</td><td>9.0.3</td><td>MIT</td><td><a href="licenses/server/jsonwebtoken-MIT.txt">查看许可证</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>三、外部或本地运行服务</h2>
+  <ul>
+    <li><strong>GoatCounter：</strong>托管统计服务；当前对合理的公开网站流量免费，具体以其最新使用条款为准。</li>
+    <li><strong>Ollama：</strong>本机推理程序采用 MIT 许可证；通过 Ollama 使用的每个模型都有独立许可证，部署前须逐个核对。</li>
+    <li><strong>EasyOCR：</strong>采用 Apache License 2.0；模型文件及其依赖应随实际部署环境一并核对。</li>
+    <li><strong>Claude Code：</strong><code>beads.html</code> 的可选本地代理会调用用户已登录的 Claude Code，可能消耗订阅额度或产生 API 费用。</li>
+    <li><strong>Web Speech API、Web Audio API、Canvas、SVG：</strong>浏览器原生能力，不是按调用计费的第三方素材服务。</li>
+  </ul>
+
+  <h2>四、系统字体与 Emoji</h2>
+  <p>页面 CSS 会按名称调用 <code>Comic Sans MS</code>、<code>华文圆体</code>、<code>微软雅黑</code>、<code>PingFang SC</code> 等系统字体。本站不分发这些字体文件，实际显示由访问者设备已安装字体及其系统许可决定。页面中的 Emoji 以 Unicode 文本保存，没有随项目分发第三方 Emoji 图片集。</p>
+
+  <h2>五、上游项目</h2>
+  <ul class="links">
+    <li><a href="https://github.com/JetBrains/JetBrainsMono" rel="noopener noreferrer">JetBrains Mono</a></li>
+    <li><a href="https://github.com/google/fonts/tree/main/apache/specialelite" rel="noopener noreferrer">Special Elite</a></li>
+    <li><a href="https://github.com/chanind/hanzi-writer" rel="noopener noreferrer">Hanzi Writer</a></li>
+    <li><a href="https://github.com/chanind/hanzi-writer-data" rel="noopener noreferrer">Hanzi Writer Data</a></li>
+    <li><a href="https://www.goatcounter.com/" rel="noopener noreferrer">GoatCounter</a></li>
+    <li><a href="https://github.com/ollama/ollama" rel="noopener noreferrer">Ollama</a></li>
+    <li><a href="https://github.com/JaidedAI/EasyOCR" rel="noopener noreferrer">EasyOCR</a></li>
+  </ul>
+
+  <p class="source-note">本页是工程合规记录的浏览器友好版本，不构成法律意见。维护源文件为 <a href="THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a>；新增第三方内容时应同步更新本页、维护源和 <code>licenses/</code>。</p>
+  <a class="back" href="index.html">← 返回慧陪学</a>
+</main>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

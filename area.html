@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面积认识</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e3f2fd 0%,#e8eaf6 50%,#fff9c4 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#1565c0;letter-spacing:3px;text-shadow:2px 3px 0 #90caf9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.grid-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:10px;}
+.info-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.info-tag{background:#e3f2fd;border-radius:10px;padding:8px 18px;font-size:1rem;font-weight:bold;color:#1565c0;}
+.info-tag span{font-size:1.4rem;color:#ad1457;}
+.formula-box{background:#fffde7;border-radius:12px;padding:12px 18px;font-size:1rem;color:#555;text-align:center;line-height:2;}
+.slider-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.85rem;color:#777;}
+input[type=range]{width:130px;accent-color:#1565c0;}
+.sl-val{font-weight:bold;font-size:1.1rem;color:#1565c0;}
+.step-row{display:flex;gap:8px;justify-content:center;margin:10px 0;}
+.step-btn{padding:8px 20px;border:none;border-radius:12px;background:#e3f2fd;color:#1565c0;font-weight:bold;font-size:.95rem;cursor:pointer;font-family:inherit;}
+.step-btn:hover{background:#1565c0;color:#fff;}
+.step-desc{text-align:center;font-size:1rem;color:#555;min-height:40px;padding:4px 0;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e3f2fd;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#1565c0;}
+.quiz-q{font-size:1.15rem;color:#333;margin-bottom:12px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #90caf9;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#1565c0;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#1565c0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#1565c0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#1565c0">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🟦</div>
+    <h1>面积认识</h1>
+    <p>数格子理解面积，推导长×宽公式</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 数格子</button>
+    <button class="tab-btn" onclick="switchTab('formula')">🔢 公式推导</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 数格子 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div style="text-align:center;font-size:1rem;color:#555;margin-bottom:8px;">点击格子涂色，看覆盖了多少面积</div>
+      <div class="grid-wrap"><canvas id="countCanvas" width="300" height="300" onclick="toggleCell(event)"></canvas></div>
+      <div class="info-row">
+        <div class="info-tag">已涂 <span id="filledCount">0</span> 格</div>
+        <div class="info-tag">每格 1 平方格</div>
+        <div class="info-tag">面积 = <span id="filledCount2">0</span> 平方格</div>
+      </div>
+      <div class="formula-box">面积 = 物体表面或图形的大小，用<b>平方单位</b>计量</div>
+    </div>
+    <div class="card">
+      <div style="text-align:center;font-size:.95rem;color:#777;margin-bottom:10px;">常见面积单位换算</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.95rem;color:#555;line-height:2.2;">
+        <div>1 平方厘米 = 1cm²</div>
+        <div>1 平方分米 = 100cm²</div>
+        <div>1 平方米 = 100dm²</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 公式推导 -->
+  <div id="tab-formula" style="display:none;">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group">
+          <label>长（格）</label>
+          <input type="range" id="fLen" min="1" max="10" value="5" oninput="updateFormula()">
+          <span class="sl-val" id="fLenVal">5</span>
+        </div>
+        <div class="sl-group">
+          <label>宽（格）</label>
+          <input type="range" id="fWid" min="1" max="8" value="3" oninput="updateFormula()">
+          <span class="sl-val" id="fWidVal">3</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <button class="step-btn" onclick="prevStep()">◀ 上一步</button>
+        <span id="stepNum" style="font-size:.9rem;color:#999;align-self:center;">第 1 步</span>
+        <button class="step-btn" onclick="nextStep()">下一步 ▶</button>
+      </div>
+      <div class="step-desc" id="stepDesc"></div>
+      <div class="grid-wrap"><canvas id="formulaCanvas" width="340" height="280"></canvas></div>
+      <div class="info-row">
+        <div class="info-tag">长 <span id="fL">5</span></div>
+        <div class="info-tag">宽 <span id="fW">3</span></div>
+        <div class="info-tag">面积 = <span id="fA">15</span> 格²</div>
+      </div>
+    </div>
+    <div class="card formula-box">
+      长方形面积 = <b style="color:#ad1457">长 × 宽</b><br>
+      <span style="color:#aaa;font-size:.85rem;">正方形面积 = 边长 × 边长 = <b style="color:#1565c0">边长²</b></span>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="grid-wrap"><canvas id="quizCanvas" width="280" height="220"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+
+// count canvas
+const CELL=28, COLS=9, ROWS=9;
+let cells=Array(ROWS).fill(null).map(()=>Array(COLS).fill(false));
+
+function drawCountCanvas(){
+  const canvas=document.getElementById('countCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const ox=(canvas.width-COLS*CELL)/2, oy=(canvas.height-ROWS*CELL)/2;
+  let count=0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    ctx.fillStyle=cells[r][c]?'#90caf9':'#f5f5f5';
+    ctx.fillRect(ox+c*CELL,oy+r*CELL,CELL-1,CELL-1);
+    if(cells[r][c]) count++;
+  }
+  ctx.strokeStyle='#ccc';ctx.lineWidth=1;
+  for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(ox,oy+r*CELL);ctx.lineTo(ox+COLS*CELL,oy+r*CELL);ctx.stroke();}
+  for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(ox+c*CELL,oy);ctx.lineTo(ox+c*CELL,oy+ROWS*CELL);ctx.stroke();}
+  document.getElementById('filledCount').textContent=count;
+  document.getElementById('filledCount2').textContent=count;
+}
+function toggleCell(e){
+  const canvas=document.getElementById('countCanvas');
+  const rect=canvas.getBoundingClientRect();
+  const ox=(canvas.width-COLS*CELL)/2, oy=(canvas.height-ROWS*CELL)/2;
+  const sx=(e.clientX-rect.left)*(canvas.width/rect.width);
+  const sy=(e.clientY-rect.top)*(canvas.height/rect.height);
+  const c=Math.floor((sx-ox)/CELL), r=Math.floor((sy-oy)/CELL);
+  if(r>=0&&r<ROWS&&c>=0&&c<COLS){cells[r][c]=!cells[r][c];drawCountCanvas();
+    const cnt=cells.flat().filter(Boolean).length;
+    speak(`已涂${cnt}格，面积是${cnt}平方格。`);
+  }
+}
+drawCountCanvas();
+
+// formula
+let fStep=0;
+const FSTEPS=['看图形：这是一个长方形格子图',
+  '第1行：有几个格子？= 长的格数',
+  '有几行？= 宽的格数',
+  '总格数 = 每行数 × 行数 = 长 × 宽',
+  '所以：面积 = 长 × 宽 ✅'];
+
+function drawFormulaCanvas(L,W,step){
+  const canvas=document.getElementById('formulaCanvas');
+  const ctx=canvas.getContext('2d');
+  const cs=28;
+  const ox=(canvas.width-L*cs)/2, oy=(canvas.height-W*cs)/2+10;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let r=0;r<W;r++) for(let c=0;c<L;c++){
+    let fill='#e3f2fd';
+    if(step===1&&r===0) fill='#42a5f5';
+    if(step===2&&c===0) fill='#66bb6a';
+    if(step>=3) fill=`hsl(${200+r*15},70%,${70+c*2}%)`;
+    ctx.fillStyle=fill;
+    ctx.fillRect(ox+c*cs,oy+r*cs,cs-1,cs-1);
+    if(step>=3){
+      ctx.fillStyle='rgba(0,0,0,.3)';ctx.font=`bold ${cs*.5}px sans-serif`;ctx.textAlign='center';
+      ctx.fillText(r*L+c+1,ox+c*cs+cs/2,oy+r*cs+cs*.7);
+    }
+  }
+  ctx.strokeStyle='#1565c0';ctx.lineWidth=2;
+  for(let r=0;r<=W;r++){ctx.beginPath();ctx.moveTo(ox,oy+r*cs);ctx.lineTo(ox+L*cs,oy+r*cs);ctx.stroke();}
+  for(let c=0;c<=L;c++){ctx.beginPath();ctx.moveTo(ox+c*cs,oy);ctx.lineTo(ox+c*cs,oy+W*cs);ctx.stroke();}
+  // labels
+  ctx.fillStyle='#1565c0';ctx.font=`bold ${cs*.55}px 微软雅黑,sans-serif`;ctx.textAlign='center';
+  ctx.fillText('长 = '+L+' 格',ox+L*cs/2,oy-6);
+  ctx.save();ctx.translate(ox-8,oy+W*cs/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('宽='+W,0,0);ctx.restore();
+}
+
+function updateFormula(){
+  const L=parseInt(document.getElementById('fLen').value);
+  const W=parseInt(document.getElementById('fWid').value);
+  document.getElementById('fLenVal').textContent=L;
+  document.getElementById('fWidVal').textContent=W;
+  document.getElementById('fL').textContent=L;
+  document.getElementById('fW').textContent=W;
+  document.getElementById('fA').textContent=L*W;
+  document.getElementById('stepNum').textContent='第 '+(fStep+1)+' 步';
+  document.getElementById('stepDesc').textContent=FSTEPS[fStep];
+  drawFormulaCanvas(L,W,fStep);
+}
+function nextStep(){if(fStep<FSTEPS.length-1){fStep++;updateFormula();speak(FSTEPS[fStep]);}}
+function prevStep(){if(fStep>0){fStep--;updateFormula();speak(FSTEPS[fStep]);}}
+
+// quiz
+let qScore={c:0,w:0},qAns=0;
+function drawQCanvas(L,W){
+  const canvas=document.getElementById('quizCanvas');
+  const ctx=canvas.getContext('2d');
+  const cs=22;
+  const ox=(canvas.width-L*cs)/2, oy=(canvas.height-W*cs)/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let r=0;r<W;r++) for(let c=0;c<L;c++){
+    ctx.fillStyle=`hsl(${210+r*10},65%,${72+c*2}%)`;
+    ctx.fillRect(ox+c*cs,oy+r*cs,cs-1,cs-1);
+  }
+  ctx.strokeStyle='#1565c0';ctx.lineWidth=1.5;
+  for(let r=0;r<=W;r++){ctx.beginPath();ctx.moveTo(ox,oy+r*cs);ctx.lineTo(ox+L*cs,oy+r*cs);ctx.stroke();}
+  for(let c=0;c<=L;c++){ctx.beginPath();ctx.moveTo(ox+c*cs,oy);ctx.lineTo(ox+c*cs,oy+W*cs);ctx.stroke();}
+  ctx.fillStyle='#1565c0';ctx.font=`bold ${cs*.65}px 微软雅黑,sans-serif`;ctx.textAlign='center';
+  ctx.fillText('长='+L+'格',ox+L*cs/2,oy-5);
+  ctx.save();
+  ctx.translate(ox-7,oy+W*cs/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('宽='+W+'格',0,0);
+  ctx.restore();
+}
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const L=2+Math.floor(Math.random()*9);
+  const W=2+Math.floor(Math.random()*7);
+  qAns=L*W;
+  drawQCanvas(L,W);
+  document.getElementById('quizQ').innerHTML=`上面长方形的面积是多少平方格？<br><small style="color:#999">（提示：面积 = 长 × 宽 = ${L} × ${W}）</small>`;
+  speak(`上面长方形的面积是多少平方格？提示：长${L}乘以宽${W}。`);
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';document.getElementById('quizMsg').textContent='✅ 正确！';speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns+' 平方格';speak('答案是'+qAns+'平方格，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','formula','quiz']);
+  if(t==='learn') speak('数格子：点击方格涂色，看看覆盖了多少面积。');
+  if(t==='formula'){fStep=0;updateFormula();speak(FSTEPS[0]);}
+  if(t==='quiz') nextQ();
+}
+speak('欢迎来到面积认识！点击方格涂色，感受面积大小。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

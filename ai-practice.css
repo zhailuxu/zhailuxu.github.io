@@ -1,0 +1,83 @@
+/* ══════════════════════════════════════════
+   AI 出题 / AI 解析 —— 共享样式
+   由 olympiad1.html / olympiad2.html / olympiad3.html 共同引用。
+   任何这三份文件都需要的 AI 相关外观改动，只改这一处即可。
+══════════════════════════════════════════ */
+
+/* ── AI 相似题生成（错题练习专用）── */
+.q-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.q-main{flex:1 1 260px;min-width:0;}
+.ai-gen-btn{display:none;flex-shrink:0;align-self:flex-start;margin-top:2px;
+  border:none;border-radius:12px;padding:7px 14px;font-size:.8rem;font-weight:bold;
+  cursor:pointer;font-family:inherit;color:#fff;
+  background:linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow:0 2px 8px rgba(94,53,177,.3);transition:transform .1s,opacity .15s;
+  white-space:nowrap;}
+.ai-gen-btn:active{transform:scale(.95);}
+.ai-gen-btn.show{display:inline-flex;align-items:center;gap:4px;}
+.ai-gen-btn:disabled{opacity:.6;cursor:default;}
+.ai-panel{display:none;flex:1 1 220px;min-width:200px;max-width:320px;
+  background:linear-gradient(135deg,#ede7f6,#f3e5f5);border-radius:14px;
+  border:1.5px solid #d1c4e9;padding:10px 12px;font-size:.85rem;color:#4527a0;
+  line-height:1.7;}
+.ai-panel.show{display:block;}
+.ai-panel .ai-tag{font-size:.72rem;font-weight:bold;color:#5e35b1;
+  background:#fff;display:inline-block;border-radius:8px;padding:1px 8px;margin-bottom:6px;}
+.ai-panel .ai-loading{color:#7e57c2;font-style:italic;}
+.ai-panel .ai-err{color:#c62828;font-size:.78rem;}
+.ai-panel .ai-retry{margin-top:6px;border:1.5px solid #9575cd;background:#fff;color:#5e35b1;
+  border-radius:8px;padding:3px 10px;font-size:.75rem;cursor:pointer;font-family:inherit;}
+.ai-panel .ai-reveal{display:block;margin:6px 0;border:1.5px dashed #9575cd;background:#fff;
+  color:#5e35b1;border-radius:8px;padding:4px 10px;font-size:.78rem;font-weight:bold;
+  cursor:pointer;font-family:inherit;width:100%;text-align:center;}
+.ai-panel .ai-answer{display:none;margin-bottom:4px;}
+.ai-panel .ai-answer.show{display:block;animation:aiAnsIn .25s ease-out;}
+@keyframes aiAnsIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.ai-panel .ai-try-row{display:flex;gap:6px;margin:8px 0 4px;}
+.ai-panel .ai-try-input{flex:1;min-width:0;border:1.5px solid #b39ddb;border-radius:8px;
+  padding:5px 8px;font-size:.85rem;font-family:inherit;color:#4527a0;outline:none;}
+.ai-panel .ai-try-input:focus{border-color:#5e35b1;}
+.ai-panel .ai-try-input:disabled{background:#ede7f6;color:#7e57c2;}
+.ai-panel .ai-check-btn{flex-shrink:0;border:none;border-radius:8px;padding:5px 12px;
+  font-size:.78rem;font-weight:bold;cursor:pointer;font-family:inherit;color:#fff;
+  background:linear-gradient(135deg,#7e57c2,#4527a0);}
+.ai-panel .ai-fb{font-size:.8rem;font-weight:bold;min-height:18px;margin-bottom:2px;}
+.ai-panel .ai-fb.ok{color:#2e7d32;}
+.ai-panel .ai-fb.no{color:#c62828;}
+@media print{ .ai-gen-btn,.ai-panel{display:none!important;} }
+@media(max-width:520px){ .ai-panel{max-width:100%;flex-basis:100%;} }
+
+/* ── AI 答案解析（"答案解析"弹窗专用）── */
+.sol-q-head{justify-content:space-between;}
+.sol-ai-btn{flex-shrink:0;border:none;border-radius:10px;padding:4px 11px;
+  font-size:.74rem;font-weight:bold;cursor:pointer;font-family:inherit;color:#fff;
+  background:linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow:0 2px 6px rgba(94,53,177,.3);white-space:nowrap;}
+.sol-ai-btn:active{transform:scale(.95);}
+.sol-ai-btn:disabled{opacity:.6;cursor:default;}
+.sol-ai-box{display:none;margin:8px 0 2px 32px;background:linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border:1.5px solid #d1c4e9;border-radius:10px;padding:9px 11px;font-size:.83rem;
+  color:#4527a0;line-height:1.75;}
+.sol-ai-box.show{display:block;animation:solAiIn .25s ease-out;}
+@keyframes solAiIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.sol-ai-box .sol-ai-tag{font-size:.7rem;font-weight:bold;color:#5e35b1;
+  background:#fff;display:inline-block;border-radius:8px;padding:1px 8px;margin-bottom:5px;}
+.sol-ai-box .sol-ai-loading{color:#7e57c2;font-style:italic;}
+.sol-ai-box .sol-ai-err{color:#c62828;font-size:.78rem;}
+.sol-ai-box .sol-ai-retry{margin-top:5px;border:1.5px solid #9575cd;background:#fff;color:#5e35b1;
+  border-radius:8px;padding:3px 10px;font-size:.74rem;cursor:pointer;font-family:inherit;}
+
+/* AI 详细讲解：大方向提示 + 逐条小卡片步骤（替代大段文字） */
+.sol-ai-bigidea{background:#fff;border-radius:8px;padding:7px 10px;margin-bottom:8px;
+  font-size:.86rem;font-weight:bold;color:#5e35b1;line-height:1.5;
+  border:1.5px dashed #b39ddb;}
+.sol-ai-steps{display:flex;flex-direction:column;gap:7px;}
+.sol-ai-step{display:flex;align-items:flex-start;gap:8px;background:#fff;
+  border-radius:9px;padding:8px 10px;box-shadow:0 1px 4px rgba(94,53,177,.12);
+  flex-wrap:wrap;}
+.sol-ai-step-n{flex-shrink:0;padding:2px 9px;border-radius:10px;
+  background:linear-gradient(135deg,#9575cd,#5e35b1);color:#fff;
+  font-size:.7rem;font-weight:bold;white-space:nowrap;line-height:1.5;}
+.sol-ai-step-emoji{flex-shrink:0;font-size:1.05rem;line-height:1.5;}
+.sol-ai-step-text{font-size:.84rem;color:#333;line-height:1.5;}
+@media print{ .sol-ai-btn,.sol-ai-box{display:none!important;} }

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>二年级每日数学训练｜慧陪学</title>
+<meta name="description" content="把二年级每天的口算、知识、综合应用和数学思维练习按顺序串起来，完成一项再进入下一项。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+:root{--ink:#34443d;--muted:#718078;--green:#47715b;--green-soft:#e3efe5;--cream:#fffaf0;--gold:#c58a35;--line:#d9e5d9;--paper:rgba(255,255,252,.95);--shadow:0 8px 28px rgba(55,79,61,.11)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:18px 13px 52px;background:linear-gradient(145deg,#e1efdc,#f4f0d9 52%,#f3e3d6);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+button,a{font:inherit}.wrap{max-width:880px;margin:auto}.hero,.overview,.task,.history-panel,.week-preview{border:1px solid rgba(255,255,255,.78);background:var(--paper);box-shadow:var(--shadow)}
+.hero{padding:24px 20px;border-radius:27px;text-align:center}.hero-icon{font-size:2.5rem}.hero h1{margin:5px 0 7px;color:#5d5949;font-size:clamp(1.75rem,6vw,2.55rem);letter-spacing:3px}.hero p{max-width:610px;margin:auto;color:var(--muted);font-size:.88rem;line-height:1.7}.hero-tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{border:1px solid #cbd9ca;border-radius:999px;background:#f8fbf5;padding:7px 12px;color:#5e7264;font-size:.76rem;font-weight:850}.chip.button{cursor:pointer}.chip.button:hover{border-color:var(--green);color:var(--green)}
+.overview{margin:14px 0;padding:17px 19px;border-radius:21px}.overview-head{display:flex;justify-content:space-between;align-items:flex-start;gap:13px}.date{color:#65736b;font-size:.8rem;font-weight:800}.overview h2{margin:4px 0 0;font-size:1.15rem}.count{color:var(--green);font-size:.87rem;font-weight:900}.meter{height:11px;margin-top:13px;border-radius:99px;background:#dce6d9;overflow:hidden}.meter span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#7aa482,#c69a49);transition:width .3s}.overview-note{margin:9px 0 0;color:var(--muted);font-size:.76rem;line-height:1.6}
+.tasks{position:relative;display:grid;gap:12px}.task{--accent:#5c8067;position:relative;display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:14px;padding:17px;border-left:7px solid var(--accent);border-radius:20px}.task::before{content:"";position:absolute;left:20px;top:-13px;width:3px;height:13px;background:#bacbb9}.task:first-child::before{display:none}.task-icon{display:grid;width:49px;height:49px;place-items:center;border-radius:16px;background:color-mix(in srgb,var(--accent) 14%,white);font-size:1.6rem}.task-step{color:var(--accent);font-size:.71rem;font-weight:950;letter-spacing:1px}.task h3{margin:3px 0 5px;font-size:1.05rem}.task p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.55}.task-meta{margin-top:6px;color:#7f897f;font-size:.69rem;font-weight:750}.task-action{min-width:116px;border:0;border-radius:13px;background:var(--accent);padding:10px 13px;color:#fff;cursor:pointer;font-size:.78rem;font-weight:900}.task-action:hover{filter:brightness(.95)}.task.current{outline:3px solid rgba(197,138,53,.2);outline-offset:1px}.task.done{background:rgba(238,247,235,.96)}.task.done .task-icon{background:#d8ead7;color:#3d704c}.task.done .task-action{background:#e0e9df;color:#58705e}.task.locked{opacity:.58}.task.locked .task-action{background:#d6ddd5;color:#758077;cursor:not-allowed}.task:focus-within{outline:3px solid rgba(71,113,91,.25);outline-offset:2px}
+.complete{display:none;margin-top:14px;padding:23px;border-radius:22px;background:linear-gradient(135deg,#dcedd9,#fff4d8);text-align:center;box-shadow:var(--shadow)}.complete.show{display:block}.complete strong{display:block;color:#4f7459;font-size:1.25rem}.complete p{margin:7px 0 0;color:#66766c;font-size:.82rem;line-height:1.65}.streak{display:inline-block;margin-top:10px;border-radius:999px;background:#fff;padding:7px 12px;color:#93692d;font-size:.78rem;font-weight:900}
+.history-panel{margin-top:15px;padding:17px;border-radius:21px}.history-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.history-head h2{margin:0;color:#52685a;font-size:1rem}.history-head p{margin:4px 0 0;color:var(--muted);font-size:.7rem}.history-total{border-radius:999px;background:#e6f0e4;padding:6px 10px;color:#54705b;font-size:.7rem;font-weight:900;white-space:nowrap}.history-list{display:grid;gap:9px;margin-top:12px}.history-empty{border-radius:14px;background:#f3f6f0;padding:15px;color:#7a857d;text-align:center;font-size:.78rem}.history-day{border:1px solid #dbe6da;border-radius:15px;background:#fbfdf9;padding:12px}.history-day-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.history-date{color:#4f6255;font-size:.8rem;font-weight:900}.history-result{border-radius:999px;background:#edf2e9;padding:5px 8px;color:#6d7c71;font-size:.67rem;font-weight:900}.history-result.complete-result{background:#dcecdc;color:#457052}.history-theme{margin:4px 0 8px;color:#77837b;font-size:.68rem}.history-tasks{display:flex;gap:6px;flex-wrap:wrap}.history-task{border-radius:999px;background:#f0f3ee;padding:5px 8px;color:#899189;font-size:.65rem}.history-task.done{background:#e1ede0;color:#4f7357}.history-task.has-wrong{background:#f4e4df;color:#96564a}.history-time{margin-top:8px;color:#89928c;font-size:.63rem}.wrong-review{margin-top:10px;border-top:1px dashed #d8dfd5;padding-top:9px}.wrong-review summary{cursor:pointer;color:#91584d;font-size:.72rem;font-weight:900}.wrong-list{display:grid;gap:8px;margin-top:8px}.wrong-item{border-left:4px solid #c77a69;border-radius:10px;background:#fff7f4;padding:10px}.wrong-item.reviewed{border-left-color:#6f9778;background:#f3f8f1}.wrong-item-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.wrong-item-head b{color:#67564f;font-size:.73rem}.wrong-item-head time{color:#90847f;font-size:.6rem}.wrong-item p{margin:6px 0 0;color:#756962;font-size:.68rem;line-height:1.55}.wrong-item p b{color:#5f514b}.review-button{margin-top:8px;border:0;border-radius:999px;background:#9b665a;padding:6px 10px;color:#fff;cursor:pointer;font-size:.65rem;font-weight:900}.wrong-item.reviewed .review-button{background:#dfe9dd;color:#56705b}
+.week-preview{margin-top:15px;padding:17px;border-radius:21px}.week-preview summary{cursor:pointer;color:#56685d;font-weight:900}.week-list{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:13px}.day{min-width:0;border:0;border-radius:13px;background:#edf3e9;padding:9px 5px;text-align:center;cursor:pointer}.day:hover{background:#e4eee1}.day.today{box-shadow:inset 0 0 0 2px #75967d}.day.selected{background:#d6e8da;box-shadow:inset 0 0 0 2px #52765e}.day b{display:block;color:#536a58;font-size:.76rem}.day span{display:block;margin-top:4px;color:#738078;font-size:.64rem;line-height:1.4}.week-detail{margin-top:11px;border:1px solid #d4e2d3;border-radius:17px;background:#f9fcf7;padding:14px}.week-detail h3{margin:0 0 10px;color:#4e6756;font-size:.95rem}.week-detail-tasks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.week-task{display:grid;grid-template-columns:28px 1fr;align-items:start;gap:8px;border-radius:12px;background:#fff;padding:10px}.week-task-number{display:grid;width:25px;height:25px;place-items:center;border-radius:50%;background:#e0ece0;color:#53705b;font-size:.7rem;font-weight:950}.week-task b{display:block;color:#4c5e52;font-size:.76rem}.week-task small{display:block;margin-top:3px;color:#77827b;font-size:.66rem;line-height:1.45}.principle{margin:15px 0 0;padding:13px 15px;border-radius:16px;background:rgba(255,250,240,.85);color:#74654f;font-size:.77rem;line-height:1.7}.back{display:block;margin:19px auto 0;text-align:center;color:#526f5b;text-decoration:none;font-size:.84rem;font-weight:850}
+dialog{width:min(980px,100vw);height:min(820px,100dvh);max-width:none;max-height:none;border:0;border-radius:23px;padding:0;background:#f6f8f3;box-shadow:0 20px 70px rgba(31,46,35,.35)}dialog::backdrop{background:rgba(30,39,33,.62)}.practice-shell{height:100%;display:grid;grid-template-rows:auto 1fr auto}.practice-head,.practice-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#f7faf4}.practice-head{border-bottom:1px solid #dce5da}.practice-head strong{font-size:.9rem}.practice-close,.practice-done{border:0;border-radius:11px;padding:9px 13px;cursor:pointer;font-weight:850}.practice-close{background:#e6ece4;color:#5d6b61}.practice-done{background:var(--green);color:#fff}.practice-frame{width:100%;height:100%;border:0;background:#fff}.practice-foot{border-top:1px solid #dce5da}.practice-tip{color:#718078;font-size:.73rem}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:4px solid rgba(47,108,78,.28);outline-offset:2px}
+@media(max-width:650px){body{padding:11px 10px 42px}.hero{padding:20px 14px}.overview{padding:15px}.task{grid-template-columns:45px 1fr;padding:14px 12px;gap:10px}.task-icon{width:43px;height:43px}.task-action{grid-column:1/-1;width:100%}.week-list{grid-template-columns:repeat(2,1fr)}.day:last-child{grid-column:1/-1}.week-detail-tasks{grid-template-columns:1fr}dialog{width:100vw;height:100dvh;border-radius:0}.practice-tip{display:none}.practice-head,.practice-foot{padding:max(9px,env(safe-area-inset-top)) 10px 9px}.practice-foot{padding:9px 10px max(9px,env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#47715b">
+<main class="wrap">
+  <header class="hero">
+    <div class="hero-icon" aria-hidden="true">🧮</div>
+    <h1>二年级每日数学训练</h1>
+    <p>每天约 15～20 分钟，按顺序完成口算、知识、综合应用和数学思维。一次只做一项，做完再进入下一项。</p>
+    <div class="hero-tools"><span class="chip" id="dayTheme"></span><button class="chip button" type="button" id="speakToggle" aria-pressed="true">🔊 声音解说 开</button></div>
+  </header>
+
+  <section class="overview" aria-labelledby="todayTitle">
+    <div class="overview-head"><div><div class="date" id="dateText"></div><h2 id="todayTitle">今天的四项练习</h2></div><span class="count" id="progressText">0 / 4</span></div>
+    <div class="meter" role="progressbar" aria-label="今日训练进度" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span id="progressBar"></span></div>
+    <p class="overview-note" id="nextHint" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="tasks" id="taskList" aria-label="今日顺序训练"></section>
+
+  <section class="complete" id="completePanel" aria-live="polite">
+    <strong>今天的数学训练完成啦！</strong>
+    <p>四种能力都练到了。明天会自动换一组内容，继续稳稳向前。</p>
+    <span class="streak" id="streakText">连续完成 1 天</span>
+  </section>
+
+  <section class="history-panel" aria-labelledby="historyTitle">
+    <div class="history-head"><div><h2 id="historyTitle">每日训练记录</h2><p>保存完成情况与错题明细，方便家长练习后检查；数据仅留在当前设备。</p></div><span class="history-total" id="historyTotal">0 天</span></div>
+    <div class="history-list" id="historyList" aria-live="polite"></div>
+  </section>
+
+  <details class="week-preview">
+    <summary>查看一周练习安排</summary>
+    <div class="week-list" id="weekList"></div>
+    <section class="week-detail" id="weekDetail" aria-live="polite" aria-labelledby="weekDetailTitle">
+      <h3 id="weekDetailTitle"></h3>
+      <div class="week-detail-tasks" id="weekDetailTasks"></div>
+    </section>
+    <p class="principle">安排原则：运算每天出现，数位、时间、长度、方向、图形、货币和统计轮换练习；综合题与思维题交替出现。遇到明显困难时，可以停留在当前任务，不必为了打卡赶进度。</p>
+  </details>
+  <a class="back" href="index.html">← 返回慧陪学</a>
+</main>
+
+<dialog id="practiceDialog" aria-labelledby="practiceTitle">
+  <div class="practice-shell">
+    <header class="practice-head"><strong id="practiceTitle">今日练习</strong><button type="button" class="practice-close" id="closePractice">暂时返回</button></header>
+    <iframe class="practice-frame" id="practiceFrame" title="当前数学练习"></iframe>
+    <footer class="practice-foot"><span class="practice-tip">完成页面中的一轮练习后，再点击右侧按钮。</span><button type="button" class="practice-done" id="finishTask">完成这项，学习下一项</button></footer>
+  </div>
+</dialog>
+
+<script src="hpx-core.js"></script>
+<script>
+(function(){
+'use strict';
+const STORE='hpx_grade2_daily_math_v1';
+const WEEK_PLAN=[
+ {day:'星期一',theme:'加减法与数位',tasks:[
+  {track:'口算与运算',icon:'🧮',title:'进位加减法',href:'carry.html',minutes:'4～5分钟',description:'练习两位数加减法，注意进位、退位和数位对齐。'},
+  {track:'当日知识',icon:'🔢',title:'数位认知',href:'placevalue.html',minutes:'3～4分钟',description:'认清个位、十位和百位，理解数字由哪些数位组成。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'4～5分钟',description:'完成一轮加减乘除综合题，读清题目再计算。'},
+  {track:'数学思维',icon:'🧩',title:'数学广角',href:'mathwide1.html',minutes:'3～5分钟',description:'练习排除、搭配或等量代换，尝试说出自己的理由。'}]},
+ {day:'星期二',theme:'乘法与时间',tasks:[
+  {track:'口算与运算',icon:'✖️',title:'九九乘法口诀',href:'multiplication.html',minutes:'4～5分钟',description:'先理解几个几，再练习当天的乘法口诀。'},
+  {track:'当日知识',icon:'🕐',title:'认识时钟',href:'clock.html',minutes:'3～4分钟',description:'观察时针和分针，练习整时、半时及常见时刻。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'4～5分钟',description:'完成一轮随机练习，遇到错题先想清楚再重做。'},
+  {track:'数学思维',icon:'🔶',title:'图案接龙',href:'pattern-sequence.html',minutes:'3～4分钟',description:'找出重复或变化规律，再选择下一个图案。'}]},
+ {day:'星期三',theme:'除法与长度',tasks:[
+  {track:'口算与运算',icon:'➗',title:'除法速算',href:'division.html',minutes:'4～5分钟',description:'把平均分和乘法口诀联系起来，练习表内除法。'},
+  {track:'当日知识',icon:'📏',title:'长度认识',href:'length.html',minutes:'3～4分钟',description:'选择合适的长度单位，练习估测、读数和简单换算。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'4～5分钟',description:'完成一轮综合计算，检查运算符号和计算顺序。'},
+  {track:'数学思维',icon:'🔢',title:'数字迷宫',href:'number-maze.html',minutes:'3～5分钟',description:'边计算边找正确路线，错了可以回到上一步重新判断。'}]},
+ {day:'星期四',theme:'加减法与方向',tasks:[
+  {track:'口算与运算',icon:'🧮',title:'进位加减法',href:'carry.html',minutes:'4～5分钟',description:'再次练习容易出错的进位与退位，计算后主动验算。'},
+  {track:'当日知识',icon:'🧭',title:'方向认识',href:'direction.html',minutes:'3～4分钟',description:'辨认东南西北，结合路线说清从哪里走到哪里。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'4～5分钟',description:'完成一轮课后巩固题，重点理解题目在问什么。'},
+  {track:'数学思维',icon:'🧩',title:'数学广角',href:'mathwide1.html',minutes:'3～5分钟',description:'用列表、排除或尝试的方法解决一道思维题。'}]},
+ {day:'星期五',theme:'乘法与图形',tasks:[
+  {track:'口算与运算',icon:'✖️',title:'九九乘法口诀',href:'multiplication.html',minutes:'4～5分钟',description:'复习本周口诀，重点练习停顿或答错的算式。'},
+  {track:'当日知识',icon:'🔷',title:'图形认识',href:'shapes.html',minutes:'3～4分钟',description:'观察边和角，分辨常见平面图形及它们的特点。'},
+  {track:'综合应用',icon:'⚙️',title:'混合运算',href:'mixed.html',minutes:'4～5分钟',description:'从简单模式开始，注意先看清运算顺序。'},
+  {track:'数学思维',icon:'🗂️',title:'分类统计',href:'data-classification.html',minutes:'3～5分钟',description:'整理数据并比较多少，用清楚的分类帮助计算。'}]},
+ {day:'星期六',theme:'除法与生活数学',tasks:[
+  {track:'口算与运算',icon:'➗',title:'除法速算',href:'division.html',minutes:'4～5分钟',description:'复习平均分和表内除法，先用乘法口诀想答案。'},
+  {track:'当日知识',icon:'🛍️',title:'货币商店',href:'money-shop.html',minutes:'3～5分钟',description:'认识元、角、分，在购物情境中练习付款和找零。'},
+  {track:'综合应用',icon:'📝',title:'综合数学练习',href:'math1.html',minutes:'4～5分钟',description:'完成一轮综合题，把计算过程写清楚。'},
+  {track:'数学思维',icon:'🥇',title:'二年级思维训练',href:'olympiad2.html',minutes:'3～5分钟',description:'选择简单难度，慢慢分析一道有挑战的题。'}]},
+ {day:'星期日',theme:'综合复习与整理',tasks:[
+  {track:'口算与运算',icon:'⚙️',title:'混合运算',href:'mixed.html',minutes:'4～5分钟',description:'选择适合自己的难度，复习一周的计算方法。'},
+  {track:'当日知识',icon:'🗂️',title:'分类统计',href:'data-classification.html',minutes:'3～4分钟',description:'整理一组数据，回答最多、最少、相差和总数。'},
+  {track:'综合应用',icon:'🌸',title:'数学小练习',href:'math_drill.html',minutes:'4～5分钟',description:'做一轮综合巩固，把本周不熟练的地方找出来。'},
+  {track:'数学思维',icon:'🧩',title:'数学广角',href:'mathwide1.html',minutes:'3～5分钟',description:'用图、表格或尝试法完成一题，并说说为什么。'}]}
+];
+const COLORS=['#5d8067','#547b86','#8a704c','#765f83'];
+const $=id=>document.getElementById(id);
+const escapeHtml=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const speech=window.Hpx&&Hpx.speech?Hpx.speech.create({buttonId:'speakToggle',rate:.88,pitch:1.04}):null;
+const say=text=>speech&&speech.speak(text);
+let activeTaskIndex=-1;
+let previewDayIndex=null;
+
+function localDateKey(date){return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');}
+function loadState(){try{const value=JSON.parse(localStorage.getItem(STORE)||'{"days":{}}');return value&&value.days?value:{days:{}};}catch(error){return {days:{}};}}
+function saveState(state){
+ const keys=Object.keys(state.days).sort().slice(-60),trimmed={days:{}};
+ keys.forEach(key=>{trimmed.days[key]=state.days[key];});
+ try{localStorage.setItem(STORE,JSON.stringify(trimmed));}catch(error){}
+ return trimmed;
+}
+function todayContext(){
+ const now=new Date(),dateKey=localDateKey(now),planIndex=(now.getDay()+6)%7,state=loadState();
+ if(!state.days[dateKey])state.days[dateKey]={done:[]};
+ return {now,dateKey,planIndex,plan:WEEK_PLAN[planIndex],state,record:state.days[dateKey]};
+}
+function completedStreak(state,date){
+ let total=0,cursor=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+ for(let index=0;index<365;index++){
+  const record=state.days[localDateKey(cursor)];
+  if(!record||new Set(record.done||[]).size<4)break;
+  total++;cursor.setDate(cursor.getDate()-1);
+ }
+ return total;
+}
+function recordPlanIndex(dateKey){
+ const date=new Date(`${dateKey}T12:00:00`);
+ return (date.getDay()+6)%7;
+}
+function formatRecordTime(value){
+ if(!value)return '';
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?'':new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
+}
+function renderHistory(state){
+ const hasActivity=record=>new Set(record.done||[]).size>0||Object.values(record.taskResults||{}).some(result=>Array.isArray(result&&result.mistakes)&&result.mistakes.length>0);
+ const allEntries=Object.entries(state.days||{}).filter(([dateKey,record])=>/^\d{4}-\d{2}-\d{2}$/.test(dateKey)&&hasActivity(record)).sort(([a],[b])=>b.localeCompare(a)),entries=allEntries.slice(0,14);
+ $('historyTotal').textContent=`已训练 ${allEntries.length} 天`;
+ if(!entries.length){$('historyList').innerHTML='<div class="history-empty">完成第一项练习后，这里就会留下今天的记录。</div>';return;}
+ $('historyList').innerHTML=entries.map(([dateKey,record])=>{
+  const plan=WEEK_PLAN[Number.isInteger(record.planIndex)?record.planIndex:recordPlanIndex(dateKey)],done=new Set(record.done||[]),doneCount=Math.min(4,done.size),date=new Date(`${dateKey}T12:00:00`),time=formatRecordTime(record.completedAt||record.updatedAt);
+  const dateText=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'short'}).format(date);
+  const results=record.taskResults||{},wrongRows=[];
+  const taskStatus=plan.tasks.map((task,index)=>{const result=results[index],attempts=Math.max(0,Number(result&&result.attempts)||0),mistakes=Array.isArray(result&&result.mistakes)?result.mistakes:[];mistakes.forEach(item=>wrongRows.push({taskIndex:index,task:task,item:item}));return `<span class="history-task${mistakes.length?' has-wrong':done.has(index)?' done':''}">${done.has(index)?'✓':'○'} ${task.track}${attempts>1?` · ${attempts}次`:''}${mistakes.length?` · ${mistakes.length}错`:''}</span>`;}).join('');
+  const wrongHtml=wrongRows.length?`<details class="wrong-review"><summary>错题记录 ${wrongRows.length} 条 · 家长展开检查</summary><div class="wrong-list">${wrongRows.map(row=>{const item=row.item||{},reviewed=Boolean(item.reviewedAt),wrongTime=formatRecordTime(item.at);return `<article class="wrong-item${reviewed?' reviewed':''}"><div class="wrong-item-head"><b>${escapeHtml(row.task.track)} · ${escapeHtml(row.task.title)}</b>${wrongTime?`<time>${wrongTime}</time>`:''}</div><p><b>题目：</b>${escapeHtml(item.question||'页面未提供可识别的题干文字')}</p><p><b>孩子作答：</b>${escapeHtml(item.answer||'未能识别')}</p>${item.correct?`<p><b>正确答案：</b>${escapeHtml(item.correct)}</p>`:`<p><b>页面提示：</b>${escapeHtml(item.feedback||'页面已判定本次作答不正确')}</p>`}<button type="button" class="review-button" data-review-date="${dateKey}" data-review-task="${row.taskIndex}" data-review-id="${escapeHtml(item.id||'')}">${reviewed?'✓ 家长已检查':'标记为家长已检查'}</button></article>`;}).join('')}</div></details>`:'';
+  return `<article class="history-day"><div class="history-day-head"><span class="history-date">${dateText}</span><span class="history-result${doneCount===4?' complete-result':''}">${doneCount===4?'全部完成':`完成 ${doneCount} / 4`}</span></div><div class="history-theme">${plan.theme}</div><div class="history-tasks">${taskStatus}</div>${time?`<div class="history-time">${doneCount===4?'完成时间':'最近训练'} ${time}</div>`:''}${wrongHtml}</article>`;
+ }).join('');
+}
+function renderWeek(todayIndex){
+ if(previewDayIndex===null)previewDayIndex=todayIndex;
+ $('weekList').innerHTML=WEEK_PLAN.map((plan,index)=>`<button type="button" class="day${index===todayIndex?' today':''}${index===previewDayIndex?' selected':''}" data-preview-day="${index}" aria-pressed="${index===previewDayIndex}"><b>${plan.day.replace('星期','周')}${index===todayIndex?' · 今天':''}</b><span>${plan.theme}</span></button>`).join('');
+ renderWeekDetail(previewDayIndex);
+}
+function renderWeekDetail(index){
+ const plan=WEEK_PLAN[index];
+ $('weekDetailTitle').textContent=`${plan.day} · ${plan.theme}（预览）`;
+ $('weekDetailTasks').innerHTML=plan.tasks.map((task,taskIndex)=>`<div class="week-task"><span class="week-task-number">${taskIndex+1}</span><div><b>${task.track} · ${task.title}</b><small>${task.description} · 约 ${task.minutes}</small></div></div>`).join('');
+}
+function render(){
+ const context=todayContext(),done=new Set(context.record.done||[]),doneCount=Math.min(4,done.size),nextIndex=context.plan.tasks.findIndex((_,index)=>!done.has(index));
+ $('dateText').textContent=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(context.now);
+ $('dayTheme').textContent=`今日主题 · ${context.plan.theme}`;
+ $('progressText').textContent=`${doneCount} / 4`;
+ $('progressBar').style.width=`${doneCount/4*100}%`;
+ document.querySelector('.meter').setAttribute('aria-valuenow',String(doneCount));
+ $('taskList').innerHTML=context.plan.tasks.map((task,index)=>{
+  const isDone=done.has(index),isCurrent=index===nextIndex,isLocked=!isDone&&!isCurrent,status=isDone?'done':isCurrent?'current':'locked';
+  const buttonText=isDone?'再练一次':isCurrent?'开始练习 →':'完成上一项后解锁';
+  return `<article class="task ${status}" style="--accent:${COLORS[index]}"><span class="task-icon" aria-hidden="true">${isDone?'✓':task.icon}</span><div><div class="task-step">第 ${index+1} 项 · ${task.track}</div><h3>${task.title}</h3><p>${task.description}</p><div class="task-meta">约 ${task.minutes}</div></div><button type="button" class="task-action" data-task="${index}" ${isLocked?'disabled':''}>${buttonText}</button></article>`;
+ }).join('');
+ const complete=doneCount===4;
+ $('completePanel').classList.toggle('show',complete);
+ $('nextHint').textContent=complete?'今天四项都完成了，可以安心休息。':`下一项：${context.plan.tasks[nextIndex].track} · ${context.plan.tasks[nextIndex].title}`;
+ if(complete)$('streakText').textContent=`连续完成 ${completedStreak(context.state,context.now)} 天`;
+ renderHistory(context.state);
+ renderWeek(context.planIndex);
+}
+function openTask(index){
+ const context=todayContext(),task=context.plan.tasks[index],dialog=$('practiceDialog');activeTaskIndex=index;
+ const query=new URLSearchParams({from:'grade2-daily-math',date:context.dateKey,task:String(index)});
+ $('practiceTitle').textContent=`第 ${index+1} 项 · ${task.title}`;$('practiceFrame').src=`${task.href}?${query}`;$('practiceFrame').title=task.title;
+ const alreadyDone=(context.record.done||[]).includes(index);
+ $('finishTask').textContent=alreadyDone?'结束复习，返回计划':'完成这项，学习下一项';
+ if(typeof dialog.showModal==='function')dialog.showModal();else window.location.href=task.href;
+}
+function closeTask(){const dialog=$('practiceDialog');if(dialog.open)dialog.close();$('practiceFrame').src='about:blank';activeTaskIndex=-1;}
+function finishTask(){
+ if(activeTaskIndex<0)return;
+ const context=todayContext(),done=new Set(context.record.done||[]),wasDone=done.has(activeTaskIndex),now=new Date().toISOString();
+ done.add(activeTaskIndex);context.record.done=[...done].sort((a,b)=>a-b);context.record.planIndex=context.planIndex;context.record.taskResults=context.record.taskResults||{};
+ const previous=context.record.taskResults[activeTaskIndex]||{};
+ context.record.taskResults[activeTaskIndex]=Object.assign({},previous,{completedAt:previous.completedAt||now,lastPracticedAt:now,attempts:Math.max(0,Number(previous.attempts)||0)+1});
+ context.record.updatedAt=now;if(done.size===4&&!context.record.completedAt)context.record.completedAt=now;saveState(context.state);
+ closeTask();render();
+ if(!wasDone){
+  const next=document.querySelector('.task.current');if(next)next.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  say(done.size===4?'今天四项数学训练全部完成！':`完成了。下一项，${context.plan.tasks[done.size].track}。`);
+ }
+}
+function captureWrongAnswer(event){
+ const frame=$('practiceFrame'),message=event.data;
+ if(event.source!==frame.contentWindow||!message||message.type!=='hpx:grade2-daily-wrong'||message.version!==1)return;
+ const context=todayContext(),index=Number(message.taskIndex),detail=message.detail||{};
+ if(message.dateKey!==context.dateKey||index!==activeTaskIndex||index<0||index>3)return;
+ const clean=(value,limit)=>String(value||'').replace(/\s+/g,' ').trim().slice(0,limit);
+ const item={id:`${Date.now()}-${index}`,question:clean(detail.question,240),answer:clean(detail.answer,100),correct:clean(detail.correct,120),feedback:clean(detail.feedback,240),at:clean(detail.at,40)||new Date().toISOString(),reviewedAt:null};
+ context.record.planIndex=context.planIndex;context.record.taskResults=context.record.taskResults||{};
+ const result=context.record.taskResults[index]||{},mistakes=Array.isArray(result.mistakes)?result.mistakes.slice(-39):[];
+ const duplicate=mistakes.some(previous=>previous.question===item.question&&previous.answer===item.answer&&previous.feedback===item.feedback&&Math.abs(new Date(previous.at).getTime()-new Date(item.at).getTime())<3000);
+ if(duplicate)return;
+ mistakes.push(item);context.record.taskResults[index]=Object.assign({},result,{mistakes:mistakes});context.record.updatedAt=item.at;saveState(context.state);renderHistory(context.state);
+}
+function toggleReviewed(button){
+ const dateKey=button.dataset.reviewDate,index=Number(button.dataset.reviewTask),id=button.dataset.reviewId;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)||!Number.isInteger(index)||index<0||index>3||!id)return;
+ const state=loadState(),record=state.days[dateKey],result=record&&record.taskResults&&record.taskResults[index],mistakes=result&&Array.isArray(result.mistakes)?result.mistakes:null,item=mistakes&&mistakes.find(entry=>entry.id===id);
+ if(!item)return;
+ item.reviewedAt=item.reviewedAt?null:new Date().toISOString();saveState(state);renderHistory(state);
+}
+$('taskList').addEventListener('click',event=>{const button=event.target.closest('[data-task]');if(button&&!button.disabled)openTask(Number(button.dataset.task));});
+$('weekList').addEventListener('click',event=>{const button=event.target.closest('[data-preview-day]');if(!button)return;previewDayIndex=Number(button.dataset.previewDay);renderWeek(todayContext().planIndex);});
+$('historyList').addEventListener('click',event=>{const button=event.target.closest('[data-review-id]');if(button)toggleReviewed(button);});
+$('closePractice').addEventListener('click',closeTask);$('finishTask').addEventListener('click',finishTask);$('speakToggle').addEventListener('click',()=>speech&&speech.toggle());
+$('practiceDialog').addEventListener('close',()=>{$('practiceFrame').src='about:blank';activeTaskIndex=-1;});
+window.addEventListener('message',captureWrongAnswer);
+window.addEventListener('pageshow',render);window.addEventListener('storage',render);render();
+}());
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

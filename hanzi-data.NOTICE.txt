@@ -1,0 +1,16 @@
+Hanzi stroke data notice
+
+File: hanzi-data.js
+Source: Hanzi Writer Data / Make Me A Hanzi
+Original glyph data: Copyright (C) 1999 Arphic Technology Co., Ltd.
+License: Arphic Public License
+Full license: licenses/Hanzi-Writer-Data-Arphic.txt
+
+Local change recorded on 2026-08-09:
+The upstream per-character JSON data was packaged as one browser JavaScript
+object for offline loading. No intentional changes were made to individual
+stroke outlines.
+
+Recipients may copy and modify the data under the Arphic Public License.
+If stroke outlines are modified later, record the date and nature of those
+changes in this notice.

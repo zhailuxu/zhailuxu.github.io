@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>说明文结构分析</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f2f1 0%,#e8f5e9 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#004d40;letter-spacing:1px;text-shadow:2px 3px 0 #80cbc4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.method-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.method-btn{padding:8px 14px;border:2px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.method-btn.on{background:#00695c;color:#fff;border-color:#00695c;}
+.method-title{text-align:center;font-size:1.2rem;font-weight:bold;color:#004d40;margin-bottom:8px;}
+.method-desc{text-align:center;font-size:.9rem;color:#666;line-height:1.7;margin-bottom:12px;}
+.example-box{background:#e0f2f1;border-radius:12px;padding:12px 16px;font-size:.98rem;color:#004d40;line-height:1.9;margin-bottom:8px;}
+.struct-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.struct-btn{padding:7px 16px;border:2px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;font-size:.86rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.struct-btn.on{background:#00695c;color:#fff;border-color:#00695c;}
+.diagram-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px;}
+.diag-box{padding:10px 16px;border-radius:10px;background:#b2dfdb;color:#004d40;font-size:.85rem;font-weight:bold;text-align:center;}
+.diag-box.top{background:#4db6ac;color:#fff;}
+.diag-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.diag-arrow{font-size:1.2rem;color:#00897b;}
+.passage-box{background:#fff8e1;border-radius:12px;padding:12px 16px;font-size:.92rem;color:#5d4037;line-height:1.85;margin-top:10px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e0f2f1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#00695c;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
+.choice-grid.c3{grid-template-columns:1fr 1fr 1fr;}
+.choice-btn{padding:12px 10px;border:2px solid #80cbc4;border-radius:12px;background:#fff;color:#00695c;font-size:.92rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#e0f2f1;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:12px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#00695c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#00695c">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🧩</div>
+    <h1>说明文结构分析</h1>
+    <p>认识说明方法，看懂文章是怎么搭建起来的</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('method')">📖 说明方法</button>
+    <button class="tab-btn" onclick="switchTab('struct')">🏗️ 篇章结构</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 说明方法 -->
+  <div id="tab-method">
+    <div class="card">
+      <div class="method-row" id="methodRow"></div>
+      <div class="method-title" id="methodTitle"></div>
+      <div class="method-desc" id="methodDesc"></div>
+      <div id="methodExamples"></div>
+    </div>
+  </div>
+
+  <!-- 篇章结构 -->
+  <div id="tab-struct" style="display:none;">
+    <div class="card">
+      <div class="struct-row" id="structRow"></div>
+      <div class="method-title" id="structTitle"></div>
+      <div class="method-desc" id="structDesc"></div>
+      <div class="diagram-wrap" id="structDiagram"></div>
+      <div class="passage-box" id="structPassage"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-grid" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.88});
+const randInt=Hpx.random.int;
+
+// ── 说明方法 ──
+const METHODS=[
+  {key:'example', name:'举例子', desc:'举出具体的例子来说明事物，让人更容易理解和相信。',
+   examples:['颐和园、天坛，都是我国著名的古代建筑。','苹果、香蕉、葡萄，都是我们常吃的水果。']},
+  {key:'number', name:'列数字', desc:'用具体的数字来说明事物的特点，更准确、更有说服力。',
+   examples:['太阳离我们约有1.5亿千米远。','长城全长约21196千米。','地球的年龄大约是46亿年。']},
+  {key:'compare', name:'作比较', desc:'把两种事物放在一起比较，突出被说明事物的特点。',
+   examples:['太阳的温度比地球上任何物体的温度都高得多。','蓝鲸的身体比十几头大象还重。']},
+  {key:'analogy', name:'打比方', desc:'把事物比作大家熟悉的另一种事物，说明更生动形象（其实就是比喻）。',
+   examples:['正午的太阳像一盏挂在高空的巨型暖灯，把光和热送向大地。','鲨鱼的皮肤像砂纸一样粗糙。']},
+  {key:'category', name:'分类别', desc:'把事物按照一定标准分成几类，分别加以说明，条理更清楚。',
+   examples:['常见的植物可以分为草本植物和木本植物两类。','动物可以分为脊椎动物和无脊椎动物两大类。']}
+];
+let curMethod=0;
+function buildMethodRow(){
+  const row=document.getElementById('methodRow');
+  row.innerHTML='';
+  METHODS.forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.className='method-btn'+(i===curMethod?' on':'');
+    b.textContent=m.name;
+    b.onclick=()=>{curMethod=i;buildMethodRow();renderMethod();};
+    row.appendChild(b);
+  });
+}
+function renderMethod(){
+  const m=METHODS[curMethod];
+  document.getElementById('methodTitle').textContent=m.name;
+  document.getElementById('methodDesc').textContent=m.desc;
+  document.getElementById('methodExamples').innerHTML=m.examples.map(e=>`<div class="example-box">${e}</div>`).join('');
+  speak(m.name+'：'+m.desc);
+}
+
+// ── 篇章结构 ──
+const STRUCTS=[
+  {key:'zft', name:'总分总', desc:'开头总说、中间分说几个方面、结尾再总结，像一个"汉堡"。',
+   diagram:['总（开头）',['分①','分②','分③'],'总（结尾）'],
+   passage:'秋天是一个美丽的季节。（总）天空变得高远湛蓝，树叶渐渐变黄变红，田野里稻谷成熟一片金黄。（分）秋天的美，装点着我们的生活。（总）'},
+  {key:'bl', name:'并列式', desc:'几个方面地位相同，一条一条并列讲述，没有主次总结句。',
+   diagram:[['特点①','特点②','特点③']],
+   passage:'窗台上的薄荷长得很精神。嫩叶散发着清香，细茎迎着阳光伸展，新芽一簇簇冒出来。每个特点都让这盆薄荷更有生气。'},
+  {key:'dj', name:'递进式', desc:'一层引出下一层，层层深入，像上楼梯一样越走越深。',
+   diagram:[['第一层','→','第二层','→','第三层']],
+   passage:'要想解开宇宙的奥秘，首先要了解太阳系。要想了解太阳系，就要先认识地球的近邻——月球。要认识月球，科学家们发射了许多探测器进行研究。'}
+];
+let curStruct=0;
+function buildStructRow(){
+  const row=document.getElementById('structRow');
+  row.innerHTML='';
+  STRUCTS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='struct-btn'+(i===curStruct?' on':'');
+    b.textContent=s.name;
+    b.onclick=()=>{curStruct=i;buildStructRow();renderStruct();};
+    row.appendChild(b);
+  });
+}
+function renderStruct(){
+  const s=STRUCTS[curStruct];
+  document.getElementById('structTitle').textContent=s.name;
+  document.getElementById('structDesc').textContent=s.desc;
+  const dia=document.getElementById('structDiagram');
+  dia.innerHTML='';
+  s.diagram.forEach(row=>{
+    if(Array.isArray(row)){
+      const r=document.createElement('div'); r.className='diag-row';
+      row.forEach(cell=>{
+        if(cell==='→'){ const a=document.createElement('span'); a.className='diag-arrow'; a.textContent='→'; r.appendChild(a); }
+        else { const c=document.createElement('div'); c.className='diag-box'; c.textContent=cell; r.appendChild(c); }
+      });
+      dia.appendChild(r);
+    } else {
+      const c=document.createElement('div'); c.className='diag-box top'; c.textContent=row;
+      dia.appendChild(c);
+    }
+  });
+  document.getElementById('structPassage').textContent=s.passage;
+  speak(s.name+'：'+s.desc);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns='', qType='';
+const METHOD_QUIZ=[
+  {text:'颐和园、天坛，都是我国著名的古代建筑。', ans:'举例子'},
+  {text:'长城全长约21196千米。', ans:'列数字'},
+  {text:'太阳的温度比地球上任何物体的温度都高得多。', ans:'作比较'},
+  {text:'正午的太阳像一盏挂在高空的巨型暖灯，把光和热送向大地。', ans:'打比方'},
+  {text:'动物可以分为脊椎动物和无脊椎动物两大类。', ans:'分类别'},
+  {text:'苹果、香蕉、葡萄，都是我们常吃的水果。', ans:'举例子'},
+  {text:'地球的年龄大约是46亿年。', ans:'列数字'},
+  {text:'蓝鲸的身体比十几头大象还重。', ans:'作比较'},
+  {text:'鲨鱼的皮肤像砂纸一样粗糙。', ans:'打比方'},
+  {text:'常见的植物可以分为草本植物和木本植物两类。', ans:'分类别'}
+];
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  qType = Math.random()<0.6 ? 'method' : 'struct';
+  if(qType==='method'){
+    area.className='choice-grid';
+    const item=METHOD_QUIZ[randInt(0,METHOD_QUIZ.length-1)];
+    qAns=item.ans;
+    document.getElementById('quizQ').innerHTML=`"${item.text}"<br>用了什么说明方法？`;
+    ['举例子','列数字','作比较','打比方','分类别'].forEach(name=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=name;
+      b.onclick=()=>checkQ(b,name); area.appendChild(b);
+    });
+    speak('这句话用了什么说明方法？');
+  } else {
+    area.className='choice-grid c3';
+    const item=STRUCTS[randInt(0,STRUCTS.length-1)];
+    qAns=item.name;
+    document.getElementById('quizQ').innerHTML=`${item.passage}<br><br>这段话是什么结构？`;
+    STRUCTS.forEach(s=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=s.name;
+      b.onclick=()=>checkQ(b,s.name); area.appendChild(b);
+    });
+    speak('这段话是什么结构？');
+  }
+}
+function checkQ(btn,name){
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===qAns) b.classList.add('correct');});
+  if(name===qAns){
+    qScore.c++;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+qAns;
+    speak('答案是'+qAns+'，再想想！');
+  }
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['method','struct','quiz']);
+  if(t==='method') speak('说明方法：点击上面的按钮，看看不同说明方法的例子。');
+  if(t==='struct') speak('篇章结构：点击上面的按钮，看看总分总、并列式和递进式有什么不同。');
+  if(t==='quiz') nextQ();
+}
+buildMethodRow(); renderMethod();
+buildStructRow(); renderStruct();
+speak('欢迎来到说明文结构分析！认识说明方法，看懂文章是怎么搭建起来的。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

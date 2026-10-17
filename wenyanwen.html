@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文言文入门</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#efebe9 0%,#fff8e1 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.9rem;color:#3e2723;letter-spacing:2px;text-shadow:2px 3px 0 #bcaaa4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.text-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.text-btn{padding:7px 14px;border:2px solid #bcaaa4;border-radius:14px;background:#fff;color:#3e2723;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.text-btn.on{background:#6d4c41;color:#fff;border-color:#6d4c41;}
+.text-meta{text-align:center;font-size:.82rem;color:#999;margin-bottom:12px;}
+.sent-block{margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed #e0d6cc;}
+.orig-line{font-size:1.15rem;color:#3e2723;font-weight:bold;cursor:pointer;line-height:1.9;padding:4px 0;}
+.orig-line:hover{background:#fff3e0;}
+.trans-line{font-size:.92rem;color:#6d4c41;background:#f5f0e8;border-radius:10px;padding:8px 12px;margin-top:6px;line-height:1.7;}
+.word-chips{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;}
+.word-chip{padding:3px 10px;border-radius:10px;background:#efebe9;color:#795548;font-size:.8rem;font-weight:bold;cursor:pointer;border:1px solid #d7ccc8;}
+.word-chip:hover{background:#d7ccc8;}
+.word-detail{font-size:.85rem;color:#c62828;margin-top:6px;min-height:18px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#efebe9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#6d4c41;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-col{display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;}
+.choice-btn2{padding:12px 16px;border:2px solid #d7ccc8;border-radius:12px;background:#fff;color:#3e2723;font-size:.92rem;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
+.choice-btn2:hover{background:#efebe9;}
+.choice-btn2.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn2.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#6d4c41;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#6d4c41">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📜</div>
+    <h1>文言文入门</h1>
+    <p>点一点原文，对照今译读一读</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('read')">📖 读文言文</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 读文言文 -->
+  <div id="tab-read">
+    <div class="card">
+      <div class="text-row" id="textRow"></div>
+      <div class="text-meta" id="textMeta"></div>
+      <div id="sentenceList"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-col" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.82});
+const randInt=Hpx.random.int;
+
+// ── 文言文数据 ──
+// 古文原文为公版文本；现代译文和字词释义由本项目于 2026-08-09 独立整理、重新表述。
+const TEXTS=[
+  {title:'守株待兔', grade:'三年级下册 · 韩非子', sentences:[
+    {orig:'宋人有耕田者。', trans:'宋国有一位以种田为生的人。', words:[{w:'耕田者',m:'从事耕种的人'}]},
+    {orig:'田中有株，兔走触株，折颈而死。', trans:'他的田里立着一个树桩。一只兔子奔跑时撞上树桩，折断脖子死了。', words:[{w:'株',m:'露在地面的树桩'},{w:'走',m:'古义是奔跑'},{w:'触',m:'碰撞'}]},
+    {orig:'因释其耒而守株，冀复得兔。', trans:'这个人便放下农具守在树桩旁，盼望还能捡到撞死的兔子。', words:[{w:'释',m:'放下'},{w:'耒',m:'古代翻土用的农具'},{w:'冀',m:'盼望'}]},
+    {orig:'兔不可复得，而身为宋国笑。', trans:'他再也没有等到兔子，自己反倒成了宋国人的笑柄。', words:[{w:'身',m:'他自己'},{w:'为……笑',m:'被……嘲笑'}]}
+  ]},
+  {title:'杨氏之子', grade:'五年级上册 · 世说新语', sentences:[
+    {orig:'梁国杨氏子九岁，甚聪惠。', trans:'梁国杨家有个九岁的孩子，十分机敏聪慧。', words:[{w:'惠',m:'同“慧”，这里指聪明'}]},
+    {orig:'孔君平诣其父，父不在，乃呼儿出。', trans:'孔君平登门拜访孩子的父亲，父亲恰好不在，便请孩子出来相见。', words:[{w:'诣',m:'前往拜访'},{w:'乃',m:'于是，便'}]},
+    {orig:'为设果，果有杨梅。', trans:'孩子为客人端来水果，其中正好有杨梅。', words:[{w:'设',m:'摆设、端上'}]},
+    {orig:'孔指以示儿曰："此是君家果。"', trans:'孔君平指着杨梅逗他说：“这可是你杨家的果子。”', words:[{w:'示',m:'指给对方看'},{w:'君',m:'对对方的尊称'}]},
+    {orig:'儿应声答曰："未闻孔雀是夫子家禽。"', trans:'孩子立刻答道：“可没有听说孔雀是您孔家的鸟。”', words:[{w:'应声',m:'话音刚落就回应'},{w:'夫子',m:'对年长者的敬称'},{w:'家禽',m:'这里巧妙地解释为“家里的鸟”'}]}
+  ]},
+  {title:'铁杵成针', grade:'四年级下册', sentences:[
+    {orig:'磨针溪，在眉州象耳山下。', trans:'有一条磨针溪，位于眉州象耳山脚下。', words:[{w:'磨针溪',m:'当地溪流的名称'}]},
+    {orig:'世传李白读书山中，未成，弃去。', trans:'相传李白曾在山中求学，学业尚未完成便想离开。', words:[{w:'世传',m:'世间流传的说法'},{w:'弃去',m:'放弃后离开'}]},
+    {orig:'过一溪，逢老媪方磨铁杵。', trans:'他经过溪边时，碰见一位老妇人正在磨一根铁棒。', words:[{w:'媪',m:'老妇人'},{w:'方',m:'正、正在'}]},
+    {orig:'问之，曰："欲作针。"', trans:'李白询问缘由，老妇人回答：“我要把它磨成针。”', words:[{w:'欲',m:'想要、打算'}]},
+    {orig:'太白感其意，还卒业。', trans:'李白被她坚持到底的精神触动，于是返回去完成学业。', words:[{w:'感',m:'受到触动'},{w:'卒业',m:'完成学业'}]}
+  ]},
+  {title:'学弈', grade:'六年级下册 · 孟子', sentences:[
+    {orig:'弈秋，通国之善弈者也。', trans:'弈秋是全国公认的下棋高手。', words:[{w:'通国',m:'全国范围'},{w:'善弈者',m:'善于下棋的人'}]},
+    {orig:'使弈秋诲二人弈，其一人专心致志，惟弈秋之为听；', trans:'有人请弈秋教两个人下棋，其中一人全神贯注，只专心听老师讲解；', words:[{w:'诲',m:'教导'},{w:'专心致志',m:'把心思全部集中起来'}]},
+    {orig:'一人虽听之，一心以为有鸿鹄将至，思援弓缴而射之。', trans:'另一人表面上也在听，心里却想着天鹅快飞来了，盘算着怎样拉弓把它射下。', words:[{w:'鸿鹄',m:'天鹅一类的大鸟'},{w:'援',m:'拉取'}]},
+    {orig:'虽与之俱学，弗若之矣。', trans:'他虽然和前一个人同时学习，成绩却远不如对方。', words:[{w:'俱',m:'一同'},{w:'弗若',m:'比不上'}]},
+    {orig:'为是其智弗若与？曰：非然也。', trans:'难道是因为他的才智不及别人吗？答案是：并不是。', words:[{w:'非然也',m:'事实并非如此'}]}
+  ]},
+  {title:'伯牙鼓琴', grade:'六年级上册 · 列子', sentences:[
+    {orig:'伯牙鼓琴，钟子期听之。', trans:'伯牙弹奏古琴，钟子期静静聆听。', words:[{w:'鼓',m:'弹奏乐器'}]},
+    {orig:'方鼓琴而志在太山，钟子期曰："善哉乎鼓琴！巍巍乎若太山。"', trans:'伯牙弹琴时心中描绘高山，钟子期赞叹：“琴声真美，仿佛高山巍然耸立！”', words:[{w:'志',m:'心中所想、所寄托的意境'},{w:'巍巍',m:'高大雄伟的样子'}]},
+    {orig:'少选之间而志在流水，钟子期又曰："善哉乎鼓琴！汤汤乎若流水。"', trans:'过了一会儿，伯牙又把流水寄托在琴声中，钟子期赞叹：“琴声真美，仿佛流水浩荡奔涌！”', words:[{w:'少选',m:'片刻、一会儿'},{w:'汤汤',m:'水势浩大的样子'}]},
+    {orig:'钟子期死，伯牙破琴绝弦，终身不复鼓琴，以为世无足复为鼓琴者。', trans:'钟子期去世后，伯牙毁琴断弦，从此不再弹奏，因为他认为世间再没有真正懂得自己琴声的人。', words:[{w:'破',m:'毁坏'},{w:'绝弦',m:'弄断琴弦'},{w:'足',m:'值得'}]}
+  ]}
+];
+let curText=0;
+function buildTextRow(){
+  const row=document.getElementById('textRow');
+  row.innerHTML='';
+  TEXTS.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='text-btn'+(i===curText?' on':'');
+    b.textContent=t.title;
+    b.onclick=()=>{curText=i;buildTextRow();renderText();};
+    row.appendChild(b);
+  });
+}
+function renderText(){
+  const t=TEXTS[curText];
+  document.getElementById('textMeta').textContent=t.grade;
+  const wrap=document.getElementById('sentenceList');
+  wrap.innerHTML='';
+  t.sentences.forEach((s,i)=>{
+    const block=document.createElement('div'); block.className='sent-block';
+    block.innerHTML=`<div class="orig-line">${s.orig}</div>
+      <div class="trans-line" id="trans-${i}" style="display:none;">${s.trans}</div>
+      <div class="word-chips" id="chips-${i}"></div>
+      <div class="word-detail" id="wd-${i}"></div>`;
+    block.querySelector('.orig-line').onclick=()=>toggleTrans(i,s);
+    wrap.appendChild(block);
+    const chipsWrap=document.getElementById('chips-'+i);
+    s.words.forEach(w=>{
+      const chip=document.createElement('span');
+      chip.className='word-chip'; chip.textContent=w.w;
+      chip.onclick=(e)=>{e.stopPropagation();document.getElementById('wd-'+i).textContent=`💡 "${w.w}" 的意思是：${w.m}`;speak(w.w+'，意思是'+w.m);};
+      chipsWrap.appendChild(chip);
+    });
+  });
+}
+function toggleTrans(i,s){
+  const el=document.getElementById('trans-'+i);
+  const show=el.style.display==='none';
+  el.style.display=show?'':'none';
+  if(show){ speak(s.orig); setTimeout(()=>speak(s.trans),1500); }
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0};
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const useWord=Math.random()<0.5;
+  if(useWord){
+    const allWords=TEXTS.flatMap(t=>t.sentences.flatMap(s=>s.words));
+    const item=allWords[randInt(0,allWords.length-1)];
+    const others=allWords.filter(w=>w.m!==item.m);
+    const set=new Set([item.m]);
+    while(set.size<4) set.add(others[randInt(0,others.length-1)].m);
+    const opts=shuffleArr(Array.from(set));
+    document.getElementById('quizQ').innerHTML=`文言文中的"<b>${item.w}</b>"是什么意思？`;
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn2'; b.textContent=o;
+      b.onclick=()=>checkAns(b,o,item.m); area.appendChild(b);
+    });
+    speak(`"${item.w}"是什么意思？`);
+  } else {
+    const allSents=TEXTS.flatMap(t=>t.sentences);
+    const item=allSents[randInt(0,allSents.length-1)];
+    const others=allSents.filter(s=>s.trans!==item.trans);
+    const set=new Set([item.trans]);
+    while(set.size<4) set.add(others[randInt(0,others.length-1)].trans);
+    const opts=shuffleArr(Array.from(set));
+    document.getElementById('quizQ').innerHTML=`"${item.orig}"翻译成白话文，意思是？`;
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn2'; b.textContent=o;
+      b.onclick=()=>checkAns(b,o,item.trans); area.appendChild(b);
+    });
+    speak(item.orig);
+  }
+}
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function checkAns(btn,chosen,correct){
+  document.querySelectorAll('#quizArea .choice-btn2').forEach(b=>{b.disabled=true; if(b.textContent===correct) b.classList.add('correct');});
+  if(chosen===correct){
+    qScore.c++;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 再想想看';
+    speak('再想想看！');
+  }
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['read','quiz']);
+  if(t==='read') speak('读文言文：点一点原文句子，对照今译读一读，还可以点字词看解释。');
+  if(t==='quiz') nextQ();
+}
+buildTextRow();
+renderText();
+speak('欢迎来到文言文入门！点一点原文，对照白话译文读一读。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

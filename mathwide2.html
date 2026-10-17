@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学广角（二）：优化·植树·找次品·数与形·鸽巢</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fbe9e7 0%,#fff3e0 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:780px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.55rem;color:#bf360c;letter-spacing:1px;text-shadow:2px 3px 0 #ffccbc;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 14px;font-size:.82rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.subtitle{font-size:1.05rem;font-weight:bold;color:#bf360c;margin-bottom:10px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:110px;accent-color:#bf360c;}
+.sl-val{font-weight:bold;font-size:1rem;color:#bf360c;}
+.formula-box{background:#fbe9e7;border-radius:12px;padding:12px 18px;text-align:center;font-size:.95rem;color:#bf360c;line-height:1.9;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#ff7043;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.opt-btn{padding:6px 16px;border:2px solid #ffab91;border-radius:14px;background:#fff;color:#bf360c;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:3px;}
+.opt-btn.on{background:#bf360c;color:#fff;border-color:#bf360c;}
+/* 沏茶烙饼 */
+.step-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.step-chip{background:#fff;border:2px solid #ffab91;border-radius:12px;padding:8px 12px;text-align:center;min-width:88px;}
+.step-chip .nm{font-size:.85rem;color:#4e342e;font-weight:bold;}
+.step-chip .tm{font-size:.75rem;color:#999;}
+.step-chip button{margin-top:6px;padding:3px 10px;border:none;border-radius:10px;background:#ff7043;color:#fff;font-size:.75rem;font-weight:bold;cursor:pointer;}
+/* 植树 */
+.tree-svg-wrap{display:flex;justify-content:center;margin:12px 0;overflow-x:auto;}
+/* 找次品 */
+.fp-chip{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:#eceff1;border:2px solid #b0bec5;font-weight:bold;color:#455a64;cursor:pointer;margin:3px;font-size:.95rem;position:relative;}
+.fp-chip.left{background:#90caf9;border-color:#1565c0;}
+.fp-chip.right{background:#a5d6a7;border-color:#2e7d32;}
+.fp-chip .tag{position:absolute;top:-8px;right:-4px;font-size:.65rem;background:#37474f;color:#fff;border-radius:6px;padding:0 3px;}
+.fp-row{text-align:center;margin:10px 0;}
+.fp-result{text-align:center;font-size:1rem;font-weight:bold;color:#37474f;min-height:26px;margin:8px 0;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fbe9e7;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#bf360c;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.2rem;width:80px;border:2px solid #ffab91;border-radius:10px;padding:6px 8px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#bf360c;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#bf360c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#bf360c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#bf360c">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🌰</div>
+    <h1>数学广角（二）</h1>
+    <p>优化 · 植树问题 · 找次品 · 数与形 · 鸽巢问题 —— 四五六年级思维训练</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('opt')">🍵 优化</button>
+    <button class="tab-btn" onclick="switchTab('tree')">🌳 植树问题</button>
+    <button class="tab-btn" onclick="switchTab('fp')">⚖️ 找次品</button>
+    <button class="tab-btn" onclick="switchTab('shape')">🔺 数与形</button>
+    <button class="tab-btn" onclick="switchTab('nest')">🐦 鸽巢问题</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 优化：沏茶 + 烙饼 -->
+  <div id="tab-opt">
+    <div class="card">
+      <div class="subtitle">🍵 沏茶问题</div>
+      <div class="net-desc">点每个步骤下面的按钮，切换"烧水前做"还是"烧水时同时做"，看看最少要多久</div>
+      <div class="step-row" id="teaSteps"></div>
+      <div class="formula-box" id="teaFormula"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="teaOptimal()">💡 看最优方案</button></div>
+    </div>
+    <div class="card">
+      <div class="subtitle">🥞 烙饼问题</div>
+      <div class="net-desc">一口锅每次最多烙2张饼，每面要烙3分钟，拖动滑块看几张饼最少要多久</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>饼的数量</label><input type="range" id="cakeN" min="1" max="8" value="3" oninput="updateCake()"><span class="sl-val" id="cakeNVal">3</span></div>
+      </div>
+      <div class="formula-box" id="cakeFormula"></div>
+    </div>
+  </div>
+
+  <!-- 植树问题 -->
+  <div id="tab-tree" style="display:none;">
+    <div class="card">
+      <div class="net-desc">选一种植树场景，拖动滑块调整间距和段数，看棵数怎么算</div>
+      <div style="text-align:center;margin-bottom:10px;" id="treeSceneBtns"></div>
+      <div class="slider-row">
+        <div class="sl-group"><label>每段间距（米）</label><input type="range" id="treeGap" min="2" max="10" value="5" oninput="updateTree()"><span class="sl-val" id="treeGapVal">5</span></div>
+        <div class="sl-group"><label>段数</label><input type="range" id="treeSeg" min="1" max="16" value="6" oninput="updateTree()"><span class="sl-val" id="treeSegVal">6</span></div>
+      </div>
+      <div class="tree-svg-wrap"><svg id="treeSvg" width="480" height="140" viewBox="0 0 480 140"></svg></div>
+      <div class="formula-box" id="treeFormula"></div>
+    </div>
+  </div>
+
+  <!-- 找次品 -->
+  <div id="tab-fp" style="display:none;">
+    <div class="card">
+      <div class="net-desc">这些零件里有 1 个次品比其他的都重。点零件放到左盘/右盘，两边数量相同才能称</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>零件总数</label><input type="range" id="fpNSlider" min="3" max="15" value="9" oninput="fpReset()"><span class="sl-val" id="fpNVal">9</span></div>
+      </div>
+      <div class="fp-row" id="fpChips"></div>
+      <div class="fp-row">
+        <button class="gen-btn" onclick="fpWeigh()">⚖️ 称一称</button>
+        <span style="margin-left:10px;color:#777;font-size:.9rem;">已称 <b id="fpCount">0</b> 次</span>
+      </div>
+      <div class="fp-result" id="fpResult"></div>
+      <div class="fp-row">
+        你猜次品是几号？
+        <input type="number" id="fpGuessInput" class="quiz-input" style="width:60px;" min="1">
+        <button class="check-btn" onclick="fpGuess()">确认答案</button>
+      </div>
+      <div class="result-msg" id="fpMsg"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="fpReset()">🔄 换一批</button></div>
+    </div>
+  </div>
+
+  <!-- 数与形 -->
+  <div id="tab-shape" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:10px;">
+        <button class="opt-btn on" id="shapeBtnSquare" onclick="setShapeMode('square')">🟧 平方数（奇数求和）</button>
+        <button class="opt-btn" id="shapeBtnTri" onclick="setShapeMode('tri')">🔺 三角形数</button>
+      </div>
+      <div class="slider-row">
+        <div class="sl-group"><label>n</label><input type="range" id="shapeN" min="1" max="10" value="4" oninput="updateShape()"><span class="sl-val" id="shapeNVal">4</span></div>
+      </div>
+      <div class="tree-svg-wrap"><svg id="shapeSvg" width="260" height="240" viewBox="0 0 260 240"></svg></div>
+      <div class="formula-box" id="shapeFormula"></div>
+    </div>
+  </div>
+
+  <!-- 鸽巢问题 -->
+  <div id="tab-nest" style="display:none;">
+    <div class="card">
+      <div class="net-desc">拖动滑块调整物体数和抽屉数，看看至少有一个抽屉里会有多少个</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>物体数（m）</label><input type="range" id="nestM" min="2" max="20" value="7" oninput="updateNest()"><span class="sl-val" id="nestMVal">7</span></div>
+        <div class="sl-group"><label>抽屉数（n）</label><input type="range" id="nestN" min="2" max="6" value="3" oninput="updateNest()"><span class="sl-val" id="nestNVal">3</span></div>
+      </div>
+      <div class="tree-svg-wrap"><svg id="nestSvg" width="360" height="160" viewBox="0 0 360 160"></svg></div>
+      <div class="formula-box" id="nestFormula"></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 优化：沏茶问题 ──
+const TEA_STEPS=[
+  {key:'washpot', label:'洗水壶', time:1},
+  {key:'water',   label:'接水',   time:1},
+  {key:'washcup', label:'洗茶杯', time:2},
+  {key:'tea',     label:'找茶叶', time:1},
+];
+let teaAssign={washpot:'前',water:'前',washcup:'同时',tea:'同时'};
+function renderTeaSteps(){
+  const row=document.getElementById('teaSteps');
+  row.innerHTML=TEA_STEPS.map(s=>`
+    <div class="step-chip">
+      <div class="nm">${s.label}</div>
+      <div class="tm">${s.time}分钟</div>
+      <button onclick="toggleTeaAssign('${s.key}')">${teaAssign[s.key]}</button>
+    </div>`).join('')+`
+    <div class="step-chip" style="background:#ffe0b2;">
+      <div class="nm">🔥 烧水</div><div class="tm">15分钟（固定）</div>
+    </div>
+    <div class="step-chip" style="background:#c8e6c9;">
+      <div class="nm">🍵 沏茶</div><div class="tm">1分钟（固定，最后）</div>
+    </div>`;
+  updateTeaFormula();
+}
+function toggleTeaAssign(key){
+  teaAssign[key]=teaAssign[key]==='前'?'同时':'前';
+  renderTeaSteps();
+}
+function updateTeaFormula(){
+  const before=TEA_STEPS.filter(s=>teaAssign[s.key]==='前').reduce((s,x)=>s+x.time,0);
+  const during=TEA_STEPS.filter(s=>teaAssign[s.key]==='同时').reduce((s,x)=>s+x.time,0);
+  const total=before+Math.max(15,during)+1;
+  document.getElementById('teaFormula').innerHTML=
+    `烧水前要做：${before}分钟　　烧水时同时做：${during}分钟（不超过15分钟就不多花时间）<br>
+     总时间 = 烧水前 + max(15, 同时做的时间) + 沏茶1分钟 = ${before} + ${Math.max(15,during)} + 1 = <b>${total}</b> 分钟` +
+    (total===18?'　🎉 这是最优方案！':'');
+  speak(`现在的方案一共需要${total}分钟。`);
+}
+function teaOptimal(){
+  teaAssign={washpot:'前',water:'前',washcup:'同时',tea:'同时'};
+  renderTeaSteps();
+  speak('洗水壶、接水要在烧水前先做好；洗茶杯、找茶叶可以趁烧水的时候一起做，这样最省时间，一共18分钟。');
+}
+
+// ── 优化：烙饼问题 ──
+function pancakeTime(n){ return n===1 ? 6 : 3*n; }
+function updateCake(){
+  const n=+document.getElementById('cakeN').value;
+  document.getElementById('cakeNVal').textContent=n;
+  const t=pancakeTime(n);
+  let extra='';
+  if(n===1) extra='只有1张饼，正面3分钟、反面3分钟，共6分钟。';
+  else if(n===2) extra='2张饼刚好一起烙，正面3分钟、反面3分钟，共6分钟。';
+  else if(n===3) extra='3张饼很特殊：每次烙2张的2面，轮流安排，3次刚好烙完6个面，共9分钟，并不需要12分钟！';
+  else extra=`${n}张饼共有${n*2}个面要烙，每次烙2个面，需要${n}次，每次3分钟，共${t}分钟。`;
+  document.getElementById('cakeFormula').innerHTML=`烙 <b>${n}</b> 张饼最少需要 <b>${t}</b> 分钟<br>💡 ${extra}`;
+  speak(`烙${n}张饼最少需要${t}分钟。`);
+}
+
+// ── 植树问题 ──
+let treeScene='both';
+const TREE_SCENES=[
+  {key:'both', label:'两端都栽'},
+  {key:'one',  label:'只栽一端'},
+  {key:'none', label:'两端都不栽'},
+  {key:'ring', label:'环形植树'},
+];
+function renderTreeSceneBtns(){
+  document.getElementById('treeSceneBtns').innerHTML=TREE_SCENES.map(s=>
+    `<button class="opt-btn ${s.key===treeScene?'on':''}" onclick="setTreeScene('${s.key}')">${s.label}</button>`).join('');
+}
+function setTreeScene(k){ treeScene=k; renderTreeSceneBtns(); updateTree(); }
+function treeCount(scene,segments){
+  if(scene==='both') return segments+1;
+  if(scene==='one') return segments;
+  if(scene==='none') return Math.max(0,segments-1);
+  if(scene==='ring') return segments;
+}
+function updateTree(){
+  const gap=+document.getElementById('treeGap').value;
+  const seg=+document.getElementById('treeSeg').value;
+  document.getElementById('treeGapVal').textContent=gap;
+  document.getElementById('treeSegVal').textContent=seg;
+  const length=gap*seg;
+  const count=treeCount(treeScene,seg);
+  const svg=document.getElementById('treeSvg');
+  let inner='';
+  if(treeScene!=='ring'){
+    const x0=30,x1=450,y=70;
+    inner+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#8d6e63" stroke-width="4"/>`;
+    for(let i=0;i<=seg;i++){
+      const x=x0+(x1-x0)*i/seg;
+      let show=false;
+      if(treeScene==='both') show=true;
+      else if(treeScene==='one') show=(i<seg);
+      else if(treeScene==='none') show=(i>0&&i<seg);
+      if(show) inner+=`<text x="${x}" y="${y-10}" font-size="20" text-anchor="middle">🌳</text>`;
+      else inner+=`<circle cx="${x}" cy="${y}" r="2" fill="#bbb"/>`;
+    }
+  } else {
+    const cx=240,cy=75,r=55;
+    inner+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#8d6e63" stroke-width="4"/>`;
+    for(let i=0;i<seg;i++){
+      const a=(i/seg)*2*Math.PI - Math.PI/2;
+      const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
+      inner+=`<text x="${x}" y="${y+6}" font-size="18" text-anchor="middle">🌳</text>`;
+    }
+  }
+  svg.innerHTML=inner;
+  const sceneLabel=TREE_SCENES.find(s=>s.key===treeScene).label;
+  let formulaText;
+  if(treeScene==='both') formulaText=`棵数 = 段数 + 1 = ${seg} + 1 = <b>${count}</b> 棵`;
+  else if(treeScene==='one') formulaText=`棵数 = 段数 = <b>${count}</b> 棵`;
+  else if(treeScene==='none') formulaText=`棵数 = 段数 − 1 = ${seg} − 1 = <b>${count}</b> 棵`;
+  else formulaText=`环形棵数 = 段数 = <b>${count}</b> 棵（首尾相接，不用+1）`;
+  document.getElementById('treeFormula').innerHTML=
+    `场景：${sceneLabel}　　总长 = ${gap}×${seg} = ${length} 米<br>${formulaText}`;
+  speak(`${sceneLabel}，一共要栽${count}棵树。`);
+}
+
+// ── 找次品 ──
+let fpN=9, fpOdd=0, fpPan={}, fpWeighCount=0, fpDone=false;
+function fpReset(){
+  fpN=+document.getElementById('fpNSlider').value;
+  document.getElementById('fpNVal').textContent=fpN;
+  fpOdd=randInt(0,fpN-1);
+  fpPan={}; fpWeighCount=0; fpDone=false;
+  document.getElementById('fpCount').textContent=0;
+  document.getElementById('fpResult').textContent='';
+  document.getElementById('fpMsg').textContent='';
+  document.getElementById('fpMsg').className='result-msg';
+  document.getElementById('fpGuessInput').value='';
+  document.getElementById('fpGuessInput').disabled=false;
+  document.getElementById('fpGuessInput').max=fpN;
+  renderFpChips();
+  speak(`这${fpN}个零件里有1个次品比其他的都重，点零件放到天平左右两边称一称吧。`);
+}
+function renderFpChips(){
+  const wrap=document.getElementById('fpChips');
+  wrap.innerHTML='';
+  for(let i=0;i<fpN;i++){
+    const st=fpPan[i]||0;
+    const div=document.createElement('div');
+    div.className='fp-chip'+(st===1?' left':st===2?' right':'');
+    div.textContent=i+1;
+    if(st===1) div.innerHTML+='<span class="tag">左</span>';
+    if(st===2) div.innerHTML+='<span class="tag">右</span>';
+    div.onclick=()=>fpTogglePan(i);
+    wrap.appendChild(div);
+  }
+}
+function fpTogglePan(i){
+  if(fpDone) return;
+  fpPan[i]=((fpPan[i]||0)+1)%3;
+  renderFpChips();
+}
+function fpWeigh(){
+  if(fpDone) return;
+  const left=Object.keys(fpPan).map(Number).filter(k=>fpPan[k]===1);
+  const right=Object.keys(fpPan).map(Number).filter(k=>fpPan[k]===2);
+  if(left.length===0 || left.length!==right.length){
+    document.getElementById('fpResult').textContent='⚠️ 左右两边数量要相同，且不能为空，才能称！';
+    return;
+  }
+  fpWeighCount++;
+  document.getElementById('fpCount').textContent=fpWeighCount;
+  let result;
+  if(left.includes(fpOdd)) result='⚖️ 左边更重！次品在左边这一堆里。';
+  else if(right.includes(fpOdd)) result='⚖️ 右边更重！次品在右边这一堆里。';
+  else result='⚖️ 平衡！次品在没有称的那些零件里。';
+  document.getElementById('fpResult').textContent=result;
+  speak(result.replace(/[⚖️]/g,''));
+}
+function fpGuess(){
+  const v=parseInt(document.getElementById('fpGuessInput').value);
+  if(isNaN(v)) return;
+  fpDone=true;
+  document.getElementById('fpGuessInput').disabled=true;
+  const correct=(v-1)===fpOdd;
+  const minWeigh=Math.ceil(Math.log(fpN)/Math.log(3));
+  const msg=document.getElementById('fpMsg');
+  if(correct){
+    msg.className='result-msg ok';
+    msg.textContent=`✅ 猜对了！你用了 ${fpWeighCount} 次，理论最少只需要 ${minWeigh} 次。`+(fpWeighCount<=minWeigh?' 太厉害了！':' 再试试能不能称得更少！');
+    speak('猜对了！次品就是'+v+'号。');
+  } else {
+    msg.className='result-msg no';
+    msg.textContent=`❌ 猜错了，次品其实是 ${fpOdd+1} 号。理论最少只需要 ${minWeigh} 次就能找到。`;
+    speak('猜错了，次品其实是'+(fpOdd+1)+'号。');
+  }
+}
+
+// ── 数与形 ──
+let shapeMode='square';
+function setShapeMode(m){
+  shapeMode=m;
+  document.getElementById('shapeBtnSquare').classList.toggle('on',m==='square');
+  document.getElementById('shapeBtnTri').classList.toggle('on',m==='tri');
+  updateShape();
+}
+function updateShape(){
+  const n=+document.getElementById('shapeN').value;
+  document.getElementById('shapeNVal').textContent=n;
+  const svg=document.getElementById('shapeSvg');
+  let inner='';
+  const layerColors=['#e57373','#ffb74d','#fff176','#81c784','#64b5f6','#ba68c8','#4db6ac','#f06292','#a1887f','#90a4ae'];
+  if(shapeMode==='square'){
+    const cell=18, ox=130, oy=20;
+    for(let r=0;r<n;r++){
+      for(let c=0;c<n;c++){
+        const layer=Math.max(r,c);
+        const cx=ox+(c-n/2)*cell, cy=oy+r*cell+20;
+        inner+=`<circle cx="${cx}" cy="${cy}" r="7" fill="${layerColors[layer%layerColors.length]}"/>`;
+      }
+    }
+    const odds=Array.from({length:n},(_,i)=>2*i+1);
+    document.getElementById('shapeFormula').innerHTML=
+      `1 + 3 + 5 + ... + ${odds[odds.length-1]}（前${n}个奇数）= <b>${n*n}</b>　　即 ${n}² = ${n*n}<br>
+       💡 每加一个奇数，就多围成一圈（同色是第几圈），最后正好拼成一个 ${n}×${n} 的正方形。`;
+    speak(`前${n}个奇数相加，正好等于${n}的平方，等于${n*n}。`);
+  } else {
+    const cell=20, oy=20;
+    let sum=0;
+    for(let r=1;r<=n;r++){
+      sum+=r;
+      const rowWidth=(r-1)*cell;
+      const ox=130-rowWidth/2;
+      for(let c=0;c<r;c++){
+        inner+=`<circle cx="${ox+c*cell}" cy="${oy+(r-1)*cell+20}" r="7" fill="${layerColors[(r-1)%layerColors.length]}"/>`;
+      }
+    }
+    document.getElementById('shapeFormula').innerHTML=
+      `1 + 2 + 3 + ... + ${n}（前${n}个三角形数的第${n}项）= <b>${sum}</b>　　即 ${n}×(${n}+1)÷2 = ${sum}<br>
+       💡 每往下一行多摆一个，就是三角形数；用"底×高÷2"的思路能快速算出总数。`;
+    speak(`前${n}行摆成三角形，一共有${sum}个点。`);
+  }
+  svg.innerHTML=inner;
+}
+
+// ── 鸽巢问题 ──
+function updateNest(){
+  const m=+document.getElementById('nestM').value;
+  const n=+document.getElementById('nestN').value;
+  document.getElementById('nestMVal').textContent=m;
+  document.getElementById('nestNVal').textContent=n;
+  const guarantee=Math.ceil(m/n);
+  const counts=new Array(n).fill(0);
+  for(let i=0;i<m;i++) counts[i%n]++;
+  const maxCount=Math.max(...counts);
+  const svg=document.getElementById('nestSvg');
+  let inner='';
+  const boxW=340/n;
+  for(let i=0;i<n;i++){
+    const x=10+i*boxW;
+    const isMax=counts[i]===maxCount;
+    inner+=`<rect x="${x}" y="70" width="${boxW-8}" height="60" rx="8" fill="${isMax?'#ffcc80':'#eceff1'}" stroke="${isMax?'#e65100':'#90a4ae'}" stroke-width="2"/>`;
+    inner+=`<text x="${x+(boxW-8)/2}" y="105" font-size="16" text-anchor="middle" fill="#37474f" font-weight="bold">${counts[i]}个</text>`;
+    inner+=`<text x="${x+(boxW-8)/2}" y="60" font-size="12" text-anchor="middle" fill="#777">抽屉${i+1}</text>`;
+  }
+  svg.innerHTML=inner;
+  document.getElementById('nestFormula').innerHTML=
+    `把 ${m} 个物体尽量平均放进 ${n} 个抽屉，最多的一个抽屉里有 <b>${maxCount}</b> 个<br>
+     💡 公式：⌈${m}÷${n}⌉ = <b>${guarantee}</b>　—— 不管怎么放，一定有一个抽屉里至少有 ${guarantee} 个物体`;
+  speak(`把${m}个物体放进${n}个抽屉，一定有一个抽屉里至少有${guarantee}个物体。`);
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, qDone=false;
+function attachNumAutoCheck(ans){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(ans).length) checkNumQ(ans); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNumQ(ans); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNumQ(ans); });
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,4);
+  if(type===0){
+    if(Math.random()<0.5){
+      document.getElementById('quizQ').innerHTML='沏茶需要：洗水壶1分钟、接水1分钟、烧水15分钟、洗茶杯2分钟、找茶叶1分钟、沏茶1分钟。合理安排，最少需要多少分钟？';
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(18);
+      speak('沏茶最少需要多少分钟？');
+    } else {
+      const n=randInt(2,8);
+      document.getElementById('quizQ').innerHTML=`一口锅每次最多烙2张饼，每面3分钟。烙 ${n} 张饼最少需要多少分钟？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(pancakeTime(n));
+      speak(`烙${n}张饼最少需要多少分钟？`);
+    }
+  } else if(type===1){
+    const scene=TREE_SCENES[randInt(0,3)];
+    const seg=randInt(3,12), gap=randInt(2,8);
+    const length=seg*gap;
+    const ans=treeCount(scene.key,seg);
+    const sceneText=scene.key==='ring' ? `一个周长 ${length} 米的圆形花坛，每隔 ${gap} 米栽一棵树（环形植树），一共能栽多少棵？`
+      : `一条长 ${length} 米的小路，每隔 ${gap} 米栽一棵树（${scene.label}），一共能栽多少棵？`;
+    document.getElementById('quizQ').textContent=sceneText;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(ans);
+    speak(sceneText);
+  } else if(type===2){
+    const n=randInt(3,27);
+    const ans=Math.ceil(Math.log(n)/Math.log(3));
+    document.getElementById('quizQ').textContent=`${n} 个零件里有1个次品比其他的重，用天平称，最少称多少次一定能找出次品？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(ans);
+    speak(`${n}个零件里有1个次品，最少称多少次能找出来？`);
+  } else if(type===3){
+    const n=randInt(2,9);
+    if(Math.random()<0.5){
+      document.getElementById('quizQ').textContent=`1 + 3 + 5 + ... 前 ${n} 个奇数相加，和是多少？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(n*n);
+      speak(`前${n}个奇数相加，和是多少？`);
+    } else {
+      document.getElementById('quizQ').textContent=`1 + 2 + 3 + ... + ${n}，和是多少？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(n*(n+1)/2);
+      speak(`1加到${n}，和是多少？`);
+    }
+  } else {
+    const n=randInt(2,6), m=randInt(n+1,3*n);
+    const ans=Math.ceil(m/n);
+    document.getElementById('quizQ').textContent=`把 ${m} 个物体放进 ${n} 个抽屉，不管怎么放，一定有一个抽屉里至少有多少个物体？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(ans);
+    speak(`把${m}个物体放进${n}个抽屉，至少有一个抽屉里有多少个？`);
+  }
+}
+function checkNumQ(ans){
+  if(qDone) return;
+  const v=parseInt(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  if(v===ans){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['opt','tree','fp','shape','nest','quiz']);
+  if(t==='opt') speak('优化问题：怎么安排步骤最省时间？');
+  if(t==='tree') speak('植树问题：选一种场景，看看棵数和段数的关系。');
+  if(t==='fp') speak('找次品：用天平称一称，找出更重的那个次品。');
+  if(t==='shape') speak('数与形：数字和图形之间藏着奇妙的规律。');
+  if(t==='nest') speak('鸽巢问题：不管怎么放，总有一个抽屉里的物体特别多。');
+  if(t==='quiz') nextQ();
+}
+renderTeaSteps();
+updateCake();
+renderTreeSceneBtns();
+updateTree();
+fpReset();
+updateShape();
+updateNest();
+speak('欢迎来到数学广角！今天我们来研究怎么安排时间最省、植树、找次品、数与形的规律，还有奇妙的鸽巢问题。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

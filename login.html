@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 / 注册 — 慧陪学</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#f3e5f5 45%,#fff9c4 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#fff;border-radius:22px;padding:32px 28px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:360px;width:100%;}
+.logo{text-align:center;font-size:2.4rem;margin-bottom:6px;}
+h1{text-align:center;font-size:1.3rem;color:#4a148c;margin-bottom:6px;}
+p.sub{text-align:center;font-size:.82rem;color:#999;margin-bottom:20px;}
+.tabs{display:flex;gap:8px;margin-bottom:18px;}
+.tab-btn{flex:1;padding:9px;border:2px solid #ce93d8;border-radius:16px;background:#fff;color:#4a148c;font-weight:bold;font-size:.92rem;cursor:pointer;font-family:inherit;}
+.tab-btn.on{background:#4a148c;color:#fff;border-color:#4a148c;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.85rem;color:#777;margin-bottom:4px;}
+.field input{width:100%;padding:10px 12px;border:2px solid #e1bee7;border-radius:12px;font-size:1rem;outline:none;font-family:inherit;}
+.field input:focus{border-color:#4a148c;}
+.submit-btn{width:100%;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#ab47bc,#4a148c);color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;margin-top:6px;}
+.submit-btn:active{transform:scale(.98);}
+.msg{text-align:center;font-size:.88rem;font-weight:bold;min-height:22px;margin-top:12px;}
+.msg.ok{color:#2e7d32;}
+.msg.no{color:#c62828;}
+.trial-hint{background:#fff8e1;border-radius:12px;padding:10px 14px;font-size:.8rem;color:#8d6e00;margin-bottom:16px;text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🏫</div>
+  <h1>慧陪学</h1>
+  <p class="sub">注册后可免费试用全部功能3天</p>
+  <div class="trial-hint">📱 用手机号 + 自己设的密码就能注册，不需要短信验证码</div>
+  <div class="tabs">
+    <button class="tab-btn on" id="tabRegister" onclick="switchMode('register')">注册</button>
+    <button class="tab-btn" id="tabLogin" onclick="switchMode('login')">登录</button>
+  </div>
+  <div class="field">
+    <label>手机号</label>
+    <input type="tel" id="phone" placeholder="11位手机号" maxlength="11" inputmode="numeric">
+  </div>
+  <div class="field">
+    <label>密码</label>
+    <input type="password" id="password" placeholder="至少6位" autocomplete="off">
+  </div>
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">注册并开始试用</button>
+  <div class="msg" id="msg"></div>
+</div>
+<script src="hpx-config.js"></script>
+<script>
+var API_BASE = (window.HPX_CONFIG && window.HPX_CONFIG.API_BASE) || 'http://localhost:8787';
+var TOKEN_KEY = 'huipeixue_token';
+var mode = 'register';
+
+function switchMode(m){
+  mode = m;
+  document.getElementById('tabRegister').classList.toggle('on', m==='register');
+  document.getElementById('tabLogin').classList.toggle('on', m==='login');
+  document.getElementById('submitBtn').textContent = m==='register' ? '注册并开始试用' : '登录';
+  document.getElementById('msg').textContent = '';
+}
+
+function getRedirectTarget(){
+  var params = new URLSearchParams(location.search);
+  return params.get('redirect') || 'index.html';
+}
+
+function submitForm(){
+  var phone = document.getElementById('phone').value.trim();
+  var password = document.getElementById('password').value;
+  var msg = document.getElementById('msg');
+  msg.className = 'msg'; msg.textContent = '';
+
+  if(!/^1[3-9]\d{9}$/.test(phone)){ msg.className='msg no'; msg.textContent='请输入正确的11位手机号'; return; }
+  if(!password || password.length < 6){ msg.className='msg no'; msg.textContent='密码至少6位'; return; }
+
+  var url = API_BASE + (mode==='register' ? '/api/register' : '/api/login');
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: phone, password: password })
+  }).then(function(r){ return r.json().then(function(data){ return {status:r.status, data:data}; }); })
+    .then(function(res){
+      if(res.status >= 400){
+        msg.className='msg no'; msg.textContent = res.data.error || '出错了，请重试';
+        return;
+      }
+      localStorage.setItem(TOKEN_KEY, res.data.token);
+      msg.className='msg ok'; msg.textContent = mode==='register' ? '注册成功，正在进入…' : '登录成功，正在进入…';
+      setTimeout(function(){ location.href = getRedirectTarget(); }, 500);
+    }).catch(function(){
+      msg.className='msg no'; msg.textContent='连不上服务器，请检查网络或稍后再试';
+    });
+}
+document.getElementById('password').addEventListener('keydown', function(e){ if(e.key==='Enter') submitForm(); });
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

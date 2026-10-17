@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>除法速算训练</title>
+<meta name="description" content="小学除法口诀表、背诵与测验，三种模式全面掌握 1-81 的除法运算。">
+<style>
+/* ── 设计令牌 ── */
+:root {
+  --bg-a: #FFF9EE;
+  --bg-b: #FFF0D8;
+  --bg-c: #E8F4FF;
+  --accent:      #F27B22;
+  --accent-dark: #C45D00;
+  --blue:        #1E88C7;
+  --blue-light:  #E3F2FD;
+  --success:     #2DA44E;
+  --danger:      #D93025;
+  --text:        #1C2B3A;
+  --text-muted:  #6B7A8D;
+  --card-bg:     rgba(255,255,255,0.92);
+  --shadow-sm:   0 2px 8px rgba(28,43,58,.08);
+  --shadow-md:   0 4px 20px rgba(28,43,58,.11);
+  --radius-lg:   18px;
+  --radius-md:   12px;
+  --radius-pill: 99px;
+}
+
+/* ── 基础 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(140deg, var(--bg-a) 0%, var(--bg-b) 48%, var(--bg-c) 100%);
+  min-height: 100vh;
+  padding: 22px 14px 40px;
+  color: var(--text);
+}
+.container { max-width: 880px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+/* ── 标题 ── */
+.header { text-align: center; margin-bottom: 22px; }
+.header-icon { font-size: 2.4rem; line-height: 1; margin-bottom: 6px; }
+.header h1 {
+  font-size: 2rem; font-weight: 800; letter-spacing: 3px;
+  color: var(--accent-dark);
+  text-shadow: 2px 3px 0 rgba(242,123,34,.15);
+}
+.header p { font-size: .85rem; color: var(--text-muted); margin-top: 5px; }
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+.tab-btn {
+  border: 2px solid transparent; border-radius: var(--radius-pill);
+  padding: 8px 24px; font-size: .95rem; font-weight: 700;
+  cursor: pointer; transition: all .18s;
+  background: var(--card-bg); color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
+  font-family: inherit;
+}
+.tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 4px 14px rgba(242,123,34,.35); }
+
+/* ── 通用卡片 ── */
+.card-panel {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 22px 18px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 18px;
+}
+.sub-hint { text-align: center; font-size: .82rem; color: var(--text-muted); margin-bottom: 14px; }
+
+/* ── 按钮 ── */
+.btn {
+  border: none; border-radius: var(--radius-md); padding: 9px 22px;
+  font-size: .93rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: transform .12s, box-shadow .12s;
+  box-shadow: 0 3px 10px rgba(0,0,0,.10);
+}
+.btn:active { transform: scale(.96); }
+.btn-primary { background: linear-gradient(135deg, #F7A44A, var(--accent-dark)); color: #fff; }
+.btn-green   { background: linear-gradient(135deg, #56d87e, #1a7a37); color: #fff; }
+.btn-blue    { background: linear-gradient(135deg, #5ab8f0, #1565a0); color: #fff; }
+.btn-gray    { background: #E8ECF0; color: #555; }
+
+/* ══════════════════════════════════════
+   TAB 1 — 除法口诀表
+══════════════════════════════════════ */
+.group-section { margin-bottom: 18px; }
+.group-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; padding-left: 2px;
+}
+.group-label {
+  font-size: .88rem; font-weight: 700; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.group-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-size: .78rem; font-weight: 800;
+}
+.speak-btn {
+  border: none; background: none; cursor: pointer; font-size: .78rem;
+  color: var(--accent); padding: 2px 8px; border-radius: 8px;
+  transition: background .15s; font-family: inherit;
+}
+.speak-btn:hover { background: rgba(242,123,34,.12); }
+
+.formula-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.formula-cell {
+  border-radius: var(--radius-md); padding: 9px 11px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border: 2px solid transparent; transition: all .18s;
+  min-width: 88px; text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.formula-cell:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 6px 18px rgba(0,0,0,.14);
+  border-color: var(--accent);
+}
+.formula-cell.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242,123,34,.22); }
+.fc-main {
+  font-size: .92rem; font-weight: 800; color: var(--text);
+  white-space: nowrap;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+.fc-sub { font-size: .70rem; color: var(--text-muted); margin-top: 1px; }
+
+/* ══════════════════════════════════════
+   TAB 2 — 背诵
+══════════════════════════════════════ */
+.memo-nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+.memo-row-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid #FBCB99; background: #fff;
+  color: var(--accent-dark); font-size: .95rem; font-weight: 800;
+  cursor: pointer; transition: all .2s; font-family: inherit;
+}
+.memo-row-btn:hover { border-color: var(--accent); }
+.memo-row-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 3px 12px rgba(242,123,34,.4); }
+.memo-row-btn.mastered { background: #D4EDDA; border-color: #2DA44E; color: #1a6e33; }
+
+.memo-cards { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 18px; }
+.memo-card { width: 128px; height: 98px; perspective: 600px; cursor: pointer; }
+.memo-card-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .44s cubic-bezier(.4,0,.2,1);
+}
+.memo-card.flipped .memo-card-inner { transform: rotateY(180deg); }
+.memo-card-front, .memo-card-back {
+  position: absolute; width: 100%; height: 100%;
+  backface-visibility: hidden; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.11);
+}
+.memo-card-front { background: linear-gradient(135deg, #F7A44A, var(--accent-dark)); color: #fff; }
+.memo-card-back  { background: linear-gradient(135deg, #FFFBEF, #FFF3D0); color: var(--text); transform: rotateY(180deg); }
+
+.mc-q    { font-size: .96rem; font-weight: 800; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+.mc-tap  { font-size: .68rem; opacity: .75; margin-top: 2px; }
+.mc-ans  { font-size: 1.6rem; font-weight: 900; color: var(--accent-dark); line-height: 1; }
+.mc-eq   { font-size: .78rem; color: var(--text-muted); font-family: 'Courier New', monospace; }
+
+.memo-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.memo-progress { text-align: center; font-size: .84rem; color: var(--text-muted); margin-top: 12px; }
+.prog-dots { display: flex; gap: 4px; justify-content: center; margin-top: 7px; flex-wrap: wrap; }
+.prog-dot {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: #E0E4EA; transition: background .3s;
+}
+.prog-dot.known   { background: var(--success); }
+.prog-dot.unknown { background: #F4A7A4; }
+
+/* ══════════════════════════════════════
+   TAB 3 — 测验
+══════════════════════════════════════ */
+.quiz-setup { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: flex-end; margin-bottom: 22px; }
+.setup-group { display: flex; flex-direction: column; gap: 4px; }
+.setup-group label { font-size: .82rem; font-weight: 700; color: var(--text-muted); }
+.quiz-setup select {
+  border: 2px solid #FBCB99; border-radius: var(--radius-md); padding: 6px 12px;
+  font-size: .88rem; color: var(--text); background: #fff; outline: none; cursor: pointer;
+  font-family: inherit;
+}
+.quiz-setup select:focus { border-color: var(--accent); }
+
+.quiz-board { display: none; }
+.quiz-board.active { display: block; }
+
+.quiz-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.quiz-score { font-size: .95rem; font-weight: 800; color: var(--accent-dark); }
+.quiz-timer-display {
+  font-size: .95rem; font-weight: 800; color: #E07000;
+  background: #FFF3E0; border-radius: 10px; padding: 4px 14px;
+}
+.quiz-progress-bar { background: #E8ECF0; border-radius: var(--radius-pill); height: 7px; margin-bottom: 22px; overflow: hidden; }
+.quiz-progress-fill {
+  height: 100%; border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #F7C97A, var(--accent));
+  transition: width .3s;
+}
+
+.question-box { text-align: center; margin-bottom: 24px; }
+.q-badge {
+  display: inline-block; font-size: .75rem; font-weight: 700;
+  background: var(--blue-light); color: var(--blue);
+  border-radius: var(--radius-pill); padding: 3px 14px; margin-bottom: 10px;
+  letter-spacing: .5px;
+}
+.q-equation {
+  font-size: 2.8rem; font-weight: 900; color: var(--text);
+  letter-spacing: 5px; line-height: 1.2;
+  font-family: 'Courier New', 'Consolas', monospace;
+}
+.q-input-row { display: flex; justify-content: center; gap: 10px; margin-top: 18px; }
+.q-input {
+  width: 88px; height: 58px; border: 3px solid #FBCB99; border-radius: 14px;
+  text-align: center; font-size: 1.9rem; font-weight: 900;
+  color: var(--text); background: #FAFAFA; outline: none;
+  transition: border-color .2s, background .2s;
+  -moz-appearance: textfield;
+  font-family: 'Courier New', monospace;
+}
+.q-input::-webkit-inner-spin-button,
+.q-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.q-input:focus  { border-color: var(--accent); background: #FFF8EE; }
+.q-input.correct { border-color: var(--success); background: #EDFAF3; color: var(--success); }
+.q-input.wrong   { border-color: var(--danger); background: #FFF0EE; color: var(--danger); }
+
+.q-feedback {
+  min-height: 32px; text-align: center; font-size: 1.05rem; font-weight: 700;
+  margin-top: 12px; transition: opacity .2s;
+  font-family: inherit;
+}
+.q-feedback.show-ok   { color: var(--success); }
+.q-feedback.show-fail { color: var(--danger); }
+
+/* 结果 */
+.quiz-result { display: none; text-align: center; }
+.quiz-result.show { display: block; }
+.result-score-big { font-size: 3rem; font-weight: 900; color: var(--accent); font-family: 'Courier New', monospace; }
+.result-msg { font-size: 1.15rem; color: var(--text-muted); margin: 8px 0 20px; }
+.wrong-review { text-align: left; margin-top: 16px; }
+.wr-title { font-size: .88rem; font-weight: 700; color: var(--danger); margin-bottom: 10px; }
+.wr-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.wr-item {
+  background: #FFF4F3; border: 1.5px solid #FFCDD2;
+  border-radius: 9px; padding: 8px 12px; font-size: .87rem;
+  font-family: 'Courier New', monospace; font-weight: 700;
+  min-width: 150px;
+}
+.wr-correct { color: var(--success); font-weight: 900; }
+
+/* ══════════════════════════════════════
+   TAB 4 — 错题本
+══════════════════════════════════════ */
+.wr-book-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+.wr-book-hint { color:var(--text-muted); font-size:.85rem; margin:0; }
+.wr-book-empty { text-align:center; color:var(--text-muted); padding:32px 0; font-size:1rem; }
+.wr-card { background:#fff; border-radius:var(--radius-lg); padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
+.wr-card-top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+.wr-formula { font-size:1.05rem; font-weight:900; color:var(--accent-dark); font-family:'Courier New',monospace; letter-spacing:1px; }
+.wr-count { margin-left:auto; font-size:.8rem; font-weight:700; color:#fff; background:var(--danger); border-radius:var(--radius-pill); padding:3px 10px; }
+.wr-card-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.wr-card-btns .btn { padding:6px 14px; font-size:.82rem; box-shadow:none; }
+.ai-tip-btn {
+  border:none; border-radius:var(--radius-md); padding:6px 14px; font-size:.82rem; font-weight:700; cursor:pointer;
+  color:#fff; background:linear-gradient(135deg, var(--blue), #12547d); font-family:inherit;
+}
+.ai-tip-btn:disabled { opacity:.6; cursor:default; }
+.ai-tip-box {
+  display:none; margin-top:10px; background:linear-gradient(135deg,#EAF6FF,#F0FAFF);
+  border:1.5px solid #C4E4FA; border-radius:var(--radius-md); padding:10px 12px; font-size:.85rem; color:#144D73; line-height:1.6;
+}
+.ai-tip-box.show { display:block; }
+.ai-tip-tag { font-size:.7rem; font-weight:700; color:var(--blue); background:#fff; display:inline-block; border-radius:8px; padding:1px 8px; margin-bottom:6px; }
+.ai-tip-loading { color:var(--blue); font-style:italic; }
+.ai-tip-err { color:var(--danger); font-size:.78rem; }
+.ai-tip-retry { margin-top:6px; border:1.5px solid var(--blue); background:#fff; color:var(--blue); border-radius:8px; padding:3px 10px; font-size:.75rem; cursor:pointer; font-family:inherit; }
+.ai-tip-trick, .ai-tip-breakdown { background:#fff; border-radius:9px; padding:8px 10px; margin-bottom:7px; }
+
+/* ── 烟花 ── */
+#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+/* ── 响应式 ── */
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.55rem; }
+  .formula-cell { min-width: 74px; padding: 7px 8px; }
+  .fc-main { font-size: .8rem; }
+  .q-equation { font-size: 2rem; letter-spacing: 3px; }
+  .memo-card { width: 108px; height: 88px; }
+  .q-input { width: 78px; height: 52px; font-size: 1.6rem; }
+}
+
+/* ── focus visible ── */
+.btn:focus-visible, .tab-btn:focus-visible, .formula-cell:focus-visible,
+.memo-row-btn:focus-visible, .q-input:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .memo-card-inner { transition: none; }
+  .formula-cell { transition: none; }
+}
+
+/* ── 点阵 Toast ── */
+#divToast {
+  position: fixed;
+  bottom: 64px; left: 50%;
+  transform: translateX(-50%) translateY(18px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 32px rgba(196,93,0,.20);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .22s, transform .22s;
+  z-index: 10000;
+  min-width: 240px; max-width: 92vw;
+  border-top: 4px solid var(--accent);
+}
+#divToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.toast-main  { font-size: 1.2rem; font-weight: 900; color: var(--accent-dark); margin-bottom: 3px;
+               font-family: 'Courier New', monospace; letter-spacing: 2px; }
+.toast-desc  { font-size: .88rem; color: var(--text-muted); margin-bottom: 9px; }
+.toast-dots  { font-size: .95rem; letter-spacing: 3px; line-height: 1.75;
+               margin-bottom: 9px; color: var(--accent); }
+.toast-add   { font-size: .85rem; color: #666; }
+.toast-add b { color: var(--danger); font-family: 'Courier New', monospace; }
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="divToast"></div>
+<div class="container">
+
+<div class="header">
+  <div class="header-icon">➗</div>
+  <h1>除法速算训练</h1>
+  <p>点击算式朗读 · 三种模式全面掌握 1 ÷ 1 到 81 ÷ 9</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('table')">📊 除法口诀表</button>
+  <button class="tab-btn" onclick="switchTab('memo')">📖 背诵</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">✏️ 测验</button>
+  <button class="tab-btn" onclick="switchTab('wrongbook')">📕 错题本</button>
+</div>
+
+<!-- ══ TAB 1: 除法口诀表 ══ -->
+<div id="tab-table">
+  <p class="sub-hint">按"商"分组 · 商 1 到 9，每组 9 道 · 点击任意算式听朗读</p>
+  <div class="card-panel" id="divTableContainer"></div>
+</div>
+
+<!-- ══ TAB 2: 背诵 ══ -->
+<div id="tab-memo" class="hidden">
+  <div class="card-panel">
+    <p class="sub-hint">选择商的组 · 翻转卡片看答案 · 点击「记住了」追踪掌握进度</p>
+    <div class="memo-nav" id="memoNav"></div>
+    <div class="memo-cards" id="memoCards"></div>
+    <div class="memo-actions" id="memoActions"></div>
+    <div class="memo-progress" id="memoProgress"></div>
+    <div class="prog-dots" id="progDots"></div>
+  </div>
+</div>
+
+<!-- ══ TAB 3: 测验 ══ -->
+<div id="tab-quiz" class="hidden">
+  <div class="card-panel">
+
+    <!-- 设置 -->
+    <div id="quizSetupArea">
+      <div class="quiz-setup">
+        <div class="setup-group">
+          <label>商的范围</label>
+          <select id="quizRange">
+            <option value="5">商 1 ～ 5</option>
+            <option value="9" selected>商 1 ～ 9（全部）</option>
+          </select>
+        </div>
+        <div class="setup-group">
+          <label>题型</label>
+          <select id="quizMode">
+            <option value="quotient" selected>求商（□ ÷ 除数 = ?）</option>
+            <option value="divisor">求除数（□ ÷ ? = 商）</option>
+            <option value="mixed">混合出题</option>
+          </select>
+        </div>
+        <div class="setup-group">
+          <label>题数</label>
+          <select id="quizCount">
+            <option value="10" selected>10 题</option>
+            <option value="20">20 题</option>
+            <option value="81">全部 81 题</option>
+          </select>
+        </div>
+        <div class="setup-group">
+          <label>限时</label>
+          <select id="quizTimer">
+            <option value="0">不限时</option>
+            <option value="5">每题 5 秒</option>
+            <option value="8" selected>每题 8 秒</option>
+            <option value="15">每题 15 秒</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="startQuiz()" style="align-self:flex-end">🚀 开始测验</button>
+      </div>
+    </div>
+
+    <!-- 答题区 -->
+    <div class="quiz-board" id="quizBoard">
+      <div class="quiz-header">
+        <span class="quiz-score" id="quizScore">✅ 0 &nbsp; ❌ 0</span>
+        <span class="quiz-score" id="quizQNum">第 1 / 10 题</span>
+        <span class="quiz-timer-display" id="quizTimerDisp" style="display:none">⏱ 8s</span>
+      </div>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="quizProgFill" style="width:0%"></div>
+      </div>
+      <div class="question-box">
+        <div class="q-badge" id="qBadge">求商</div>
+        <div class="q-equation" id="qEquation"></div>
+        <div class="q-input-row">
+          <input class="q-input" id="qInput" type="number" inputmode="numeric"
+            placeholder="?" autocomplete="off"
+            oninput="autoCheck(this)"
+            onkeydown="if(event.key==='Enter')checkAnswer()">
+        </div>
+        <div class="q-feedback" id="qFeedback"></div>
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div class="quiz-result" id="quizResult">
+      <div class="result-score-big" id="resultBig"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="wrong-review" id="wrongReview"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+        <button class="btn btn-primary" onclick="startQuiz()">再来一次</button>
+        <button class="btn btn-gray"    onclick="resetQuiz()">重新设置</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ TAB 4: 错题本 ══ -->
+<div id="tab-wrongbook" class="hidden">
+  <div class="card-panel">
+    <div class="wr-book-empty" id="wrongBookEmpty">还没有错题，加油保持哦！🎉</div>
+    <div class="wr-book-top" id="wrongBookTop">
+      <p class="wr-book-hint">按错的次数排序，点「AI 解析」看记忆诀窍，掌握了就移除</p>
+      <button class="btn btn-primary" onclick="startWrongQuiz()">🎯 专项测验错题</button>
+    </div>
+    <div id="wrongBookList"></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script src="hpx-core.js"></script>
+<script>
+// ══════════════════════════════════════
+//  颜色 — 9 组各有色调
+// ══════════════════════════════════════
+const GROUP_COLORS = [
+  '#FFF0E6','#FFF8DC','#F0FFF0','#E6F3FF',
+  '#F5E6FF','#E6FFFF','#FFE6E6','#F0F0FF','#F5FFF5'
+];
+
+const CN = ['','一','二','三','四','五','六','七','八','九'];
+
+// ══════════════════════════════════════
+//  数据：dividend ÷ divisor = quotient
+//  按商（quotient）分组，商 1-9，除数 1-9
+// ══════════════════════════════════════
+const ALL = [];
+const ROWS = {};
+for (let q = 1; q <= 9; q++) {
+  ROWS[q] = [];
+  for (let d = 1; d <= 9; d++) {
+    const item = { dividend: d * q, divisor: d, quotient: q };
+    ALL.push(item);
+    ROWS[q].push(item);
+  }
+}
+
+// ══════════════════════════════════════
+//  点阵 Toast
+// ══════════════════════════════════════
+let _toastTimer = null;
+
+function showDivToast(item) {
+  const { dividend, divisor, quotient } = item;
+
+  // 点阵：quotient 行 × divisor 列 = dividend 个点
+  // 直觉：dividend 个苹果，每组 divisor 个，分成 quotient 组
+  const DOTS = ['🟠','🔵','🟢','🔴','🟣','🟡','🩵','🟤','🩷'];
+  const dot  = DOTS[(quotient - 1) % DOTS.length];
+
+  let dotsHtml;
+  if (dividend <= 45) {
+    // 正常展示点阵
+    const rowsArr = Array.from({ length: quotient }, () =>
+      Array(divisor).fill(dot).join(' ')
+    );
+    dotsHtml = `<div class="toast-dots">${rowsArr.join('<br>')}</div>`;
+  } else {
+    // 被除数较大时，用紧凑格式 + 数字标注
+    dotsHtml = `<div class="toast-dots" style="font-size:.8rem;letter-spacing:2px">${
+      Array.from({ length: quotient }, (_, i) =>
+        `<span title="第${i+1}组">${Array(divisor).fill(dot).join('')}</span>`
+      ).join(' ')
+    }</div>`;
+  }
+
+  // 加法展开：divisor + divisor + ... = dividend（quotient 个 divisor）
+  const addParts = Array(quotient).fill(divisor);
+  const addStr   = addParts.length <= 9 ? addParts.join(' + ') : `${divisor} × ${quotient}`;
+
+  document.getElementById('divToast').innerHTML = `
+    <div class="toast-main">${dividend} ÷ ${divisor} = ${quotient}</div>
+    <div class="toast-desc">${dividend} 个，每份 ${divisor} 个，平均分成 ${quotient} 份</div>
+    ${dotsHtml}
+    <div class="toast-add">${quotient} 份合起来：${addStr} = <b>${dividend}</b></div>
+  `;
+
+  const el = document.getElementById('divToast');
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
+}
+
+// ══════════════════════════════════════
+//  语音
+// ══════════════════════════════════════
+const divisionSpeech=Hpx.speech.install({rate:0.82,pitch:1.05,startDelayMs:50});
+
+function speakItem(item) {
+  speak(`${item.dividend} 除以 ${item.divisor} 等于 ${item.quotient}`);
+}
+
+function speakGroup(q) {
+  const texts=ROWS[q].map(it=>`${it.dividend} 除以 ${it.divisor} 等于 ${it.quotient}`);
+  return divisionSpeech.sequence(texts,{rate:0.76,pitch:1.05,gapMs:160});
+}
+
+// ══════════════════════════════════════
+//  Tab 切换
+// ══════════════════════════════════════
+function switchTab(name) {
+  Hpx.tabs.activate(name,['table','memo','quiz','wrongbook'],{activeClass:'active',hiddenClass:'hidden'});
+  if (name === 'memo' && !memoInited) initMemo();
+  if (name === 'wrongbook') renderWrongBook();
+}
+
+// ══════════════════════════════════════
+//  TAB 1 — 除法口诀表
+// ══════════════════════════════════════
+function buildTable() {
+  const wrap = document.getElementById('divTableContainer');
+  for (let q = 1; q <= 9; q++) {
+    const section = document.createElement('div');
+    section.className = 'group-section';
+    const color = GROUP_COLORS[q - 1];
+
+    const hdr = document.createElement('div');
+    hdr.className = 'group-header';
+    hdr.innerHTML = `
+      <div class="group-label">
+        <span class="group-badge">${q}</span>
+        商 = ${q}（${CN[q]}）&nbsp;·&nbsp;除数 1 ～ 9
+      </div>
+      <button class="speak-btn" onclick="speakGroup(${q})">🔊 朗读本组</button>`;
+    section.appendChild(hdr);
+
+    const row = document.createElement('div');
+    row.className = 'formula-row';
+    ROWS[q].forEach(item => {
+      const cell = document.createElement('div');
+      cell.className = 'formula-cell';
+      cell.style.background = color;
+      cell.setAttribute('tabindex', '0');
+      cell.innerHTML = `
+        <div class="fc-main">${item.dividend}&thinsp;÷&thinsp;${item.divisor}&thinsp;=&thinsp;${item.quotient}</div>
+        <div class="fc-sub">${item.dividend} 除以 ${item.divisor}</div>`;
+      const activate = () => {
+        document.querySelectorAll('.formula-cell.active').forEach(c => c.classList.remove('active'));
+        cell.classList.add('active');
+        speakItem(item);
+        showDivToast(item);
+        setTimeout(() => cell.classList.remove('active'), 1200);
+      };
+      cell.addEventListener('click', activate);
+      cell.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') activate(); });
+      row.appendChild(cell);
+    });
+    section.appendChild(row);
+    wrap.appendChild(section);
+  }
+}
+
+// ══════════════════════════════════════
+//  TAB 2 — 背诵
+// ══════════════════════════════════════
+let memoInited = false;
+let memoGroup  = 1;
+const memoKnown = {};
+const MEMO_KEY  = 'divMemo_v1';
+
+function memoKey(item) { return `${item.dividend}÷${item.divisor}`; }
+function loadMemo() {
+  try { Object.assign(memoKnown, JSON.parse(localStorage.getItem(MEMO_KEY)) || {}); } catch(e) {}
+}
+function saveMemo() {
+  try { localStorage.setItem(MEMO_KEY, JSON.stringify(memoKnown)); } catch(e) {}
+}
+
+function initMemo() {
+  memoInited = true;
+  loadMemo();
+  buildMemoNav();
+  showMemoGroup(1);
+}
+
+function buildMemoNav() {
+  const nav = document.getElementById('memoNav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= 9; i++) {
+    const all = ROWS[i];
+    const kn  = all.filter(x => memoKnown[memoKey(x)]).length;
+    const mastered = kn === all.length;
+    const btn = document.createElement('button');
+    btn.className = 'memo-row-btn' + (i === memoGroup ? ' selected' : '') + (mastered ? ' mastered' : '');
+    btn.textContent = i;
+    btn.title = `商=${i}：${kn}/${all.length} 已掌握`;
+    btn.onclick = () => showMemoGroup(i);
+    nav.appendChild(btn);
+  }
+}
+
+function showMemoGroup(g) {
+  memoGroup = g;
+  buildMemoNav();
+  const items = ROWS[g];
+  const cards = document.getElementById('memoCards');
+  cards.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'memo-card';
+    card.innerHTML = `
+      <div class="memo-card-inner">
+        <div class="memo-card-front">
+          <div class="mc-q">${item.dividend}&thinsp;÷&thinsp;${item.divisor}&thinsp;=&thinsp;?</div>
+          <div class="mc-tap">点击翻转</div>
+        </div>
+        <div class="memo-card-back">
+          <div class="mc-ans">${item.quotient}</div>
+          <div class="mc-eq">${item.dividend}÷${item.divisor}=${item.quotient}</div>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) speakItem(item);
+    });
+    cards.appendChild(card);
+  });
+
+  document.getElementById('memoActions').innerHTML = `
+    <button class="btn btn-green" onclick="markAll(${g}, true)">✅ 全部记住了</button>
+    <button class="btn btn-blue"  onclick="speakGroup(${g})">🔊 朗读本组</button>
+    <button class="btn btn-gray"  onclick="markAll(${g}, false)">🔁 重新练习</button>`;
+  updateProgress(g);
+}
+
+function markAll(g, known) {
+  ROWS[g].forEach(x => {
+    if (known) memoKnown[memoKey(x)] = true;
+    else delete memoKnown[memoKey(x)];
+  });
+  saveMemo(); updateProgress(g); buildMemoNav();
+  if (!known) document.querySelectorAll('#memoCards .memo-card').forEach(c => c.classList.remove('flipped'));
+}
+
+function updateProgress(g) {
+  const items = ROWS[g];
+  const kn    = items.filter(x => memoKnown[memoKey(x)]).length;
+  const totalKn = ALL.filter(x => memoKnown[memoKey(x)]).length;
+  document.getElementById('memoProgress').textContent =
+    `商 = ${g} 组：${kn} / ${items.length} 已掌握 · 全部 81 题：${totalKn} / ${ALL.length}`;
+  document.getElementById('progDots').innerHTML = ALL.map(x => {
+    const cls = memoKnown[memoKey(x)] ? 'known' : 'unknown';
+    return `<div class="prog-dot ${cls}" title="${x.dividend}÷${x.divisor}=${x.quotient}"></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  TAB 3 — 测验
+// ══════════════════════════════════════
+let quizList = [], quizIdx = 0, quizCorrect = 0, quizWrong = [];
+let quizTimerInterval = null, quizTimerLeft = 0, quizTimerSec = 0;
+let quizAnswered = false;
+
+function buildQuizList() {
+  const range = parseInt(document.getElementById('quizRange').value);
+  const count = parseInt(document.getElementById('quizCount').value);
+  const mode  = document.getElementById('quizMode').value;
+  const pool  = ALL.filter(x => x.quotient <= range);
+  const typed = pool.map(x => {
+    let ask;
+    if (mode === 'quotient') ask = 'quotient';
+    else if (mode === 'divisor') ask = 'divisor';
+    else ask = Math.random() < .5 ? 'quotient' : 'divisor';
+    return { ...x, ask };
+  });
+  return typed.sort(() => Math.random() - .5).slice(0, Math.min(count, typed.length));
+}
+
+function getQ(item) {
+  if (item.ask === 'quotient')
+    return { display: `${item.dividend} ÷ ${item.divisor} = ?`, answer: item.quotient, badge: '求商' };
+  return { display: `${item.dividend} ÷ ? = ${item.quotient}`, answer: item.divisor, badge: '求除数' };
+}
+
+function startQuiz() {
+  quizTimerSec = parseInt(document.getElementById('quizTimer').value);
+  runQuiz(buildQuizList());
+}
+
+// 从错题本抽题做专项测验：不限时，混合出题，专心复习
+function startWrongQuiz() {
+  const items = Object.values(wrongBook).map(w => ({
+    dividend: w.dividend, divisor: w.divisor, quotient: w.quotient,
+    ask: Math.random() < .5 ? 'quotient' : 'divisor',
+  }));
+  if (!items.length) return;
+  quizTimerSec = 0;
+  switchTab('quiz');
+  runQuiz([...items].sort(() => Math.random() - .5));
+}
+
+function runQuiz(list) {
+  quizList = list;
+  quizIdx = 0; quizCorrect = 0; quizWrong = [];
+  document.getElementById('quizSetupArea').style.display  = 'none';
+  document.getElementById('quizBoard').classList.add('active');
+  document.getElementById('quizResult').classList.remove('show');
+  document.getElementById('quizTimerDisp').style.display = quizTimerSec > 0 ? '' : 'none';
+  showQuestion();
+}
+
+function autoCheck(inp) {
+  if (quizAnswered) return;
+  const val = inp.value.trim();
+  if (val === '') return;
+  const q = getQ(quizList[quizIdx]);
+  if (val.length >= String(q.answer).length) checkAnswer();
+}
+
+function showQuestion() {
+  if (quizIdx >= quizList.length) { endQuiz(); return; }
+  quizAnswered = false;
+  const item  = quizList[quizIdx];
+  const q     = getQ(item);
+  const total = quizList.length;
+
+  document.getElementById('qBadge').textContent   = q.badge;
+  document.getElementById('qEquation').textContent = q.display;
+  document.getElementById('qFeedback').textContent  = '';
+  document.getElementById('qFeedback').className    = 'q-feedback';
+
+  const inp = document.getElementById('qInput');
+  inp.value = ''; inp.className = 'q-input'; inp.disabled = false;
+  setTimeout(() => inp.focus(), 60);
+
+  document.getElementById('quizScore').textContent =
+    `✅ ${quizCorrect}  ❌ ${quizList.slice(0, quizIdx).length - quizCorrect}`;
+  document.getElementById('quizQNum').textContent = `第 ${quizIdx + 1} / ${total} 题`;
+  document.getElementById('quizProgFill').style.width = (quizIdx / total * 100) + '%';
+
+  clearInterval(quizTimerInterval);
+  if (quizTimerSec > 0) {
+    quizTimerLeft = quizTimerSec;
+    renderTimer();
+    quizTimerInterval = setInterval(() => {
+      quizTimerLeft--;
+      renderTimer();
+      if (quizTimerLeft <= 0) { clearInterval(quizTimerInterval); timeOut(); }
+    }, 1000);
+  }
+}
+
+function renderTimer() {
+  const d = document.getElementById('quizTimerDisp');
+  d.textContent = `⏱ ${quizTimerLeft}s`;
+  const warn = Math.max(3, Math.floor(quizTimerSec * .25));
+  d.style.color = quizTimerLeft <= warn ? '#D93025' : '#E07000';
+}
+
+function timeOut() {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const item = quizList[quizIdx];
+  const q    = getQ(item);
+  const inp  = document.getElementById('qInput');
+  inp.disabled = true; inp.classList.add('wrong');
+  const fb = document.getElementById('qFeedback');
+  fb.textContent = `⏰ 超时！答案是 ${q.answer}（${item.dividend} ÷ ${item.divisor} = ${item.quotient}）`;
+  fb.className = 'q-feedback show-fail';
+  quizWrong.push(item);
+  recordWrong(item);
+  speakItem(item);
+  showDivToast(item);
+  setTimeout(nextQ, 1700);
+}
+
+function checkAnswer() {
+  if (quizAnswered) return;
+  const inp = document.getElementById('qInput');
+  const val = inp.value.trim();
+  if (val === '') return;
+  quizAnswered = true;
+  clearInterval(quizTimerInterval);
+
+  const item    = quizList[quizIdx];
+  const q       = getQ(item);
+  const userAns = parseInt(val);
+  const ok      = userAns === q.answer;
+  const fb      = document.getElementById('qFeedback');
+
+  if (ok) {
+    quizCorrect++;
+    inp.classList.add('correct');
+    fb.textContent = `✅ 正确！${item.dividend} ÷ ${item.divisor} = ${item.quotient}`;
+    fb.className   = 'q-feedback show-ok';
+    playOk();
+  } else {
+    inp.classList.add('wrong');
+    fb.textContent = `❌ 答案是 ${q.answer}（${item.dividend} ÷ ${item.divisor} = ${item.quotient}）`;
+    fb.className   = 'q-feedback show-fail';
+    quizWrong.push(item);
+    recordWrong(item);
+    playFail();
+  }
+  inp.disabled = true;
+  speakItem(item);
+  showDivToast(item);
+  setTimeout(nextQ, ok ? 900 : 1700);
+}
+
+function nextQ() { quizIdx++; showQuestion(); }
+
+function endQuiz() {
+  clearInterval(quizTimerInterval);
+  document.getElementById('quizBoard').classList.remove('active');
+  const result = document.getElementById('quizResult');
+  result.classList.add('show');
+
+  const total = quizList.length;
+  const pct   = Math.round(quizCorrect / total * 100);
+  document.getElementById('resultBig').textContent = `${quizCorrect} / ${total}（${pct}%）`;
+
+  const msgs = [
+    [100,'🏆 满分！除法高手！'],
+    [90, '🌟 非常优秀！'],
+    [80, '😊 做得不错！'],
+    [60, '💪 继续努力！'],
+    [0,  '📚 多多练习！']
+  ];
+  document.getElementById('resultMsg').textContent = msgs.find(([t]) => pct >= t)[1];
+
+  const wr = document.getElementById('wrongReview');
+  if (quizWrong.length) {
+    wr.innerHTML = `<div class="wr-title">❌ 以下 ${quizWrong.length} 道需要复习：</div>
+      <div class="wr-list">${quizWrong.map(x => {
+        const key = memoKey(x);
+        return `<div class="wr-item">
+          <div>${x.dividend}÷${x.divisor}=<span class="wr-correct">${x.quotient}</span></div>
+          <button class="ai-tip-btn" id="aiTipBtn-qr-${key}" onclick="genDivTip('${key}','qr')" style="margin-top:6px">🤖 AI 解析</button>
+          <div class="ai-tip-box" id="tipBox-qr-${key}"></div>
+        </div>`;
+      }).join('')}</div>
+      <p style="text-align:center;margin-top:10px;font-size:.82rem;color:var(--text-muted)">这些题已自动加入 📕 错题本，随时可以去专项复习</p>`;
+  } else {
+    wr.innerHTML = '<div style="color:var(--success);text-align:center;font-size:1.1rem;margin-top:10px">🎉 全部答对！除法满分！</div>';
+  }
+
+  document.getElementById('quizProgFill').style.width = '100%';
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizWrong.length}`;
+  if (pct >= 90) setTimeout(launchConfetti, 300);
+}
+
+function resetQuiz() {
+  clearInterval(quizTimerInterval);
+  document.getElementById('quizSetupArea').style.display = '';
+  document.getElementById('quizBoard').classList.remove('active');
+  document.getElementById('quizResult').classList.remove('show');
+}
+
+// ══════════════════════════════════════
+//  TAB 4 — 错题本（自动收集测验答错的题，持久化）
+// ══════════════════════════════════════
+const WRONG_KEY = 'divWrongBook_v1';
+let wrongBook = {}; // key = "dividend÷divisor", value = {dividend,divisor,quotient,count,lastAt}
+
+function loadWrongBook() {
+  try { wrongBook = JSON.parse(localStorage.getItem(WRONG_KEY)) || {}; }
+  catch (e) { wrongBook = {}; }
+}
+function saveWrongBook() {
+  try { localStorage.setItem(WRONG_KEY, JSON.stringify(wrongBook)); } catch (e) {}
+}
+function recordWrong(item) {
+  const key = memoKey(item);
+  const cur = wrongBook[key];
+  wrongBook[key] = {
+    dividend: item.dividend, divisor: item.divisor, quotient: item.quotient,
+    count: (cur ? cur.count : 0) + 1, lastAt: Date.now(),
+  };
+  saveWrongBook();
+}
+function removeWrong(key) {
+  delete wrongBook[key];
+  saveWrongBook();
+  renderWrongBook();
+}
+
+function renderWrongBook() {
+  loadWrongBook();
+  const list  = document.getElementById('wrongBookList');
+  const empty = document.getElementById('wrongBookEmpty');
+  const top   = document.getElementById('wrongBookTop');
+  const entries = Object.entries(wrongBook).sort((x, y) => y[1].count - x[1].count || y[1].lastAt - x[1].lastAt);
+
+  if (!entries.length) {
+    empty.style.display = 'block'; top.style.display = 'none'; list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none'; top.style.display = 'flex';
+  list.innerHTML = entries.map(([key, item]) => `
+    <div class="wr-card">
+      <div class="wr-card-top">
+        <span class="wr-formula">${item.dividend}&thinsp;÷&thinsp;${item.divisor}&thinsp;=&thinsp;${item.quotient}</span>
+        <span class="wr-count">错 ${item.count} 次</span>
+      </div>
+      <div class="wr-card-btns">
+        <button class="btn btn-gray" onclick="speakItem({dividend:${item.dividend},divisor:${item.divisor},quotient:${item.quotient}})">🔊 朗读</button>
+        <button class="ai-tip-btn" id="aiTipBtn-wb-${key}" onclick="genDivTip('${key}','wb')">🤖 AI 解析</button>
+        <button class="btn btn-green" onclick="removeWrong('${key}')">✓ 已掌握</button>
+      </div>
+      <div class="ai-tip-box" id="tipBox-wb-${key}"></div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════
+//  AI 解析：调用本地 Ollama，讲记忆诀窍 + 除法拆解
+//  和 multiplication.html 的「AI 解析」用同一套本地调用模式
+// ══════════════════════════════════════
+const DIV_OLLAMA_URL = 'http://localhost:11434/api/generate';
+const DIV_OLLAMA_MODEL = 'qwen2.5:14b';
+const DIV_TIP_MAXLEN = 70;
+
+const DIV_TIP_SCHEMA = {
+  type: 'object',
+  properties: {
+    trick: { type: 'string', maxLength: DIV_TIP_MAXLEN,
+      description: `给一个好记的诀窍或联想小故事，帮孩子记住这道除法的商，最多${DIV_TIP_MAXLEN}个字` },
+    breakdown: { type: 'string', maxLength: DIV_TIP_MAXLEN,
+      description: `讲清楚怎么算出这个商的，最多${DIV_TIP_MAXLEN}个字` },
+  },
+  required: ['trick', 'breakdown'],
+};
+
+function divEscapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function divClampText(s, maxLen) {
+  s = String(s || '').trim();
+  return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+}
+
+function buildDivTipPrompt(item) {
+  const { dividend, divisor, quotient } = item;
+  return `你是一名教小学生数学的老师，正在帮孩子记住除法算式"${dividend} ÷ ${divisor} = ${quotient}"。
+
+请你做两件事：
+1. trick：给一个好记的诀窍或联想小故事，帮孩子记住这道题的商是${quotient}，最多${DIV_TIP_MAXLEN}个字，要具体、有画面感，不要说"这个很简单"这类空话。
+2. breakdown：讲清楚怎么算出这个商的，用"想乘法口诀"的思路（比如${divisor} × ？= ${dividend}，因为${divisor} × ${quotient} = ${dividend}，所以商是${quotient}），最多${DIV_TIP_MAXLEN}个字。
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+async function genDivTip(key, ctx) {
+  const item = wrongBook[key];
+  const box = document.getElementById(`tipBox-${ctx}-${key}`);
+  const btn = document.getElementById(`aiTipBtn-${ctx}-${key}`);
+  if (!item || !box) return;
+
+  if (btn) btn.disabled = true;
+  box.classList.add('show');
+  box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析</span><div class="ai-tip-loading">正在生成，请稍候…</div>`;
+
+  const prompt = buildDivTipPrompt(item);
+  try {
+    const resp = await fetch(DIV_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: DIV_OLLAMA_MODEL, prompt, stream: false, format: DIV_TIP_SCHEMA }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const raw = (data.response || '').trim();
+    if (!raw) throw new Error('空响应');
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch (e) { throw new Error('返回内容不是合法 JSON'); }
+    if (!parsed.trick || !parsed.breakdown) throw new Error('返回内容缺少讲解字段');
+
+    const trick = divClampText(parsed.trick, DIV_TIP_MAXLEN);
+    const breakdown = divClampText(parsed.breakdown, DIV_TIP_MAXLEN);
+    box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析：${divEscapeHtml(item.dividend+'÷'+item.divisor+'='+item.quotient)}</span>
+      <div class="ai-tip-trick">💡 ${divEscapeHtml(trick)}</div>
+      <div class="ai-tip-breakdown">🔢 ${divEscapeHtml(breakdown)}</div>`;
+  } catch (err) {
+    box.innerHTML = `<span class="ai-tip-tag">🤖 AI 解析</span>
+      <div class="ai-tip-err">生成失败：无法连接本地 Ollama（${divEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${DIV_OLLAMA_MODEL}</code>；
+      ③ 若本页面不是从本机打开，需设置 <code>OLLAMA_ORIGINS=*</code> 允许跨域访问。</div>
+      <button class="ai-tip-retry" onclick="genDivTip('${key}','${ctx}')">🔄 重试</button>`;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════
+//  音效
+// ══════════════════════════════════════
+let aCtx = null;
+function getACtx() {
+  if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (aCtx.state === 'suspended') aCtx.resume();
+  return aCtx;
+}
+function tone(freq, dur, type = 'sine', vol = .22) {
+  try {
+    const ctx = getACtx();
+    const osc = ctx.createOscillator();
+    const gn  = ctx.createGain();
+    osc.connect(gn); gn.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gn.gain.setValueAtTime(vol, ctx.currentTime);
+    gn.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function playOk()   { tone(523, .09); setTimeout(() => tone(784, .16), 90); }
+function playFail() { tone(200, .22, 'sawtooth', .16); }
+
+// ══════════════════════════════════════
+//  烟花
+// ══════════════════════════════════════
+function launchConfetti() {
+  const cv  = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+  const cols = ['#F27B22','#F7C97A','#1E88C7','#2DA44E','#E91E63','#9C27B0','#00BCD4'];
+  const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const ps = Array.from({ length: 140 }, () => ({
+    x: Math.random() * cv.width,
+    y: Math.random() * cv.height - cv.height,
+    w: rand(6, 13), h: rand(4, 8),
+    color: cols[rand(0, cols.length - 1)],
+    vx: (Math.random() - .5) * 3, vy: rand(2, 6),
+    angle: Math.random() * Math.PI * 2,
+    spin: (Math.random() - .5) * .22, op: 1
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    let alive = 0;
+    ps.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+      p.op = Math.max(0, 1 - frame / 135);
+      if (p.y < cv.height + 20) alive++;
+      ctx.save();
+      ctx.globalAlpha = p.op;
+      ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive > 0 && frame < 165) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+// ══════════════════════════════════════
+//  初始化
+// ══════════════════════════════════════
+buildTable();
+loadWrongBook();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

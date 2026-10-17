@@ -1,4 +1,3 @@
-```c
 <title>小学数学六年学习计划 · 螺旋上升</title>
 <style>
   @font-face {
@@ -16,7 +15,7 @@
     font-display: swap;
   }
 
-   :root {
+  :root {
     --bg: #EAEEE4;
     --bg-line: rgba(62, 90, 74, 0.14);
     --card-bg: #FBFBF6;
@@ -325,6 +324,15 @@
     padding-top: 1px;
   }
   .thread-row .text { color: var(--ink-soft); }
+  .study-links { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 8px; vertical-align: middle; }
+  .study-link {
+    display: inline-flex; align-items: center; min-height: 28px; padding: 2px 9px;
+    border: 1px solid currentColor; border-radius: 999px; color: var(--accent);
+    background: var(--accent-soft); font-size: 12px; font-weight: 600;
+    line-height: 1.4; text-decoration: none; white-space: nowrap;
+  }
+  .study-link:hover { background: var(--card-bg); }
+  .study-link::after { content: "\2192"; margin-left: 4px; }
 
   .keypoint {
     margin-top: 16px;
@@ -515,10 +523,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">20 以内、100 以内加减法（不进位 → 进位 → 退位），认识「数位」概念</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识长方体、正方体、圆柱、球等立体图形（先立体后平面，符合认知规律）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">认识钟表（整点、半点）、人民币</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维铺垫</span><span class="text">分类、比较大小、简单排序</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">20 以内、100 以内加减法（不进位 → 进位 → 退位），认识「数位」概念<span class="study-links" aria-label="一年级数与运算配套学习"><a class="study-link" href="grade1-daily-math.html">每日练习</a><a class="study-link" href="numbers.html">数字乐园</a><a class="study-link" href="addsub10.html">10以内加减</a><a class="study-link" href="carry.html">进退位加减</a><a class="study-link" href="placevalue.html">认识数位</a><a class="study-link" href="math1.html">综合练习</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识长方体、正方体、圆柱、球等立体图形（先立体后平面，符合认知规律）<span class="study-links"><a class="study-link" href="shapes.html">图形认识</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">认识钟表（整点、半点）、人民币<span class="study-links" aria-label="一年级量与计量配套学习"><a class="study-link" href="clock.html">认识钟表</a><a class="study-link" href="money-shop.html">货币商店</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维铺垫</span><span class="text">分类、比较大小、简单排序<span class="study-links" aria-label="一年级思维配套学习"><a class="study-link" href="data-classification.html">分类统计</a><a class="study-link" href="math_drill.html">趣味小练习</a><a class="study-link" href="olympiad1.html">思维训练</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>一切用实物、图片、手指辅助，不追求速度，先追求「理解为什么」。</div>
     </div>
@@ -534,10 +542,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">表内乘除法（重中之重，必须脱口而出）、万以内加减法（含连续进位 / 退位）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识角（直角、锐角、钝角）、简单图形的周长</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">长度单位（米、厘米）、时分秒的换算</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维</span><span class="text">初步的「平均分」概念（为三年级分数打基础）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">表内乘除法（重中之重，必须脱口而出）、万以内加减法（含连续进位 / 退位）<span class="study-links" aria-label="二年级数与运算配套学习"><a class="study-link" href="grade2-daily-math.html">每日训练</a><a class="study-link" href="multiplication.html">乘法口诀</a><a class="study-link" href="division.html">除法训练</a><a class="study-link" href="carry.html">进退位加减</a><a class="study-link" href="placevalue.html">认识数位</a><a class="study-link" href="mixed.html">混合运算</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">认识角（直角、锐角、钝角）、简单图形的周长<span class="study-links" aria-label="二年级图形配套学习"><a class="study-link" href="shapes.html">图形认识</a><a class="study-link" href="direction.html">方向认识</a><a class="study-link" href="perimeter.html">周长计算</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">长度单位（米、厘米）、时分秒的换算<span class="study-links" aria-label="二年级量与计量配套学习"><a class="study-link" href="length.html">长度认识</a><a class="study-link" href="time_calc.html">时间计算</a><a class="study-link" href="weight.html">克和千克</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">思维</span><span class="text">初步的「平均分」概念（为三年级分数打基础）<span class="study-links" aria-label="二年级思维配套学习"><a class="study-link" href="mathwide1.html">数学广角</a><a class="study-link" href="olympiad2.html">思维训练</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>乘法口诀是全小学数学的地基，必须滚瓜烂熟，否则三、四年级除法、分数会全线吃力。</div>
     </div>
@@ -553,10 +561,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">多位数乘除法（两三位数乘一位数、除以一位数）、分数初步认识（把「平均分」正式符号化）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">面积概念、长方形正方形周长与面积公式</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">质量单位（克、千克、吨）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">两步应用题开始出现</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">多位数乘除法（两三位数乘一位数、除以一位数）、分数初步认识（把「平均分」正式符号化）<span class="study-links" aria-label="三年级数与运算配套学习"><a class="study-link" href="multiply2d.html">两位数乘法</a><a class="study-link" href="division.html">除法训练</a><a class="study-link" href="fraction.html">分数初步</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">面积概念、长方形正方形周长与面积公式<span class="study-links" aria-label="三年级图形配套学习"><a class="study-link" href="area.html">面积认识</a><a class="study-link" href="perimeter.html">周长计算</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-measure)">量与计量</span><span class="text">质量单位（克、千克、吨）<span class="study-links"><a class="study-link" href="weight.html">克和千克</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">两步应用题开始出现<span class="study-links" aria-label="三年级思维配套学习"><a class="study-link" href="olympiad3.html">思维训练</a><a class="study-link" href="mathwide1.html">数学广角</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>这是小学数学第一个真正的分水岭。分数概念若在此时不扎实，会一路影响到六年级分数四则运算乃至初中有理数。建议多用「分蛋糕、分披萨」等实物类比，不要急着做题。</div>
     </div>
@@ -572,10 +580,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">三位数乘两位数、除数是两位数的除法、四则混合运算与运算律（交换律 / 结合律 / 分配律）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">分数与小数</span><span class="text">小数的意义与加减法，分数的意义深化</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">角的度量、三角形 / 平行四边形 / 梯形的认识</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">行程问题、和差倍问题开始系统出现</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">三位数乘两位数、除数是两位数的除法、四则混合运算与运算律（交换律 / 结合律 / 分配律）<span class="study-links" aria-label="四年级数与运算配套学习"><a class="study-link" href="bignumber.html">大数认识</a><a class="study-link" href="operationlaws.html">运算定律</a><a class="study-link" href="grade4misc.html">综合练习</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">分数与小数</span><span class="text">小数的意义与加减法，分数的意义深化<span class="study-links" aria-label="四年级分数与小数配套学习"><a class="study-link" href="decimal_intro.html">小数认识</a><a class="study-link" href="decimal.html">小数加减</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">角的度量、三角形 / 平行四边形 / 梯形的认识<span class="study-links" aria-label="四年级图形配套学习"><a class="study-link" href="angle.html">角的度量</a><a class="study-link" href="triangle.html">三角形</a><a class="study-link" href="grade4misc.html">平行四边形与梯形</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">行程问题、和差倍问题开始系统出现<span class="study-links" aria-label="四年级思维配套学习"><a class="study-link" href="chickenrabbit.html">鸡兔同笼</a><a class="study-link" href="mathwide2.html">数学广角</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>运算律是简便计算和以后代数式变形的雏形，一定要讲清楚「为什么可以这样交换」，不是死记公式。</div>
     </div>
@@ -591,10 +599,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数四则运算（通分、约分）、小数乘除法、简易方程（用字母表示数，正式代数思维起点）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">多边形面积（三角形、平行四边形、梯形面积公式推导，注意「推导」而非死记）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">条形统计图、折线统计图</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">分数应用题、行程问题升级（相遇、追及）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数四则运算（通分、约分）、小数乘除法、简易方程（用字母表示数，正式代数思维起点）<span class="study-links" aria-label="五年级数与运算配套学习"><a class="study-link" href="fraction_addsub.html">分数加减</a><a class="study-link" href="decimal_muldiv.html">小数乘除</a><a class="study-link" href="equation.html">简易方程</a><a class="study-link" href="factors.html">因数倍数</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">多边形面积（三角形、平行四边形、梯形面积公式推导，注意「推导」而非死记）<span class="study-links" aria-label="五年级图形配套学习"><a class="study-link" href="polygonarea.html">多边形面积</a><a class="study-link" href="cuboid.html">长方体和正方体</a><a class="study-link" href="threeview.html">观察物体</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">条形统计图、折线统计图<span class="study-links" aria-label="五年级统计与概率配套学习"><a class="study-link" href="barchart.html">条形统计图</a><a class="study-link" href="linechart.html">折线统计图</a><a class="study-link" href="probability.html">可能性</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">分数应用题、行程问题升级（相遇、追及）<span class="study-links"><a class="study-link" href="mathwide2.html">数学广角</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>五年级是公认的分水岭年级。方程思想的引入，标志着从「算术思维」（怎么算出答案）向「代数思维」（设未知数、列关系式）过渡，是初中数学的直接铺垫，务必重视。</div>
     </div>
@@ -610,10 +618,10 @@
         </div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数除法、百分数（与分数、小数三者互化）、比和比例</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">圆的周长与面积、简单立体图形（长方体、圆柱）的表面积与体积</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">扇形统计图、平均数 / 中位数概念</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">工程问题、浓度问题、正反比例应用，综合应用题（融合比例、百分数、几何）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-num)">数与运算</span><span class="text">分数除法、百分数（与分数、小数三者互化）、比和比例<span class="study-links" aria-label="六年级数与运算配套学习"><a class="study-link" href="fraction_ops.html">分数乘除</a><a class="study-link" href="percentage.html">百分数</a><a class="study-link" href="proportion.html">比和比例</a><a class="study-link" href="negative.html">认识负数</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-geo)">图形</span><span class="text">圆的周长与面积、简单立体图形（长方体、圆柱）的表面积与体积<span class="study-links" aria-label="六年级图形配套学习"><a class="study-link" href="circle.html">圆</a><a class="study-link" href="cylinder_cone.html">圆柱与圆锥</a><a class="study-link" href="cuboid.html">长方体和正方体</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-stat)">统计</span><span class="text">扇形统计图、平均数 / 中位数概念<span class="study-links"><a class="study-link" href="percentage.html">扇形统计图</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-app)">应用题</span><span class="text">工程问题、浓度问题、正反比例应用，综合应用题（融合比例、百分数、几何）<span class="study-links" aria-label="六年级应用题配套学习"><a class="study-link" href="proportion.html">比例应用</a><a class="study-link" href="mathwide2.html">数学广角</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>下学期要做系统性总复习，把六年内容按五条主线重新串一遍，同时提前接触「用字母表示数量关系」的强化训练，为初中一元一次方程做铺垫。</div>
     </div>
@@ -667,3 +675,5 @@
 </div>
 <script src="hpx-page-speech.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+<script src="feedback.js?v=20260906-2"></script>

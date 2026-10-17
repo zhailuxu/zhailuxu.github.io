@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运算定律与简便计算</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#ede7f6 0%,#e1f5fe 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#4527a0;letter-spacing:2px;text-shadow:2px 3px 0 #d1c4e9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 22px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.law-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.law-btn{padding:8px 14px;border:2px solid #d1c4e9;border-radius:14px;background:#fff;color:#5e35b1;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.law-btn.on{background:#5e35b1;color:#fff;border-color:#5e35b1;}
+.law-title{text-align:center;font-size:1.15rem;font-weight:bold;color:#4527a0;margin-bottom:6px;}
+.law-formula{text-align:center;font-size:1.3rem;color:#ad1457;font-weight:bold;margin-bottom:10px;letter-spacing:1px;}
+.law-desc{text-align:center;font-size:.9rem;color:#666;margin-bottom:16px;line-height:1.7;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;font-weight:bold;}
+input[type=range]{width:110px;accent-color:#5e35b1;}
+.sl-val{font-weight:bold;font-size:1.05rem;color:#5e35b1;}
+.equation-box{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:#f3e5f5;border-radius:14px;padding:16px 12px;margin-bottom:10px;}
+.eq-side{font-size:1.15rem;font-weight:bold;color:#4527a0;text-align:center;}
+.eq-sign{font-size:1.6rem;font-weight:bold;}
+.eq-sign.ok{color:#2e7d32;}
+.eq-val{display:block;font-size:1.05rem;color:#ad1457;margin-top:4px;}
+.shuffle-btn{display:block;margin:0 auto;padding:8px 22px;border:none;border-radius:14px;background:#5e35b1;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.example-box{background:#fffde7;border-radius:12px;padding:12px 16px;font-size:.9rem;color:#5d4037;text-align:center;line-height:1.8;margin-top:12px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#ede7f6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#5e35b1;}
+.quiz-q{font-size:1.4rem;color:#333;margin-bottom:8px;line-height:1.8;font-weight:bold;}
+.quiz-hint{font-size:.85rem;color:#999;margin-bottom:12px;}
+.quiz-input{font-size:1.3rem;width:120px;border:2px solid #d1c4e9;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#5e35b1;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#5e35b1;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.hint-btn{margin-top:10px;padding:6px 16px;border:2px solid #d1c4e9;border-radius:12px;background:#fff;color:#5e35b1;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.hint-text{font-size:.85rem;color:#7b1fa2;margin-top:8px;min-height:20px;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#5e35b1;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#5e35b1">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">⚖️</div>
+    <h1>运算定律与简便计算</h1>
+    <p>换个数字试试看，两边永远相等！</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识定律</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 简便计算练习</button>
+  </div>
+
+  <!-- 认识定律 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div class="law-row" id="lawRow"></div>
+      <div class="law-title" id="lawTitle"></div>
+      <div class="law-formula" id="lawFormula"></div>
+      <div class="law-desc" id="lawDesc"></div>
+      <div class="slider-row" id="sliderRow"></div>
+      <div class="equation-box">
+        <div class="eq-side" id="eqLeft"></div>
+        <div class="eq-sign ok">=</div>
+        <div class="eq-side" id="eqRight"></div>
+      </div>
+      <button class="shuffle-btn" onclick="shuffleVars()">🎲 换一换数字</button>
+      <div class="example-box" id="exampleBox"></div>
+    </div>
+  </div>
+
+  <!-- 简便计算练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-hint">算一算，等于多少？</div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+      </div>
+      <button class="hint-btn" onclick="showHint()">💡 提示</button>
+      <div class="hint-text" id="hintText"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 定律数据 ──
+const LAWS=[
+  {key:'add-comm', title:'加法交换律', formula:'a + b = b + a',
+   desc:'两个数相加，交换加数的位置，和不变。', vars:['a','b'],
+   ranges:{a:[10,90],b:[10,90]},
+   left:v=>`${v.a} + ${v.b}`, right:v=>`${v.b} + ${v.a}`,
+   calc:v=>({l:v.a+v.b, r:v.b+v.a}),
+   example:'25 + 37 = 37 + 25 = 62'},
+  {key:'add-assoc', title:'加法结合律', formula:'(a+b)+c = a+(b+c)',
+   desc:'三个数相加，先把前两个数相加，或先把后两个数相加，和不变。', vars:['a','b','c'],
+   ranges:{a:[10,60],b:[5,40],c:[5,40]},
+   left:v=>`(${v.a}+${v.b})+${v.c}`, right:v=>`${v.a}+(${v.b}+${v.c})`,
+   calc:v=>({l:(v.a+v.b)+v.c, r:v.a+(v.b+v.c)}),
+   example:'(45+25)+15 = 45+(25+15) = 85'},
+  {key:'mul-comm', title:'乘法交换律', formula:'a × b = b × a',
+   desc:'两个数相乘，交换因数的位置，积不变。', vars:['a','b'],
+   ranges:{a:[2,20],b:[2,20]},
+   left:v=>`${v.a} × ${v.b}`, right:v=>`${v.b} × ${v.a}`,
+   calc:v=>({l:v.a*v.b, r:v.b*v.a}),
+   example:'4 × 25 = 25 × 4 = 100'},
+  {key:'mul-assoc', title:'乘法结合律', formula:'(a×b)×c = a×(b×c)',
+   desc:'三个数相乘，先把前两个数相乘，或先把后两个数相乘，积不变。', vars:['a','b','c'],
+   ranges:{a:[2,12],b:[2,10],c:[2,10]},
+   left:v=>`(${v.a}×${v.b})×${v.c}`, right:v=>`${v.a}×(${v.b}×${v.c})`,
+   calc:v=>({l:(v.a*v.b)*v.c, r:v.a*(v.b*v.c)}),
+   example:'(125×8)×4 = 125×(8×4) = 4000'},
+  {key:'mul-dist', title:'乘法分配律', formula:'a×(b+c) = a×b+a×c',
+   desc:'一个数乘以两个数的和，等于把这个数分别乘以这两个数，再把积相加。', vars:['a','b','c'],
+   ranges:{a:[2,30],b:[5,50],c:[5,50]},
+   left:v=>`${v.a}×(${v.b}+${v.c})`, right:v=>`${v.a}×${v.b}+${v.a}×${v.c}`,
+   calc:v=>({l:v.a*(v.b+v.c), r:v.a*v.b+v.a*v.c}),
+   example:'25×(4+2) = 25×4+25×2 = 150'},
+  {key:'sub-prop', title:'减法的性质', formula:'a−b−c = a−(b+c)',
+   desc:'一个数连续减去两个数，等于减去这两个数的和。', vars:['a','b','c'],
+   ranges:{a:[80,300],b:[5,60],c:[5,60]},
+   left:v=>`${v.a}−${v.b}−${v.c}`, right:v=>`${v.a}−(${v.b}+${v.c})`,
+   calc:v=>({l:v.a-v.b-v.c, r:v.a-(v.b+v.c)}),
+   example:'234−66−34 = 234−(66+34) = 134'},
+  {key:'div-prop', title:'除法的性质', formula:'a÷b÷c = a÷(b×c)',
+   desc:'一个数连续除以两个数，等于除以这两个数的积。', vars:['a','b','c'],
+   isDiv:true,
+   left:v=>`${v.a}÷${v.b}÷${v.c}`, right:v=>`${v.a}÷(${v.b}×${v.c})`,
+   calc:v=>({l:v.a/v.b/v.c, r:v.a/(v.b*v.c)}),
+   example:'480÷4÷2 = 480÷(4×2) = 60'}
+];
+let curLaw=0, curVars={};
+function buildLawRow(){
+  const row=document.getElementById('lawRow');
+  row.innerHTML='';
+  LAWS.forEach((law,i)=>{
+    const b=document.createElement('button');
+    b.className='law-btn'+(i===curLaw?' on':'');
+    b.textContent=law.title;
+    b.onclick=()=>{curLaw=i;buildLawRow();shuffleVars();};
+    row.appendChild(b);
+  });
+}
+function randomVars(law){
+  if(law.isDiv){
+    const b=randInt(2,6), c=randInt(2,6), k=randInt(2,15);
+    return {a:b*c*k, b, c};
+  }
+  const v={};
+  law.vars.forEach(name=>{const [lo,hi]=law.ranges[name]; v[name]=randInt(lo,hi);});
+  return v;
+}
+function shuffleVars(){
+  const law=LAWS[curLaw];
+  curVars=randomVars(law);
+  document.getElementById('lawTitle').textContent=law.title;
+  document.getElementById('lawFormula').textContent=law.formula;
+  document.getElementById('lawDesc').textContent=law.desc;
+  document.getElementById('exampleBox').innerHTML='📝 简便计算举例：<br>'+law.example;
+  const sliderRow=document.getElementById('sliderRow');
+  sliderRow.innerHTML='';
+  if(!law.isDiv){
+    law.vars.forEach(name=>{
+      const [lo,hi]=law.ranges[name];
+      const wrap=document.createElement('div'); wrap.className='sl-group';
+      wrap.innerHTML=`<label>${name}</label><input type="range" min="${lo}" max="${hi}" value="${curVars[name]}" id="sl-${name}"><span class="sl-val" id="slv-${name}">${curVars[name]}</span>`;
+      sliderRow.appendChild(wrap);
+      wrap.querySelector('input').addEventListener('input', e=>{
+        curVars[name]=parseInt(e.target.value);
+        document.getElementById('slv-'+name).textContent=curVars[name];
+        updateEquation();
+      });
+    });
+  } else {
+    sliderRow.innerHTML='<div style="font-size:.85rem;color:#999;">（除法要保证能整除，换一换会自动生成合适的数字）</div>';
+  }
+  updateEquation();
+  speak(law.title+'：'+law.desc);
+}
+function updateEquation(){
+  const law=LAWS[curLaw];
+  const {l,r}=law.calc(curVars);
+  document.getElementById('eqLeft').innerHTML=law.left(curVars)+`<span class="eq-val">= ${l}</span>`;
+  document.getElementById('eqRight').innerHTML=law.right(curVars)+`<span class="eq-val">= ${r}</span>`;
+}
+
+// ── 简便计算练习 ──
+let qScore={c:0,w:0}, qAns=0, qExpr='', qHint='';
+const QUIZ_GEN=[
+  ()=>{ // a+b+c，b+c凑整
+    const k=randInt(1,9), b=k*10, c=100-b, a=randInt(10,89);
+    return {expr:`${a} + ${b} + ${c}`, ans:a+b+c, hint:`先算 ${b}+${c}=${b+c}（凑成整十或整百），再加 ${a}`};
+  },
+  ()=>{ // a×99 / a×98
+    const a=randInt(2,60), base=Math.random()<0.5?99:98;
+    return {expr:`${a} × ${base}`, ans:a*base, hint:`把 ${base} 看成 (100−${100-base})，用乘法分配律：${a}×100−${a}×${100-base}`};
+  },
+  ()=>{ // a×b×c 凑整
+    const pairs=[[25,4],[125,8],[5,2],[50,2],[20,5]];
+    const [p1,p2]=pairs[randInt(0,pairs.length-1)];
+    const c=randInt(2,20);
+    const arr=[p1,c,p2]; for(let i=arr.length-1;i>0;i--){const j=randInt(0,i);[arr[i],arr[j]]=[arr[j],arr[i]];}
+    return {expr:`${arr[0]} × ${arr[1]} × ${arr[2]}`, ans:p1*p2*c, hint:`先算 ${p1}×${p2}=${p1*p2}（正好凑整），再乘 ${c}`};
+  },
+  ()=>{ // a-b-c，b+c凑整
+    const k=randInt(1,9), b=k*10, c=100-b, a=randInt(150,400);
+    return {expr:`${a} − ${b} − ${c}`, ans:a-b-c, hint:`先算 ${b}+${c}=${b+c}，再用 ${a} 减去它`};
+  },
+  ()=>{ // a÷b÷c
+    const b=randInt(2,6), c=randInt(2,6), k=randInt(2,15), a=b*c*k;
+    return {expr:`${a} ÷ ${b} ÷ ${c}`, ans:k, hint:`先算 ${b}×${c}=${b*c}，再用 ${a} 除以它`};
+  },
+  ()=>{ // a×102 / a×101
+    const a=randInt(2,40), extra=randInt(1,3);
+    return {expr:`${a} × ${100+extra}`, ans:a*(100+extra), hint:`把 ${100+extra} 看成 (100+${extra})，用乘法分配律：${a}×100+${a}×${extra}`};
+  }
+];
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  document.getElementById('hintText').textContent='';
+  const g=QUIZ_GEN[randInt(0,QUIZ_GEN.length-1)]();
+  qExpr=g.expr; qAns=g.ans; qHint=g.hint;
+  document.getElementById('quizQ').textContent=qExpr+' = ?';
+  speak('算一算：'+qExpr.replace(/×/g,'乘').replace(/÷/g,'除以').replace(/−/g,'减').replace(/\+/g,'加')+'等于多少？');
+}
+function showHint(){document.getElementById('hintText').textContent='💡 '+qHint;}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns;
+    speak('答案是'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','quiz']);
+  if(t==='learn') speak('认识定律：换一换数字，看看两边是不是永远相等。');
+  if(t==='quiz') nextQ();
+}
+buildLawRow();
+shuffleVars();
+speak('欢迎来到运算定律与简便计算！换一换数字，验证定律是不是永远成立。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

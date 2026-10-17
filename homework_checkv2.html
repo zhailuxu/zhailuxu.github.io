@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作业拍照检查 v2 — OCR + 大模型判断</title>
+<meta name="description" content="拍照或上传作业照片，先用本地OCR识别文字，再用大模型判断对错，错题给出详细解析。">
+<style>
+:root {
+  --bg:       #EEF2F7;
+  --card:     #FFFFFF;
+  --ink:      #1C2D3E;
+  --slate:    #3B536B;
+  --slate-lt: #D6E4F0;
+  --purple:   #5e35b1;
+  --purple-lt:#ede7f6;
+  --green:    #3B7558;
+  --green-lt: #E3F2EA;
+  --red:      #C44B3B;
+  --red-lt:   #FBEAEA;
+  --muted:    #6E859A;
+  --border:   #C4D2DF;
+  --teal:     #00695c;
+  --teal-lt:  #e0f2f1;
+  --shadow:   0 2px 14px rgba(28,45,62,.09), 0 0 0 1px rgba(28,45,62,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 22px 14px 52px;
+  color: var(--ink);
+}
+.container { max-width: 760px; margin: 0 auto; }
+.hidden { display: none !important; }
+
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 1.8rem; font-weight: 800; color: var(--slate); letter-spacing: 2px; }
+.header p  { font-size: .82rem; color: var(--muted); margin-top: 5px; }
+.header .ver-tag {
+  display: inline-block; margin-top: 6px; font-size: .72rem; font-weight: 700;
+  color: var(--teal); background: var(--teal-lt); border-radius: 10px; padding: 2px 10px;
+}
+
+.card-panel {
+  background: var(--card); border-radius: 18px; padding: 20px 18px;
+  box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px;
+}
+
+/* ── 架构说明面板 ── */
+.arch-panel {
+  font-size: .78rem; color: var(--muted); line-height: 1.7; background: var(--teal-lt);
+  border: 1.5px dashed #80cbc4; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+}
+.arch-panel b { color: var(--teal); }
+
+/* ── 拍照/上传区 ── */
+.capture-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.capture-tab {
+  flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px;
+  font-size: .85rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: var(--card); color: var(--muted); transition: all .15s;
+}
+.capture-tab.active { background: var(--slate); color: #fff; border-color: var(--slate); }
+
+.cam-wrap { position: relative; border-radius: 14px; overflow: hidden; background: #000; margin-bottom: 12px; }
+#camVideo { width: 100%; display: block; max-height: 420px; object-fit: contain; background:#000; }
+.cam-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 220px; color: #aaa; font-size: .85rem; gap: 8px; padding: 20px;
+}
+.cam-hint { font-size: .78rem; color: var(--muted); text-align: center; margin-bottom: 10px; }
+
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 14px; padding: 34px 16px;
+  text-align: center; cursor: pointer; transition: all .15s; margin-bottom: 12px;
+}
+.upload-zone:hover { border-color: var(--slate); background: var(--slate-lt); }
+.upload-zone .icon { font-size: 2.4rem; margin-bottom: 8px; }
+.upload-zone p { font-size: .88rem; color: var(--muted); }
+
+#previewWrap { display: none; margin-bottom: 12px; }
+#previewWrap.show { display: block; }
+#previewImg { width: 100%; border-radius: 14px; max-height: 420px; object-fit: contain; background:#000; display:block; }
+
+.btn {
+  border: none; border-radius: 10px; padding: 10px 22px;
+  font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: transform .12s;
+}
+.btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-slate  { background: var(--slate); color: #fff; box-shadow: 0 3px 10px rgba(59,83,107,.25); }
+.btn-green  { background: var(--green); color: #fff; box-shadow: 0 3px 10px rgba(59,117,88,.25); }
+.btn-ghost  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-purple { background: var(--purple); color: #fff; box-shadow: 0 3px 10px rgba(94,53,177,.28); }
+.btn-teal   { background: var(--teal); color: #fff; box-shadow: 0 3px 10px rgba(0,105,92,.28); }
+.btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── 分析中 ── */
+.analyzing { display: none; text-align: center; padding: 30px 16px; }
+.analyzing.show { display: block; }
+.analyzing .spinner {
+  width: 40px; height: 40px; margin: 0 auto 14px; border-radius: 50%;
+  border: 4px solid var(--slate-lt); border-top-color: var(--slate);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.analyzing p { color: var(--muted); font-size: .9rem; }
+
+/* ── 结果面板 ── */
+#resultPanel { display: none; }
+#resultPanel.show { display: block; }
+.result-hud { display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.hud-box { background: var(--bg); border-radius: 12px; padding: 10px 18px; text-align: center; min-width: 74px; }
+.hud-box .num { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.hud-box .label { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.hud-box.ok .num   { color: var(--green); }
+.hud-box.fail .num { color: var(--red); }
+
+/* ── 耗时诊断面板 ── */
+.hw-timing-panel {
+  background: #F3F0FA; border: 1.5px dashed #c4b8e8; border-radius: 12px;
+  padding: 10px 14px; margin-bottom: 14px; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+.hw-timing-title { font-size: .78rem; font-weight: 700; color: var(--purple); margin-bottom: 6px; }
+.hw-timing-row {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: .78rem; color: var(--ink); padding: 2px 0; font-variant-numeric: tabular-nums;
+}
+.hw-timing-row span:first-child { color: var(--muted); }
+.hw-timing-total {
+  margin-top: 5px; padding-top: 6px; border-top: 1px dashed #c4b8e8; font-weight: 700;
+}
+.hw-timing-total span:first-child { color: var(--purple); }
+
+/* ── OCR原始识别结果（可折叠查看，帮助排查是OCR的问题还是大模型的问题）── */
+.ocr-raw-panel {
+  background: var(--teal-lt); border: 1.5px dashed #80cbc4; border-radius: 12px;
+  padding: 10px 14px; margin-bottom: 14px;
+}
+.ocr-raw-panel summary { font-size: .78rem; font-weight: 700; color: var(--teal); cursor: pointer; }
+.ocr-raw-list { margin-top: 8px; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: .74rem; color: #37474f; line-height: 1.8; }
+.ocr-raw-list .low-conf { color: #bf360c; font-weight: 700; }
+
+/* ── 两步开关：控制 OCR→大模型 是否自动连续执行 ── */
+.stage-switch-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+}
+.stage-switch-text { font-size: .82rem; color: var(--ink); }
+.stage-switch-text b { color: var(--teal); }
+.stage-switch-sub { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.switch {
+  position: relative; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch-track {
+  position: absolute; inset: 0; background: var(--border); border-radius: 13px; transition: background .2s;
+}
+.switch-track::before {
+  content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
+  background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+}
+.switch input:checked + .switch-track { background: var(--teal); }
+.switch input:checked + .switch-track::before { transform: translateX(20px); }
+
+/* ── OCR识别结果确认面板（两步模式下，第一步结束后展示） ── */
+.ocr-confirm-panel { display: none; }
+.ocr-confirm-panel.show { display: block; }
+.ocr-confirm-title { font-size: .85rem; font-weight: 700; color: var(--teal); margin-bottom: 8px; }
+.ocr-confirm-hint { font-size: .76rem; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+.ocr-confirm-list {
+  background: var(--teal-lt); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: .82rem; color: #37474f; line-height: 1.9;
+  max-height: 320px; overflow-y: auto;
+}
+.ocr-confirm-list .low-conf { color: #bf360c; font-weight: 700; }
+.ocr-confirm-list .line-idx { color: var(--muted); margin-right: 6px; }
+
+.q-row { border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+.q-row.ok   { border-color: #bfe0cc; background: #f6fbf8; }
+.q-row.fail { border-color: #f0c9c2; background: #fdf7f6; }
+.q-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.q-main { flex: 1; min-width: 200px; }
+.q-badge { flex-shrink: 0; font-size: 1.1rem; }
+.q-text { font-size: .95rem; color: var(--ink); line-height: 1.6; }
+.q-ans-row { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+.q-ans-row .stu-wrong { color: var(--red); text-decoration: line-through; }
+.q-ans-row .correct-val { color: var(--green); font-weight: 700; }
+.q-confirm { font-size: .74rem; color: var(--muted); margin-top: 6px; }
+
+/* ── 竖式展示（由代码精确计算，不是AI猜的）── */
+.vcalc-wrap { display: flex; justify-content: center; margin: 10px 0 6px; }
+.vcalc-board { display: inline-flex; flex-direction: column; align-items: flex-end; }
+.vcalc-row { display: flex; align-items: center; }
+.vcalc-cell {
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; font-weight: 700; color: var(--ink); position: relative;
+}
+.vcalc-cell.op { width: 22px; color: var(--muted); font-size: 1.1rem; }
+.vcalc-carry { height: 22px; }
+.vcalc-carry .vcalc-cell { height: 22px; font-size: .78rem; color: var(--red); font-weight: 700; }
+.vcalc-line { height: 2.5px; background: var(--ink); border-radius: 2px; margin: 2px 0; }
+.vcalc-cell.result { color: var(--slate); }
+.vcalc-borrow-orig { color: #bbb; text-decoration: line-through; font-size: .95rem; }
+.vcalc-borrow-new  { color: #e65100; font-size: .95rem; margin-left: 1px; }
+.vcalc-tag {
+  font-size: .68rem; font-weight: 700; color: var(--purple); background: var(--purple-lt);
+  display: inline-block; border-radius: 8px; padding: 1px 8px; margin-bottom: 6px;
+}
+
+.ai-hw-btn {
+  flex-shrink: 0; border: none; border-radius: 10px; padding: 5px 12px; font-size: .78rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; color: #fff; background: linear-gradient(135deg,#9575cd,#5e35b1);
+  box-shadow: 0 2px 6px rgba(94,53,177,.3); white-space: nowrap; margin-top: 4px;
+}
+.ai-hw-btn:disabled { opacity: .6; cursor: default; }
+.ai-hw-box {
+  display: none; width: 100%; margin-top: 8px; background: linear-gradient(135deg,#ede7f6,#f3e5f5);
+  border: 1.5px solid #d1c4e9; border-radius: 10px; padding: 9px 11px; font-size: .85rem; color: #4527a0; line-height: 1.7;
+}
+.ai-hw-box.show { display: block; }
+.ai-hw-tag {
+  font-size: .7rem; font-weight: 700; color: #5e35b1; background: #fff;
+  display: inline-block; border-radius: 8px; padding: 1px 8px; margin-bottom: 6px;
+}
+.ai-hw-loading { color: #7e57c2; font-style: italic; }
+.ai-hw-err { color: #c62828; font-size: .78rem; }
+.ai-hw-retry {
+  margin-top: 6px; border: 1.5px solid #9575cd; background: #fff; color: #5e35b1;
+  border-radius: 8px; padding: 3px 10px; font-size: .74rem; cursor: pointer; font-family: inherit;
+}
+.ai-hw-bigidea { background: #fff; border-radius: 8px; padding: 6px 9px; margin-bottom: 7px; font-weight: 700; }
+.ai-hw-steps { display: flex; flex-direction: column; gap: 6px; }
+.ai-hw-step { display: flex; align-items: flex-start; gap: 8px; background: #fff; border-radius: 9px; padding: 7px 10px; flex-wrap: wrap; }
+.ai-hw-step-n {
+  flex-shrink: 0; padding: 2px 9px; border-radius: 10px; background: linear-gradient(135deg,#9575cd,#5e35b1);
+  color: #fff; font-size: .7rem; font-weight: 700; white-space: nowrap; line-height: 1.5;
+}
+.ai-hw-step-emoji { flex-shrink: 0; font-size: 1.05rem; line-height: 1.5; }
+.ai-hw-step-text { font-size: .84rem; color: #333; line-height: 1.5; }
+
+.err-panel {
+  display: none; text-align: center; padding: 20px 16px; color: var(--red);
+  background: var(--red-lt); border-radius: 14px; font-size: .88rem; line-height: 1.7;
+}
+.err-panel.show { display: block; }
+.err-panel code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+
+.back-link { display: block; text-align: center; margin-top: 14px; color: var(--slate); text-decoration: none; font-size: .88rem; }
+
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📷 作业拍照检查</h1>
+  <p>先用本地 OCR 识别文字，再交给大模型判断对错、生成解析</p>
+  <div class="ver-tag">v2：OCR + 文本大模型 方案</div>
+</div>
+
+<div class="card-panel">
+  <div class="arch-panel">
+    🧩 <b>v2 架构说明</b>：这个版本不再让视觉大模型直接"看图识别+判断"，而是拆成三步——
+    ① 本地 <b>EasyOCR</b> 服务（<code>ocr_server.py</code>）先把照片里的文字识别出来；
+    ② <b>规则预处理</b>：自动过滤页眉/姓名栏/页码等噪音行，订正"="被误识别成"-"的规律性错误，
+    尝试拆分粘连/挤在一行的多道题（只有唯一自洽的拆法才采纳，猜不准就保留原文交给AI）；
+    ③ 干净后的内容交给纯文本模型 <b>qwen2.5:14b</b> 去理解题意、自己计算、判断对错。
+    能用规则可靠处理的就不麻烦AI，AI只处理规则解决不了的部分。<br>
+    ⚠️ 代价：手写体本来就是 OCR 的弱项，如果 OCR 认错字，后面大模型判断也会跟着错——
+    这是本版本已知的局限，结果页可展开"查看OCR识别详情"核对过滤前后的差异。<br>
+    使用前需要：① <code>python3 ocr_server.py</code> 启动 OCR 服务（默认 <code>127.0.0.1:5001</code>）；
+    ② 本机 Ollama 已启动并执行过 <code>ollama pull qwen2.5:14b</code>。
+  </div>
+
+  <div class="stage-switch-row">
+    <div>
+      <div class="stage-switch-text">🔗 OCR识别后 <b id="switchStateText">自动</b> 进行AI判断</div>
+      <div class="stage-switch-sub">关闭后：OCR识别完先展示结果，确认无误再手动点击"继续AI判断"</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="autoContinueSwitch" checked onchange="onAutoContinueToggle()">
+      <span class="switch-track"></span>
+    </label>
+  </div>
+</div>
+
+<!-- 拍照/上传 面板 -->
+<div class="card-panel" id="capturePanel">
+  <div class="capture-tabs">
+    <button class="capture-tab active" id="tabCam" onclick="switchCaptureTab('cam')">📷 拍照</button>
+    <button class="capture-tab" id="tabUpload" onclick="switchCaptureTab('upload')">🖼️ 上传照片</button>
+  </div>
+
+  <!-- 摄像头模式 -->
+  <div id="camMode">
+    <div class="cam-wrap">
+      <video id="camVideo" class="hidden" autoplay playsinline></video>
+      <div class="cam-placeholder" id="camPlaceholder">
+        <div style="font-size:2.4rem">📷</div>
+        <div>点击下方按钮开启摄像头</div>
+      </div>
+    </div>
+    <div class="cam-hint">若摄像头无法打开（比如直接双击文件打开的页面），请改用"上传照片"</div>
+    <div class="btn-row">
+      <button class="btn btn-slate" id="camStartBtn" onclick="startCamera()">▶ 开启摄像头</button>
+      <button class="btn btn-green hidden" id="camShotBtn" onclick="captureFromCamera()">📸 拍照</button>
+      <button class="btn btn-ghost hidden" id="camStopBtn" onclick="stopCamera()">✕ 关闭摄像头</button>
+    </div>
+  </div>
+
+  <!-- 上传模式 -->
+  <div id="uploadMode" class="hidden">
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">🖼️</div>
+      <p>点击选择作业照片（或手机拍照上传）</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" class="hidden" onchange="handleFileUpload(event)">
+  </div>
+
+  <!-- 预览 + 提交 -->
+  <div id="previewWrap">
+    <img id="previewImg" alt="作业照片预览">
+  </div>
+  <div class="btn-row" id="submitRow" style="display:none;margin-top:10px">
+    <button class="btn btn-ghost" onclick="resetCapture()">↺ 重新拍/传</button>
+    <button class="btn btn-teal" id="analyzeBtn" onclick="startPipeline()">🔎 OCR + AI 批改</button>
+  </div>
+</div>
+
+<!-- 分析中 -->
+<div class="card-panel analyzing" id="analyzingPanel">
+  <div class="spinner"></div>
+  <p id="analyzingText">正在识别作业内容，请稍候…</p>
+</div>
+
+<!-- 错误提示 -->
+<div class="card-panel">
+  <div class="err-panel" id="errPanel"></div>
+</div>
+
+<!-- OCR识别结果确认面板（仅在"两步模式"下，第一步结束后展示） -->
+<div class="card-panel ocr-confirm-panel" id="ocrConfirmPanel">
+  <div class="ocr-confirm-title">🔍 第①步：OCR 识别结果（请核对无误后再继续）</div>
+  <div class="ocr-confirm-hint">
+    橙色为低置信度、容易识别错的行，请重点核对。如果发现明显认错字，建议重新拍一张更清晰的照片，
+    而不是直接继续——OCR 认错的内容会被第②步大模型当成"事实"，无法在下一步被自动纠正。
+  </div>
+  <div class="ocr-confirm-list" id="ocrConfirmList"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="resetCapture(true)">✕ 不继续，重新拍照</button>
+    <button class="btn btn-teal" id="continueJudgeBtn" onclick="startJudgeStage()">▶ 继续 AI 判断对错</button>
+  </div>
+</div>
+
+<!-- 结果面板 -->
+<div class="card-panel" id="resultPanel">
+  <div class="result-hud">
+    <div class="hud-box"><div class="num" id="hudTotal">0</div><div class="label">共 N 题</div></div>
+    <div class="hud-box ok"><div class="num" id="hudOk">0</div><div class="label">✅ 正确</div></div>
+    <div class="hud-box fail"><div class="num" id="hudFail">0</div><div class="label">❌ 错误</div></div>
+  </div>
+  <div id="resultList"></div>
+
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-slate" onclick="resetCapture(true)">📷 再检查一份作业</button>
+  </div>
+</div>
+
+<a href="index.html" class="back-link">← 返回慧陪学</a>
+<a href="homework_check.html" class="back-link">↔ 切换回 v1（视觉大模型直接识别）</a>
+</div>
+
+<script>
+// ══ CONFIG ═══════════════════════════════════════════════
+const HW_OLLAMA_URL = 'http://localhost:11434/api/generate';
+const HW_TEXT_MODEL = 'qwen2.5:14b';       // 纯文本模型：负责"理解OCR文字+判断对错+详细讲解"
+const OCR_SERVER_URL = 'http://127.0.0.1:5001/ocr'; // 本地 EasyOCR 桥接服务
+
+// AI 讲解字数上限（沿用 v1 / math1.html / olympiad 系列验证过的做法）
+const HW_IDEA_MAXLEN = 22;
+const HW_STEP_MAXLEN = 26;
+const HW_MAX_STEPS   = 4;
+
+// ══ STATE ═════════════════════════════════════════════════
+let camStream = null;
+let currentImageBase64 = null; // 不含 data: 前缀的纯 base64
+let currentResults = [];
+let lastOcrLines = [];          // 最近一次"过滤+订正后"的OCR结果，真正会交给大模型
+let lastOcrLinesRaw = [];       // 最近一次OCR服务返回的原始结果(未过滤)，供核对排查用
+let lastOcrDroppedCount = 0;    // 被判定为噪音、过滤掉的行数
+let autoContinue = true;        // 开关：OCR完成后是否自动进行第②步AI判断（关闭=需手动确认）
+
+function onAutoContinueToggle() {
+  autoContinue = document.getElementById('autoContinueSwitch').checked;
+  document.getElementById('switchStateText').textContent = autoContinue ? '自动' : '手动确认后';
+}
+
+// ══ 耗时分析：拆到"OCR识别"和"大模型判断"两段，方便对比两种架构的耗时构成 ══
+let hwTimings = {
+  captureMs:  0,
+  compressMs: 0,
+  ocrMs:      0,   // OCR服务识别耗时(含网络往返)
+  modelCallMs: 0,  // 文本大模型判断耗时(含网络往返)
+  parseMs:    0,
+  renderMs:   0,
+  retryCount: 0,
+  totalMs:    0,
+  _pipelineStart: 0, // 内部使用：第①步开始的时间戳，第②步接力用它算出"两步合计"总耗时
+};
+
+// ══ 拍照 / 上传 切换 ══════════════════════════════════════
+function switchCaptureTab(mode) {
+  document.getElementById('tabCam').classList.toggle('active', mode === 'cam');
+  document.getElementById('tabUpload').classList.toggle('active', mode === 'upload');
+  document.getElementById('camMode').classList.toggle('hidden', mode !== 'cam');
+  document.getElementById('uploadMode').classList.toggle('hidden', mode !== 'upload');
+  if (mode === 'upload') stopCamera();
+}
+
+// ══ 摄像头 ════════════════════════════════════════════════
+async function startCamera() {
+  const errPanel = document.getElementById('errPanel');
+  errPanel.classList.remove('show');
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false,
+    });
+    const video = document.getElementById('camVideo');
+    video.srcObject = camStream;
+    video.classList.remove('hidden');
+    document.getElementById('camPlaceholder').classList.add('hidden');
+    document.getElementById('camStartBtn').classList.add('hidden');
+    document.getElementById('camShotBtn').classList.remove('hidden');
+    document.getElementById('camStopBtn').classList.remove('hidden');
+  } catch (err) {
+    errPanel.classList.add('show');
+    errPanel.innerHTML = `📷 无法打开摄像头：${hwEscapeHtml(err.message)}。<br>
+      常见原因：① 浏览器/系统未授权摄像头权限；② 页面是通过 <code>file://</code> 直接打开的（多数浏览器要求 <code>https://</code> 或 <code>localhost</code> 才允许摄像头）。<br>
+      请改用"🖼️ 上传照片"方式。`;
+  }
+}
+
+function stopCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  const video = document.getElementById('camVideo');
+  video.classList.add('hidden');
+  video.srcObject = null;
+  document.getElementById('camPlaceholder').classList.remove('hidden');
+  document.getElementById('camStartBtn').classList.remove('hidden');
+  document.getElementById('camShotBtn').classList.add('hidden');
+  document.getElementById('camStopBtn').classList.add('hidden');
+}
+
+function captureFromCamera() {
+  const t0 = performance.now();
+  const video = document.getElementById('camVideo');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  hwTimings.captureMs = performance.now() - t0;
+  showPreview(dataUrl);
+  stopCamera();
+}
+
+// ══ 上传照片 ══════════════════════════════════════════════
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const t0 = performance.now();
+  const reader = new FileReader();
+  reader.onload = e => {
+    hwTimings.captureMs = performance.now() - t0;
+    showPreview(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+// 手机拍的原图动辄3000×4000px，直接送去OCR/大模型都会偏慢，
+// 统一压缩到"长边不超过1280px"，兼顾清晰度和处理速度（做法沿用v1）。
+const HW_MAX_DIM = 1280;
+
+function hwDownscaleImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, HW_MAX_DIM / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function showPreview(dataUrl) {
+  const tCompress0 = performance.now();
+  const scaledUrl = await hwDownscaleImage(dataUrl);
+  hwTimings.compressMs = performance.now() - tCompress0;
+  currentImageBase64 = scaledUrl.split(',')[1] || '';
+  const img = document.getElementById('previewImg');
+  img.src = scaledUrl;
+  document.getElementById('previewWrap').classList.add('show');
+  document.getElementById('submitRow').style.display = 'flex';
+  document.getElementById('errPanel').classList.remove('show');
+}
+
+function resetCapture(fullReset) {
+  currentImageBase64 = null;
+  lastOcrLines = [];
+  lastOcrLinesRaw = [];
+  lastOcrDroppedCount = 0;
+  hwStopTick();
+  document.getElementById('previewWrap').classList.remove('show');
+  document.getElementById('submitRow').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('errPanel').classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('ocrConfirmPanel').classList.remove('show');
+  document.getElementById('analyzingPanel').classList.remove('show');
+  document.getElementById('capturePanel').classList.remove('hidden');
+  document.getElementById('analyzingText').textContent = '正在识别作业内容，请稍候…';
+  if (fullReset) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══ 第一步：调用本地 EasyOCR 服务，把图片识别成文字行 ══════════
+async function hwCallOcr() {
+  const t0 = performance.now();
+  let resp;
+  try {
+    resp = await fetch(OCR_SERVER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: currentImageBase64 }),
+    });
+  } catch (err) {
+    throw new Error(`无法连接本地OCR服务(${OCR_SERVER_URL})：${err.message}。请先执行 python3 ocr_server.py 启动服务`);
+  }
+  if (!resp.ok) {
+    let detail = '';
+    try { detail = (await resp.json()).error || ''; } catch (e) {}
+    throw new Error(`OCR服务返回错误 HTTP ${resp.status}${detail ? '：' + detail : ''}`);
+  }
+  const data = await resp.json();
+  hwTimings.ocrMs = performance.now() - t0;
+  return data.lines || [];
+}
+
+// ══ OCR结果预处理：过滤噪音行 + 修正常见的规律性识别错误 ══════
+// 背景：实测发现OCR整页识别时会混入大量"非题目"内容（页眉标题、姓名栏、页码、
+// 装饰花纹被误识别成乱码字符），而且几乎所有"="都被识别成了"-"，还有些题目和
+// 答案粘在一起没有分隔符（比如"69978"其实是"69+9=78"）、或者一行塞了2~3道题。
+// 这些都是能用确定性规则可靠修正的模式，不需要靠大模型去"猜"——
+// 规则能处理的，就不要交给AI处理，这样更快、更可靠，也让第②步大模型的输入更干净。
+//
+// 处理策略：
+// 1. 按空格把一行拆成多个token（应对"一行挤多道题"的情况）
+// 2. 对每个token尝试用"数字 运算符 数字 分隔符 数字"的正则匹配（分隔符=或-都认，
+//    因为OCR混淆了这两者），匹配上就统一把分隔符正规化成"="
+// 3. 对"数字 运算符 数字"后面直接跟着一串数字、没有分隔符"（粘连）"的情况，
+//    枚举所有可能的切分位置，只有当"唯一一种切法能让算式左右相等"时才采纳这个切法
+//    ——如果有0种或多种自洽切法，说明这行数据本身有更深的识别问题，
+//    不武断猜测，原样保留交给大模型去理解上下文
+// 4. 只有"看起来完全不像算式"的行才归入噪音、不传给大模型（比如中文标题、姓名栏）
+const HW_FORMULA_RE       = /^(\d{1,3})\s*([+\-])\s*(\d{1,3})\s*[=\-]\s*(\d{1,3})$/; // 完整算式(分隔符=或-)
+const HW_FORMULA_NOANS_RE = /^(\d{1,3})\s*([+\-])\s*(\d{1,3})\s*=\s*$/;               // 只有题目，还没作答
+const HW_FORMULA_GLUED_RE = /^(\d{1,3})\s*([+\-])\s*(\d{3,})$/;                       // 题目和答案粘连无分隔符
+
+function hwTryGluedSplit(a, op, rest) {
+  // 枚举"第二个数"取多长(1位到rest.length-1位)，只保留能让算式左右相等的切法
+  const matches = [];
+  for (let bLen = 1; bLen < rest.length; bLen++) {
+    const bStr = rest.slice(0, bLen);
+    const resStr = rest.slice(bLen);
+    if (!resStr || (resStr.length > 1 && resStr[0] === '0')) continue; // 答案不应有前导0
+    const b = parseInt(bStr, 10);
+    const res = parseInt(resStr, 10);
+    const real = (op === '+') ? (a + b) : (a - b);
+    if (real === res) matches.push({ b, res });
+  }
+  return matches; // 唯一一条才算数，0条或多条都视为"猜不准"
+}
+
+function hwNormalizeOneToken(token) {
+  token = token.trim();
+  if (!token) return null;
+
+  let m = token.match(HW_FORMULA_RE);
+  if (m) {
+    // 只统一分隔符写法(把可能是=被识别成-的情况订正为=)，不改动任何数字——
+    // 数字对不对、学生答案是否正确，留给下一步大模型去判断，这里不做"纠错"以免篡改真实作答。
+    return `${m[1]}${m[2]}${m[3]}=${m[4]}`;
+  }
+
+  m = token.match(HW_FORMULA_NOANS_RE);
+  if (m) return `${m[1]}${m[2]}${m[3]}=（学生尚未作答或字迹无法辨认）`;
+
+  m = token.match(HW_FORMULA_GLUED_RE);
+  if (m) {
+    const a = parseInt(m[1], 10), op = m[2], rest = m[3];
+    const splits = hwTryGluedSplit(a, op, rest);
+    if (splits.length === 1) return `${a}${op}${splits[0].b}=${splits[0].res}`;
+    // 0种或多种自洽切法：猜不准，原样保留，交给大模型结合上下文自己理解
+    return token;
+  }
+
+  return null; // 完全不像算式，视为噪音
+}
+
+function hwPreprocessOcrLines(rawLines) {
+  const kept = [];
+  const droppedCount = { value: 0 };
+  for (const line of rawLines) {
+    const tokens = String(line.text || '').split(/\s+/).filter(Boolean);
+    let matchedAny = false;
+    for (const tok of tokens) {
+      const norm = hwNormalizeOneToken(tok);
+      if (norm) {
+        kept.push({ text: norm, confidence: line.confidence, bbox: line.bbox });
+        matchedAny = true;
+      }
+    }
+    if (!matchedAny) droppedCount.value++;
+  }
+  return { kept, droppedCount: droppedCount.value };
+}
+
+// ══ 第二步：把OCR文字行拼成文本，交给纯文本大模型理解+判断对错 ══
+const HW_ITEM_BASE_PROPS = {
+  question:      { type: 'string', description: '题目内容（尽量还原原文，包含数字和运算符）' },
+  studentAnswer: { type: 'string', description: '学生写的答案，如果OCR文本里看不出答案就写"看不清"' },
+  correctAnswer: { type: 'string', description: '这道题真正正确的答案' },
+  isCorrect:     { type: 'boolean', description: '学生的答案是否正确' },
+};
+
+const HW_CHECK_SCHEMA = {
+  type: 'object',
+  properties: {
+    items: {
+      type: 'array',
+      description: 'OCR文本里识别出的每一道题目',
+      items: { type: 'object', properties: HW_ITEM_BASE_PROPS,
+        required: ['question','studentAnswer','correctAnswer','isCorrect'] },
+    },
+  },
+  required: ['items'],
+};
+
+function buildHwCheckPromptFromOcr(ocrLines) {
+  // OCR是按从上到下的顺序排的，每行前面加个序号，方便大模型理解"这是按顺序排列的文字行"，
+  // 而不是无序的词袋——这对判断"哪几行属于同一道题"很重要（有些题目OCR会切成两行）。
+  const linesText = ocrLines.map((l, i) => `${i + 1}. ${l.text}`).join('\n');
+  return `你是一名小学老师。下面是用OCR从一张学生作业照片中识别出的文字，按从上到下的顺序排列
+（可能存在OCR识别错误，比如把数字认错、符号丢失、一道题被拆成了两行——请结合小学数学/语文题目的
+常见样式自己判断、合理还原，不要机械地逐字照抄）：
+
+--- OCR识别结果 ---
+${linesText}
+--- OCR识别结果结束 ---
+
+请你据此还原出每一道题目，对每一道题：
+1. question：还原出的题目内容（如果OCR明显识别错了某个字符，可以结合上下文纠正，比如算式里不太可能出现的怪异符号，大概率是数字被认错了）
+2. studentAnswer：学生写的答案是什么
+3. correctAnswer：你自己认真计算/判断出的正确答案（不要直接照抄OCR识别出的"学生答案"当正确答案）
+4. isCorrect：学生写的答案是否等于正确答案
+
+注意：
+- 如果某几行OCR文字明显是同一道题被拆开了（比如"7 + 5"和"= 11"分成两行），要合并成一道题。
+- 如果OCR结果整体乱码、无法辨认出任何题目，items 返回空数组即可，不要编造题目。
+- 按题目在原文中出现的顺序返回。`;
+}
+
+// 两层JSON兜底解析：本地模型偶尔输出格式不完全规范的JSON（做法沿用v1）
+function hwParseJsonLoose(raw) {
+  try { return JSON.parse(raw); }
+  catch (e) { /* fall through */ }
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(raw.slice(start, end + 1)); }
+    catch (e2) { /* fall through */ }
+  }
+  return null;
+}
+
+const HW_TIMEOUT_MS = 90 * 1000;
+const HW_MAX_RETRY = 2;
+
+async function hwCallJudgeOnce(ocrLines) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), HW_TIMEOUT_MS);
+  let resp;
+  const tStart = performance.now();
+  try {
+    resp = await fetch(HW_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: HW_TEXT_MODEL,
+        prompt: buildHwCheckPromptFromOcr(ocrLines),
+        stream: false,
+        format: HW_CHECK_SCHEMA,
+      }),
+    });
+  } catch (err) {
+    clearTimeout(timer);
+    if (err.name === 'AbortError') {
+      throw new Error(`超过${HW_TIMEOUT_MS / 1000}秒未返回结果，已自动放弃本次请求`);
+    }
+    throw new Error(`无法连接本地Ollama：${err.message}`);
+  }
+  clearTimeout(timer);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  hwTimings.modelCallMs = performance.now() - tStart;
+  const raw = (data.response || '').trim();
+  if (!raw) throw new Error('空响应');
+  const tParseStart = performance.now();
+  const parsed = hwParseJsonLoose(raw);
+  hwTimings.parseMs = performance.now() - tParseStart;
+  if (!parsed) throw new Error('返回内容不是合法JSON（原始输出：' + raw.slice(0, 80) + '…）');
+  if (!parsed.items || !Array.isArray(parsed.items)) throw new Error('返回内容缺少 items 字段');
+  return parsed.items;
+}
+
+async function hwCallJudgeWithRetry(ocrLines, onRetry) {
+  let lastErr;
+  for (let attempt = 1; attempt <= HW_MAX_RETRY; attempt++) {
+    try {
+      const items = await hwCallJudgeOnce(ocrLines);
+      hwTimings.retryCount = attempt - 1;
+      return items;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < HW_MAX_RETRY && onRetry) onRetry(attempt);
+    }
+  }
+  throw lastErr;
+}
+
+// ══ 主流程：拍照/上传的图 → OCR识别 →（可选暂停确认）→ 大模型判断 → 渲染 ══
+// 用 autoContinue 开关控制两步是否自动连续执行：
+// - 开(默认)：OCR识别完立刻自动进入大模型判断，行为和之前一致
+// - 关：OCR识别完先停下来，展示识别结果面板，用户看过、确认没问题后手动点"继续AI判断"
+//   这样即使OCR认错字，也能在喂给大模型之前发现问题、及时重拍，而不是让错误的OCR文字
+//   被大模型当成"事实"直接拼出一道新题（这正是之前实测发现的、两步式架构最大的风险点）。
+
+let hwTickTimer = null;
+function hwStartTick(getText) {
+  const startedAt = Date.now();
+  const pEl = document.getElementById('analyzingText');
+  hwTickTimer = setInterval(() => {
+    if (!document.getElementById('analyzingPanel').classList.contains('show')) return;
+    const secs = Math.floor((Date.now() - startedAt) / 1000);
+    pEl.textContent = `${getText()}，已等待 ${secs} 秒…`;
+  }, 1000);
+}
+function hwStopTick() {
+  if (hwTickTimer) { clearInterval(hwTickTimer); hwTickTimer = null; }
+}
+
+function startPipeline() {
+  runOcrStage();
+}
+
+// 第①步：OCR识别。结束后根据开关状态，要么自动接第②步，要么停下来等用户确认。
+async function runOcrStage() {
+  if (!currentImageBase64) return;
+  document.getElementById('capturePanel').classList.add('hidden');
+  document.getElementById('errPanel').classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('ocrConfirmPanel').classList.remove('show');
+  document.getElementById('analyzingPanel').classList.add('show');
+
+  let stageText = '① 本地OCR正在识别文字';
+  hwStartTick(() => stageText);
+
+  const tTotalStart = performance.now();
+  try {
+    const rawOcrLines = await hwCallOcr();
+    lastOcrLinesRaw = rawOcrLines; // 保留未过滤的原始结果，供"查看OCR原始识别结果"面板核对
+    const { kept, droppedCount } = hwPreprocessOcrLines(rawOcrLines);
+    lastOcrLines = kept;           // 过滤+订正后的干净结果，才是真正交给大模型的输入
+    lastOcrDroppedCount = droppedCount;
+    hwTimings._pipelineStart = tTotalStart; // 留给第②步接力计算总耗时
+
+    hwStopTick();
+    document.getElementById('analyzingPanel').classList.remove('show');
+
+    if (!kept.length) {
+      renderResults([]);
+      return;
+    }
+
+    if (autoContinue) {
+      // 开关开着：直接继续第②步，行为等同于原来的一步到底
+      await runJudgeStage();
+    } else {
+      // 开关关着：先展示OCR识别结果，让用户确认后再手动触发第②步
+      renderOcrConfirmPanel(kept, droppedCount);
+    }
+  } catch (err) {
+    hwStopTick();
+    document.getElementById('analyzingPanel').classList.remove('show');
+    document.getElementById('capturePanel').classList.remove('hidden');
+    const errPanel = document.getElementById('errPanel');
+    errPanel.classList.add('show');
+    errPanel.innerHTML = `😵 OCR识别失败：${hwEscapeHtml(err.message)}<br>
+      请确认：① OCR服务已启动（<code>python3 ocr_server.py</code>，监听 127.0.0.1:5001）；
+      ② 照片是否清晰、字迹是否可辨认。<br>
+      <button class="btn btn-teal" style="margin-top:8px" onclick="runOcrStage()">🔄 手动重试</button>`;
+  }
+}
+
+// 展示OCR识别结果确认面板（仅"手动确认"模式下会走到这里）
+// 展示的是"过滤+订正后"的干净结果（即将交给大模型的真正输入），而不是原始OCR输出，
+// 这样用户核对的就是"AI实际会看到什么"，更有意义；如果想看被过滤掉了哪些噪音行，
+// 可以在结果页展开"查看OCR原始识别结果"面板对照。
+function renderOcrConfirmPanel(ocrLines, droppedCount) {
+  const rows = ocrLines.map((l, i) => {
+    const lowConf = l.confidence < 0.6;
+    return `<div class="${lowConf ? 'low-conf' : ''}"><span class="line-idx">${i + 1}.</span>${hwEscapeHtml(l.text)}　(置信度 ${l.confidence.toFixed(2)}${lowConf ? ' ⚠️' : ''})</div>`;
+  }).join('');
+  const dropNote = droppedCount > 0
+    ? `<div class="ocr-confirm-hint">🧹 已自动过滤掉 ${droppedCount} 行噪音（页眉/姓名栏/页码等非题目内容），下面展示的是过滤+订正分隔符后、真正会交给AI判断的内容。</div>`
+    : '';
+  document.getElementById('ocrConfirmList').innerHTML = dropNote + rows;
+  document.getElementById('ocrConfirmPanel').classList.add('show');
+  document.getElementById('ocrConfirmPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 第②步：文本大模型判断对错。手动模式下由"继续AI判断"按钮触发；自动模式下由第①步接力调用。
+async function startJudgeStage() {
+  document.getElementById('ocrConfirmPanel').classList.remove('show');
+  await runJudgeStage();
+}
+
+async function runJudgeStage() {
+  document.getElementById('analyzingPanel').classList.add('show');
+  let stageText = '② AI 正在理解题意、判断对错';
+  hwStartTick(() => stageText);
+
+  try {
+    const items = await hwCallJudgeWithRetry(lastOcrLines, (attempt) => {
+      stageText = `第一次判断结果格式有点问题，正在自动重试（第${attempt}次）`;
+    });
+
+    const tStart = hwTimings._pipelineStart || performance.now();
+    hwTimings.totalMs = performance.now() - tStart;
+    hwStopTick();
+    currentResults = items;
+    renderResults(items);
+  } catch (err) {
+    hwStopTick();
+    document.getElementById('analyzingPanel').classList.remove('show');
+    const errPanel = document.getElementById('errPanel');
+    errPanel.classList.add('show');
+    errPanel.innerHTML = `😵 AI判断失败：${hwEscapeHtml(err.message)}<br>
+      请确认：本机已安装并启动 Ollama，且已执行 <code>ollama pull ${HW_TEXT_MODEL}</code>。<br>
+      <button class="btn btn-teal" style="margin-top:8px" onclick="startJudgeStage()">🔄 手动重试</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="resetCapture(true)">✕ 重新拍照</button>`;
+  }
+}
+
+// ══ 结果渲染 ══════════════════════════════════════════════
+function renderResults(items) {
+  document.getElementById('analyzingPanel').classList.remove('show');
+
+  if (!items.length) {
+    document.getElementById('errPanel').classList.add('show');
+    document.getElementById('errPanel').innerHTML = '🤔 没有从照片里识别出题目，试试换一张更清晰、光线更好的照片。';
+    document.getElementById('capturePanel').classList.remove('hidden');
+    return;
+  }
+
+  const tRenderStart = performance.now();
+
+  const ok = items.filter(it => it.isCorrect).length;
+  const fail = items.length - ok;
+  document.getElementById('hudTotal').textContent = items.length;
+  document.getElementById('hudOk').textContent = ok;
+  document.getElementById('hudFail').textContent = fail;
+
+  const itemsHtml = items.map((it, i) => `
+    <div class="q-row ${it.isCorrect ? 'ok' : 'fail'}">
+      <div class="q-head">
+        <div class="q-main">
+          <div class="q-text">${hwEscapeHtml(it.question || '（未识别到题目文字）')}</div>
+          <div class="q-ans-row">
+            你写的：<span class="${it.isCorrect ? '' : 'stu-wrong'}">${hwEscapeHtml(it.studentAnswer || '（未识别）')}</span>
+            ${it.isCorrect ? '' : ` → 正确答案：<span class="correct-val">${hwEscapeHtml(it.correctAnswer || '')}</span>`}
+          </div>
+          ${it.studentAnswer === '看不清' ? '<div class="q-confirm">⚠️ AI 没看清这题的手写答案，建议自己核对一下</div>' : ''}
+        </div>
+        <div>
+          <div class="q-badge">${it.isCorrect ? '✅' : '❌'}</div>
+          ${it.isCorrect ? '' : `<button class="ai-hw-btn" id="hwaib-${i}" onclick="genHwAnalysis(${i})">🤖 AI解析</button>`}
+        </div>
+      </div>
+      ${it.isCorrect ? '' : `<div class="ai-hw-box" id="hwaibox-${i}"></div>`}
+    </div>`).join('');
+
+  hwTimings.renderMs = performance.now() - tRenderStart;
+
+  const list = document.getElementById('resultList');
+  list.innerHTML = buildTimingPanelHtml() + buildOcrRawPanelHtml() + itemsHtml;
+
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 各阶段耗时面板：拆成OCR识别 / 大模型判断两段，方便和v1(单次视觉大模型调用)对比
+function buildTimingPanelHtml() {
+  const t = hwTimings;
+  const fmtS = (ms) => (ms / 1000).toFixed(2) + 's';
+  const fmtMs = (ms) => ms.toFixed(1) + 'ms';
+  const retryNote = t.retryCount > 0 ? `（含${t.retryCount}次重试）` : '（一次成功，无重试）';
+  return `<div class="hw-timing-panel">
+    <div class="hw-timing-title">⏱️ 各阶段耗时（v2: OCR + 文本大模型 两段式）</div>
+    <div class="hw-timing-row"><span>① 拍照/上传获取原图</span><span>${fmtS(t.captureMs)}</span></div>
+    <div class="hw-timing-row"><span>② 图片压缩(长边≤${HW_MAX_DIM}px)</span><span>${fmtS(t.compressMs)}</span></div>
+    <div class="hw-timing-row"><span>③ 本地OCR识别文字(EasyOCR)</span><span>${fmtS(t.ocrMs)}</span></div>
+    <div class="hw-timing-row"><span>④ 文本大模型判断对错(qwen2.5:14b)</span><span>${fmtS(t.modelCallMs)}</span></div>
+    <div class="hw-timing-row"><span>⑤ 解析模型返回的JSON</span><span>${fmtMs(t.parseMs)}</span></div>
+    <div class="hw-timing-row"><span>⑥ 渲染结果列表(DOM)</span><span>${fmtMs(t.renderMs)}</span></div>
+    <div class="hw-timing-row hw-timing-total"><span>总耗时 ${retryNote}</span><span>${fmtS(t.totalMs)}</span></div>
+  </div>`;
+}
+
+// OCR识别结果面板（默认折叠）：分两部分展示——
+// ①"已过滤+订正"后真正交给大模型的干净结果；②原始OCR输出（含被过滤掉的噪音行），
+// 出错时可以对照两者，判断"是OCR整体没识别出来""是被误判成噪音过滤掉了""还是大模型判断错了"。
+function buildOcrRawPanelHtml() {
+  if (!lastOcrLinesRaw.length) return '';
+  const cleanRows = lastOcrLines.map(l => {
+    const lowConf = l.confidence < 0.6;
+    return `<div class="${lowConf ? 'low-conf' : ''}">${lowConf ? '⚠️ ' : ''}${hwEscapeHtml(l.text)}　(置信度 ${l.confidence.toFixed(2)})</div>`;
+  }).join('');
+  const rawRows = lastOcrLinesRaw.map(l => {
+    const lowConf = l.confidence < 0.6;
+    return `<div class="${lowConf ? 'low-conf' : ''}">${lowConf ? '⚠️ ' : ''}${hwEscapeHtml(l.text)}　(置信度 ${l.confidence.toFixed(2)})</div>`;
+  }).join('');
+  return `<details class="ocr-raw-panel">
+    <summary>🔍 查看OCR识别详情（过滤掉${lastOcrDroppedCount}行噪音，保留${lastOcrLines.length}道算式交给AI）</summary>
+    <div style="margin-top:8px;font-size:.76rem;font-weight:700;color:var(--teal)">✅ 过滤+订正后，实际交给AI判断的内容：</div>
+    <div class="ocr-raw-list">${cleanRows}</div>
+    <div style="margin-top:10px;font-size:.76rem;font-weight:700;color:var(--muted)">📄 OCR服务原始返回（未过滤，共${lastOcrLinesRaw.length}行）：</div>
+    <div class="ocr-raw-list">${rawRows}</div>
+  </details>`;
+}
+
+// ══ 错题 AI 详细解析（复用v1的prompt模板与竖式计算逻辑）══════════
+const HW_ANALYSIS_SCHEMA = {
+  type: 'object',
+  properties: {
+    bigIdea: { type: 'string', maxLength: HW_IDEA_MAXLEN, description: `一句话点出核心思路，最多${HW_IDEA_MAXLEN}个字` },
+    steps: {
+      type: 'array', minItems: 2, maxItems: HW_MAX_STEPS,
+      description: `2到${HW_MAX_STEPS}个解题步骤，按"理解题意→列式计算→得出答案"的顺序`,
+      items: {
+        type: 'object',
+        properties: {
+          emoji: { type: 'string', maxLength: 2, description: '一个emoji表情，比如🤔✏️➕✅' },
+          text:  { type: 'string', maxLength: HW_STEP_MAXLEN, description: `这一步做什么、算出多少，最多${HW_STEP_MAXLEN}个字` },
+        },
+        required: ['emoji','text'],
+      },
+    },
+  },
+  required: ['bigIdea','steps'],
+};
+
+function buildHwAnalysisPrompt(it) {
+  return `你是一名耐心的小学老师，正在给学生讲解一道做错的作业题。
+题目：${it.question}
+学生写的答案：${it.studentAnswer}
+正确答案：${it.correctAnswer}
+
+请把解题过程拆成"步骤1、步骤2、步骤3…"这样编号的小卡片，目标是让孩子看完真正明白"怎么算的"，
+而不是简单重复题目或算式。
+
+**最重要的一条规则**：如果这道题涉及"进位"（加法：个位相加满10）或"退位"（减法：个位不够减，要向十位借1），
+必须把"进位/退位"这个具体过程单独列成一步详细讲出来，不能跳过、也不能只写最终算式。
+- 退位减法例子（54-6）的正确讲法：
+  bigIdea："个位不够减，要向十位借1"
+  步骤1 🤔："个位4减6，不够减"
+  步骤2 🔄："向十位借1，变成14减6"
+  步骤3 ✏️："14减6等于8，十位5减1等于4"
+  步骤4 ✅："答案是48"
+- 错误示范（不要这样写，太空洞）：
+  步骤1："题目要求算出54-6的结果"（这是废话，没有讲解任何东西）
+  步骤2："列出算式：54-6=48"（跳过了怎么算的过程，孩子看了还是不会）
+
+如果题目**不涉及**进位/退位（比如两位数直接相加减、没有借位的情况），可以简化成：
+- 步骤1【理解题意】🤔：说清楚要用哪种运算
+- 步骤2【列式计算】✏️：写出算式和结果
+- 步骤3【得出答案】✅：说出最终答案
+
+步骤数量最多不超过${HW_MAX_STEPS}步。
+
+字数与格式要求（严格遵守）：
+- bigIdea：最多${HW_IDEA_MAXLEN}个字
+- 每个 step 的 text：最多${HW_STEP_MAXLEN}个字，只写这一步该讲的内容，句子写完就结束，
+  **禁止在句子末尾额外添加"数学题""加油"之类的无关词语**
+- 每个 emoji 字段只能是1个标准emoji字符（比如🤔🔄✏️✅➕➖），不要输出乱码或多个符号
+
+直接输出内容，不要说"好的""下面是"这类客套话。`;
+}
+
+function hwEscapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function hwClampText(s, maxLen) {
+  s = String(s || '').trim();
+  return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+}
+
+// ══ 竖式展示（纯代码计算，不依赖 AI，保证100%准确，逻辑与v1完全一致）══
+function hwParseArithmetic(qtext) {
+  const s = String(qtext || '').replace(/[=？?]/g, '').trim();
+  const m = s.match(/^(\d+)\s*([+\-－])\s*(\d+)$/);
+  if (!m) return null;
+  const a = parseInt(m[1], 10);
+  const op = (m[2] === '+') ? '+' : '-';
+  const bNum = parseInt(m[3], 10);
+  if (Number.isNaN(a) || Number.isNaN(bNum)) return null;
+  if (op === '-' && a < bNum) return null;
+  return { a, b: bNum, op };
+}
+
+function hwDigs(n, len) {
+  const s = String(Math.abs(n)).padStart(len, '0');
+  return s.split('').reverse().map(Number);
+}
+function hwNdig(n) { return String(Math.abs(n)).length; }
+
+function hwComputeAdd(a, b) {
+  const len = Math.max(hwNdig(a), hwNdig(b), 1);
+  const dA = hwDigs(a, len), dB = hwDigs(b, len);
+  const carries = new Array(len + 1).fill(0);
+  const resDigs = new Array(len).fill(0);
+  let carry = 0;
+  for (let col = 0; col < len; col++) {
+    const sum = (dA[col]||0) + (dB[col]||0) + carry;
+    resDigs[col] = sum % 10;
+    carry = Math.floor(sum / 10);
+    carries[col + 1] = carry;
+  }
+  let finalLen = len;
+  if (carry > 0) { resDigs[len] = carry; finalLen = len + 1; }
+  return { dA, dB, carries, resDigs, len: finalLen, inLen: len };
+}
+
+function hwComputeSub(a, b) {
+  const len = Math.max(hwNdig(a), hwNdig(b), 1);
+  const dA = hwDigs(a, len).slice();
+  const dB = hwDigs(b, len);
+  const origA = hwDigs(a, len).slice();
+  const adjA = hwDigs(a, len).slice();
+  const borrows = new Array(len).fill(0);
+  const resDigs = new Array(len).fill(0);
+  for (let col = 0; col < len; col++) {
+    let da = adjA[col], db = dB[col] || 0;
+    let borrow = 0;
+    if (da < db) { borrow = 1; adjA[col + 1] = (adjA[col + 1] || 0) - 1; da += 10; }
+    resDigs[col] = da - db;
+    borrows[col] = borrow;
+  }
+  return { dA: origA, dB, adjA, borrows, resDigs, len };
+}
+
+function hwRenderVertical(a, b, op) {
+  const cellW = 34;
+  if (op === '+') {
+    const d = hwComputeAdd(a, b);
+    const { dA, dB, carries, resDigs, len, inLen } = d;
+    let html = '<div class="vcalc-board">';
+    html += '<div class="vcalc-row vcalc-carry"><div class="vcalc-cell op" style="visibility:hidden">+</div>';
+    for (let c = len - 1; c >= 0; c--) {
+      html += `<div class="vcalc-cell">${carries[c] ? carries[c] : ''}</div>`;
+    }
+    html += '</div>';
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${c < inLen ? dA[c] : ''}</div>`;
+    html += '</div>';
+    html += '<div class="vcalc-row"><div class="vcalc-cell op">+</div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${c < inLen ? (dB[c] ?? '') : ''}</div>`;
+    html += '</div>';
+    html += `<div class="vcalc-line" style="width:${(len + 1) * cellW}px"></div>`;
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell result">${resDigs[c] ?? 0}</div>`;
+    html += '</div></div>';
+    return html;
+  } else {
+    const d = hwComputeSub(a, b);
+    const { dA, dB, adjA, borrows, resDigs, len } = d;
+    let html = '<div class="vcalc-board">';
+    html += '<div class="vcalc-row vcalc-carry"><div class="vcalc-cell op" style="visibility:hidden">-</div>';
+    for (let c = len - 1; c >= 0; c--) {
+      const nextBorrowed = borrows[c - 1];
+      html += `<div class="vcalc-cell">${nextBorrowed ? `<span class="vcalc-borrow-new">${adjA[c]}</span>` : ''}</div>`;
+    }
+    html += '</div>';
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) {
+      const nextBorrowed = borrows[c - 1];
+      const val = nextBorrowed ? `<span class="vcalc-borrow-orig">${dA[c]}</span>` : dA[c];
+      html += `<div class="vcalc-cell">${val}</div>`;
+    }
+    html += '</div>';
+    html += '<div class="vcalc-row"><div class="vcalc-cell op">－</div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell">${dB[c] ?? ''}</div>`;
+    html += '</div>';
+    html += `<div class="vcalc-line" style="width:${(len + 1) * cellW}px"></div>`;
+    html += '<div class="vcalc-row"><div class="vcalc-cell op"></div>';
+    for (let c = len - 1; c >= 0; c--) html += `<div class="vcalc-cell result">${resDigs[c] ?? 0}</div>`;
+    html += '</div></div>';
+    return html;
+  }
+}
+
+function hwBuildVerticalBlock(qtext) {
+  const parsed = hwParseArithmetic(qtext);
+  if (!parsed) return '';
+  const board = hwRenderVertical(parsed.a, parsed.b, parsed.op);
+  return `<div><span class="vcalc-tag">🧮 竖式计算</span><div class="vcalc-wrap">${board}</div></div>`;
+}
+
+async function hwRunAnalysis(it, box, btn) {
+  if (!it || !box) return;
+  const vBlock = hwBuildVerticalBlock(it.question);
+
+  if (btn) btn.disabled = true;
+  box.classList.add('show');
+  box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 解析</span><div class="ai-hw-loading">正在生成讲解，请稍候…</div>`;
+
+  const prompt = buildHwAnalysisPrompt(it);
+
+  try {
+    const resp = await fetch(HW_OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: HW_TEXT_MODEL, prompt, stream: false, format: HW_ANALYSIS_SCHEMA })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const raw = (data.response || '').trim();
+    if (!raw) throw new Error('空响应');
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch (e) { throw new Error('返回内容不是合法 JSON'); }
+    if (!parsed.bigIdea || !Array.isArray(parsed.steps) || !parsed.steps.length) throw new Error('返回内容缺少讲解字段');
+
+    const bigIdea = hwClampText(parsed.bigIdea, HW_IDEA_MAXLEN);
+    const steps = parsed.steps.slice(0, HW_MAX_STEPS).map(s => ({
+      emoji: String(s && s.emoji || '✏️').trim().slice(0, 2),
+      text: hwClampText(s && s.text, HW_STEP_MAXLEN),
+    })).filter(s => s.text);
+
+    const stepsHtml = steps.map((s, idx) => `
+      <div class="ai-hw-step">
+        <span class="ai-hw-step-n">步骤${idx + 1}</span>
+        <span class="ai-hw-step-emoji">${hwEscapeHtml(s.emoji)}</span>
+        <span class="ai-hw-step-text">${hwEscapeHtml(s.text)}</span>
+      </div>`).join('');
+
+    box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 详细讲解</span>
+      ${bigIdea ? `<div class="ai-hw-bigidea">💡 ${hwEscapeHtml(bigIdea)}</div>` : ''}
+      <div class="ai-hw-steps">${stepsHtml}</div>`;
+  } catch (err) {
+    box.innerHTML = `${vBlock}<span class="ai-hw-tag">🤖 AI 解析</span>
+      <div class="ai-hw-err">生成失败：无法连接本地 Ollama（${hwEscapeHtml(err.message)}）。<br>
+      请确认：① 本机已安装并启动 Ollama；② 已执行 <code>ollama pull ${HW_TEXT_MODEL}</code>。</div>
+      <button class="ai-hw-retry" onclick="genHwAnalysis(${currentResults.indexOf(it)})">🔄 重试</button>`;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function genHwAnalysis(i) {
+  const it = currentResults[i];
+  const box = document.getElementById(`hwaibox-${i}`);
+  const btn = document.getElementById(`hwaib-${i}`);
+  await hwRunAnalysis(it, box, btn);
+}
+</script>
+<script src="hpx-page-speech.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
+</body>
+</html>

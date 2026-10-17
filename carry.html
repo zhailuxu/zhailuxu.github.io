@@ -470,21 +470,29 @@ function buildSub(a, b) {
 
   for (let col = 0; col < len; col++) {
     let da = adjA[col], db = dB[col];
+    const daBeforeBorrow = da;
     let borrow = 0;
+    let lenderCol = col + 1;
+    const borrowChanges = [];
     if (da < db) {
       borrow = 1;
-      adjA[col+1] = adjA[col+1] - 1;
+      while (lenderCol < len && adjA[lenderCol] === 0) lenderCol++;
+      if (lenderCol < len) {
+        borrowChanges.push({ col:lenderCol, before:adjA[lenderCol], after:adjA[lenderCol]-1 });
+        adjA[lenderCol]--;
+        for (let relayCol = lenderCol-1; relayCol > col; relayCol--) {
+          borrowChanges.push({ col:relayCol, before:adjA[relayCol], after:9 });
+          adjA[relayCol] = 9;
+        }
+      }
       da += 10;
     }
     const digit = da - db;
     resDigs[col] = digit;
     borrows[col] = borrow;
     steps.push({
-      type:'sub', col, daOrig: adjA[col] - (borrow?10:0) + (borrow?0:0),
-      daOrigDisplay: origA[col],
-      adjAcol1Before: adjA[col+1] + (borrow?1:0),
-      adjAcol1After: adjA[col+1],
-      da, db, borrow, digit, len
+      type:'sub', col, daOrigDisplay:daBeforeBorrow,
+      lenderCol, borrowChanges, da, db, borrow, digit, len
     });
   }
   steps.push({ type:'done', result, resDigs, len });
@@ -617,28 +625,33 @@ function applyStep(step) {
     setTimeout(() => showRD(col, digit), spMs * 0.4);
 
   } else if (step.type === 'sub') {
-    const { col, daOrigDisplay, adjAcol1Before, adjAcol1After, da, db, borrow, digit } = step;
+    const { col, daOrigDisplay, lenderCol, borrowChanges, da, db, borrow, digit } = step;
     hlCol(col);
 
     if (borrow) {
-      setNarr(`${COL_NAME[col]}：${daOrigDisplay} < ${db}，不够减！向${COL_NAME[col+1]}借 1`);
+      const borrowFrom = COL_NAME[lenderCol] || `前面的数位`;
+      const borrowPath = lenderCol === col+1 ? `向${borrowFrom}借 1` : `${COL_NAME[col+1]}是0，继续向${borrowFrom}借 1`;
+      setNarr(`${COL_NAME[col]}：${daOrigDisplay} < ${db}，不够减！${borrowPath}`);
       const eq = `<span style="color:#f57c00">借1后：</span>`
         + `<span style="color:#1565c0">${da}</span>`
         + ` − <span style="color:#c62828">${db}</span>`
         + ` = <span style="color:#2e7d32;font-size:1.8rem">${digit}</span>`;
       const note = `${daOrigDisplay} 不够减 ${db}，借来10变成 <b style="color:#1565c0">${da}</b>，再减 ${db} = <b>${digit}</b>`;
       setComp(eq, note);
-      voiceText = `${COL_NAME[col]}，${daOrigDisplay}比${db}小，不够减，向${COL_NAME[col+1]}借一。借来十以后，${da}减${db}等于${digit}，写${digit}。`;
+      voiceText = lenderCol === col+1
+        ? `${COL_NAME[col]}，${daOrigDisplay}比${db}小，不够减，向${borrowFrom}借一。借来十以后，${da}减${db}等于${digit}，写${digit}。`
+        : `${COL_NAME[col]}，${daOrigDisplay}比${db}小，不够减。${COL_NAME[col+1]}是零，继续向${borrowFrom}借一，中间数位依次退位。借来十以后，${da}减${db}等于${digit}，写${digit}。`;
 
-      // Show borrow: highlight the lending column and update its cell
+      // Show every changed lending/relay column, including borrows across zeroes.
       setTimeout(() => {
-        const lendCell = document.getElementById(`ca-${col+1}`);
-        if (lendCell) {
+        borrowChanges.forEach(change => {
+          const lendCell = document.getElementById(`ca-${change.col}`);
+          if (!lendCell) return;
           lendCell.classList.add('active');
           lendCell.innerHTML =
-            `<span class="orig-dig borrow-appear">${adjAcol1Before}</span>`
-            + `<span class="new-dig borrow-appear" style="animation-delay:.15s">${adjAcol1After}</span>`;
-        }
+            `<span class="orig-dig borrow-appear">${change.before}</span>`
+            + `<span class="new-dig borrow-appear" style="animation-delay:.15s">${change.after}</span>`;
+        });
       }, spMs * 0.25);
     } else {
       setNarr(`${COL_NAME[col]}：${daOrigDisplay} − ${db} = ${digit}`);
@@ -925,8 +938,9 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

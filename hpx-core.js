@@ -98,6 +98,27 @@
       return speakUtterance(text, overrides);
     }
 
+    // Android browsers may require the first utterance to start synchronously
+    // inside a trusted user gesture. Keep this path free of timers and cancel().
+    function unlock(text, overrides) {
+      overrides = overrides || {};
+      if (!enabled || !synth || typeof global.SpeechSynthesisUtterance === 'undefined') return false;
+      var utterance = new global.SpeechSynthesisUtterance(String(text || options.enabledMessage || '声音已开启。'));
+      var lang = overrides.lang || options.lang || 'zh-CN';
+      var voice = selectVoice(lang);
+      if (voice) utterance.voice = voice;
+      utterance.lang = voice ? voice.lang : lang;
+      utterance.rate = overrides.rate || rate;
+      utterance.pitch = overrides.pitch || pitch;
+      if (typeof overrides.onStart === 'function') utterance.onstart = overrides.onStart;
+      if (typeof overrides.onEnd === 'function') utterance.onend = overrides.onEnd;
+      utterance.onerror = function (event) {
+        if (typeof overrides.onError === 'function') overrides.onError(event);
+      };
+      synth.speak(utterance);
+      return true;
+    }
+
     async function sequence(items, overrides) {
       overrides = overrides || {};
       var ownCommand = ++commandId;
@@ -134,10 +155,12 @@
     updateButton();
     return {
       speak: speak,
+      unlock: unlock,
       sequence: sequence,
       stop: stop,
       toggle: toggle,
       setEnabled: setEnabled,
+      isAvailable: function () { return Boolean(synth && typeof global.SpeechSynthesisUtterance !== 'undefined'); },
       isEnabled: function () { return enabled; }
     };
   }
@@ -185,6 +208,16 @@
     }
     return result;
   }
+
+  function loadAccessibility() {
+    if (typeof document === 'undefined' || !document.createElement || document.getElementById('hpxAccessibilityScript')) return;
+    var script = document.createElement('script');
+    script.id = 'hpxAccessibilityScript';
+    script.src = 'hpx-accessibility.js';
+    document.head.appendChild(script);
+  }
+
+  loadAccessibility();
 
   global.Hpx = Object.freeze({
     speech: Object.freeze({ create: createSpeech, install: installSpeech }),

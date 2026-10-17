@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四年级零散知识点</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#efebe9 0%,#fff3e0 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:760px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.65rem;color:#4e342e;letter-spacing:1px;text-shadow:2px 3px 0 #d7ccc8;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 14px;font-size:.82rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:120px;accent-color:#4e342e;}
+.sl-val{font-weight:bold;font-size:1rem;color:#4e342e;}
+.formula-box{background:#efebe9;border-radius:12px;padding:12px 18px;text-align:center;font-size:.95rem;color:#4e342e;line-height:1.9;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#6d4c41;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#4e342e;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.quiz-input{font-size:1.15rem;width:100px;border:2px solid #bcaaa4;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#4e342e;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#4e342e;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 公顷平方千米 */
+.compare-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.compare-chip{background:#fff3e0;border-radius:12px;padding:8px 14px;font-size:.85rem;color:#e65100;font-weight:bold;}
+/* 竖式步骤 */
+.step-box{background:#efebe9;border-radius:14px;padding:16px 18px;margin-bottom:14px;}
+.vert-calc{font-family:"Courier New",monospace;font-size:1.4rem;text-align:right;color:#333;line-height:1.7;white-space:pre;background:#fff;border-radius:10px;padding:14px 20px;display:inline-block;min-width:180px;}
+.vert-calc .hi{color:#c62828;font-weight:bold;}
+.vert-calc .dim{color:#bbb;}
+.step-desc{font-size:1rem;color:#4e342e;margin-top:10px;min-height:50px;line-height:1.7;}
+.step-nav{display:flex;gap:10px;justify-content:center;margin-top:10px;}
+.step-nav button{padding:7px 18px;border:none;border-radius:12px;background:#6d4c41;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.step-nav button:disabled{background:#d7ccc8;cursor:not-allowed;}
+/* 图形分类 */
+.shape-svg-wrap{display:flex;justify-content:center;margin:10px 0;}
+.choice-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.choice-btn{padding:10px 18px;border:2px solid #bcaaa4;border-radius:14px;background:#fff;color:#4e342e;font-size:.92rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-btn:hover{background:#efebe9;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.prop-table{border-collapse:collapse;margin:10px auto;font-size:.88rem;}
+.prop-table th,.prop-table td{border:1px solid #bcaaa4;padding:8px 12px;text-align:center;}
+.prop-table th{background:#efebe9;color:#4e342e;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#efebe9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#4e342e;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#4e342e">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🧮</div>
+    <h1>四年级零散知识点</h1>
+    <p>公顷和平方千米 · 三位数乘两位数 · 平行四边形和梯形 · 除数是两位数的除法</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('land')">🗺️ 公顷和平方千米</button>
+    <button class="tab-btn" onclick="switchTab('mul3')">✖️ 三位数乘两位数</button>
+    <button class="tab-btn" onclick="switchTab('shape')">🔷 平行四边形和梯形</button>
+    <button class="tab-btn" onclick="switchTab('div2')">➗ 两位数除法</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 公顷和平方千米 -->
+  <div id="tab-land">
+    <div class="card">
+      <div class="net-desc">拖动滑块调整公顷数，看看换算成平方米、平方千米是多少</div>
+      <div class="formula-box">1 公顷 = 100米×100米 = 10000 平方米　　1 平方千米 = 100 公顷 = 1000000 平方米</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>公顷数</label><input type="range" id="landHa" min="1" max="300" value="50" step="1" oninput="updateLand()"><span class="sl-val" id="landHaVal">50</span></div>
+      </div>
+      <div class="formula-box" id="landFormula" style="margin-top:10px;"></div>
+      <div class="net-desc" style="margin-top:14px;">生活中的参照物，帮你建立"1公顷有多大"的感觉：</div>
+      <div class="compare-row">
+        <div class="compare-chip">⚽ 一个标准足球场 ≈ 0.7 公顷</div>
+        <div class="compare-chip">🏯 天安门广场 ≈ 44 公顷</div>
+        <div class="compare-chip">🏊 一个标准游泳池 ≈ 0.125 公顷</div>
+        <div class="compare-chip">🏙️ 一个小型居民小区 ≈ 3～8 公顷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 三位数乘两位数 -->
+  <div id="tab-mul3">
+    <div class="card">
+      <div class="net-desc">两位数拆成十位和个位分别去乘，十位乘得的结果要向左错一位再相加</div>
+      <div class="step-box" style="text-align:center;">
+        <div class="vert-calc" id="mul3Calc"></div>
+        <div class="step-desc" id="mul3Desc"></div>
+        <div class="step-nav">
+          <button id="mul3Prev" onclick="mul3Step(-1)">← 上一步</button>
+          <span id="mul3Info" style="align-self:center;color:#999;font-size:.85rem;"></span>
+          <button id="mul3Next" onclick="mul3Step(1)">下一步 →</button>
+        </div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextMul3()">🔄 换一题</button></div>
+    </div>
+  </div>
+
+  <!-- 平行四边形和梯形 -->
+  <div id="tab-shape" style="display:none;">
+    <div class="card">
+      <div class="net-desc">先认识两种图形的特点，再练习分类</div>
+      <table class="prop-table">
+        <tr><th></th><th>平行四边形</th><th>梯形</th></tr>
+        <tr><td>对边关系</td><td>两组对边分别平行且相等</td><td>只有一组对边平行</td></tr>
+        <tr><td>特殊叫法</td><td>长方形/菱形/正方形都是特殊的平行四边形</td><td>平行的两边叫上底、下底；不平行的叫腰</td></tr>
+        <tr><td>角</td><td>对角相等</td><td>没有固定角度关系</td></tr>
+      </table>
+      <div class="shape-svg-wrap"><svg id="shapeSvg" width="220" height="160" viewBox="0 0 220 160"></svg></div>
+      <div class="net-desc" id="shapeQText" style="font-size:1rem;color:#4e342e;font-weight:bold;"></div>
+      <div class="choice-row" id="shapeChoiceRow"></div>
+      <div class="result-msg" id="shapeMsg" style="text-align:center;"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextShape()">下一题 →</button></div>
+    </div>
+  </div>
+
+  <!-- 两位数除法 -->
+  <div id="tab-div2" style="display:none;">
+    <div class="card">
+      <div class="net-desc">把除数看成接近的整十数来试商，再用乘法验证、调整</div>
+      <div class="step-box" style="text-align:center;">
+        <div class="vert-calc" id="div2Calc"></div>
+        <div class="step-desc" id="div2Desc"></div>
+        <div class="step-nav">
+          <button id="div2Prev" onclick="div2Step(-1)">← 上一步</button>
+          <span id="div2Info" style="align-self:center;color:#999;font-size:.85rem;"></span>
+          <button id="div2Next" onclick="div2Step(1)">下一步 →</button>
+        </div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextDiv2()">🔄 换一题</button></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 公顷和平方千米 ──
+function updateLand(){
+  const ha=+document.getElementById('landHa').value;
+  document.getElementById('landHaVal').textContent=ha;
+  const sqm=ha*10000;
+  const sqkm=ha/100;
+  document.getElementById('landFormula').innerHTML=
+    `${ha} 公顷 = ${ha}×10000 = <b>${sqm.toLocaleString()}</b> 平方米　　= ${ha}÷100 = <b>${sqkm}</b> 平方千米`;
+  speak(`${ha}公顷等于${sqm}平方米，等于${sqkm}平方千米。`);
+}
+
+// ── 三位数乘两位数 ──
+let mul3State=null, mul3CurStep=0;
+function genMul3(){
+  const a=randInt(100,999), b=randInt(10,99);
+  const tens=Math.floor(b/10), ones=b%10;
+  const p1=a*ones, p2=a*tens, ans=p1+p2*10;
+  return {a,b,tens,ones,p1,p2,ans};
+}
+function nextMul3(){
+  mul3State=genMul3();
+  mul3CurStep=0;
+  renderMul3();
+}
+function renderMul3(){
+  const {a,b,tens,ones,p1,p2,ans}=mul3State;
+  const steps=[
+    { calc:`  ${a}\n×  ${b}\n------`, desc:`列竖式：${a} 乘 ${b}。${b} 的个位是 ${ones}，十位是 ${tens}，分两步来乘。` },
+    { calc:`  ${a}\n×  ${b}\n------\n ${p1}`, desc:`第一步：用个位 ${ones} 去乘 ${a}，${a}×${ones} = ${p1}` },
+    { calc:`  ${a}\n×  ${b}\n------\n ${p1}\n${p2}·`, desc:`第二步：用十位 ${tens} 去乘 ${a}，${a}×${tens} = ${p2}，因为乘的是十位，结果要向左错一位（末尾多空一格，相当于×10）` },
+    { calc:`  ${a}\n×  ${b}\n------\n ${p1}\n${p2}·\n------\n${ans}`, desc:`第三步：把两次结果相加：${p1} + ${p2}×10 = ${p1} + ${p2*10} = ${ans}` },
+  ];
+  document.getElementById('mul3Calc').textContent=steps[mul3CurStep].calc;
+  document.getElementById('mul3Desc').innerHTML=steps[mul3CurStep].desc;
+  document.getElementById('mul3Info').textContent=`第 ${mul3CurStep+1} / ${steps.length} 步`;
+  document.getElementById('mul3Prev').disabled=mul3CurStep===0;
+  document.getElementById('mul3Next').disabled=mul3CurStep===steps.length-1;
+  speak(steps[mul3CurStep].desc);
+}
+function mul3Step(delta){
+  const total=4;
+  mul3CurStep=Math.max(0,Math.min(total-1,mul3CurStep+delta));
+  renderMul3();
+}
+
+// ── 平行四边形和梯形（认识分类）──
+const SHAPES=[
+  { name:'平行四边形', pts:[[30,120],[70,30],[190,30],[150,120]] },
+  { name:'梯形',       pts:[[40,120],[80,30],[160,30],[190,120]] },
+  { name:'长方形',     pts:[[40,30],[180,30],[180,120],[40,120]] },
+  { name:'正方形',     pts:[[60,30],[160,30],[160,130],[60,130]] },
+  { name:'菱形',       pts:[[110,20],[180,80],[110,140],[40,80]] },
+  { name:'梯形',       pts:[[60,120],[95,30],[125,30],[190,120]] },
+  { name:'两者都不是', pts:[[40,30],[190,50],[160,130],[50,110]] },
+  { name:'平行四边形', pts:[[50,130],[100,20],[200,20],[150,130]] },
+];
+let shapeIdx=0;
+function renderShape(){
+  const s=SHAPES[shapeIdx];
+  const pts=s.pts.map(p=>p.join(',')).join(' ');
+  document.getElementById('shapeSvg').innerHTML=`<polygon points="${pts}" fill="#ffe0b2" stroke="#e65100" stroke-width="3"/>`;
+  document.getElementById('shapeQText').textContent='这个图形属于下面哪一类？';
+  const options=['平行四边形','梯形','两者都不是'];
+  document.getElementById('shapeChoiceRow').innerHTML=options.map(o=>
+    `<button class="choice-btn" onclick="checkShape(this,'${o}')">${o}</button>`).join('');
+  document.getElementById('shapeMsg').textContent='';
+  speak('这个图形属于平行四边形、梯形，还是两者都不是？');
+}
+function checkShape(btn,choice){
+  const s=SHAPES[shapeIdx];
+  const correctLabel = (s.name==='平行四边形'||s.name==='长方形'||s.name==='正方形'||s.name==='菱形') ? '平行四边形' : (s.name==='梯形'?'梯形':'两者都不是');
+  document.querySelectorAll('#shapeChoiceRow .choice-btn').forEach(b=>{ b.disabled=true; if(b.textContent===correctLabel) b.classList.add('correct'); });
+  if(choice!==correctLabel) btn.classList.add('wrong');
+  const msg=document.getElementById('shapeMsg');
+  if(choice===correctLabel){
+    msg.className='result-msg ok'; msg.textContent=`✅ 正确！这是${s.name}。`;
+    speak('正确！这是'+s.name+'。');
+  } else {
+    msg.className='result-msg no'; msg.textContent=`❌ 这其实是${s.name}，属于「${correctLabel}」这一类。`;
+    speak('这其实是'+s.name+'，再想想！');
+  }
+}
+function nextShape(){ shapeIdx=(shapeIdx+1)%SHAPES.length; renderShape(); }
+
+// ── 两位数除法（试商）──
+let div2State=null, div2CurStep=0;
+function genDiv2(){
+  const b=randInt(11,99);
+  const q=randInt(11,89);
+  const r=randInt(0,b-1);
+  const a=b*q+r;
+  const roundedB=Math.round(b/10)*10||10;
+  return {a,b,q,r,roundedB};
+}
+function nextDiv2(){
+  div2State=genDiv2();
+  div2CurStep=0;
+  renderDiv2();
+}
+function renderDiv2(){
+  const {a,b,q,r,roundedB}=div2State;
+  const remText = r>0 ? `……余 ${r}` : '（正好除尽）';
+  const steps=[
+    { calc:`${a} ÷ ${b} = ?`, desc:`要计算 ${a} ÷ ${b}，除数 ${b} 是两位数，先用"试商"的方法估计商是几。` },
+    { calc:`${a} ÷ ${b} = ?\n把${b}看成${roundedB}`, desc:`把除数 ${b} 看成接近的整十数 ${roundedB} 来试商：${a} ÷ ${roundedB} 大约是多少，先估个大概的商。` },
+    { calc:`${a} ÷ ${b} = ${q}${remText}`, desc:`用估出来的商去乘 ${b} 验证：${b} × ${q} = ${b*q}，${r>0?`比${a}小${r}，说明商是${q}，余数是${r}`:`正好等于${a}，说明商就是${q}，没有余数`}。` },
+  ];
+  document.getElementById('div2Calc').textContent=steps[div2CurStep].calc;
+  document.getElementById('div2Desc').innerHTML=steps[div2CurStep].desc;
+  document.getElementById('div2Info').textContent=`第 ${div2CurStep+1} / ${steps.length} 步`;
+  document.getElementById('div2Prev').disabled=div2CurStep===0;
+  document.getElementById('div2Next').disabled=div2CurStep===steps.length-1;
+  speak(steps[div2CurStep].desc);
+}
+function div2Step(delta){
+  const total=3;
+  div2CurStep=Math.max(0,Math.min(total-1,div2CurStep+delta));
+  renderDiv2();
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, qDone=false;
+function attachSingleNumAutoCheck(ans){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(ans).length) checkNumQ(ans); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNumQ(ans); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNumQ(ans); });
+}
+function attachDivAutoCheck(q,r){
+  const inp1=document.getElementById('quizInput'), inp2=document.getElementById('quizInput2');
+  const maybeCheck=()=>{ if(inp1.value.length>0 && inp2.value.length>0) checkDivQ(q,r); };
+  inp1.addEventListener('input',maybeCheck); inp2.addEventListener('input',maybeCheck);
+  inp1.addEventListener('blur',maybeCheck); inp2.addEventListener('blur',maybeCheck);
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,3);
+  if(type===0){
+    const ha=randInt(2,500);
+    const askType=randInt(0,1);
+    if(askType===0){
+      document.getElementById('quizQ').textContent=`${ha} 公顷 = 多少平方米？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+      attachSingleNumAutoCheck(ha*10000);
+      speak(`${ha}公顷等于多少平方米？`);
+    } else {
+      const ha2=randInt(1,20)*100;
+      document.getElementById('quizQ').textContent=`${ha2} 公顷 = 多少平方千米？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+      attachSingleNumAutoCheck(ha2/100);
+      speak(`${ha2}公顷等于多少平方千米？`);
+    }
+  } else if(type===1){
+    const s=genMul3();
+    document.getElementById('quizQ').textContent=`${s.a} × ${s.b} = ?`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachSingleNumAutoCheck(s.ans);
+    speak(`${s.a}乘以${s.b}等于多少？`);
+  } else if(type===2){
+    const idx=randInt(0,SHAPES.length-1);
+    const s=SHAPES[idx];
+    const pts=s.pts.map(p=>p.join(',')).join(' ');
+    const correctLabel = (s.name==='平行四边形'||s.name==='长方形'||s.name==='正方形'||s.name==='菱形') ? '平行四边形' : (s.name==='梯形'?'梯形':'两者都不是');
+    document.getElementById('quizQ').innerHTML=`<svg width="180" height="130" viewBox="0 0 220 160" style="display:block;margin:0 auto 10px;"><polygon points="${pts}" fill="#ffe0b2" stroke="#e65100" stroke-width="3"/></svg>这个图形属于哪一类？`;
+    area.innerHTML=`<div class="choice-row">${['平行四边形','梯形','两者都不是'].map(o=>`<button class="choice-btn" onclick="checkShapeQ(this,'${o}','${correctLabel}','${s.name}')">${o}</button>`).join('')}</div>`;
+    speak('这个图形属于平行四边形、梯形，还是两者都不是？');
+  } else {
+    const s=genDiv2();
+    document.getElementById('quizQ').textContent=`${s.a} ÷ ${s.b} = ?（商和余数用空格隔开，没有余数写0）`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="商" style="width:70px;"> 余 <input type="number" id="quizInput2" class="quiz-input" placeholder="余数" style="width:70px;">`;
+    attachDivAutoCheck(s.q,s.r);
+    speak(`${s.a}除以${s.b}，商是多少，余数是多少？`);
+  }
+}
+function checkShapeQ(btn,choice,correctLabel,name){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===correctLabel) b.classList.add('correct');});
+  if(choice!==correctLabel) btn.classList.add('wrong');
+  markResult(choice===correctLabel, correctLabel+'（这是'+name+'）');
+}
+function checkNumQ(ans){
+  if(qDone) return;
+  const v=parseFloat(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(v===ans, ans);
+}
+function checkDivQ(q,r){
+  if(qDone) return;
+  const vq=parseInt(document.getElementById('quizInput').value);
+  const vr=parseInt(document.getElementById('quizInput2').value);
+  if(isNaN(vq)||isNaN(vr)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  document.getElementById('quizInput2').disabled=true;
+  markResult(vq===q && vr===r, `商 ${q} 余 ${r}`);
+}
+function markResult(correct,ans){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['land','mul3','shape','div2','quiz']);
+  if(t==='land') speak('公顷和平方千米：拖动滑块，看看面积单位怎么换算。');
+  if(t==='mul3') speak('三位数乘两位数：拆成十位和个位分别乘，再错位相加。');
+  if(t==='shape') speak('平行四边形和梯形：先看特点，再练习分类。');
+  if(t==='div2') speak('两位数除法：把除数看成整十数来试商。');
+  if(t==='quiz') nextQ();
+}
+updateLand();
+nextMul3();
+renderShape();
+nextDiv2();
+speak('欢迎来到四年级零散知识点！我们来学公顷、三位数乘两位数、图形分类，还有两位数除法。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

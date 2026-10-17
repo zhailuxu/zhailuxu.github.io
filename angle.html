@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>角的度量</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#f3e5f5 0%,#ede7f6 50%,#fff8e1 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#4a148c;letter-spacing:3px;text-shadow:2px 3px 0 #ce93d8;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 22px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:12px;touch-action:none;}
+.preset-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.preset-btn{padding:8px 16px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:.88rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.preset-btn.on{background:#6a1b9a;color:#fff;border-color:#6a1b9a;}
+.type-badge{display:inline-block;padding:5px 16px;border-radius:16px;font-size:.95rem;font-weight:bold;color:#fff;}
+.desc-box{font-size:.95rem;color:#555;text-align:center;margin-top:10px;line-height:1.8;}
+.deg-readout{text-align:center;margin:10px 0;}
+.deg-readout .num{font-size:2.2rem;font-weight:bold;color:#ad1457;}
+.info-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.reset-btn{display:block;margin:10px auto 0;padding:8px 22px;border:none;border-radius:14px;background:#6a1b9a;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#f3e5f5;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#6a1b9a;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:10px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #ce93d8;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#6a1b9a;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#6a1b9a;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#6a1b9a;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#6a1b9a">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">∠</div>
+    <h1>角的度量</h1>
+    <p>拖一拖、量一量，认识各种各样的角</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识角</button>
+    <button class="tab-btn" onclick="switchTab('measure')">🖱️ 量角器测量</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识角 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div class="preset-row" id="presetRow"></div>
+      <div class="canvas-wrap"><canvas id="learnCanvas" width="340" height="230"></canvas></div>
+      <div style="text-align:center;"><span class="type-badge" id="learnBadge"></span></div>
+      <div class="desc-box" id="learnDesc"></div>
+    </div>
+    <div class="card" style="font-size:.9rem;color:#666;line-height:2;">
+      <div>🟢 <b>锐角</b>：小于 90° 的角</div>
+      <div>🔵 <b>直角</b>：正好等于 90° 的角</div>
+      <div>🟠 <b>钝角</b>：大于 90°、小于 180° 的角</div>
+      <div>🟣 <b>平角</b>：正好等于 180° 的角，是一条直线</div>
+      <div>🌸 <b>周角</b>：转满一整圈，等于 360°</div>
+    </div>
+  </div>
+
+  <!-- 量角器测量 -->
+  <div id="tab-measure" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:6px;">拖动粉色端点，转动角的大小，量角器会帮你读数</div>
+      <div class="canvas-wrap"><canvas id="measureCanvas" width="340" height="230"></canvas></div>
+      <div class="deg-readout"><span class="num" id="measureDeg">60</span>°</div>
+      <div style="text-align:center;"><span class="type-badge" id="measureBadge"></span></div>
+      <button class="reset-btn" onclick="resetMeasure()">↺ 重置</button>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="quizCanvas" width="300" height="200"></canvas></div>
+      <div class="quiz-q">用量角器读一读，这是多少度的角？</div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+        <span>°</span>
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+
+// ── 几何工具 ──
+function pt(cx,cy,r,deg){const rad=deg*Math.PI/180;return [cx+r*Math.cos(rad), cy-r*Math.sin(rad)];}
+function polyPath(ctx,cx,cy,r,fromDeg,toDeg){
+  const steps=Math.max(6,Math.round(Math.abs(toDeg-fromDeg)/3));
+  ctx.beginPath();
+  for(let i=0;i<=steps;i++){
+    const d=fromDeg+(toDeg-fromDeg)*i/steps;
+    const [x,y]=pt(cx,cy,r,d);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+}
+function angleType(d){
+  if(Math.abs(d-90)<0.5) return {name:'直角',color:'#1565c0'};
+  if(Math.abs(d-180)<0.5) return {name:'平角',color:'#6a1b9a'};
+  if(d>=359.5) return {name:'周角',color:'#ad1457'};
+  if(d<90) return {name:'锐角',color:'#2e7d32'};
+  if(d<180) return {name:'钝角',color:'#e65100'};
+  return {name:'反角',color:'#ad1457'};
+}
+function vx(canvas){return canvas.width/2;} // 顶点放在水平居中，量角器才能左右两侧都画得下
+function vy(canvas){return canvas.height-30;}
+
+function drawAngleScene(canvas, deg, opts={}){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const cx=vx(canvas), cy=vy(canvas), rayLen=cx-30;
+  // protractor
+  if(opts.protractor){
+    ctx.save();
+    ctx.fillStyle='rgba(255,235,59,.20)';
+    polyPath(ctx,cx,cy,rayLen,0,180);ctx.lineTo(cx,cy);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#fbc02d';ctx.lineWidth=2;
+    polyPath(ctx,cx,cy,rayLen,0,180);ctx.stroke();
+    for(let d=0; d<=180; d+=10){
+      const major=d%30===0;
+      const r1=rayLen, r2=rayLen-(major?14:8);
+      const [x1,y1]=pt(cx,cy,r1,d),[x2,y2]=pt(cx,cy,r2,d);
+      ctx.strokeStyle=major?'#f57f17':'#ffca28';ctx.lineWidth=major?2:1;
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      if(major){
+        const [tx,ty]=pt(cx,cy,r1-27,d);
+        ctx.fillStyle='#f57f17';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(d,tx,ty);
+      }
+    }
+    ctx.restore();
+  }
+  // sweep fill
+  const sweepTo = opts.sweep!==undefined ? opts.sweep : deg;
+  ctx.save();
+  polyPath(ctx,cx,cy,38,0,sweepTo);ctx.lineTo(cx,cy);ctx.closePath();
+  ctx.fillStyle='rgba(173,20,87,.28)';ctx.fill();
+  ctx.restore();
+  // base ray
+  ctx.strokeStyle='#37474f';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+rayLen,cy);ctx.stroke();
+  // second ray
+  const [ex,ey]=pt(cx,cy,rayLen,deg);
+  ctx.strokeStyle='#ad1457';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();
+  // vertex
+  ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#37474f';ctx.fill();
+  if(opts.draggable){
+    ctx.beginPath();ctx.arc(ex,ey,10,0,Math.PI*2);ctx.fillStyle='#ad1457';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  }
+  if(opts.label!==false){
+    const [lx,ly]=pt(cx,cy,58,Math.min(sweepTo,deg)/2);
+    ctx.fillStyle='#ad1457';ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(Math.round(deg)+'°',lx,ly);
+  }
+}
+
+// ── 认识角 ──
+const PRESETS=[{deg:30,label:'锐角 30°'},{deg:90,label:'直角 90°'},{deg:120,label:'钝角 120°'},{deg:180,label:'平角 180°'},{deg:360,label:'周角 360°'}];
+let curPreset=0, learnTimer=null;
+function buildPresets(){
+  const row=document.getElementById('presetRow');
+  row.innerHTML='';
+  PRESETS.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='preset-btn'+(i===curPreset?' on':'');
+    b.textContent=p.label;
+    b.onclick=()=>{curPreset=i;buildPresets();playLearn();};
+    row.appendChild(b);
+  });
+}
+function playLearn(){
+  if(learnTimer) clearInterval(learnTimer);
+  const target=PRESETS[curPreset].deg;
+  const canvas=document.getElementById('learnCanvas');
+  let prog=0;
+  const t=angleType(target>180?target:target);
+  document.getElementById('learnBadge').textContent=target===360?'周角':t.name;
+  document.getElementById('learnBadge').style.background=target===360?'#ad1457':t.color;
+  document.getElementById('learnDesc').textContent='';
+  learnTimer=setInterval(()=>{
+    prog+=target/60;
+    if(prog>=target){prog=target;clearInterval(learnTimer);
+      const nm=target===360?'周角':t.name;
+      document.getElementById('learnDesc').innerHTML=`这是一个 <b style="color:#ad1457">${target}°</b> 的角，属于<b>${nm}</b>。`;
+      speak(`这是一个${target}度的角，属于${nm}。`);
+    }
+    drawAngleScene(canvas, target>180?prog:prog, {sweep:prog, label:true});
+  },16);
+}
+function initLearn(){buildPresets();curPreset=0;playLearn();}
+
+// ── 量角器测量 ──
+let measureDeg=60, mDragging=false;
+function drawMeasure(){
+  const canvas=document.getElementById('measureCanvas');
+  drawAngleScene(canvas, measureDeg, {protractor:true, draggable:true});
+  document.getElementById('measureDeg').textContent=Math.round(measureDeg);
+  const t=angleType(measureDeg);
+  const badge=document.getElementById('measureBadge');
+  badge.textContent=t.name; badge.style.background=t.color;
+}
+function getAngleFromEvent(e,canvas){
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+  const src=e.touches?e.touches[0]:e;
+  const x=(src.clientX-rect.left)*scaleX;
+  const y=(src.clientY-rect.top)*scaleY;
+  const cx=vx(canvas), cy=vy(canvas);
+  let rad=Math.atan2(cy-y, x-cx);
+  let deg=rad*180/Math.PI;
+  if(deg<0) deg+=360;
+  if(deg>180) deg = deg<=270?180:0;
+  return deg;
+}
+let _measureSpeakTimer=null;
+function bindMeasureDrag(){
+  const canvas=document.getElementById('measureCanvas');
+  const start=e=>{e.preventDefault();mDragging=true;};
+  const move=e=>{
+    if(!mDragging) return;
+    measureDeg=Math.round(getAngleFromEvent(e,canvas));
+    drawMeasure();
+    if(_measureSpeakTimer) clearTimeout(_measureSpeakTimer);
+    _measureSpeakTimer=setTimeout(()=>{const t=angleType(measureDeg);speak(`这是一个${measureDeg}度的角，属于${t.name}。`);},500);
+  };
+  const end=()=>{mDragging=false;};
+  canvas.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+function resetMeasure(){measureDeg=60;drawMeasure();speak('重置为60度。');}
+
+// ── 练习 ──
+let qScore={c:0,w:0},qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const options=[]; for(let d=10;d<=170;d+=10) options.push(d);
+  qAns=options[Math.floor(Math.random()*options.length)];
+  drawAngleScene(document.getElementById('quizCanvas'), qAns, {protractor:true, draggable:false});
+  speak(`用量角器读一读，这是多少度的角？`);
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  const t=angleType(qAns);
+  if(Math.abs(v-qAns)<=2){
+    qScore.c++;
+    document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent=`✅ 正确！${qAns}° 是${t.name}`;
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;
+    document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent=`❌ 答案是 ${qAns}°（${t.name}）`;
+    speak('答案是'+qAns+'度，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','measure','quiz']);
+  if(t==='learn') speak('认识角：点击上面的按钮，看看不同的角长什么样。');
+  if(t==='measure'){drawMeasure();speak('拖动粉色端点，用量角器量一量角的大小。');}
+  if(t==='quiz') nextQ();
+}
+initLearn();
+bindMeasureDrag();
+drawMeasure();
+speak('欢迎来到角的度量！点击上面的按钮，认识各种各样的角。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

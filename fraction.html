@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分数初步认识</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#ad1457;letter-spacing:3px;text-shadow:2px 3px 0 #f48fb1;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* ── 认识分数 ── */
+.demo-area{display:flex;flex-direction:column;align-items:center;gap:20px;}
+.shape-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.shape-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);text-align:center;cursor:pointer;transition:transform .18s;}
+.shape-card:hover{transform:translateY(-3px);}
+.shape-card.active{box-shadow:0 4px 16px rgba(173,20,87,.3);border:2px solid #ad1457;}
+.shape-label{font-size:1.1rem;font-weight:bold;color:#ad1457;margin-top:8px;}
+svg.frac-shape{display:block;margin:0 auto;}
+.controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;}
+.frac-display{font-size:2.4rem;font-weight:bold;color:#ad1457;min-width:80px;text-align:center;line-height:1;}
+.frac-display .line{border-top:3px solid #ad1457;margin:4px 0;}
+.slider-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.slider-group label{font-size:.85rem;color:#777;}
+input[type=range]{width:120px;accent-color:#ad1457;}
+.big-visual{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0;}
+/* ── 练习 ── */
+.quiz-box{text-align:center;}
+.quiz-svg-wrap{display:flex;justify-content:center;margin:10px 0;}
+.quiz-q{font-size:1.3rem;color:#555;margin-bottom:14px;}
+.options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.opt-btn{padding:10px 28px;border:2px solid #f48fb1;border-radius:14px;background:#fff;font-size:1.1rem;font-weight:bold;color:#ad1457;cursor:pointer;transition:all .18s;font-family:inherit;}
+.opt-btn:hover{background:#fce4ec;}
+.opt-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.opt-btn.wrong{background:#ffebee;border-color:#ef9a9a;color:#c62828;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:28px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:10px;}
+.score-item{background:#fce4ec;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#ad1457;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#ad1457;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.next-btn:hover{background:#880e4f;}
+/* ── 声音 ── */
+.speak-toggle{border-color:#f48fb1;color:#ad1457;}
+.speak-toggle.on{border-color:#ad1457;}
+.speak-btn-sm{padding:5px 12px;border:none;border-radius:12px;background:#fce4ec;color:#ad1457;font-size:.88rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.speak-btn-sm:hover{background:#f48fb1;color:#fff;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#ad1457">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🍕</div>
+    <h1>分数初步认识</h1>
+    <p>看图理解分数，动手拆分，轻松掌握</p>
+  </div>
+  <div class="speak-bar">
+    <button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button>
+    <button class="speak-btn-sm" onclick="speakNow()">▶ 朗读当前</button>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识分数</button>
+    <button class="tab-btn" onclick="switchTab('split')">✂️ 动手拆分</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 看图写分数</button>
+  </div>
+
+  <!-- 认识分数 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div class="demo-area">
+        <div style="font-size:1rem;color:#777;text-align:center;">点击下方图形，看它被平均分成几份</div>
+        <div class="shape-row" id="shapeRow"></div>
+        <div id="learnDesc" style="font-size:1.05rem;color:#555;text-align:center;line-height:1.8;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="text-align:center;font-size:1rem;color:#777;margin-bottom:12px;">🔍 认识分数各部分的名称</div>
+      <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div id="labelNum" style="font-size:2.4rem;font-weight:bold;color:#ad1457;line-height:1.2;">1</div>
+          <div style="border-top:3px solid #ad1457;width:40px;margin:6px auto;"></div>
+          <div id="labelDen" style="font-size:2.4rem;font-weight:bold;color:#1565c0;line-height:1.2;">2</div>
+        </div>
+        <div style="text-align:left;font-size:.95rem;color:#555;line-height:2.2;">
+          <div>⬆️ <b style="color:#ad1457">分子</b> — 涂色的份数（<span id="labelNumText">1</span>份）</div>
+          <div>➖ <b>分数线</b> — 平均分</div>
+          <div>⬇️ <b style="color:#1565c0">分母</b> — 总共分成几份（<span id="labelDenText">2</span>份）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 动手拆分 -->
+  <div id="tab-split" style="display:none;">
+    <div class="card">
+      <div class="demo-area">
+        <div class="controls">
+          <div class="slider-group">
+            <label>分母（平均分几份）</label>
+            <input type="range" id="denSlider" min="2" max="10" value="4" oninput="updateSplit()">
+            <span id="denVal" style="font-weight:bold;color:#1565c0;">4</span>
+          </div>
+          <div class="slider-group">
+            <label>分子（涂色几份）</label>
+            <input type="range" id="numSlider" min="1" max="9" value="1" oninput="updateSplit()">
+            <span id="numVal" style="font-weight:bold;color:#ad1457;">1</span>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1rem;color:#777;margin-bottom:6px;">当前分数</div>
+            <div id="fracShow" style="font-size:2.8rem;font-weight:bold;color:#ad1457;"></div>
+          </div>
+        </div>
+        <div id="splitVisual" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0;"></div>
+        <div id="splitDesc" style="font-size:1rem;color:#555;text-align:center;"></div>
+      </div>
+    </div>
+    <div class="card" id="compareCard">
+      <div style="text-align:center;font-size:.95rem;color:#777;margin-bottom:12px;">分数比较</div>
+      <div id="compareVisual" style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;"></div>
+    </div>
+  </div>
+
+  <!-- 看图写分数 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ 答对 <span id="qCorrect">0</span></div>
+        <div class="score-item">❌ 答错 <span id="qWrong">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ">下面图形涂色部分是整体的几分之几？</div>
+      <div class="quiz-svg-wrap" id="quizSvg"></div>
+      <div class="options" id="quizOpts"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuiz()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+
+<script src="hpx-core.js"></script>
+<script>
+const SHAPES = [
+  {label:'1/2',n:1,d:2,shape:'circle'},
+  {label:'1/3',n:1,d:3,shape:'rect'},
+  {label:'1/4',n:1,d:4,shape:'circle'},
+  {label:'2/3',n:2,d:3,shape:'rect'},
+  {label:'3/4',n:3,d:4,shape:'circle'},
+  {label:'2/5',n:2,d:5,shape:'rect'},
+];
+
+function drawCircleFrac(n,d,size=120,color='#f48fb1'){
+  const r=size/2-6, cx=size/2, cy=size/2;
+  let paths='';
+  for(let i=0;i<d;i++){
+    const a1=(-Math.PI/2)+(2*Math.PI/d)*i;
+    const a2=(-Math.PI/2)+(2*Math.PI/d)*(i+1);
+    const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+    const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    const lg=2*Math.PI/d>Math.PI?1:0;
+    const fill=i<n?color:'#f5f5f5';
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r},0,${lg},1,${x2},${y2} Z" fill="${fill}" stroke="#fff" stroke-width="2"/>`;
+  }
+  return `<svg width="${size}" height="${size}">${paths}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ccc" stroke-width="1.5"/></svg>`;
+}
+
+function drawRectFrac(n,d,w=200,h=80,color='#f48fb1'){
+  let rects='';
+  const sw=w/d;
+  for(let i=0;i<d;i++){
+    rects+=`<rect x="${i*sw+1}" y="1" width="${sw-2}" height="${h-2}" fill="${i<n?color:'#f5f5f5'}" stroke="#fff" stroke-width="2" rx="3"/>`;
+  }
+  return `<svg width="${w}" height="${h}">${rects}<rect x="1" y="1" width="${w-2}" height="${h-2}" fill="none" stroke="#ccc" stroke-width="1.5" rx="4"/></svg>`;
+}
+
+function initLearn(){
+  const row=document.getElementById('shapeRow');
+  row.innerHTML='';
+  SHAPES.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='shape-card'+(i===0?' active':'');
+    div.innerHTML=(s.shape==='circle'?drawCircleFrac(s.n,s.d,90):drawRectFrac(s.n,s.d,140,56))+`<div class="shape-label">${s.label}</div>`;
+    div.onclick=()=>{
+      document.querySelectorAll('.shape-card').forEach(c=>c.classList.remove('active'));
+      div.classList.add('active');
+      showDesc(s);
+    };
+    row.appendChild(div);
+  });
+  showDesc(SHAPES[0]);
+}
+
+function showDesc(s){
+  document.getElementById('learnDesc').innerHTML=
+    `把一个整体平均分成 <b style="color:#1565c0;font-size:1.3rem;">${s.d}</b> 份，<br>其中涂色了 <b style="color:#ad1457;font-size:1.3rem;">${s.n}</b> 份，<br>涂色部分就是这个整体的 <b style="color:#ad1457;font-size:1.5rem;">${s.label}</b>`;
+  document.getElementById('labelNum').textContent=s.n;
+  document.getElementById('labelDen').textContent=s.d;
+  document.getElementById('labelNumText').textContent=s.n;
+  document.getElementById('labelDenText').textContent=s.d;
+  speak(`把一个整体平均分成${s.d}份，其中涂色了${s.n}份，涂色部分就是这个整体的${numToChinese(s.d)}分之${numToChinese(s.n)}`);
+}
+
+function updateSplit(){
+  const d=parseInt(document.getElementById('denSlider').value);
+  let n=parseInt(document.getElementById('numSlider').value);
+  if(n>=d){n=d-1;document.getElementById('numSlider').value=n;}
+  document.getElementById('numSlider').max=d-1;
+  document.getElementById('denVal').textContent=d;
+  document.getElementById('numVal').textContent=n;
+  document.getElementById('fracShow').innerHTML=`<span style="color:#ad1457">${n}</span><div style="border-top:3px solid #ad1457;width:36px;margin:4px auto;"></div><span style="color:#1565c0">${d}</span>`;
+
+  const vis=document.getElementById('splitVisual');
+  vis.innerHTML='';
+  const colors=['#f48fb1','#90caf9','#a5d6a7','#ffe082','#ce93d8','#80cbc4','#ffab91','#b0bec5'];
+  for(let i=0;i<d;i++){
+    const sq=document.createElement('div');
+    sq.style.cssText=`width:52px;height:52px;border-radius:10px;background:${i<n?colors[i%8]:'#eee'};border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-weight:bold;color:${i<n?'#fff':'#bbb'};font-size:1rem;`;
+    sq.textContent=i<n?'★':'';
+    vis.appendChild(sq);
+  }
+  document.getElementById('splitDesc').textContent=`${d}个方块平均分为1整体，涂色${n}个，所以涂色部分是 ${n}/${d}`;
+  speak(`现在把整体平均分成${numToChinese(d)}份，涂色${numToChinese(n)}份，这个分数读作：${numToChinese(d)}分之${numToChinese(n)}`);
+
+  // 比较
+  const cv=document.getElementById('compareVisual');
+  cv.innerHTML='';
+  [[1,d,'同分母最小'],[n,d,'当前'],[d-1,d,'同分母最大']].forEach(([nn,dd,lbl])=>{
+    const item=document.createElement('div');
+    item.style.cssText='text-align:center;';
+    item.innerHTML=drawRectFrac(nn,dd,150,46)+'<div style="font-size:1rem;font-weight:bold;color:#ad1457;margin-top:4px;">'+nn+'/'+dd+'</div><div style="font-size:.78rem;color:#999;">'+lbl+'</div>';
+    cv.appendChild(item);
+  });
+}
+
+// Quiz
+let qScore={c:0,w:0};
+let qAns=0;
+function nextQuiz(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.querySelectorAll('.opt-btn').forEach(b=>{b.disabled=false;b.className='opt-btn';});
+
+  const d=2+Math.floor(Math.random()*6);
+  const n=1+Math.floor(Math.random()*(d-1));
+  qAns=n+'/'+d;
+  const shape=Math.random()<0.5?'circle':'rect';
+  document.getElementById('quizSvg').innerHTML=shape==='circle'?drawCircleFrac(n,d,140):drawRectFrac(n,d,260,80);
+
+  // wrong options
+  const opts=new Set([qAns]);
+  while(opts.size<4){
+    const wn=1+Math.floor(Math.random()*(d-1));
+    const wd=2+Math.floor(Math.random()*6);
+    if(wn<wd) opts.add(wn+'/'+wd);
+  }
+  const arr=[...opts].sort(()=>Math.random()-.5);
+  const cont=document.getElementById('quizOpts');
+  cont.innerHTML='';
+  arr.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';
+    b.textContent=o;
+    b.onclick=()=>checkQuiz(b,o);
+    cont.appendChild(b);
+  });
+  document.getElementById('quizQ').textContent='下面图形涂色部分是整体的几分之几？';
+  speak('下面图形涂色部分是整体的几分之几？请选择答案。');
+}
+
+function checkQuiz(btn,ans){
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  if(ans===qAns){
+    btn.classList.add('correct');
+    qScore.c++;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 太棒了，答对了！';
+    const [n,d]=qAns.split('/');
+    speak(`太棒了，答对了！这个分数读作${numToChinese(parseInt(d))}分之${numToChinese(parseInt(n))}。`);
+  } else {
+    btn.classList.add('wrong');
+    qScore.w++;
+    document.querySelector('.opt-btn:not(.wrong)') && document.querySelectorAll('.opt-btn').forEach(b=>{if(b.textContent===qAns)b.classList.add('correct');});
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答错了，正确答案是 '+qAns;
+    const [n,d]=qAns.split('/');
+    speak(`答错了，别灰心！正确答案是${numToChinese(parseInt(d))}分之${numToChinese(parseInt(n))}，下次加油哦！`);
+  }
+  document.getElementById('qCorrect').textContent=qScore.c;
+  document.getElementById('qWrong').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','split','quiz']);
+  if(t==='split'){updateSplit();}
+  if(t==='quiz') nextQuiz();
+  const hints={learn:'认识分数。点击下方图形，听解说。',split:'动手拆分。拖动滑块，改变分子和分母，感受分数的变化。',quiz:'看图写分数。仔细看图，选出正确的分数。'};
+  speak(hints[t]);
+}
+
+// ── 语音引擎 ──
+Hpx.speech.install({rate:0.9});
+
+function speakNow(){
+  const activeTab=document.querySelector('.tab-btn.on');
+  if(!activeTab) return;
+  const idx=[...document.querySelectorAll('.tab-btn')].indexOf(activeTab);
+  const tab=['learn','split','quiz'][idx];
+  if(tab==='learn'){
+    const desc=document.getElementById('learnDesc').textContent;
+    speak(desc||'请点击一个图形听解说。');
+  } else if(tab==='split'){
+    const d=parseInt(document.getElementById('denSlider').value);
+    const n=parseInt(document.getElementById('numSlider').value);
+    speak(`把整体平均分成${numToChinese(d)}份，涂色${numToChinese(n)}份，这个分数是${numToChinese(d)}分之${numToChinese(n)}。分母是${numToChinese(d)}，分子是${numToChinese(n)}。`);
+  } else {
+    speak(document.getElementById('quizQ').textContent||'');
+  }
+}
+
+// 数字转中文朗读（1-99）
+function numToChinese(n){
+  const u=['','一','二','三','四','五','六','七','八','九'];
+  const t=['','十','二十','三十','四十','五十','六十','七十','八十','九十'];
+  if(n<=9) return u[n];
+  if(n<20) return (n===10?'十':'一十')+u[n%10];
+  return t[Math.floor(n/10)]+(n%10?u[n%10]:'');
+}
+
+initLearn();
+speak('欢迎来到分数初步认识！点击下方图形，开始学习吧。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

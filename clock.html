@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>认识时针、分针和秒针</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS", "华文圆体", "微软雅黑", sans-serif;
+  background: linear-gradient(160deg, #e0f7fa 0%, #e8eaf6 50%, #fce4ec 100%);
+  min-height: 100vh;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 1.9rem;
+  color: #37474f;
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 1px 2px 0 rgba(0,0,0,.08);
+}
+.subtitle {
+  font-size: .95rem;
+  color: #90a4ae;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ── 时钟区 ── */
+.clock-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+canvas#clk {
+  filter: drop-shadow(0 6px 24px rgba(0,0,0,.18));
+  border-radius: 50%;
+  max-width: 340px;
+  width: 90vw;
+  height: auto;
+}
+
+/* ── 数字时间 ── */
+.digital {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0;
+  font-size: 2.4rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,.75);
+  border-radius: 16px;
+  padding: 8px 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.10);
+}
+.d-hour   { color: #1565c0; }
+.d-sep    { color: #bbb; }
+.d-min    { color: #2e7d32; }
+.d-sec    { color: #c62828; }
+
+/* ── 倒计时提示 ── */
+.countdown-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cd-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: .88rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,.10);
+  transition: transform .2s;
+}
+.cd-chip.flash { transform: scale(1.12); }
+.cd-min { background: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; }
+.cd-hr  { background: #e3f2fd; color: #1565c0; border: 2px solid #90caf9; }
+.cd-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.cd-min .cd-dot { background: #2e7d32; }
+.cd-hr  .cd-dot { background: #1565c0; }
+
+/* ── 三针信息卡 ── */
+.cards {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 760px;
+}
+.hand-card {
+  background: rgba(255,255,255,.88);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 3px 14px rgba(0,0,0,.10);
+  flex: 1;
+  min-width: 180px;
+  max-width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hc-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hc-icon {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.hc-name { font-size: 1.1rem; font-weight: bold; }
+.hc-desc { font-size: .78rem; color: #90a4ae; }
+.hc-fact { font-size: .82rem; color: #546e7a; line-height: 1.5; }
+
+/* 进度条 */
+.prog-wrap {
+  background: #f0f0f0;
+  border-radius: 99px;
+  height: 14px;
+  overflow: hidden;
+}
+.prog-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .08s linear;
+}
+.prog-label { font-size: .78rem; color: #90a4ae; text-align: right; }
+
+/* 颜色主题 */
+.card-sec .hc-icon { background: #ffebee; }
+.card-sec .hc-name { color: #c62828; }
+.card-sec .prog-bar { background: linear-gradient(90deg, #ef9a9a, #c62828); }
+
+.card-min .hc-icon { background: #e8f5e9; }
+.card-min .hc-name { color: #2e7d32; }
+.card-min .prog-bar { background: linear-gradient(90deg, #a5d6a7, #2e7d32); }
+
+.card-hr .hc-icon { background: #e3f2fd; }
+.card-hr .hc-name { color: #1565c0; }
+.card-hr .prog-bar { background: linear-gradient(90deg, #90caf9, #1565c0); }
+
+/* ── 关系图 ── */
+.relation-box {
+  background: rgba(255,255,255,.88);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 3px 14px rgba(0,0,0,.10);
+  max-width: 560px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+.rel-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #37474f;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.rel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.rel-row:last-child { margin-bottom: 0; }
+.rel-hand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .92rem;
+  font-weight: bold;
+  min-width: 70px;
+}
+.rel-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.rel-track {
+  flex: 1;
+  position: relative;
+  height: 28px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 100px;
+}
+.rel-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 8px;
+  transition: width .08s linear;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+}
+.rel-pct { font-size: .72rem; font-weight: bold; color: #fff; white-space: nowrap; }
+.rel-end {
+  font-size: .82rem;
+  color: #90a4ae;
+  white-space: nowrap;
+}
+.rel-arrow {
+  font-size: 1.1rem;
+  color: #bbb;
+}
+.rel-result {
+  font-size: .85rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ── 辅助文字 ── */
+.tip {
+  font-size: .85rem;
+  color: #90a4ae;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+.tip strong { color: #546e7a; }
+
+/* ── 响应式 ── */
+@media(max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  .digital { font-size: 1.8rem; padding: 6px 18px; }
+  .cards { gap: 10px; }
+  .hand-card { min-width: 140px; padding: 12px 14px; }
+}
+
+/* ══ 互动 Demo ══ */
+.demo-wrap {
+  width: 100%; max-width: 680px;
+  background: rgba(255,255,255,.88);
+  border-radius: 22px; padding: 22px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.11);
+  margin-top: 14px; margin-bottom: 28px;
+}
+.demo-title { font-size: 1.1rem; font-weight: bold; color: #4a148c; text-align: center; margin-bottom: 5px; }
+.demo-sub   { font-size: .82rem; color: #90a4ae; text-align: center; margin-bottom: 16px; }
+.demo-body  { display: flex; gap: 18px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+
+#ic {
+  border-radius: 50%;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,.14));
+  cursor: grab; touch-action: none; flex-shrink: 0;
+  width: 260px; height: 260px; max-width: 80vw;
+}
+#ic.grabbing { cursor: grabbing; }
+
+.demo-info { flex: 1; min-width: 186px; max-width: 236px; }
+.di-time {
+  font-size: 2rem; font-weight: bold; letter-spacing: 2px;
+  text-align: center; margin-bottom: 14px;
+  background: #f9f9f9; border-radius: 12px; padding: 6px 12px;
+}
+.di-row { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+.di-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.di-name { font-size: .82rem; font-weight: bold; width: 28px; }
+.di-track { flex: 1; background: #f0f0f0; border-radius: 99px; height: 11px; overflow: hidden; }
+.di-fill  { height: 100%; border-radius: 99px; transition: width .04s linear; }
+.di-deg   { font-size: .75rem; color: #90a4ae; width: 32px; text-align: right; }
+
+.drag-hint {
+  margin-top: 12px; border-radius: 11px; padding: 9px 12px;
+  font-size: .83rem; font-weight: bold; line-height: 1.55;
+  min-height: 48px; transition: background .2s, color .2s;
+  background: #f3e5f5; color: #6a1b9a;
+}
+.demo-btns { display: flex; gap: 8px; margin-top: 11px; flex-wrap: wrap; }
+.dbtn {
+  border: none; border-radius: 10px; padding: 7px 14px;
+  font-size: .82rem; font-weight: bold; cursor: pointer; transition: transform .12s;
+}
+.dbtn:active { transform: scale(.95); }
+.dbtn-reset { background: #e3f2fd; color: #1565c0; }
+.dbtn-now   { background: #e8f5e9; color: #2e7d32; }
+
+.demo-ratio {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px;
+}
+.ratio-pill {
+  background: rgba(255,255,255,.75); border-radius: 20px; padding: 6px 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.09); color: #546e7a; font-size: .82rem;
+}
+
+/* ══ 认钟面练习 ══ */
+.quiz-wrap {
+  width: 100%; max-width: 680px;
+  background: rgba(255,255,255,.88);
+  border-radius: 22px; padding: 22px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.11);
+  margin-top: 14px; margin-bottom: 28px;
+}
+.quiz-title { font-size: 1.1rem; font-weight: bold; color: #4a148c; text-align: center; margin-bottom: 5px; }
+.quiz-sub   { font-size: .82rem; color: #90a4ae; text-align: center; margin-bottom: 14px; }
+.quiz-score-row { display: flex; gap: 14px; justify-content: center; margin-bottom: 14px; }
+.quiz-score-item { background: #f3e5f5; border-radius: 10px; padding: 6px 16px; font-size: .9rem; font-weight: bold; color: #6a1b9a; }
+.quiz-prompt { text-align: center; font-size: 1.05rem; color: #37474f; font-weight: bold; margin-bottom: 14px; }
+.quiz-clk-single { display: flex; justify-content: center; margin-bottom: 16px; }
+.quiz-clk-single canvas { border-radius: 50%; filter: drop-shadow(0 4px 14px rgba(0,0,0,.14)); max-width: 100%; }
+.quiz-opts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+.q-opt-btn {
+  border: 2px solid #ce93d8; border-radius: 14px; background: #fff; color: #4a148c;
+  font-size: 1.05rem; font-weight: bold; padding: 10px 20px; cursor: pointer;
+  font-family: inherit; transition: transform .15s, background .15s;
+}
+.q-opt-btn:hover:not(:disabled) { background: #f3e5f5; }
+.q-opt-btn:disabled { cursor: default; }
+.q-opt-btn.q-right { background: #c8e6c9; border-color: #2e7d32; color: #2e7d32; }
+.q-opt-btn.q-wrong { background: #ffcdd2; border-color: #c62828; color: #c62828; }
+.quiz-clk-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+  justify-items: center; margin: 0 auto 10px; max-width: 320px;
+}
+.q-clk-opt {
+  border: 3px solid #e0e0e0; border-radius: 16px; background: #fff; padding: 8px;
+  cursor: pointer; transition: transform .15s, border-color .15s;
+}
+.q-clk-opt:hover:not(:disabled) { transform: scale(1.04); border-color: #ce93d8; }
+.q-clk-opt:disabled { cursor: default; }
+.q-clk-opt canvas { border-radius: 50%; display: block; }
+.q-clk-opt.q-right { border-color: #2e7d32; background: #e8f5e9; }
+.q-clk-opt.q-wrong { border-color: #c62828; background: #ffebee; }
+.q-fb { text-align: center; font-size: 1rem; font-weight: bold; min-height: 26px; margin-bottom: 10px; }
+.q-fb.ok  { color: #2e7d32; }
+.q-fb.bad { color: #c62828; }
+.q-next-btn {
+  display: block; margin: 0 auto; padding: 9px 26px; border: none; border-radius: 20px;
+  background: #8e24aa; color: #fff; font-size: .95rem; font-weight: bold; cursor: pointer; font-family: inherit;
+}
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+
+<h1>🕐 认识时针、分针和秒针</h1>
+<p class="subtitle">三根指针各有分工，一起来看看它们的关系！</p>
+
+<!-- 时钟画布 -->
+<div class="clock-wrap">
+  <canvas id="clk" width="340" height="340"></canvas>
+</div>
+
+<!-- 数字时间 -->
+<div class="digital">
+  <span class="d-hour" id="dHour">00</span>
+  <span class="d-sep">:</span>
+  <span class="d-min" id="dMin">00</span>
+  <span class="d-sep">:</span>
+  <span class="d-sec" id="dSec">00</span>
+</div>
+
+<!-- 倒计时提示 -->
+<div class="countdown-row">
+  <div class="cd-chip cd-min" id="cdMin">
+    <div class="cd-dot"></div>
+    <span id="cdMinTxt">再过 60 秒，分针走一格</span>
+  </div>
+  <div class="cd-chip cd-hr" id="cdHr">
+    <div class="cd-dot"></div>
+    <span id="cdHrTxt">再过 60 分，时针走一格</span>
+  </div>
+</div>
+
+<!-- 三针信息卡 -->
+<div class="cards">
+
+  <div class="hand-card card-sec">
+    <div class="hc-top">
+      <div class="hc-icon">⚡</div>
+      <div>
+        <div class="hc-name">秒针</div>
+        <div class="hc-desc">最细最长 · 跑得最快</div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="secBar" style="width:0%"></div></div>
+    <div class="prog-label" id="secLabel">0 / 60 秒</div>
+    <div class="hc-fact">每 <strong>1 秒</strong>跳一格，转完 1 圈 = <strong>60 秒</strong></div>
+  </div>
+
+  <div class="hand-card card-min">
+    <div class="hc-top">
+      <div class="hc-icon">🚶</div>
+      <div>
+        <div class="hc-name">分针</div>
+        <div class="hc-desc">中等长短 · 走得不慢</div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="minBar" style="width:0%"></div></div>
+    <div class="prog-label" id="minLabel">0 / 60 分</div>
+    <div class="hc-fact">每 <strong>1 分</strong>走一格，转完 1 圈 = <strong>60 分</strong></div>
+  </div>
+
+  <div class="hand-card card-hr">
+    <div class="hc-top">
+      <div class="hc-icon">🐢</div>
+      <div>
+        <div class="hc-name">时针</div>
+        <div class="hc-desc">最短最粗 · 走得最慢</div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="hrBar" style="width:0%"></div></div>
+    <div class="prog-label" id="hrLabel">0 / 12 时</div>
+    <div class="hc-fact">每 <strong>1 小时</strong>走一格，转完 1 圈 = <strong>12 小时</strong></div>
+  </div>
+
+</div>
+
+<!-- 关系图 -->
+<div class="relation-box">
+  <div class="rel-title">🔗 三根指针的速度关系</div>
+
+  <!-- 秒 vs 分 -->
+  <div class="rel-row">
+    <div class="rel-hand"><div class="rel-dot" style="background:#c62828"></div>秒针</div>
+    <div class="rel-track">
+      <div class="rel-fill" id="relSecFill" style="background:linear-gradient(90deg,#ef9a9a,#c62828);width:0%">
+        <span class="rel-pct" id="relSecPct"></span>
+      </div>
+    </div>
+    <div class="rel-arrow">→</div>
+    <div class="rel-result" style="color:#c62828">转完 1 圈</div>
+  </div>
+  <div class="rel-row" style="margin-top:-6px;margin-bottom:18px;">
+    <div class="rel-hand"><div class="rel-dot" style="background:#2e7d32"></div>分针</div>
+    <div class="rel-track">
+      <div class="rel-fill" id="relMinFill" style="background:linear-gradient(90deg,#a5d6a7,#2e7d32);width:0%">
+        <span class="rel-pct" id="relMinPct"></span>
+      </div>
+    </div>
+    <div class="rel-arrow">→</div>
+    <div class="rel-result" style="color:#2e7d32">走 1 小格</div>
+  </div>
+
+  <!-- 分 vs 时 -->
+  <div class="rel-row">
+    <div class="rel-hand"><div class="rel-dot" style="background:#2e7d32"></div>分针</div>
+    <div class="rel-track">
+      <div class="rel-fill" id="relMin60Fill" style="background:linear-gradient(90deg,#a5d6a7,#2e7d32);width:0%">
+        <span class="rel-pct" id="relMin60Pct"></span>
+      </div>
+    </div>
+    <div class="rel-arrow">→</div>
+    <div class="rel-result" style="color:#2e7d32">转完 1 圈</div>
+  </div>
+  <div class="rel-row" style="margin-top:-6px;">
+    <div class="rel-hand"><div class="rel-dot" style="background:#1565c0"></div>时针</div>
+    <div class="rel-track">
+      <div class="rel-fill" id="relHrFill" style="background:linear-gradient(90deg,#90caf9,#1565c0);width:0%">
+        <span class="rel-pct" id="relHrPct"></span>
+      </div>
+    </div>
+    <div class="rel-arrow">→</div>
+    <div class="rel-result" style="color:#1565c0">走 1 大格</div>
+  </div>
+</div>
+
+<p class="tip">
+  ⚡ <strong>秒针</strong>转 60 圈，<strong>分针</strong>才转 1 圈<br>
+  🚶 <strong>分针</strong>转 60 圈，<strong>时针</strong>才转 1 圈<br>
+  🐢 <strong>时针</strong>最慢，12 小时才转 1 圈！
+</p>
+
+<!-- ══ 互动 Demo ══ -->
+<div class="demo-wrap">
+  <div class="demo-title">🎮 手动拨针 · 观察联动</div>
+  <p class="demo-sub">拖动任意一根指针，另外两根会同步跟着移动</p>
+  <div class="demo-body">
+    <canvas id="ic" width="260" height="260"></canvas>
+    <div class="demo-info">
+      <div class="di-time">
+        <span id="diH" style="color:#1565c0">06</span><span style="color:#ccc">:</span><span id="diM" style="color:#2e7d32">00</span><span style="color:#ccc">:</span><span id="diS" style="color:#c62828">00</span>
+      </div>
+      <div class="di-row">
+        <div class="di-dot" style="background:#c62828"></div>
+        <span class="di-name" style="color:#c62828">秒</span>
+        <div class="di-track"><div class="di-fill" id="diSecBar" style="background:linear-gradient(90deg,#ef9a9a,#c62828)"></div></div>
+        <span class="di-deg" id="diSecDeg">0°</span>
+      </div>
+      <div class="di-row">
+        <div class="di-dot" style="background:#2e7d32"></div>
+        <span class="di-name" style="color:#2e7d32">分</span>
+        <div class="di-track"><div class="di-fill" id="diMinBar" style="background:linear-gradient(90deg,#a5d6a7,#2e7d32)"></div></div>
+        <span class="di-deg" id="diMinDeg">0°</span>
+      </div>
+      <div class="di-row">
+        <div class="di-dot" style="background:#1565c0"></div>
+        <span class="di-name" style="color:#1565c0">时</span>
+        <div class="di-track"><div class="di-fill" id="diHrBar" style="background:linear-gradient(90deg,#90caf9,#1565c0)"></div></div>
+        <span class="di-deg" id="diHrDeg">0°</span>
+      </div>
+      <div class="drag-hint" id="dragHint">↕️ 拖动任意指针试试看</div>
+      <div class="demo-btns">
+        <button class="dbtn dbtn-reset" onclick="resetDemo()">🔄 归零</button>
+        <button class="dbtn dbtn-now"   onclick="syncNow()">📍 同步现在</button>
+      </div>
+    </div>
+  </div>
+  <div class="demo-ratio">
+    <span class="ratio-pill">⚡ 秒针转1圈(360°) → 分针走6°</span>
+    <span class="ratio-pill">🚶 分针转1圈(360°) → 时针走30°</span>
+    <span class="ratio-pill">🐢 时针走30° = 分针转一整圈</span>
+  </div>
+</div>
+
+<!-- ══ 认钟面练习 ══ -->
+<div class="quiz-wrap">
+  <div class="quiz-title">🎯 认钟面练习</div>
+  <p class="quiz-sub">整点和半点，看你能不能一下认出来</p>
+  <div class="quiz-score-row">
+    <div class="quiz-score-item">✅ <span id="qC">0</span></div>
+    <div class="quiz-score-item">❌ <span id="qW">0</span></div>
+  </div>
+  <div class="quiz-prompt" id="qPrompt"></div>
+  <div class="quiz-clk-single" id="qClkWrap" style="display:none;">
+    <canvas id="qClk" width="220" height="220"></canvas>
+  </div>
+  <div class="quiz-opts" id="qOptWrap" style="display:none;"></div>
+  <div class="quiz-clk-grid" id="qClkGridWrap" style="display:none;"></div>
+  <div class="q-fb" id="qFb"></div>
+  <button class="q-next-btn" id="qNextBtn" onclick="genQuiz()" style="display:none;">下一题 →</button>
+</div>
+
+<script src="hpx-core.js"></script>
+<script>
+const canvas = document.getElementById('clk');
+const ctx = canvas.getContext('2d');
+const SIZE = 340;
+const CX = SIZE / 2, CY = SIZE / 2;
+const R = 148;  // 钟面半径
+
+// 上一秒/上一分，用于触发「走格了」动画
+let lastSec = -1, lastMin = -1;
+
+function toRad(deg) { return deg * Math.PI / 180; }
+// angle: 0=12点钟方向，顺时针
+function polar(angleDeg, r) {
+  const rad = toRad(angleDeg - 90);
+  return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+}
+
+// 画手
+function drawHand(angleDeg, len, width, color, cap = 'round', tail = 0) {
+  const [ex, ey] = polar(angleDeg, len);
+  const [tx, ty] = polar(angleDeg + 180, tail);
+  ctx.save();
+  ctx.beginPath();
+  if (tail > 0) ctx.moveTo(tx, ty); else ctx.moveTo(CX, CY);
+  ctx.lineTo(ex, ey);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = cap;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawClock() {
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  // ── 表盘背景 ──
+  const grad = ctx.createRadialGradient(CX, CY - 20, 10, CX, CY, R);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(1, '#f0f4ff');
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  // 边框
+  ctx.strokeStyle = '#90a4ae';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // ── 刻度 ──
+  for (let i = 0; i < 60; i++) {
+    const ang = i * 6;
+    const isHour = i % 5 === 0;
+    const [x1, y1] = polar(ang, R - 2);
+    const [x2, y2] = polar(ang, R - (isHour ? 16 : 8));
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = isHour ? '#455a64' : '#b0bec5';
+    ctx.lineWidth = isHour ? 2.5 : 1;
+    ctx.stroke();
+  }
+
+  // ── 数字 ──
+  ctx.font = `bold ${SIZE / 17}px "Comic Sans MS","华文圆体","微软雅黑",sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 1; i <= 12; i++) {
+    const ang = i * 30;
+    const [x, y] = polar(ang, R - 32);
+    ctx.fillStyle = '#37474f';
+    ctx.fillText(String(i), x, y);
+  }
+
+  // ── 当前时间 ──
+  const now = new Date();
+  const h = now.getHours() % 12;
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+  const ms = now.getMilliseconds();
+
+  const sPct = (s + ms / 1000) / 60;
+  const mPct = (m + sPct) / 60;
+  const hPct = (h + mPct) / 12;
+
+  const secDeg  = sPct * 360;
+  const minDeg  = mPct * 360;
+  const hourDeg = hPct * 360;
+
+  // ── 时针 (蓝，短粗) ──
+  drawHand(hourDeg, R * 0.52, 8, '#1565c0');
+  // ── 分针 (绿，中长) ──
+  drawHand(minDeg, R * 0.72, 5, '#2e7d32');
+  // ── 秒针 (红，细长，带尾巴) ──
+  drawHand(secDeg, R * 0.85, 2, '#c62828', 'round', 20);
+  // 秒针末端圆点
+  const [sx, sy] = polar(secDeg, R * 0.85);
+  ctx.beginPath();
+  ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#c62828';
+  ctx.fill();
+
+  // ── 中心圆 ──
+  ctx.beginPath();
+  ctx.arc(CX, CY, 7, 0, Math.PI * 2);
+  ctx.fillStyle = '#37474f';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(CX, CY, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  // ── 三针标注 (贴着针头) ──
+  labelHand(hourDeg, R * 0.52, '时针', '#1565c0', '#e3f2fd');
+  labelHand(minDeg,  R * 0.72, '分针', '#2e7d32', '#e8f5e9');
+  labelHand(secDeg,  R * 0.85, '秒针', '#c62828', '#ffebee');
+
+  // ── 更新 DOM ──
+  document.getElementById('dHour').textContent = String(now.getHours()).padStart(2, '0');
+  document.getElementById('dMin').textContent  = String(m).padStart(2, '0');
+  document.getElementById('dSec').textContent  = String(s).padStart(2, '0');
+
+  // 进度条
+  set('secBar', sPct * 100);
+  set('minBar', mPct * 100);
+  set('hrBar',  hPct * 100);
+  document.getElementById('secLabel').textContent = `${s} 秒 / 60 秒`;
+  document.getElementById('minLabel').textContent = `${m} 分 ${s} 秒 / 60 分`;
+  document.getElementById('hrLabel').textContent  = `${h} 时 ${m} 分 / 12 时`;
+
+  // 关系图进度
+  const secInMin  = sPct;          // 秒针在本分钟的进度 0-1
+  const minInHr   = mPct;          // 分针在本小时的进度 0-1
+  const hrIn12    = hPct;          // 时针在12小时的进度 0-1
+  const minSmall  = secInMin;      // 分针走了本小格的多少（=秒针进度）
+  const hrSmall   = minInHr / 12;  // 时针走了本大格的多少（=分针进度/12)
+
+  setRel('relSecFill',  'relSecPct',  secInMin * 100);
+  setRel('relMinFill',  'relMinPct',  minSmall * 100);
+  setRel('relMin60Fill','relMin60Pct',minInHr  * 100);
+  setRel('relHrFill',   'relHrPct',   hrSmall  * 100);
+
+  // 倒计时提示
+  const secLeft = 60 - s - (ms > 0 ? 1 : 0);
+  const minLeft = 60 - m - (s > 0 ? 1 : 0);
+  document.getElementById('cdMinTxt').textContent =
+    secLeft === 0 ? `🎉 分针走了一格！` : `再过 ${s === 0 ? 60 : 60 - s} 秒，分针走一格`;
+  document.getElementById('cdHrTxt').textContent =
+    (m === 0 && s === 0) ? `🎉 时针走了一格！` : `再过 ${m === 0 ? 60 : 60 - m} 分，时针走一格`;
+
+  // 走格时闪烁动画
+  if (s !== lastSec) {
+    if (s === 0) flashChip('cdMin');
+    lastSec = s;
+  }
+  if (m !== lastMin) {
+    if (m === 0) flashChip('cdHr');
+    lastMin = m;
+  }
+
+  requestAnimationFrame(drawClock);
+}
+
+function labelHand(angleDeg, handLen, text, color, bgColor) {
+  const labelR = handLen + 18;
+  let [x, y] = polar(angleDeg, labelR);
+
+  // 把标签推到钟面边缘外
+  const push = R - labelR;
+  if (push < 0) {
+    const [ox, oy] = polar(angleDeg, R + 24);
+    x = ox; y = oy;
+  }
+
+  const pad = 5, fsize = SIZE / 23;
+  ctx.font = `bold ${fsize}px "Comic Sans MS","微软雅黑",sans-serif`;
+  const tw = ctx.measureText(text).width;
+
+  // 背景圆角矩形
+  const bx = x - tw / 2 - pad, by = y - fsize / 2 - pad;
+  const bw = tw + pad * 2, bh = fsize + pad * 2;
+  // 确保不超出 canvas
+  const cx2 = Math.max(pad, Math.min(SIZE - bw - pad, bx));
+  const cy2 = Math.max(pad, Math.min(SIZE - bh - pad, by));
+
+  ctx.save();
+  ctx.beginPath();
+  roundRect(ctx, cx2, cy2, bw, bh, 6);
+  ctx.fillStyle = bgColor;
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, cx2 + bw / 2, cy2 + bh / 2);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function set(id, pct) {
+  document.getElementById(id).style.width = Math.min(100, pct).toFixed(1) + '%';
+}
+function setRel(fillId, pctId, pct) {
+  const p = Math.min(100, pct);
+  document.getElementById(fillId).style.width = p.toFixed(1) + '%';
+  const pctEl = document.getElementById(pctId);
+  if (p > 12) pctEl.textContent = Math.round(p) + '%';
+  else pctEl.textContent = '';
+}
+function flashChip(id) {
+  const el = document.getElementById(id);
+  el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 600);
+}
+
+drawClock();
+
+// ════════════════════════════════════════
+//  互动时钟 Demo
+//  iSecs: 当前"手动时间"（秒，0-43199，即12小时制）
+//  拖动时：delta角度 → 换算成秒数变化，三针同步更新
+// ════════════════════════════════════════
+const ic  = document.getElementById('ic');
+const ict = ic.getContext('2d');
+const ICS = 260, ICX = 130, ICY = 130, ICR = 110;
+
+let iSecs    = 6 * 3600; // 起始 6:00:00
+let iDrag    = null;     // 'sec' | 'min' | 'hr' | null
+let iPrev    = null;     // 上一帧鼠标角度
+let iHover   = null;     // 鼠标悬停最近的针
+let iDragDeg = 0;        // 本次拖动累计角度（带符号）
+
+function iPolar(deg, r) {
+  const rad = (deg - 90) * Math.PI / 180;
+  return [ICX + r * Math.cos(rad), ICY + r * Math.sin(rad)];
+}
+function iAngles(s) {
+  return { sec: (s % 60) / 60 * 360, min: (s % 3600) / 3600 * 360, hr: (s % 43200) / 43200 * 360 };
+}
+function iDrawHand(deg, len, w, col, tail, glow) {
+  const [ex, ey] = iPolar(deg, len);
+  ict.save();
+  if (glow) { ict.shadowColor = col; ict.shadowBlur = 18; }
+  ict.beginPath();
+  if (tail) { const [tx, ty] = iPolar(deg + 180, tail); ict.moveTo(tx, ty); }
+  else ict.moveTo(ICX, ICY);
+  ict.lineTo(ex, ey);
+  ict.strokeStyle = col; ict.lineWidth = glow ? w + 2 : w; ict.lineCap = 'round'; ict.stroke();
+  ict.restore();
+}
+function iLabel(deg, len, text, col, bg) {
+  const [lx, ly] = iPolar(deg, len + 16);
+  const pad = 4, fs = ICS / 22;
+  ict.font = `bold ${fs}px "Comic Sans MS","微软雅黑",sans-serif`;
+  const tw = ict.measureText(text).width;
+  const bx = Math.max(2, Math.min(ICS - tw - pad * 2 - 2, lx - tw / 2 - pad));
+  const by = Math.max(2, Math.min(ICS - fs - pad * 2 - 2, ly - fs / 2 - pad));
+  const bw = tw + pad * 2, bh = fs + pad * 2;
+  ict.save();
+  roundRect(ict, bx, by, bw, bh, 5);
+  ict.fillStyle = bg; ict.fill();
+  ict.strokeStyle = col; ict.lineWidth = 1.5; ict.stroke();
+  ict.fillStyle = col; ict.textAlign = 'center'; ict.textBaseline = 'middle';
+  ict.fillText(text, bx + bw / 2, by + bh / 2);
+  ict.restore();
+}
+
+function drawIC() {
+  ict.clearRect(0, 0, ICS, ICS);
+
+  // 表盘
+  const g = ict.createRadialGradient(ICX, ICY - 12, 8, ICX, ICY, ICR);
+  g.addColorStop(0, '#fff'); g.addColorStop(1, '#f0f4ff');
+  ict.beginPath(); ict.arc(ICX, ICY, ICR, 0, Math.PI * 2);
+  ict.fillStyle = g; ict.fill();
+  ict.strokeStyle = '#90a4ae'; ict.lineWidth = 3; ict.stroke();
+
+  // 刻度
+  for (let i = 0; i < 60; i++) {
+    const a = i * 6, isH = i % 5 === 0;
+    const [x1, y1] = iPolar(a, ICR - 2), [x2, y2] = iPolar(a, ICR - (isH ? 13 : 6));
+    ict.beginPath(); ict.moveTo(x1, y1); ict.lineTo(x2, y2);
+    ict.strokeStyle = isH ? '#455a64' : '#b0bec5'; ict.lineWidth = isH ? 2 : 1; ict.stroke();
+  }
+
+  // 数字
+  ict.font = `bold ${ICS / 20}px "Comic Sans MS","微软雅黑",sans-serif`;
+  ict.textAlign = 'center'; ict.textBaseline = 'middle';
+  for (let i = 1; i <= 12; i++) {
+    const [x, y] = iPolar(i * 30, ICR - 24);
+    ict.fillStyle = '#37474f'; ict.fillText(i, x, y);
+  }
+
+  const { sec: sa, min: ma, hr: ha } = iAngles(iSecs);
+
+  // 悬停光圈
+  if (iHover && !iDrag) {
+    const LENS = { sec: ICR * .82, min: ICR * .70, hr: ICR * .50 };
+    const ANGS = { sec: sa, min: ma, hr: ha };
+    const COLS = { sec: 'rgba(198,40,40,.14)', min: 'rgba(46,125,50,.14)', hr: 'rgba(21,101,192,.14)' };
+    const [hx, hy] = iPolar(ANGS[iHover], LENS[iHover] * .55);
+    ict.save(); ict.beginPath(); ict.arc(hx, hy, 24, 0, Math.PI * 2);
+    ict.fillStyle = COLS[iHover]; ict.fill(); ict.restore();
+  }
+
+  // 三根针（时→分→秒，越后越在上层）
+  iDrawHand(ha, ICR * .52, 7,   '#1565c0', 0,  iDrag === 'hr');
+  iDrawHand(ma, ICR * .71, 4.5, '#2e7d32', 0,  iDrag === 'min');
+  iDrawHand(sa, ICR * .84, 2,   '#c62828', 17, iDrag === 'sec');
+
+  // 秒针末端点
+  const [sx, sy] = iPolar(sa, ICR * .84);
+  ict.save();
+  if (iDrag === 'sec') { ict.shadowColor = '#c62828'; ict.shadowBlur = 14; }
+  ict.beginPath(); ict.arc(sx, sy, 4.5, 0, Math.PI * 2); ict.fillStyle = '#c62828'; ict.fill();
+  ict.restore();
+
+  // 中心
+  ict.beginPath(); ict.arc(ICX, ICY, 6, 0, Math.PI * 2); ict.fillStyle = '#37474f'; ict.fill();
+  ict.beginPath(); ict.arc(ICX, ICY, 3, 0, Math.PI * 2); ict.fillStyle = '#fff'; ict.fill();
+
+  // 针标签
+  iLabel(sa, ICR * .84, '秒', '#c62828', '#ffebee');
+  iLabel(ma, ICR * .71, '分', '#2e7d32', '#e8f5e9');
+  iLabel(ha, ICR * .52, '时', '#1565c0', '#e3f2fd');
+
+  // 信息面板
+  const hh = Math.floor(iSecs / 3600), mm = Math.floor(iSecs % 3600 / 60), ss = Math.floor(iSecs % 60);
+  document.getElementById('diH').textContent = String(hh % 12 || 12).padStart(2, '0');
+  document.getElementById('diM').textContent = String(mm).padStart(2, '0');
+  document.getElementById('diS').textContent = String(ss).padStart(2, '0');
+  document.getElementById('diSecBar').style.width = ((iSecs % 60) / 60 * 100).toFixed(1) + '%';
+  document.getElementById('diMinBar').style.width = ((iSecs % 3600) / 3600 * 100).toFixed(1) + '%';
+  document.getElementById('diHrBar').style.width  = ((iSecs % 43200) / 43200 * 100).toFixed(1) + '%';
+  document.getElementById('diSecDeg').textContent = Math.round(sa) + '°';
+  document.getElementById('diMinDeg').textContent = Math.round(ma) + '°';
+  document.getElementById('diHrDeg').textContent  = Math.round(ha) + '°';
+}
+
+// ── 角度工具 ──
+function iAngDiff(a, b) { let d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
+
+function iGetAngle(e) {
+  const rect = ic.getBoundingClientRect(), scale = ICS / rect.width;
+  const src = e.touches ? e.touches[0] : e;
+  const x = (src.clientX - rect.left) * scale - ICX;
+  const y = (src.clientY - rect.top)  * scale - ICY;
+  let a = Math.atan2(y, x) * 180 / Math.PI + 90;
+  return a < 0 ? a + 360 : a;
+}
+
+function iNearest(a) {
+  const { sec, min, hr } = iAngles(iSecs);
+  const ds = [{ h: 'sec', d: iAngDiff(a, sec) }, { h: 'min', d: iAngDiff(a, min) }, { h: 'hr', d: iAngDiff(a, hr) }];
+  ds.sort((x, y) => x.d - y.d);
+  return ds[0].d < 35 ? ds[0].h : null;
+}
+
+// ── 拖动处理 ──
+function iDragMove(e) {
+  const a = iGetAngle(e);
+  let delta = a - iPrev;
+  if (delta >  180) delta -= 360;
+  if (delta < -180) delta += 360;
+  // 角度 → 秒数：秒针1°=1/6s，分针1°=10s，时针1°=120s
+  const mult = iDrag === 'sec' ? 60 / 360 : iDrag === 'min' ? 3600 / 360 : 43200 / 360;
+  iSecs = ((iSecs + delta * mult) % 43200 + 43200) % 43200;
+  iDragDeg += delta;
+  iPrev = a;
+  updateDragHint();
+  drawIC();
+}
+
+function updateDragHint() {
+  const el = document.getElementById('dragHint');
+  if (!iDrag) {
+    el.style.cssText = 'background:#f3e5f5;color:#6a1b9a';
+    el.innerHTML = '↕️ 拖动任意指针试试看';
+    return;
+  }
+  const d = Math.abs(iDragDeg);
+  const styles = { sec: 'background:#ffebee;color:#c62828', min: 'background:#e8f5e9;color:#2e7d32', hr: 'background:#e3f2fd;color:#1565c0' };
+  el.style.cssText = styles[iDrag];
+  if (iDrag === 'sec')
+    el.innerHTML = `🔴 秒针拨了 <b>${d.toFixed(0)}°</b><br>→ 分针跟着走了 <b>${(d / 60).toFixed(2)}°</b>`;
+  else if (iDrag === 'min')
+    el.innerHTML = `🟢 分针拨了 <b>${d.toFixed(0)}°</b><br>→ 时针跟着走了 <b>${(d / 12).toFixed(2)}°</b>`;
+  else
+    el.innerHTML = `🔵 时针拨了 <b>${d.toFixed(0)}°</b><br>→ 分针跟着走了 <b>${(d * 12).toFixed(1)}°</b>`;
+}
+
+// ── 事件绑定 ──
+ic.addEventListener('mousedown', e => {
+  e.preventDefault();
+  const a = iGetAngle(e); iDrag = iNearest(a); iPrev = a; iDragDeg = 0;
+  if (iDrag) { ic.classList.add('grabbing'); updateDragHint(); }
+});
+ic.addEventListener('mousemove', e => {
+  if (!iDrag) { iHover = iNearest(iGetAngle(e)); drawIC(); }
+});
+ic.addEventListener('mouseleave', () => { if (!iDrag) { iHover = null; drawIC(); } });
+window.addEventListener('mousemove',  e  => { if (iDrag) iDragMove(e); });
+window.addEventListener('mouseup',    ()  => {
+  if (!iDrag) return;
+  iDrag = null; ic.classList.remove('grabbing'); updateDragHint();
+});
+
+ic.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const a = iGetAngle(e); iDrag = iNearest(a); iPrev = a; iDragDeg = 0;
+  updateDragHint();
+}, { passive: false });
+ic.addEventListener('touchmove', e => {
+  e.preventDefault(); if (iDrag) iDragMove(e);
+}, { passive: false });
+ic.addEventListener('touchend', () => { iDrag = null; updateDragHint(); });
+
+// ── 按钮 ──
+function resetDemo() { iSecs = 6 * 3600; iDrag = null; updateDragHint(); drawIC(); }
+function syncNow() {
+  const n = new Date();
+  iSecs = (n.getHours() % 12) * 3600 + n.getMinutes() * 60 + n.getSeconds();
+  iDrag = null; updateDragHint(); drawIC();
+}
+
+drawIC();
+
+// ════════════════════════════════════════
+//  认钟面练习
+// ════════════════════════════════════════
+let qScore = { c: 0, w: 0 }, qDone = false, qHour = 0, qMinute = 0;
+Hpx.speech.install({rate:0.9});
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+const randInt=Hpx.random.int;
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+let _qac = null;
+function qTone(f, d = .12, type = 'sine', v = .16) {
+  try {
+    if (!_qac) _qac = new (window.AudioContext || window.webkitAudioContext)();
+    if (_qac.state === 'suspended') _qac.resume();
+    const o = _qac.createOscillator(), g = _qac.createGain();
+    o.connect(g); g.connect(_qac.destination);
+    o.type = type; o.frequency.setValueAtTime(f, _qac.currentTime);
+    g.gain.setValueAtTime(v, _qac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, _qac.currentTime + d);
+    o.start(); o.stop(_qac.currentTime + d);
+  } catch (e) {}
+}
+function playOk() { qTone(523, .1); setTimeout(() => qTone(659, .12), 100); setTimeout(() => qTone(784, .18), 220); }
+function playFail() { qTone(220, .25, 'sawtooth', .18); }
+
+function qPolar(cx, cy, angleDeg, r) {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+function qDrawHand(ctx, cx, cy, angleDeg, len, width, color) {
+  const [ex, ey] = qPolar(cx, cy, angleDeg, len);
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey);
+  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = 'round'; ctx.stroke();
+}
+function drawStaticClock(ctx, size, hour, minute) {
+  const cx = size / 2, cy = size / 2, r = size / 2 - 10;
+  ctx.clearRect(0, 0, size, size);
+  const g = ctx.createRadialGradient(cx, cy - size * 0.06, size * 0.03, cx, cy, r);
+  g.addColorStop(0, '#fff'); g.addColorStop(1, '#f0f4ff');
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 3; ctx.stroke();
+  for (let i = 0; i < 60; i++) {
+    const ang = i * 6, isH = i % 5 === 0;
+    const [x1, y1] = qPolar(cx, cy, ang, r - 2), [x2, y2] = qPolar(cx, cy, ang, r - (isH ? 12 : 6));
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.strokeStyle = isH ? '#455a64' : '#b0bec5'; ctx.lineWidth = isH ? 2 : 1; ctx.stroke();
+  }
+  ctx.font = `bold ${size / 11}px "Comic Sans MS","微软雅黑",sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 1; i <= 12; i++) {
+    const [x, y] = qPolar(cx, cy, i * 30, r - size * 0.14);
+    ctx.fillStyle = '#37474f'; ctx.fillText(String(i), x, y);
+  }
+  const hourAng = ((hour % 12) + minute / 60) / 12 * 360;
+  const minAng = minute / 60 * 360;
+  qDrawHand(ctx, cx, cy, hourAng, r * 0.5, size / 36, '#1565c0');
+  qDrawHand(ctx, cx, cy, minAng, r * 0.72, size / 55, '#2e7d32');
+  ctx.beginPath(); ctx.arc(cx, cy, size / 40, 0, Math.PI * 2); ctx.fillStyle = '#37474f'; ctx.fill();
+}
+
+function fmtTime(h, m) { return `${h}:${String(m).padStart(2, '0')}`; }
+function fmtTimeCN(h, m) { return m === 0 ? `${h}点整` : `${h}点${m}分`; }
+function randTime() { return { h: randInt(1, 12), m: Math.random() < 0.5 ? 0 : 30 }; }
+
+function buildDistractors(h, m) {
+  const key = (a, b) => `${a}:${b}`;
+  const correctKey = key(h, m);
+  const candidates = [
+    { h, m: m === 0 ? 30 : 0 },
+    { h: h % 12 + 1, m },
+    { h: h === 1 ? 12 : h - 1, m },
+  ];
+  const result = [];
+  for (const c of candidates) {
+    if (key(c.h, c.m) !== correctKey && !result.some(r => key(r.h, r.m) === key(c.h, c.m))) result.push(c);
+  }
+  while (result.length < 3) {
+    const c = randTime();
+    if (key(c.h, c.m) !== correctKey && !result.some(r => key(r.h, r.m) === key(c.h, c.m))) result.push(c);
+  }
+  return result.slice(0, 3);
+}
+
+function genQuiz() {
+  qDone = false;
+  const { h, m } = randTime();
+  qHour = h; qMinute = m;
+  document.getElementById('qFb').textContent = '';
+  document.getElementById('qFb').className = 'q-fb';
+  document.getElementById('qNextBtn').style.display = 'none';
+  const qType = Math.random() < 0.5 ? 0 : 1;
+
+  if (qType === 0) {
+    document.getElementById('qPrompt').textContent = '现在几点了？';
+    document.getElementById('qClkWrap').style.display = '';
+    document.getElementById('qOptWrap').style.display = '';
+    document.getElementById('qClkGridWrap').style.display = 'none';
+    const qc = document.getElementById('qClk').getContext('2d');
+    drawStaticClock(qc, 220, h, m);
+    const correctStr = fmtTime(h, m);
+    const opts = shuffle([correctStr, ...buildDistractors(h, m).map(d => fmtTime(d.h, d.m))]);
+    document.getElementById('qOptWrap').innerHTML = opts.map(t =>
+      `<button class="q-opt-btn" onclick="answerText(this,'${t}','${correctStr}')">${t}</button>`
+    ).join('');
+    speak('现在几点了？');
+  } else {
+    document.getElementById('qPrompt').textContent = `哪个钟面是 ${fmtTimeCN(h, m)}？`;
+    document.getElementById('qClkWrap').style.display = 'none';
+    document.getElementById('qOptWrap').style.display = 'none';
+    document.getElementById('qClkGridWrap').style.display = '';
+    const all = shuffle([{ h, m, ok: true }, ...buildDistractors(h, m).map(d => ({ ...d, ok: false }))]);
+    document.getElementById('qClkGridWrap').innerHTML = all.map((o, i) =>
+      `<button class="q-clk-opt" data-ok="${o.ok}"><canvas id="qOptClk${i}" width="120" height="120"></canvas></button>`
+    ).join('');
+    document.querySelectorAll('.q-clk-opt').forEach((b, i) => b.addEventListener('click', () => answerClock(b)));
+    all.forEach((o, i) => {
+      const c = document.getElementById('qOptClk' + i).getContext('2d');
+      drawStaticClock(c, 120, o.h, o.m);
+    });
+    speak(`哪个钟面是${fmtTimeCN(h, m)}？`);
+  }
+}
+
+function answerText(btn, chosen, correct) {
+  if (qDone) return;
+  qDone = true;
+  document.querySelectorAll('.q-opt-btn').forEach(b => b.disabled = true);
+  handleQuizAnswer(chosen === correct, btn);
+}
+function answerClock(btn) {
+  if (qDone) return;
+  qDone = true;
+  document.querySelectorAll('.q-clk-opt').forEach(b => b.disabled = true);
+  handleQuizAnswer(btn.dataset.ok === 'true', btn);
+}
+async function handleQuizAnswer(isCorrect, btn) {
+  const fb = document.getElementById('qFb');
+  if (isCorrect) {
+    qScore.c++; document.getElementById('qC').textContent = qScore.c;
+    btn.classList.add('q-right');
+    fb.textContent = '✅ 正确！'; fb.className = 'q-fb ok';
+    playOk(); speak('正确！真棒！');
+    await delay(1200);
+    genQuiz();
+  } else {
+    qScore.w++; document.getElementById('qW').textContent = qScore.w;
+    btn.classList.add('q-wrong');
+    fb.textContent = `❌ 正确答案是 ${fmtTimeCN(qHour, qMinute)}`; fb.className = 'q-fb bad';
+    playFail(); speak(`不对哦，正确答案是${fmtTimeCN(qHour, qMinute)}`);
+    document.getElementById('qNextBtn').style.display = 'inline-block';
+  }
+}
+
+genQuiz();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>观察物体：三视图</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#efebe9 0%,#e0f2f1 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.8rem;color:#37474f;letter-spacing:1px;text-shadow:2px 3px 0 #b0bec5;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.build-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,44px);gap:4px;}
+.grid-cell{width:44px;height:44px;border:2px solid #90a4ae;border-radius:8px;background:#eceff1;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:bold;color:#455a64;cursor:pointer;}
+.grid-cell:hover{background:#cfd8dc;}
+.grid-label{text-align:center;font-size:.78rem;color:#999;margin-bottom:4px;}
+canvas{border-radius:10px;}
+.views-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.view-box{text-align:center;}
+.view-title{font-size:.85rem;font-weight:bold;color:#455a64;margin-bottom:6px;}
+.bar-row{display:flex;gap:4px;justify-content:center;align-items:flex-end;height:70px;}
+.bar{width:24px;background:#4db6ac;border-radius:3px 3px 0 0;position:relative;}
+.bar .n{position:absolute;top:-16px;left:0;right:0;text-align:center;font-size:.75rem;color:#37474f;font-weight:bold;}
+.top-mini{display:grid;grid-template-columns:repeat(3,24px);gap:3px;}
+.top-mini div{width:24px;height:24px;border:1px solid #b0bec5;border-radius:4px;background:#eceff1;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:bold;color:#455a64;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#eceff1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#455a64;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.blank-row{display:flex;gap:10px;justify-content:center;margin-bottom:12px;}
+.blank-row input{width:50px;font-size:1.1rem;text-align:center;border:2px solid #90a4ae;border-radius:8px;padding:6px;outline:none;font-family:inherit;}
+.blank-row input:focus{border-color:#455a64;}
+.check-btn{padding:8px 22px;border:none;border-radius:10px;background:#455a64;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#455a64;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 拖动旋转 3D */
+.mini-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:12px;}
+.rotate-scene{perspective:900px;width:100%;height:250px;display:flex;align-items:center;justify-content:center;margin:6px 0;touch-action:none;cursor:grab;}
+.rotate-scene:active{cursor:grabbing;}
+.cube3d{position:relative;transform-style:preserve-3d;}
+.face{position:absolute;top:50%;left:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:.95rem;border:2px solid rgba(255,255,255,.55);box-sizing:border-box;backface-visibility:hidden;user-select:none;line-height:1.3;text-shadow:0 1px 2px rgba(0,0,0,.25);}
+.face-dim{font-size:.7rem;font-weight:normal;opacity:.9;margin-top:2px;}
+.face-front{background:#7986cb;} .face-back{background:#5c6bc0;}
+.face-left{background:#4db6ac;} .face-right{background:#00897b;}
+.face-top{background:#ffb74d;} .face-bottom{background:#fb8c00;}
+.rotate-btn-row{display:flex;gap:10px;justify-content:center;margin-top:8px;}
+.rotate-btn{padding:8px 20px;border:none;border-radius:20px;background:#455a64;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* 堆积木：可拖动旋转的积木山 */
+.stack-scene{perspective:700px;width:220px;height:200px;flex-shrink:0;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;}
+.stack-scene:active{cursor:grabbing;}
+.stack3d{position:relative;transform-style:preserve-3d;}
+.ucube{position:absolute;top:50%;left:50%;width:0;height:0;transform-style:preserve-3d;}
+.ucube-face{position:absolute;top:50%;left:50%;box-sizing:border-box;border:1px solid rgba(55,71,79,.45);backface-visibility:hidden;}
+.dir-text{position:absolute;top:50%;left:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;color:#37474f;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff;pointer-events:none;backface-visibility:hidden;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#455a64">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🧱</div>
+    <h1>观察物体：三视图</h1>
+    <p>正视图 · 侧视图 · 俯视图，从不同方向看立体图形</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('build')">🧱 堆积木</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+    <button class="tab-btn" onclick="switchTab('rotate')">🔄 拖动旋转</button>
+  </div>
+
+  <!-- 堆积木 -->
+  <div id="tab-build">
+    <div class="card">
+      <div class="build-row">
+        <div>
+          <div class="grid-label">点格子：数字是这个位置摞了几个方块（0～3循环）</div>
+          <div class="grid3" id="buildGrid"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div class="stack-scene" id="buildScene"><div class="stack3d" id="stack3d"></div></div>
+          <button class="rotate-btn" style="padding:6px 16px;font-size:.8rem;" onclick="resetBuildView()">↺ 重置视角</button>
+        </div>
+      </div>
+      <div class="net-desc" style="margin-top:-6px;">👆 拖动积木山转一转，看看每个面摞了几块方块</div>
+      <div class="views-row">
+        <div class="view-box">
+          <div class="view-title">俯视图（从上面看）</div>
+          <div class="top-mini" id="topView"></div>
+        </div>
+        <div class="view-box">
+          <div class="view-title">正视图（从前面看）</div>
+          <div class="bar-row" id="frontView"></div>
+        </div>
+        <div class="view-box">
+          <div class="view-title">侧视图（从左边看）</div>
+          <div class="bar-row" id="sideView"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="build-row" style="justify-content:center;">
+        <canvas id="quizCanvas" width="220" height="200"></canvas>
+        <div class="view-box">
+          <div class="view-title">俯视图（提示）</div>
+          <div class="top-mini" id="quizTopView"></div>
+        </div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="blank-row" id="blankRow"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 拖动旋转 -->
+  <div id="tab-rotate" style="display:none;">
+    <div class="card">
+      <div class="mini-tabs">
+        <button class="tab-btn on" id="rotShapeCuboidBtn" onclick="setRotateShape('cuboid')">📦 长方体</button>
+        <button class="tab-btn" id="rotShapeCubeBtn" onclick="setRotateShape('cube')">🧊 正方体</button>
+      </div>
+      <div class="slider-row" id="rotCuboidSliders" style="display:flex;">
+        <div class="sl-group"><label>长</label><input type="range" id="rotL" min="2" max="10" value="6" oninput="updateRotate()"><span class="sl-val" id="rotLVal">6</span></div>
+        <div class="sl-group"><label>宽</label><input type="range" id="rotW" min="2" max="10" value="4" oninput="updateRotate()"><span class="sl-val" id="rotWVal">4</span></div>
+        <div class="sl-group"><label>高</label><input type="range" id="rotH" min="2" max="10" value="5" oninput="updateRotate()"><span class="sl-val" id="rotHVal">5</span></div>
+      </div>
+      <div class="slider-row" id="rotCubeSliders" style="display:none;">
+        <div class="sl-group"><label>边长</label><input type="range" id="rotA" min="2" max="10" value="5" oninput="updateRotate()"><span class="sl-val" id="rotAVal">5</span></div>
+      </div>
+      <div class="net-desc">👆 用鼠标拖动（手机用手指滑动）旋转，看看六个面分别长什么样</div>
+      <div class="rotate-scene" id="rotateScene">
+        <div class="cube3d" id="cube3d">
+          <div class="face face-front" id="faceFront">前<span class="face-dim" id="dimFront"></span></div>
+          <div class="face face-back" id="faceBack">后<span class="face-dim" id="dimBack"></span></div>
+          <div class="face face-right" id="faceRight">右<span class="face-dim" id="dimRight"></span></div>
+          <div class="face face-left" id="faceLeft">左<span class="face-dim" id="dimLeft"></span></div>
+          <div class="face face-top" id="faceTop">上<span class="face-dim" id="dimTop"></span></div>
+          <div class="face face-bottom" id="faceBottom">下<span class="face-dim" id="dimBottom"></span></div>
+        </div>
+      </div>
+      <div class="rotate-btn-row">
+        <button class="rotate-btn" onclick="resetRotateView()">↺ 重置视角</button>
+        <button class="rotate-btn" id="autoRotBtn" style="background:#00897b;" onclick="toggleAutoRotate()">▶ 自动旋转</button>
+      </div>
+      <div class="formula-box" id="rotFormula" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+const N=3;
+// heights[y][x]：y=0是最前一排，y=2是最后一排；x=0是最左，x=2是最右
+function frontView(heights){ const r=[]; for(let x=0;x<N;x++){let m=0; for(let y=0;y<N;y++) m=Math.max(m,heights[y][x]); r.push(m);} return r; }
+function sideView(heights){ const r=[]; for(let y=0;y<N;y++){let m=0; for(let x=0;x<N;x++) m=Math.max(m,heights[y][x]); r.push(m);} return r; }
+
+function poly(ctx, pts, fill){
+  ctx.beginPath();
+  pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+  ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle='#37474f'; ctx.lineWidth=1; ctx.stroke();
+}
+function drawStackedCubes(canvas, heights){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const S=26;
+  const ddx=S*0.55, ddy=-S*0.32;
+  const originX=50, originY=canvas.height-30;
+  function drawCube(bx,by){
+    const A=[bx,by],B=[bx+S,by],C=[bx+S,by-S],D=[bx,by-S];
+    const A2=[A[0]+ddx,A[1]+ddy],B2=[B[0]+ddx,B[1]+ddy],C2=[C[0]+ddx,C[1]+ddy],D2=[D[0]+ddx,D[1]+ddy];
+    poly(ctx,[B,B2,C2,C],'#90caf9');
+    poly(ctx,[D,C,C2,D2],'#bbdefb');
+    poly(ctx,[A,B,C,D],'#64b5f6');
+  }
+  for(let y=N-1;y>=0;y--){
+    for(let x=0;x<N;x++){
+      const h=heights[y][x];
+      if(h<=0) continue;
+      const bx=originX+x*S+y*ddx, by=originY+y*ddy;
+      for(let k=0;k<h;k++) drawCube(bx, by-k*S);
+    }
+  }
+  ctx.fillStyle='#455a64'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('正面', originX+S*1.5, originY+16);
+}
+function renderTopView(containerId, heights){
+  const el=document.getElementById(containerId);
+  el.innerHTML='';
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+    const d=document.createElement('div'); d.textContent=heights[y][x]; el.appendChild(d);
+  }
+}
+function renderBarRow(containerId, arr){
+  const el=document.getElementById(containerId);
+  el.innerHTML='';
+  const maxH=Math.max(1,...arr);
+  arr.forEach(v=>{
+    const bar=document.createElement('div'); bar.className='bar';
+    bar.style.height=Math.max(4,v/maxH*60)+'px';
+    bar.innerHTML=`<span class="n">${v}</span>`;
+    el.appendChild(bar);
+  });
+}
+
+// ── 堆积木：可拖动旋转的 3D 积木山 ──
+function makeUnitCube(unit, colors){
+  const cube=document.createElement('div');
+  cube.className='ucube';
+  const faces=[
+    ['translateZ('+unit/2+'px)', colors.front],
+    ['rotateY(180deg) translateZ('+unit/2+'px)', colors.back],
+    ['rotateY(90deg) translateZ('+unit/2+'px)', colors.right],
+    ['rotateY(-90deg) translateZ('+unit/2+'px)', colors.left],
+    ['rotateX(90deg) translateZ('+unit/2+'px)', colors.top],
+    ['rotateX(-90deg) translateZ('+unit/2+'px)', colors.bottom],
+  ];
+  faces.forEach(([transform,color])=>{
+    const f=document.createElement('div');
+    f.className='ucube-face';
+    f.style.width=unit+'px'; f.style.height=unit+'px';
+    f.style.marginLeft=(-unit/2)+'px'; f.style.marginTop=(-unit/2)+'px';
+    f.style.background=color;
+    f.style.transform=transform;
+    cube.appendChild(f);
+  });
+  return cube;
+}
+function makeDirText(size,transform,text){
+  const el=document.createElement('div');
+  el.className='dir-text';
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.marginLeft=(-size/2)+'px'; el.style.marginTop=(-size/2)+'px';
+  el.style.transform=transform;
+  el.textContent=text;
+  return el;
+}
+const MAXH=3;
+function renderBuild3D(heights){
+  const stack=document.getElementById('stack3d');
+  stack.innerHTML='';
+  const unit=32;
+  const colors={front:'#5c9ee6',back:'#4a86c9',right:'#8fc2f5',left:'#78b3ef',top:'#b9dcfa',bottom:'#3a6ea8'};
+  for(let y=0;y<N;y++){
+    for(let x=0;x<N;x++){
+      const h=heights[y][x];
+      for(let k=0;k<h;k++){
+        const cube=makeUnitCube(unit, colors);
+        const tx=(x-1)*unit, ty=-(k*unit+unit/2), tz=(1-y)*unit;
+        cube.style.transform=`translate3d(${tx}px, ${ty}px, ${tz}px)`;
+        stack.appendChild(cube);
+      }
+    }
+  }
+  // 前后左右上下：只标文字，贴在整个 3×3 格子（最高摞3层）外框的六个方向，不加底板
+  const hw=N*unit/2, hd=N*unit/2, hh=MAXH*unit/2, gap=8, size=30;
+  stack.appendChild(makeDirText(size, `translateZ(${hd+gap}px)`,                 '前'));
+  stack.appendChild(makeDirText(size, `rotateY(180deg) translateZ(${hd+gap}px)`, '后'));
+  stack.appendChild(makeDirText(size, `rotateY(90deg) translateZ(${hw+gap}px)`,  '右'));
+  stack.appendChild(makeDirText(size, `rotateY(-90deg) translateZ(${hw+gap}px)`, '左'));
+  stack.appendChild(makeDirText(size, `rotateX(90deg) translateZ(${hh+gap}px)`,  '上'));
+  stack.appendChild(makeDirText(size, `rotateX(-90deg) translateZ(${hh+gap}px)`, '下'));
+  applyBuildRotate();
+}
+let buildRotX=-25, buildRotY=35, buildDragging=false, buildLastX=0, buildLastY=0;
+function applyBuildRotate(){
+  const el=document.getElementById('stack3d');
+  if(el) el.style.transform=`rotateX(${buildRotX}deg) rotateY(${buildRotY}deg)`;
+}
+function resetBuildView(){ buildRotX=-25; buildRotY=35; applyBuildRotate(); }
+function buildDragStart(x,y){ buildDragging=true; buildLastX=x; buildLastY=y; }
+function buildDragMove(x,y){
+  if(!buildDragging) return;
+  buildRotY += (x-buildLastX)*0.4;
+  buildRotX -= (y-buildLastY)*0.4;
+  buildLastX=x; buildLastY=y;
+  applyBuildRotate();
+}
+function buildDragEnd(){ buildDragging=false; }
+
+let buildHeights=[[1,2,1],[0,3,1],[2,1,0]];
+function buildGridUI(){
+  const grid=document.getElementById('buildGrid');
+  grid.innerHTML='';
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+    const cell=document.createElement('div'); cell.className='grid-cell';
+    cell.textContent=buildHeights[y][x];
+    cell.onclick=()=>{ buildHeights[y][x]=(buildHeights[y][x]+1)%4; cell.textContent=buildHeights[y][x]; renderBuild(); };
+    grid.appendChild(cell);
+  }
+}
+function renderBuild(){
+  renderBuild3D(buildHeights);
+  renderTopView('topView', buildHeights);
+  renderBarRow('frontView', frontView(buildHeights));
+  renderBarRow('sideView', sideView(buildHeights));
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qHeights=null, qType='', qAns=[], qDone=false;
+function randomHeights(){
+  let h;
+  do {
+    h=Array.from({length:N},()=>Array.from({length:N},()=>randInt(0,3)));
+  } while(h.every(row=>row.every(v=>v===0)));
+  return h;
+}
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  qHeights=randomHeights();
+  drawStackedCubes(document.getElementById('quizCanvas'), qHeights);
+  renderTopView('quizTopView', qHeights);
+  qType = Math.random()<0.5 ? 'front' : 'side';
+  qAns = qType==='front' ? frontView(qHeights) : sideView(qHeights);
+  document.getElementById('quizQ').innerHTML = qType==='front'
+    ? '从<b>前面</b>看，从左到右三根柱子的高度分别是多少？（参考俯视图提示）'
+    : '从<b>左边</b>看，从前到后三根柱子的高度分别是多少？（参考俯视图提示）';
+  qDone=false;
+  const row=document.getElementById('blankRow'); row.innerHTML='';
+  for(let i=0;i<N;i++){
+    const inp=document.createElement('input'); inp.type='number'; inp.id='blank-'+i;
+    row.appendChild(inp);
+  }
+  const maybeCheck=()=>{
+    for(let i=0;i<N;i++){ if(document.getElementById('blank-'+i).value.length===0) return; }
+    checkQ();
+  };
+  for(let i=0;i<N;i++){
+    const inp=document.getElementById('blank-'+i);
+    inp.addEventListener('input',maybeCheck);
+    inp.addEventListener('blur',maybeCheck);
+  }
+  speak(qType==='front'?'从前面看，三根柱子的高度分别是多少？':'从左边看，三根柱子的高度分别是多少？');
+}
+function checkQ(){
+  if(qDone) return;
+  const vals=[];
+  for(let i=0;i<N;i++){
+    const v=parseInt(document.getElementById('blank-'+i).value);
+    if(isNaN(v)) return;
+    vals.push(v);
+  }
+  qDone=true;
+  document.querySelectorAll('#blankRow input').forEach(inp=>inp.disabled=true);
+  const ok = vals.every((v,i)=>v===qAns[i]);
+  if(ok){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+qAns.join('、');
+    speak('答案是'+qAns.join('、')+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['build','quiz','rotate']);
+  if(t==='build') speak('堆积木：点格子增加方块，看看正视图、侧视图、俯视图分别是什么样子。');
+  if(t==='quiz') nextQ();
+  if(t==='rotate'){ updateRotate(); applyRotateTransform(); speak('拖动长方体或正方体，转一转，看看前后左右上下六个面。'); }
+}
+const buildScene=document.getElementById('buildScene');
+buildScene.addEventListener('mousedown', e=>buildDragStart(e.clientX,e.clientY));
+window.addEventListener('mousemove', e=>buildDragMove(e.clientX,e.clientY));
+window.addEventListener('mouseup', buildDragEnd);
+buildScene.addEventListener('touchstart', e=>{const t=e.touches[0]; buildDragStart(t.clientX,t.clientY);}, {passive:true});
+buildScene.addEventListener('touchmove', e=>{const t=e.touches[0]; buildDragMove(t.clientX,t.clientY); e.preventDefault();}, {passive:false});
+buildScene.addEventListener('touchend', buildDragEnd);
+
+buildGridUI(); renderBuild();
+speak('欢迎来到观察物体！从正面、侧面、上面看立体图形，形状可能完全不一样。');
+
+// ── 拖动旋转：长方体 / 正方体 ──
+let rotShape='cuboid';
+function setFace(el,w,h,transform){
+  el.style.width=w+'px'; el.style.height=h+'px';
+  el.style.marginLeft=(-w/2)+'px'; el.style.marginTop=(-h/2)+'px';
+  el.style.transform=transform;
+}
+function setRotateShape(s){
+  rotShape=s;
+  document.getElementById('rotShapeCuboidBtn').classList.toggle('on', s==='cuboid');
+  document.getElementById('rotShapeCubeBtn').classList.toggle('on', s==='cube');
+  document.getElementById('rotCuboidSliders').style.display = s==='cuboid' ? 'flex' : 'none';
+  document.getElementById('rotCubeSliders').style.display = s==='cube' ? 'flex' : 'none';
+  updateRotate();
+  speak(s==='cuboid' ? '长方体：三组相对的面，每组两个面大小相同。' : '正方体：六个面完全相同，都是正方形。');
+}
+function updateRotate(){
+  let l,w,h;
+  if(rotShape==='cuboid'){
+    l=+document.getElementById('rotL').value;
+    w=+document.getElementById('rotW').value;
+    h=+document.getElementById('rotH').value;
+    document.getElementById('rotLVal').textContent=l;
+    document.getElementById('rotWVal').textContent=w;
+    document.getElementById('rotHVal').textContent=h;
+  } else {
+    l=w=h=+document.getElementById('rotA').value;
+    document.getElementById('rotAVal').textContent=l;
+  }
+  const scale=110/Math.max(l,w,h);
+  const pl=l*scale, pw=w*scale, ph=h*scale;
+  setFace(document.getElementById('faceFront'), pl, ph, `translateZ(${pw/2}px)`);
+  setFace(document.getElementById('faceBack'),  pl, ph, `rotateY(180deg) translateZ(${pw/2}px)`);
+  setFace(document.getElementById('faceRight'), pw, ph, `rotateY(90deg) translateZ(${pl/2}px)`);
+  setFace(document.getElementById('faceLeft'),  pw, ph, `rotateY(-90deg) translateZ(${pl/2}px)`);
+  setFace(document.getElementById('faceTop'),    pl, pw, `rotateX(90deg) translateZ(${ph/2}px)`);
+  setFace(document.getElementById('faceBottom'), pl, pw, `rotateX(-90deg) translateZ(${ph/2}px)`);
+  document.getElementById('dimFront').textContent=`${l}×${h}`;
+  document.getElementById('dimBack').textContent=`${l}×${h}`;
+  document.getElementById('dimLeft').textContent=`${w}×${h}`;
+  document.getElementById('dimRight').textContent=`${w}×${h}`;
+  document.getElementById('dimTop').textContent=`${l}×${w}`;
+  document.getElementById('dimBottom').textContent=`${l}×${w}`;
+  if(rotShape==='cuboid'){
+    const S=2*(l*w+l*h+w*h), V=l*w*h;
+    document.getElementById('rotFormula').innerHTML=
+      `长=${l}　宽=${w}　高=${h}　　表面积=${S}　体积=${V}<br>💡 前后、左右、上下 —— 三组相对的面，每组两个面大小相同`;
+  } else {
+    const S=6*l*l, V=l*l*l;
+    document.getElementById('rotFormula').innerHTML=
+      `边长=${l}　　表面积=${S}　体积=${V}<br>💡 正方体的六个面完全相同，都是边长为${l}的正方形`;
+  }
+}
+
+let rotX=-20, rotY=35, rotDragging=false, rotLastX=0, rotLastY=0, autoRotating=false, autoRotTimer=null;
+function applyRotateTransform(){
+  document.getElementById('cube3d').style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+}
+function resetRotateView(){ rotX=-20; rotY=35; applyRotateTransform(); }
+function stopAutoRotate(){
+  if(autoRotating){ autoRotating=false; clearInterval(autoRotTimer); document.getElementById('autoRotBtn').textContent='▶ 自动旋转'; }
+}
+function toggleAutoRotate(){
+  autoRotating=!autoRotating;
+  document.getElementById('autoRotBtn').textContent = autoRotating ? '⏸ 停止旋转' : '▶ 自动旋转';
+  if(autoRotating){ autoRotTimer=setInterval(()=>{ rotY+=1.2; applyRotateTransform(); },30); }
+  else clearInterval(autoRotTimer);
+}
+function rotDragStart(x,y){ rotDragging=true; rotLastX=x; rotLastY=y; stopAutoRotate(); }
+function rotDragMove(x,y){
+  if(!rotDragging) return;
+  rotY += (x-rotLastX)*0.4;
+  rotX -= (y-rotLastY)*0.4;
+  rotLastX=x; rotLastY=y;
+  applyRotateTransform();
+}
+function rotDragEnd(){ rotDragging=false; }
+const rotateScene=document.getElementById('rotateScene');
+rotateScene.addEventListener('mousedown', e=>rotDragStart(e.clientX,e.clientY));
+window.addEventListener('mousemove', e=>rotDragMove(e.clientX,e.clientY));
+window.addEventListener('mouseup', rotDragEnd);
+rotateScene.addEventListener('touchstart', e=>{const t=e.touches[0]; rotDragStart(t.clientX,t.clientY);}, {passive:true});
+rotateScene.addEventListener('touchmove', e=>{const t=e.touches[0]; rotDragMove(t.clientX,t.clientY); e.preventDefault();}, {passive:false});
+rotateScene.addEventListener('touchend', rotDragEnd);
+updateRotate();
+applyRotateTransform();
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

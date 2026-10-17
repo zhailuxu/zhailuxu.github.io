@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三角形</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fbe9e7 0%,#fff3e0 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#bf360c;letter-spacing:3px;text-shadow:2px 3px 0 #ffab91;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.gal-item{border:2px solid #ffccbc;border-radius:12px;padding:6px 4px;text-align:center;cursor:pointer;background:#fff;transition:all .15s;}
+.gal-item.on{border-color:#d84315;background:#fbe9e7;}
+.gal-item svg{width:100%;height:60px;}
+.gal-item .lbl{font-size:.72rem;font-weight:bold;color:#555;margin-top:2px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:12px;touch-action:none;}
+.desc-box{font-size:.92rem;color:#555;text-align:center;margin-top:10px;line-height:1.8;}
+.info-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.info-tag{background:#fbe9e7;border-radius:10px;padding:6px 16px;font-size:.92rem;font-weight:bold;color:#bf360c;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:100px;accent-color:#d84315;}
+.sl-val{font-weight:bold;font-size:1rem;color:#d84315;}
+.verdict-box{text-align:center;font-size:1.05rem;font-weight:bold;margin-top:10px;padding:10px;border-radius:12px;}
+.verdict-box.yes{background:#e8f5e9;color:#2e7d32;}
+.verdict-box.no{background:#ffebee;color:#c62828;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fbe9e7;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#bf360c;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:12px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #ffccbc;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#d84315;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#d84315;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.choice-btn{padding:10px 20px;border:2px solid #ffccbc;border-radius:14px;background:#fff;color:#bf360c;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#fbe9e7;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#d84315;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#d84315">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🔺</div>
+    <h1>三角形</h1>
+    <p>认识分类、探索内角和、判断能否围成三角形</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识三角形</button>
+    <button class="tab-btn" onclick="switchTab('drag')">🖱️ 内角和探索</button>
+    <button class="tab-btn" onclick="switchTab('side')">📏 三边关系</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识三角形 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:10px;">按边分：</div>
+      <div class="gallery" id="galSide"></div>
+      <div style="text-align:center;font-size:.9rem;color:#777;margin:14px 0 10px;">按角分：</div>
+      <div class="gallery" id="galAngle"></div>
+      <div class="desc-box" id="learnDesc"></div>
+    </div>
+  </div>
+
+  <!-- 内角和探索 -->
+  <div id="tab-drag" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:6px;">拖动任意一个顶点，看看内角和会变吗？</div>
+      <div class="canvas-wrap"><canvas id="dragCanvas" width="320" height="260"></canvas></div>
+      <div class="info-row">
+        <div class="info-tag" id="angA">∠A = 60°</div>
+        <div class="info-tag" id="angB">∠B = 60°</div>
+        <div class="info-tag" id="angC">∠C = 60°</div>
+      </div>
+      <div style="text-align:center;font-size:1.3rem;font-weight:bold;color:#2e7d32;">内角和 = <span id="angSum">180</span>°</div>
+    </div>
+  </div>
+
+  <!-- 三边关系 -->
+  <div id="tab-side" style="display:none;">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group"><label>边a</label><input type="range" id="sideA" min="1" max="20" value="5" oninput="updateSide()"><span class="sl-val" id="sideAVal">5</span></div>
+        <div class="sl-group"><label>边b</label><input type="range" id="sideB" min="1" max="20" value="7" oninput="updateSide()"><span class="sl-val" id="sideBVal">7</span></div>
+        <div class="sl-group"><label>边c</label><input type="range" id="sideC" min="1" max="20" value="9" oninput="updateSide()"><span class="sl-val" id="sideCVal">9</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="sideCanvas" width="300" height="200"></canvas></div>
+      <div class="verdict-box" id="sideVerdict"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 认识三角形：画廊 ──
+function triSVG(p1,p2,p3,ticks,angleMarks){
+  let s=`<svg viewBox="0 0 100 70"><polygon points="${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}" fill="#ffccbc" stroke="#d84315" stroke-width="2.5"/>`;
+  (ticks||[]).forEach(([mx,my,n])=>{
+    for(let i=0;i<n;i++) s+=`<line x1="${mx-3+i*3}" y1="${my-3}" x2="${mx+3+i*3}" y2="${my+3}" stroke="#bf360c" stroke-width="1.3"/>`;
+  });
+  s+='</svg>';
+  return s;
+}
+const SIDE_GAL=[
+  {name:'等边三角形', svg:triSVG([50,8],[10,62],[90,62],[[30,35,1],[70,35,1],[50,62,1]])},
+  {name:'等腰三角形', svg:triSVG([50,8],[18,62],[82,62],[[34,35,1],[66,35,1]])},
+  {name:'不等边三角形', svg:triSVG([35,8],[10,62],[90,62],[])}
+];
+const ANGLE_GAL=[
+  {name:'锐角三角形', svg:triSVG([50,8],[15,62],[85,62],[])},
+  {name:'直角三角形', svg:`<svg viewBox="0 0 100 70"><polygon points="12,62 12,10 85,62" fill="#ffe0b2" stroke="#d84315" stroke-width="2.5"/><rect x="12" y="52" width="10" height="10" fill="none" stroke="#bf360c" stroke-width="1.5"/></svg>`},
+  {name:'钝角三角形', svg:triSVG([20,20],[10,62],[90,62],[])}
+];
+let curSideIdx=0, curAngleIdx=0;
+const SIDE_DESC=['三条边都相等，三个角都是60°','有两条边相等，两个底角也相等','三条边长度都不同'];
+const ANGLE_DESC=['三个角都是锐角（小于90°）','有一个角正好是直角（90°）','有一个角是钝角（大于90°小于180°）'];
+function buildGallery(){
+  const gs=document.getElementById('galSide'); gs.innerHTML='';
+  SIDE_GAL.forEach((g,i)=>{
+    const d=document.createElement('div'); d.className='gal-item'+(i===curSideIdx?' on':'');
+    d.innerHTML=g.svg+`<div class="lbl">${g.name}</div>`;
+    d.onclick=()=>{curSideIdx=i;curAngleIdx=-1;buildGallery();document.getElementById('learnDesc').textContent=g.name+'：'+SIDE_DESC[i];speak(g.name+'，'+SIDE_DESC[i]);};
+    gs.appendChild(d);
+  });
+  const ga=document.getElementById('galAngle'); ga.innerHTML='';
+  ANGLE_GAL.forEach((g,i)=>{
+    const d=document.createElement('div'); d.className='gal-item'+(i===curAngleIdx?' on':'');
+    d.innerHTML=g.svg+`<div class="lbl">${g.name}</div>`;
+    d.onclick=()=>{curAngleIdx=i;curSideIdx=-1;buildGallery();document.getElementById('learnDesc').textContent=g.name+'：'+ANGLE_DESC[i];speak(g.name+'，'+ANGLE_DESC[i]);};
+    ga.appendChild(d);
+  });
+}
+
+// ── 内角和探索（拖动顶点）──
+let verts=[[160,40],[60,220],[260,220]];
+let dragIdx=-1;
+function angleAt(i){
+  const P=verts[i], A=verts[(i+1)%3], B=verts[(i+2)%3];
+  const v1=[A[0]-P[0],A[1]-P[1]], v2=[B[0]-P[0],B[1]-P[1]];
+  const dot=v1[0]*v2[0]+v1[1]*v2[1];
+  const m1=Math.hypot(v1[0],v1[1]), m2=Math.hypot(v2[0],v2[1]);
+  if(m1<1e-6||m2<1e-6) return 0;
+  let cos=dot/(m1*m2); cos=Math.max(-1,Math.min(1,cos));
+  return Math.acos(cos)*180/Math.PI;
+}
+function drawTriangleDrag(){
+  const canvas=document.getElementById('dragCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.beginPath();
+  ctx.moveTo(verts[0][0],verts[0][1]);
+  ctx.lineTo(verts[1][0],verts[1][1]);
+  ctx.lineTo(verts[2][0],verts[2][1]);
+  ctx.closePath();
+  ctx.fillStyle='rgba(216,67,21,.15)'; ctx.fill();
+  ctx.strokeStyle='#d84315'; ctx.lineWidth=3; ctx.stroke();
+  const labels=['A','B','C'];
+  const angs=[0,1,2].map(angleAt);
+  verts.forEach((v,i)=>{
+    ctx.beginPath();ctx.arc(v[0],v[1],9,0,Math.PI*2);ctx.fillStyle='#bf360c';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#4e342e';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+    const dx=i===0?0:(i===1?-14:14), dy=i===0?-16:20;
+    ctx.fillText(labels[i]+' '+Math.round(angs[i])+'°', v[0]+dx, v[1]+dy);
+  });
+  document.getElementById('angA').textContent='∠A = '+Math.round(angs[0])+'°';
+  document.getElementById('angB').textContent='∠B = '+Math.round(angs[1])+'°';
+  document.getElementById('angC').textContent='∠C = '+Math.round(angs[2])+'°';
+  document.getElementById('angSum').textContent=Math.round(angs[0]+angs[1]+angs[2]);
+}
+function bindDrag(){
+  const canvas=document.getElementById('dragCanvas');
+  function getPos(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+    const src=e.touches?e.touches[0]:e;
+    return [(src.clientX-rect.left)*scaleX,(src.clientY-rect.top)*scaleY];
+  }
+  function start(e){
+    e.preventDefault();
+    const [x,y]=getPos(e);
+    let best=-1,bd=1e9;
+    verts.forEach((v,i)=>{const d=Math.hypot(v[0]-x,v[1]-y); if(d<bd){bd=d;best=i;}});
+    if(bd<28) dragIdx=best;
+  }
+  function move(e){
+    if(dragIdx<0) return;
+    const [x,y]=getPos(e);
+    verts[dragIdx]=[Math.max(10,Math.min(canvas.width-10,x)), Math.max(10,Math.min(canvas.height-10,y))];
+    drawTriangleDrag();
+  }
+  function end(){dragIdx=-1;}
+  canvas.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+// ── 三边关系 ──
+function updateSide(){
+  const a=parseInt(document.getElementById('sideA').value);
+  const b=parseInt(document.getElementById('sideB').value);
+  const c=parseInt(document.getElementById('sideC').value);
+  document.getElementById('sideAVal').textContent=a;
+  document.getElementById('sideBVal').textContent=b;
+  document.getElementById('sideCVal').textContent=c;
+  const canvas=document.getElementById('sideCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const ok = (a+b>c) && (a+c>b) && (b+c>a);
+  const verdict=document.getElementById('sideVerdict');
+  if(ok){
+    // 用余弦定理算顶点位置画出三角形（以c边为底）
+    const scale=8;
+    const A=[canvas.width/2-c*scale/2, 160], B=[canvas.width/2+c*scale/2, 160];
+    const cosA=(a*a+c*c-b*b)/(2*a*c);
+    const ang=Math.acos(Math.max(-1,Math.min(1,cosA)));
+    const C=[A[0]+a*scale*Math.cos(ang), A[1]-a*scale*Math.sin(ang)];
+    ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.lineTo(C[0],C[1]);ctx.closePath();
+    ctx.fillStyle='rgba(46,125,50,.15)';ctx.fill();ctx.strokeStyle='#2e7d32';ctx.lineWidth=3;ctx.stroke();
+    verdict.className='verdict-box yes';
+    verdict.innerHTML=`✅ 能围成三角形！<br>因为 ${a}+${b}>${c}，${a}+${c}>${b}，${b}+${c}>${a}`;
+  } else {
+    ctx.fillStyle='#999'; ctx.font='16px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('无法围成三角形（两边之和 ≤ 第三边）', canvas.width/2, canvas.height/2);
+    verdict.className='verdict-box no';
+    const pairs=[[a,b,c],[a,c,b],[b,c,a]];
+    const bad=pairs.find(([x,y,z])=>x+y<=z);
+    verdict.innerHTML=`❌ 不能围成三角形！<br>因为 ${bad[0]}+${bad[1]} ≤ ${bad[2]}（两边之和必须大于第三边）`;
+  }
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qType='', qData={}, qDone=false;
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const types=['sum','fit','classify'];
+  qType=types[randInt(0,2)];
+  const area=document.getElementById('quizArea');
+  if(qType==='sum'){
+    const a=randInt(30,100), b=randInt(20,120-Math.max(0,a-100+20));
+    const bb=Math.min(b,170-a);
+    const ans=180-a-bb;
+    qData={a,b:bb,ans};
+    document.getElementById('quizQ').textContent=`一个三角形两个角分别是 ${a}° 和 ${bb}°，第三个角是多少度？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?"><span>°</span>`;
+    const sInp=document.getElementById('quizInput');
+    sInp.addEventListener('keydown',e=>{if(e.key==='Enter')checkSum();});
+    sInp.addEventListener('input',()=>{ if(sInp.value.length>0 && sInp.value.length>=String(ans).length) checkSum(); });
+    sInp.addEventListener('blur',()=>{ if(sInp.value.length>0) checkSum(); });
+    speak(`一个三角形两个角分别是${a}度和${bb}度，第三个角是多少度？`);
+  } else if(qType==='fit'){
+    const useValid=Math.random()<0.5;
+    let a,b,c;
+    if(useValid){ a=randInt(3,15); b=randInt(3,15); c=randInt(Math.abs(a-b)+1, a+b-1); if(c<1)c=1; }
+    else { a=randInt(2,10); b=randInt(2,10); c=a+b+randInt(1,5); }
+    qData={a,b,c,ans:(a+b>c&&a+c>b&&b+c>a)};
+    document.getElementById('quizQ').textContent=`三条边长度分别是 ${a}、${b}、${c}，能围成一个三角形吗？`;
+    area.innerHTML=`<div class="choice-row"><button class="choice-btn" onclick="checkFit(true)">能</button><button class="choice-btn" onclick="checkFit(false)">不能</button></div>`;
+    speak(`三条边长度分别是${a}、${b}、${c}，能围成一个三角形吗？`);
+  } else {
+    const type=randInt(0,2);
+    let a,b,c,ans;
+    if(type===0){a=b=c=randInt(3,12);ans='等边三角形';}
+    else if(type===1){a=b=randInt(4,14);c=randInt(2,2*a-1);if(c===a)c=a-1<1?a+1:a-1;ans='等腰三角形';}
+    else {a=randInt(3,8);b=a+randInt(1,4);c=Math.max(Math.abs(a-b)+1,a+randInt(1,4));if(c===a||c===b)c+=1;ans='不等边三角形';}
+    qData={a,b,c,ans};
+    document.getElementById('quizQ').textContent=`三角形的三边长度是 ${a}、${b}、${c}，这是什么三角形（按边分）？`;
+    area.innerHTML=`<div class="choice-row"><button class="choice-btn" onclick="checkClassify('等边三角形')">等边三角形</button><button class="choice-btn" onclick="checkClassify('等腰三角形')">等腰三角形</button><button class="choice-btn" onclick="checkClassify('不等边三角形')">不等边三角形</button></div>`;
+    speak(`三角形的三边长度是${a}、${b}、${c}，这是什么三角形？`);
+  }
+}
+function markResult(correct,correctText){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案：'+correctText;
+    speak('答案是'+correctText+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+function checkSum(){
+  if(qDone) return;
+  const v=parseInt(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(v===qData.ans, qData.ans+'°');
+}
+function checkFit(v){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>b.disabled=true);
+  markResult(v===qData.ans, qData.ans?'能':'不能');
+}
+function checkClassify(v){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>b.disabled=true);
+  markResult(v===qData.ans, qData.ans);
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','drag','side','quiz']);
+  if(t==='learn') speak('认识三角形：点击图片，看看不同分类的三角形。');
+  if(t==='drag'){drawTriangleDrag();speak('拖动任意一个顶点，看看内角和是不是永远等于180度。');}
+  if(t==='side'){updateSide();speak('拖动滑块调整三条边的长度，看看能不能围成三角形。');}
+  if(t==='quiz') nextQ();
+}
+buildGallery();
+document.getElementById('learnDesc').textContent='点击上面的图片，了解不同三角形的特点吧！';
+bindDrag();
+drawTriangleDrag();
+speak('欢迎来到三角形！点击图片认识各种三角形，还可以拖动顶点探索内角和的秘密。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

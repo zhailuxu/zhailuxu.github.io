@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的成就｜慧陪学</title>
+<meta name="description" content="查看坚持、探索、进步和独立完成类学习徽章，记录只保存在当前浏览器。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--ink:#435047;--muted:#738078;--paper:rgba(250,252,246,.94)}body{min-height:100vh;padding:18px 12px 42px;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:linear-gradient(145deg,#e0efd9,#f5edd7 55%,#eadfee)}.container{max-width:900px;margin:auto}.hero,.summary,.badge{border:1px solid rgba(255,255,255,.8);background:var(--paper);box-shadow:0 7px 25px rgba(62,82,62,.1)}.hero{padding:26px 20px;border-radius:27px;text-align:center}.eyebrow{color:#7b896f;font-size:.74rem;font-weight:850;letter-spacing:2.5px}.hero h1{margin:6px 0 8px;color:#6d5846;font-size:clamp(2rem,6vw,3rem);letter-spacing:3px}.hero p{max-width:620px;margin:auto;color:var(--muted);font-size:.85rem;line-height:1.7}.summary{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:15px 0;padding:17px 20px;border-radius:20px}.summary strong{font-size:1.05rem}.summary span{color:#846646;font-size:.82rem;font-weight:850}.meter{flex:1;max-width:300px;height:11px;border-radius:99px;background:#dce5d7;overflow:hidden}.meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6d9772,#d6a24b)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:13px}.badge{position:relative;display:grid;grid-template-columns:58px 1fr;gap:13px;padding:17px;border-radius:20px}.badge.locked{filter:saturate(.25);opacity:.66}.icon{display:grid;width:54px;height:54px;place-items:center;border-radius:18px;background:#fff0cf;font-size:1.85rem}.badge.locked .icon{background:#edf0eb}.category{color:#778376;font-size:.68rem;font-weight:900;letter-spacing:1px}.badge h2{margin:3px 0 5px;font-size:1rem}.badge p{color:var(--muted);font-size:.75rem;line-height:1.55}.progress{display:inline-block;margin-top:8px;padding:4px 8px;border-radius:8px;background:#eaf2e6;color:#5d735f;font-size:.68rem;font-weight:800}.badge.locked .progress{background:#eceeeb;color:#747a75}.earned{position:absolute;right:13px;top:12px;color:#8a6738;font-size:.65rem;font-weight:850}.privacy{margin-top:16px;padding:15px;border-radius:17px;background:rgba(250,252,246,.78);color:#718078;font-size:.75rem;line-height:1.65;text-align:center}.links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:17px}.links a{color:#55715b;font-size:.82rem;font-weight:800;text-decoration:none}@media(max-width:560px){.summary{align-items:stretch;flex-direction:column}.meter{width:100%;max-width:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="hero"><div class="eyebrow">KEEP GOING · KEEP GROWING</div><h1>🏅 我的成就</h1><p>徽章记录自己的坚持、探索和进步。它们不会拿来和别人比较，也没有同龄排名。</p></header>
+  <section class="summary" aria-live="polite"><strong id="summaryText">已获得 0 / 10</strong><div class="meter" role="progressbar" aria-label="徽章解锁进度" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><i id="meterBar"></i></div><span id="nextText">继续练习，解锁下一枚</span></section>
+  <section class="grid" id="badgeGrid" aria-label="成就徽章"></section>
+  <p class="privacy">🔒 徽章只根据当前浏览器里的训练和游戏成长记录生成，不上传个人信息，不设置积分排行。</p>
+  <nav class="links"><a href="daily-camp.html">每日训练营</a><a href="game-paradise.html">游戏乐园</a><a href="game-progress.html">成长记录</a><a href="index.html">返回首页</a></nav>
+</main>
+<script src="hpx-game-progress.js"></script>
+<script src="hpx-daily-camp.js"></script>
+<script src="hpx-achievements.js"></script>
+<script>
+(function(){'use strict';function render(){var result=HpxAchievements.evaluate(HpxGameProgress.load(),HpxDailyCamp.load()),unlocked=result.badges.filter(function(badge){return badge.unlockedAt}),count=unlocked.length;document.getElementById('summaryText').textContent='已获得 '+count+' / '+result.badges.length;document.getElementById('meterBar').style.width=(count/result.badges.length*100)+'%';document.querySelector('.meter').setAttribute('aria-valuenow',String(count));document.getElementById('nextText').textContent=count===result.badges.length?'全部徽章都已解锁':'还有 '+(result.badges.length-count)+' 枚等待解锁';document.getElementById('badgeGrid').innerHTML=result.badges.map(function(badge){var unlocked=Boolean(badge.unlockedAt),date=unlocked?new Intl.DateTimeFormat('zh-CN',{month:'numeric',day:'numeric'}).format(new Date(badge.unlockedAt)):'';return '<article class="badge'+(unlocked?'':' locked')+'"><span class="icon">'+(unlocked?badge.icon:'🔒')+'</span><div><div class="category">'+badge.category+'</div><h2>'+badge.name+'</h2><p>'+badge.description+'</p><span class="progress">'+badge.progressText+'</span></div>'+(unlocked?'<span class="earned">'+date+' 获得</span>':'')+'</article>'}).join('')}window.addEventListener('pageshow',render);window.addEventListener('storage',render);render()})();
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

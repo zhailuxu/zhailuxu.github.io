@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>两位数乘法竖式</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#e8eaf6 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#e65100;letter-spacing:3px;text-shadow:2px 3px 0 #ffcc80;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* vertical calc */
+.vc-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.vc-controls{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.vc-input{display:flex;align-items:center;gap:8px;font-size:1rem;color:#555;}
+.num-inp{width:72px;font-size:1.3rem;border:2px solid #ffcc80;border-radius:10px;padding:4px 8px;text-align:center;font-family:inherit;outline:none;}
+.num-inp:focus{border-color:#e65100;}
+.go-btn{padding:8px 22px;border:none;border-radius:12px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.go-btn:hover{background:#bf360c;}
+/* steps */
+.step-nav{display:flex;gap:8px;align-items:center;justify-content:center;}
+.sn-btn{padding:7px 18px;border:none;border-radius:10px;background:#fff3e0;color:#e65100;font-weight:bold;cursor:pointer;font-family:inherit;}
+.sn-btn:hover{background:#e65100;color:#fff;}
+.step-info{font-size:.9rem;color:#999;min-width:80px;text-align:center;}
+/* multiplication table display */
+.vert-calc{font-family:'Courier New',monospace;font-size:1.6rem;font-weight:bold;text-align:right;line-height:2;position:relative;min-width:220px;}
+.vc-row{display:flex;justify-content:flex-end;align-items:center;gap:4px;position:relative;}
+.vc-op{color:#888;font-size:1.3rem;margin-right:4px;width:20px;text-align:center;}
+.vc-digit{width:38px;text-align:center;border-radius:6px;transition:background .3s,color .3s;}
+.vc-digit.hi-a{background:#fff9c4;color:#e65100;}
+.vc-digit.hi-b{background:#ffe0b2;color:#e65100;}
+.vc-digit.hi-c{background:#c8e6c9;color:#2e7d32;}
+.vc-digit.hi-carry{background:#e8eaf6;color:#5c6bc0;font-size:1rem;vertical-align:super;}
+.vc-line{border-top:3px solid #ccc;width:100%;margin:2px 0;}
+.step-desc{text-align:center;font-size:1rem;color:#555;min-height:48px;line-height:1.8;background:#fffde7;border-radius:10px;padding:8px 12px;}
+/* mode toggle */
+.mode-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.mode-btn{padding:8px 22px;border:none;border-radius:20px;font-size:.95rem;font-weight:bold;cursor:pointer;background:#fff3e0;color:#e65100;font-family:inherit;}
+.mode-btn.on{background:#e65100;color:#fff;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fff3e0;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
+.quiz-q{font-size:1.2rem;color:#333;font-weight:bold;margin-bottom:8px;}
+.qv-hint{font-size:.86rem;color:#888;line-height:1.7;margin-bottom:12px;}
+.qv-work{font-family:'Courier New',monospace;font-size:1.45rem;font-weight:bold;display:inline-flex;flex-direction:column;align-items:flex-end;gap:3px;padding:12px 8px;max-width:100%;overflow-x:auto;}
+.qv-row{display:flex;justify-content:flex-end;align-items:center;gap:4px;min-height:42px;}
+.qv-op{width:24px;text-align:center;color:#888;font-size:1.25rem;flex:0 0 24px;}
+.qv-cell{width:38px;height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;border-radius:7px;}
+.qv-fixed{background:#fff8e1;color:#5d4037;}
+.qv-input{width:38px;height:38px;border:2px solid #ffcc80;border-radius:7px;background:#fff;text-align:center;font:700 1.25rem 'Courier New',monospace;color:#333;outline:none;}
+.qv-input:focus{border-color:#e65100;box-shadow:0 0 0 3px rgba(230,81,0,.12);}
+.qv-input.ok{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.qv-input.wrong{background:#ffebee;border-color:#ef5350;color:#c62828;animation:qvShake .22s ease;}
+.qv-input.locked{background:#f3f3f3;border-color:#ccc;color:#777;}
+.qv-line{border-top:3px solid #aaa;width:calc(100% - 78px);margin:2px 78px 2px 0;}
+.qv-row-label{font:400 .72rem sans-serif;color:#aaa;width:74px;text-align:left;margin-left:4px;}
+@keyframes qvShake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.check-btn{margin:8px auto 0;padding:8px 22px;border:none;border-radius:10px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#e65100">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">✖️</div>
+    <h1>两位数乘法竖式</h1>
+    <p>一步一步看，进位不再怕</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('demo')">📖 竖式演示</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 演示 -->
+  <div id="tab-demo">
+    <div class="card">
+      <div class="mode-row">
+        <button class="mode-btn on" id="m1btn" onclick="setMode(1)">两位数 × 一位数</button>
+        <button class="mode-btn" id="m2btn" onclick="setMode(2)">两位数 × 两位数</button>
+      </div>
+      <div class="vc-controls">
+        <div class="vc-input">
+          <input type="number" id="numA" class="num-inp" value="47" min="10" max="99">
+          <span>×</span>
+          <input type="number" id="numB" class="num-inp" value="6" min="1" max="99">
+        </div>
+        <button class="go-btn" onclick="buildSteps()">演示 ▶</button>
+        <button class="go-btn" style="background:#888;" onclick="randomPick()">随机</button>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="step-nav">
+          <button class="sn-btn" onclick="prevStep()">◀ 上一步</button>
+          <span class="step-info" id="stepInfo">第1步</span>
+          <button class="sn-btn" onclick="nextStep()">下一步 ▶</button>
+        </div>
+        <div style="margin:14px 0;display:flex;justify-content:center;">
+          <div class="vert-calc" id="vcDisplay"></div>
+        </div>
+        <div class="step-desc" id="stepDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="mode-row">
+        <button class="mode-btn on" id="quizMode1Btn" onclick="setQuizMode(1)">两位数 × 一位数</button>
+        <button class="mode-btn" id="quizMode2Btn" onclick="setQuizMode(2)">两位数 × 两位数</button>
+      </div>
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="qv-hint" id="quizHint"></div>
+      <div><div class="qv-work" id="quizWork"></div></div>
+      <button class="check-btn" id="checkQuizBtn" onclick="checkQ()">✅ 检查竖式</button>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+
+let curMode=1, steps=[], curStep=0;
+
+function setMode(m){
+  curMode=m;
+  speak(m===1?'两位数乘以一位数模式。':'两位数乘以两位数模式。');
+  document.getElementById('m1btn').classList.toggle('on',m===1);
+  document.getElementById('m2btn').classList.toggle('on',m===2);
+  document.getElementById('numB').max=m===1?9:99;
+  document.getElementById('numB').min=m===1?2:10;
+  if(m===1) document.getElementById('numB').value=6;
+  else document.getElementById('numB').value=13;
+  buildSteps();
+}
+
+function buildSteps(){
+  const A=parseInt(document.getElementById('numA').value)||47;
+  const B=parseInt(document.getElementById('numB').value)||(curMode===1?6:13);
+  steps=[];
+  if(curMode===1){
+    build1x(A,B);
+  } else {
+    build2x(A,B);
+  }
+  curStep=0;
+  renderStep();
+}
+
+function build1x(A,B){
+  const a1=A%10, a10=Math.floor(A/10);
+  const carry=Math.floor(a1*B/10), lo=(a1*B)%10;
+  const hi=(a10*B+carry);
+  const result=A*B;
+  const rs=String(result);
+
+  steps=[
+    {desc:`写竖式：${A} × ${B}，被乘数在上，乘数在下`,highlights:{a:[],b:[],rows:[]}},
+    {desc:`先算个位：${a1} × ${B} = ${a1*B}，个位写 <b style="color:#2e7d32">${lo}</b>${carry>0?`，进位 <b style="color:#5c6bc0">${carry}</b>`:''}`,highlights:{a:[1],b:[],carry:carry>0?carry:null,lo:lo,rows:[]}},
+    {desc:`再算十位：${a10} × ${B} = ${a10*B}${carry>0?`，加进位 ${carry} = ${hi}`:''}，写 <b style="color:#e65100">${hi}</b>`,highlights:{a:[0],b:[],rows:[]}},
+    {desc:`结果：<b style="color:#ad1457">${A} × ${B} = ${result}</b> ✅`,highlights:{a:[],b:[],showResult:true,rows:[]}},
+  ];
+  steps._A=A;steps._B=B;steps._result=result;steps._carry=carry;steps._lo=lo;steps._hi=hi;steps._mode=1;
+}
+
+function build2x(A,B){
+  const result=A*B;
+  const aDigits=[...String(A)].reverse().map(Number);
+  const bDigits=[...String(B)].reverse().map(Number);
+  const width=Math.max(String(result).length,aDigits.length+bDigits.length);
+  const partialRows=bDigits.map(()=>Array(width).fill(null));
+  const resultDigits=Array(width).fill(null);
+  const placeNames=['个位','十位','百位','千位','万位'];
+
+  const copyState=extra=>({
+    partialRows:partialRows.map(row=>row.slice()),
+    resultDigits:resultDigits.slice(),
+    activeACol:null,activeBCol:null,activeRow:null,activeCol:null,
+    carryValue:null,carryACol:null,addCol:null,...extra
+  });
+
+  steps=[{
+    desc:`写竖式：${A} × ${B}。先用乘数的个位逐位乘，再算十位，最后把部分积逐列相加。`,
+    highlights:{state:copyState({phase:'setup'})}
+  }];
+
+  bDigits.forEach((bDigit,bCol)=>{
+    // 十位及更高位的部分积先补相应数量的0，表示向左错位。
+    for(let zeroCol=0;zeroCol<bCol;zeroCol++) partialRows[bCol][zeroCol]=0;
+    let carry=0;
+    aDigits.forEach((aDigit,aCol)=>{
+      const incomingCarry=carry;
+      const raw=aDigit*bDigit;
+      const total=raw+incomingCarry;
+      const written=total%10;
+      carry=Math.floor(total/10);
+      const outCol=aCol+bCol;
+      partialRows[bCol][outCol]=written;
+      const isLast=aCol===aDigits.length-1;
+      if(isLast&&carry>0) partialRows[bCol][outCol+1]=carry;
+
+      const place=placeNames[aCol]||`从右数第${aCol+1}位`;
+      const multiplierPlace=placeNames[bCol]||`从右数第${bCol+1}位`;
+      const carryText=incomingCarry>0?`，再加进位 ${incomingCarry}`:'';
+      let writeText=`，本位写 <b style="color:#2e7d32">${written}</b>`;
+      if(isLast&&carry>0) writeText+=`，最高位再写 <b style="color:#5c6bc0">${carry}</b>`;
+      else if(carry>0) writeText+=`，向前进 <b style="color:#5c6bc0">${carry}</b>`;
+
+      steps.push({
+        desc:`用乘数${multiplierPlace}的 ${bDigit} 乘被乘数${place}的 ${aDigit}：${aDigit} × ${bDigit} = ${raw}${carryText}，得到 ${total}${writeText}`,
+        highlights:{state:copyState({
+          phase:'multiply',activeACol:aCol,activeBCol:bCol,
+          activeRow:bCol,activeCol:outCol,
+          carryValue:!isLast&&carry>0?carry:null,
+          carryACol:!isLast&&carry>0?aCol+1:null
+        })}
+      });
+    });
+  });
+
+  let addCarry=0;
+  const resultLen=String(result).length;
+  for(let col=0;col<resultLen;col++){
+    const values=partialRows.map(row=>row[col]??0);
+    const incomingCarry=addCarry;
+    const columnTotal=values.reduce((sum,n)=>sum+n,0)+incomingCarry;
+    const written=columnTotal%10;
+    addCarry=Math.floor(columnTotal/10);
+    resultDigits[col]=written;
+    const terms=values.join(' + ')+(incomingCarry>0?` + 进位${incomingCarry}`:'');
+    const carryText=addCarry>0?`，写 ${written}，向前进 ${addCarry}`:`，写 ${written}`;
+    steps.push({
+      desc:`部分积的${placeNames[col]||`第${col+1}位`}相加：${terms} = ${columnTotal}${carryText}`,
+      highlights:{state:copyState({phase:'add',addCol:col,addCarry})}
+    });
+  }
+
+  steps.push({
+    desc:`全部数位计算完成：<b style="color:#ad1457">${A} × ${B} = ${result}</b> ✅`,
+    highlights:{state:copyState({phase:'done'})}
+  });
+  steps._A=A;steps._B=B;steps._result=result;steps._mode=2;
+  steps._width=width;steps._aDigits=aDigits;steps._bDigits=bDigits;
+}
+
+function renderDigitRow(digits,width,classForCol){
+  let html='';
+  for(let col=width-1;col>=0;col--){
+    const digit=digits[col];
+    const cls=classForCol?classForCol(col):'';
+    html+=`<div class="vc-digit ${cls||''}">${digit===null||digit===undefined?'':digit}</div>`;
+  }
+  return html;
+}
+
+function renderStep(){
+  document.getElementById('stepInfo').textContent=`第 ${curStep+1} / ${steps.length} 步`;
+  document.getElementById('stepDesc').innerHTML=steps[curStep].desc;
+  speak(steps[curStep].desc.replace(/<[^>]+>/g,''));
+
+  const A=steps._A, B=steps._B, result=steps._result;
+  const h=steps[curStep].highlights;
+  let html='';
+
+  if(steps._mode===1){
+    const carry=steps._carry, lo=steps._lo, hi=steps._hi;
+    const As=String(A), Rs=String(result);
+    // carry row
+    if(curStep>=1&&carry>0){
+      html+=`<div class="vc-row"><div class="vc-digit hi-carry" style="width:38px;font-size:1rem;color:#5c6bc0;">${carry}</div><div style="width:38px;"></div></div>`;
+    }
+    // A row
+    html+=`<div class="vc-row">`;
+    [...As].forEach((d,i)=>{
+      const cls=h.a&&h.a.includes(i)?'vc-digit hi-a':'vc-digit';
+      html+=`<div class="${cls}">${d}</div>`;
+    });
+    html+=`</div>`;
+    // × B
+    html+=`<div class="vc-row"><span style="color:#888;font-size:1.3rem;margin-right:4px;">×</span><div class="vc-digit">${B}</div></div>`;
+    html+=`<div class="vc-line"></div>`;
+    // result
+    if(curStep>=3){
+      html+=`<div class="vc-row">`;
+      [...Rs].forEach(d=>{html+=`<div class="vc-digit hi-c">${d}</div>`;});
+      html+=`</div>`;
+    } else if(curStep>=1){
+      let partial='';
+      if(curStep===1) partial=String(lo);
+      if(curStep>=2) partial=String(result);
+      html+=`<div class="vc-row">`;
+      [...partial].forEach((d,i)=>{
+        const cls=i===partial.length-1&&curStep===1?'vc-digit hi-c':curStep>=2?'vc-digit hi-c':'vc-digit';
+        html+=`<div class="${cls}">${d}</div>`;
+      });
+      html+=`</div>`;
+    }
+  } else {
+    const state=h.state;
+    const width=steps._width;
+    const aDigits=steps._aDigits,bDigits=steps._bDigits;
+    if(state.carryValue!==null){
+      const carryDigits=Array(width).fill(null);
+      carryDigits[state.carryACol]=state.carryValue;
+      html+=`<div class="vc-row">${renderDigitRow(carryDigits,width,col=>col===state.carryACol?'hi-carry':'')}</div>`;
+    }
+    html+=`<div class="vc-row">${renderDigitRow(aDigits,width,col=>col===state.activeACol?'hi-a':'')}</div>`;
+    html+=`<div class="vc-row"><span class="vc-op">×</span>${renderDigitRow(bDigits,width,col=>col===state.activeBCol?'hi-b':'')}</div>`;
+    html+=`<div class="vc-line"></div>`;
+    const visibleRows=state.partialRows
+      .map((row,rowIndex)=>({row,rowIndex}))
+      .filter(item=>item.row.some(d=>d!==null));
+    visibleRows.forEach((item,visibleIndex)=>{
+      const {row,rowIndex}=item;
+      const addSign=visibleRows.length>1&&visibleIndex===visibleRows.length-1
+        ? '<span class="vc-op">＋</span>' : '';
+      html+=`<div class="vc-row">${addSign}${renderDigitRow(row,width,col=>{
+        if(state.phase==='add'&&col===state.addCol) return 'hi-a';
+        return rowIndex===state.activeRow&&col===state.activeCol?'hi-c':'';
+      })}</div>`;
+    });
+    if(state.phase==='add'||state.phase==='done'){
+      html+=`<div class="vc-line"></div>`;
+      html+=`<div class="vc-row">${renderDigitRow(state.resultDigits,width,col=>{
+        if(state.phase==='done') return 'hi-c';
+        return col===state.addCol?'hi-c':'';
+      })}</div>`;
+    }
+  }
+  document.getElementById('vcDisplay').innerHTML=html;
+}
+
+function nextStep(){if(curStep<steps.length-1){curStep++;renderStep();}}
+function prevStep(){if(curStep>0){curStep--;renderStep();}}
+function randomPick(){
+  const A=10+Math.floor(Math.random()*90);
+  document.getElementById('numA').value=A;
+  if(curMode===1){document.getElementById('numB').value=2+Math.floor(Math.random()*8);}
+  else{document.getElementById('numB').value=11+Math.floor(Math.random()*88);}
+  buildSteps();
+}
+
+// quiz：不是只填最终答案，而是逐格完成整道竖式。
+let qScore={c:0,w:0},qAns=0,qRows=[],qAnswered=false,qWrongRecorded=false,quizMode=1;
+
+function setQuizMode(mode){
+  quizMode=mode;
+  document.getElementById('quizMode1Btn').classList.toggle('on',mode===1);
+  document.getElementById('quizMode2Btn').classList.toggle('on',mode===2);
+  nextQ();
+}
+
+function buildQuizRows(A,B){
+  const result=A*B;
+  const width=Math.max(String(A).length,String(B).length,String(result).length);
+  const rows=[];
+  if(B>=10){
+    const ones=B%10,tens=Math.floor(B/10);
+    rows.push({key:'partial-ones',value:A*ones,label:`${ones} 乘出的第一行`,lockedCols:[]});
+    rows.push({key:'partial-tens',value:A*tens*10,label:`${tens} 乘出的第二行`,lockedCols:[0]});
+  }
+  rows.push({key:'result',value:result,label:B>=10?'部分积相加结果':'乘法结果',lockedCols:[]});
+  return {A,B,result,width,rows};
+}
+
+function fixedQuizRow(value,width,operator=''){
+  const digits=[...String(value)].reverse();
+  let cells='';
+  for(let col=width-1;col>=0;col--){
+    cells+=`<span class="qv-cell qv-fixed">${digits[col]??''}</span>`;
+  }
+  return `<div class="qv-row"><span class="qv-op">${operator}</span>${cells}<span class="qv-row-label"></span></div>`;
+}
+
+function inputQuizRow(row,rowIndex,width,showPlus){
+  const digits=[...String(row.value)].reverse();
+  let cells='';
+  for(let col=width-1;col>=0;col--){
+    if(col>=digits.length){
+      cells+='<span class="qv-cell"></span>';
+      continue;
+    }
+    const locked=row.lockedCols.includes(col);
+    cells+=`<input class="qv-input${locked?' locked':''}" inputmode="numeric" maxlength="1"
+      aria-label="${row.label}${col+1}位" data-row="${rowIndex}" data-col="${col}"
+      ${locked?`value="${digits[col]}" disabled`:''}>`;
+  }
+  return `<div class="qv-row"><span class="qv-op">${showPlus?'＋':''}</span>${cells}<span class="qv-row-label">${row.label}</span></div>`;
+}
+
+function renderQuizWork(data){
+  qRows=data.rows;
+  let html=fixedQuizRow(data.A,data.width)+fixedQuizRow(data.B,data.width,'×')+'<div class="qv-line"></div>';
+  data.rows.forEach((row,index)=>{
+    const isResult=index===data.rows.length-1;
+    if(isResult&&data.rows.length>1) html+='<div class="qv-line"></div>';
+    html+=inputQuizRow(row,index,data.width,!isResult&&index===data.rows.length-2);
+  });
+  document.getElementById('quizWork').innerHTML=html;
+}
+
+function nextQ(){
+  document.getElementById('quizMsg').className='result-msg';
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('checkQuizBtn').disabled=false;
+  qAnswered=false;qWrongRecorded=false;
+  const A=10+Math.floor(Math.random()*90);
+  const B=quizMode===1?2+Math.floor(Math.random()*8):11+Math.floor(Math.random()*88);
+  const data=buildQuizRows(A,B);
+  qAns=data.result;
+  document.getElementById('quizQ').textContent=`${A} × ${B}：请列竖式计算`;
+  document.getElementById('quizHint').textContent=quizMode===1
+    ? '从个位开始，一格只写一个数字。'
+    : '先填两行部分积，注意第二行向左错一位，最后把两行相加。';
+  renderQuizWork(data);
+  setTimeout(()=>document.querySelector('.qv-input[data-col="0"]:not(.locked)')?.focus(),0);
+  speak(`${A}乘以${B}，请列竖式计算。`);
+}
+
+function checkQ(){
+  if(qAnswered) return;
+  const inputs=[...document.querySelectorAll('.qv-input:not(.locked)')];
+  const firstEmpty=inputs.find(input=>!input.value);
+  if(firstEmpty){
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='✏️ 竖式还没填完哦，一格写一个数字';
+    firstEmpty.focus();
+    return;
+  }
+
+  const wrong=[];
+  inputs.forEach(input=>{
+    const row=qRows[Number(input.dataset.row)];
+    const expected=[...String(row.value)].reverse()[Number(input.dataset.col)];
+    const ok=input.value===expected;
+    input.classList.toggle('ok',ok);
+    input.classList.toggle('wrong',!ok);
+    if(!ok) wrong.push(input);
+  });
+
+  if(wrong.length){
+    if(!qWrongRecorded){
+      qWrongRecorded=true;qScore.w++;
+      document.getElementById('qW').textContent=qScore.w;
+    }
+    const row=qRows[Number(wrong[0].dataset.row)];
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent=`❌ 先检查“${row.label}”里标红的数位`;
+    wrong[0].focus();
+    speak(`先检查${row.label}里标红的数位。`);
+    return;
+  }
+
+  qAnswered=true;qScore.c++;
+  document.getElementById('qC').textContent=qScore.c;
+  document.querySelectorAll('.qv-input').forEach(input=>input.disabled=true);
+  document.getElementById('checkQuizBtn').disabled=true;
+  document.getElementById('quizMsg').className='result-msg ok';
+  document.getElementById('quizMsg').textContent=`✅ 竖式全部正确！${qAns}`;
+  document.getElementById('nextBtn').style.display='inline-block';
+  speak('竖式全部正确，真棒！');
+}
+
+document.getElementById('quizWork').addEventListener('input',event=>{
+  const input=event.target.closest('.qv-input');
+  if(!input) return;
+  input.value=input.value.replace(/\D/g,'').slice(-1);
+  input.classList.remove('ok','wrong');
+  document.getElementById('quizMsg').textContent='';
+  if(input.value){
+    const nextCol=Number(input.dataset.col)+1;
+    document.querySelector(`.qv-input[data-row="${input.dataset.row}"][data-col="${nextCol}"]:not(.locked)`)?.focus();
+  }
+});
+document.getElementById('quizWork').addEventListener('keydown',event=>{
+  if(event.key==='Enter'){checkQ();return;}
+  const input=event.target.closest('.qv-input');
+  if(event.key==='Backspace'&&input&&!input.value){
+    const prevCol=Number(input.dataset.col)-1;
+    document.querySelector(`.qv-input[data-row="${input.dataset.row}"][data-col="${prevCol}"]:not(.locked)`)?.focus();
+  }
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['demo','quiz']);
+  if(t==='demo') speak('竖式演示：一步一步看，进位不再怕。');
+  if(t==='quiz') nextQ();
+}
+buildSteps();
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

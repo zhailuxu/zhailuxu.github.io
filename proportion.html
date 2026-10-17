@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比例</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e0f7fa 50%,#f3e5f5 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#283593;letter-spacing:3px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.mode-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.mode-btn{padding:7px 16px;border:2px solid #9fa8da;border-radius:14px;background:#fff;color:#283593;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.mode-btn.on{background:#283593;color:#fff;border-color:#283593;}
+.ratio-row{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.ratio-input{width:60px;font-size:1.2rem;text-align:center;border:2px solid #9fa8da;border-radius:8px;padding:6px;outline:none;font-family:inherit;}
+.ratio-input:focus{border-color:#283593;}
+.ratio-input.locked{background:#eee;color:#999;}
+.colon{font-size:1.3rem;font-weight:bold;color:#283593;}
+.eq{font-size:1.5rem;font-weight:bold;color:#283593;}
+.verdict-box{text-align:center;font-size:1.05rem;font-weight:bold;padding:12px;border-radius:12px;margin-top:6px;}
+.verdict-box.yes{background:#e8f5e9;color:#2e7d32;}
+.verdict-box.no{background:#ffebee;color:#c62828;}
+.table-wrap{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:10px;}
+.mini-table{border-collapse:collapse;font-size:.9rem;}
+.mini-table th,.mini-table td{border:1px solid #c5cae9;padding:6px 12px;text-align:center;}
+.mini-table th{background:#e8eaf6;color:#283593;}
+.k-slider-row{display:flex;justify-content:center;gap:10px;align-items:center;margin-bottom:14px;}
+input[type=range]{width:130px;accent-color:#283593;}
+.calc-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;}
+.calc-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.calc-group label{font-size:.82rem;color:#777;font-weight:bold;}
+.calc-group input,.calc-group select{width:110px;font-size:1rem;border:2px solid #9fa8da;border-radius:10px;padding:6px 8px;text-align:center;outline:none;font-family:inherit;}
+.result-box{background:#e8eaf6;border-radius:12px;padding:12px 18px;text-align:center;font-size:1rem;color:#283593;line-height:1.9;}
+.result-box b{color:#c62828;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#283593;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #9fa8da;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#283593;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.choice-btn{padding:10px 18px;border:2px solid #9fa8da;border-radius:14px;background:#fff;color:#283593;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-btn:hover{background:#e8eaf6;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#283593">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📐</div>
+    <h1>比例</h1>
+    <p>意义与性质 · 正比例与反比例 · 比例尺</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('meaning')">📖 意义与性质</button>
+    <button class="tab-btn" onclick="switchTab('direct')">📊 正反比例</button>
+    <button class="tab-btn" onclick="switchTab('scale')">🗺️ 比例尺</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 意义与性质 -->
+  <div id="tab-meaning">
+    <div class="card">
+      <div class="mode-row">
+        <button class="mode-btn on" id="modeVerify" onclick="setMeaningMode('verify')">验证比例</button>
+        <button class="mode-btn" id="modeSolve" onclick="setMeaningMode('solve')">解比例</button>
+      </div>
+      <div class="ratio-row">
+        <input type="number" id="ra" class="ratio-input" value="2" oninput="updateMeaning()"><span class="colon">:</span>
+        <input type="number" id="rb" class="ratio-input" value="3" oninput="updateMeaning()">
+        <span class="eq">=</span>
+        <input type="number" id="rc" class="ratio-input" value="4" oninput="updateMeaning()"><span class="colon">:</span>
+        <input type="number" id="rd" class="ratio-input" value="6" oninput="updateMeaning()">
+      </div>
+      <div class="verdict-box" id="meaningVerdict"></div>
+    </div>
+  </div>
+
+  <!-- 正反比例 -->
+  <div id="tab-direct" style="display:none;">
+    <div class="card">
+      <div class="k-slider-row"><label>常数 k =</label><input type="range" id="kSlider" min="2" max="12" value="6" oninput="updateDirect()"><span id="kVal" style="font-weight:bold;color:#283593;">6</span></div>
+      <div class="table-wrap">
+        <div>
+          <div style="text-align:center;font-weight:bold;color:#1565c0;margin-bottom:6px;">正比例：y = k × x（比值 y/x 一定）</div>
+          <table class="mini-table" id="directTable"></table>
+        </div>
+        <div>
+          <div style="text-align:center;font-weight:bold;color:#c62828;margin-bottom:6px;">反比例：y = k ÷ x（积 x×y 一定）</div>
+          <table class="mini-table" id="inverseTable"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 比例尺 -->
+  <div id="tab-scale" style="display:none;">
+    <div class="card">
+      <div class="mode-row">
+        <button class="mode-btn on" id="scaleModeA" onclick="setScaleMode('toReal')">图上 → 实际</button>
+        <button class="mode-btn" id="scaleModeB" onclick="setScaleMode('toMap')">实际 → 图上</button>
+      </div>
+      <div class="calc-row">
+        <div class="calc-group" id="scaleInputGroup"><label id="scaleInputLabel">图上距离（cm）</label><input type="number" id="scaleInput" value="5" oninput="updateScale()"></div>
+        <div class="calc-group"><label>比例尺 1 :</label><input type="number" id="scaleDenom" value="1000000" oninput="updateScale()"></div>
+      </div>
+      <div class="result-box" id="scaleResult"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ── 意义与性质 ──
+let meaningMode='verify';
+function setMeaningMode(m){
+  meaningMode=m;
+  document.getElementById('modeVerify').classList.toggle('on',m==='verify');
+  document.getElementById('modeSolve').classList.toggle('on',m==='solve');
+  document.getElementById('rd').readOnly=(m==='solve');
+  document.getElementById('rd').classList.toggle('locked',m==='solve');
+  updateMeaning();
+}
+function updateMeaning(){
+  const a=parseFloat(document.getElementById('ra').value)||0;
+  const b=parseFloat(document.getElementById('rb').value)||0;
+  const c=parseFloat(document.getElementById('rc').value)||0;
+  let d=parseFloat(document.getElementById('rd').value)||0;
+  if(meaningMode==='solve'){
+    if(a!==0){ d=Math.round((b*c/a)*100)/100; document.getElementById('rd').value=d; }
+  }
+  const inner=b*c, outer=a*d; // 内项 b、c；外项 a、d
+  const isProp=Math.abs(inner-outer)<0.001;
+  const box=document.getElementById('meaningVerdict');
+  if(meaningMode==='verify'){
+    if(isProp){
+      box.className='verdict-box yes';
+      box.innerHTML=`✅ 这是一个比例！内项 ${b}×${c}=${inner} = 外项 ${a}×${d}=${outer}`;
+      speak('内项相乘等于外项相乘，这是一个比例。');
+    } else {
+      box.className='verdict-box no';
+      box.innerHTML=`❌ 不是比例。内项 ${b}×${c}=${inner} ≠ 外项 ${a}×${d}=${outer}`;
+      speak('内项相乘不等于外项相乘，这不是比例。');
+    }
+  } else {
+    box.className='verdict-box yes';
+    box.innerHTML=`💡 解比例：${a} : ${b} = ${c} : x<br>交叉相乘：${a} × x = ${b} × ${c}<br>x = ${b}×${c} ÷ ${a} = <b>${d}</b>`;
+    speak(`解比例，x等于${d}。`);
+  }
+}
+
+// ── 正反比例 ──
+function updateDirect(){
+  const k=parseInt(document.getElementById('kSlider').value);
+  document.getElementById('kVal').textContent=k;
+  const dt=document.getElementById('directTable'), it=document.getElementById('inverseTable');
+  let dRows='<tr><th>x</th>'+[1,2,3,4].map(x=>`<td>${x}</td>`).join('')+'</tr><tr><th>y</th>'+[1,2,3,4].map(x=>`<td>${k*x}</td>`).join('')+'</tr>';
+  dt.innerHTML=dRows;
+  const xs=[1,2,3,4], invK=k*12; // k*12 保证能被1、2、3、4整除，表格数据始终是整数
+  let iRows='<tr><th>x</th>'+xs.map(x=>`<td>${x}</td>`).join('')+'</tr><tr><th>y</th>'+xs.map(x=>`<td>${invK/x}</td>`).join('')+'</tr>';
+  it.innerHTML=iRows;
+  speak('滑动滑块，观察正比例和反比例的数据表有什么不同。');
+}
+
+// ── 比例尺 ──
+let scaleMode='toReal';
+function setScaleMode(m){
+  scaleMode=m;
+  document.getElementById('scaleModeA').classList.toggle('on',m==='toReal');
+  document.getElementById('scaleModeB').classList.toggle('on',m==='toMap');
+  document.getElementById('scaleInputLabel').textContent = m==='toReal' ? '图上距离（cm）' : '实际距离（m）';
+  updateScale();
+}
+function fmtDistance(cm){
+  if(cm>=100000) return (cm/100000).toFixed(2)+' km';
+  if(cm>=100) return (cm/100).toFixed(2)+' m';
+  return cm.toFixed(2)+' cm';
+}
+function updateScale(){
+  const v=parseFloat(document.getElementById('scaleInput').value)||0;
+  const denom=parseFloat(document.getElementById('scaleDenom').value)||1;
+  if(scaleMode==='toReal'){
+    const realCm=v*denom;
+    document.getElementById('scaleResult').innerHTML=`图上距离 ${v} cm，比例尺 1:${denom}<br>实际距离 = ${v} × ${denom} = ${realCm} cm = <b>${fmtDistance(realCm)}</b>`;
+    speak(`图上距离${v}厘米，实际距离是${fmtDistance(realCm)}。`);
+  } else {
+    const realCm=v*100; // v is in meters
+    const mapCm=realCm/denom;
+    document.getElementById('scaleResult').innerHTML=`实际距离 ${v} m = ${realCm} cm，比例尺 1:${denom}<br>图上距离 = ${realCm} ÷ ${denom} = <b>${mapCm.toFixed(4)} cm</b>`;
+    speak(`实际距离${v}米，图上距离是${mapCm.toFixed(2)}厘米。`);
+  }
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=null, qType='', qDone=false;
+function attachNumAutoCheck(){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(qAns).length) checkNum(); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNum(); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNum(); });
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  qType=['solve','relation','scale'][randInt(0,2)];
+  if(qType==='solve'){
+    const a=randInt(2,9), b=randInt(2,9), k=randInt(2,6), c=a*k;
+    qAns=b*k;
+    document.getElementById('quizQ').innerHTML=`解比例：${a} : ${b} = ${c} : x，x = ?`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck();
+    speak(`解比例，${a}比${b}等于${c}比x，x等于多少？`);
+  } else if(qType==='relation'){
+    const t=randInt(0,2);
+    let pts,label;
+    if(t===0){ const k=randInt(2,9); pts=[1,2,3].map(x=>[x,x*k]); label='正比例'; }
+    else if(t===1){ const kk=[12,24,36,60][randInt(0,3)]; const divs=Array.from({length:kk},(_,i)=>i+1).filter(d=>kk%d===0); const xs=shuffleArr(divs).slice(0,3).sort((a,b)=>a-b); pts=xs.map(x=>[x,kk/x]); label='反比例'; }
+    else { const k=randInt(2,9), off=randInt(1,5); pts=[1,2,3].map(x=>[x,k*x+off]); label='都不是'; }
+    qAns=label;
+    document.getElementById('quizQ').innerHTML=`x：${pts.map(p=>p[0]).join('，')}<br>y：${pts.map(p=>p[1]).join('，')}<br>x和y是什么关系？`;
+    area.innerHTML='<div class="choice-row"></div>';
+    const row=area.querySelector('.choice-row');
+    ['正比例','反比例','都不是'].forEach(name=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=name;
+      b.onclick=()=>checkChoice(b,name); row.appendChild(b);
+    });
+    speak('观察x和y的关系，它们是正比例、反比例，还是都不是？');
+  } else {
+    const denom=[500,1000,5000,10000,100000][randInt(0,4)];
+    const mapCm=randInt(2,20);
+    qAns=mapCm*denom;
+    document.getElementById('quizQ').innerHTML=`比例尺是 1:${denom}，图上距离是 ${mapCm} cm，实际距离是多少厘米？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck();
+    speak(`比例尺是1比${denom}，图上距离是${mapCm}厘米，实际距离是多少厘米？`);
+  }
+}
+function checkNum(){
+  if(qDone) return;
+  const v=parseFloat(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(Math.abs(v-qAns)<0.01, qAns);
+}
+function checkChoice(btn,val){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===qAns) b.classList.add('correct');});
+  if(val!==qAns) btn.classList.add('wrong');
+  markResult(val===qAns, qAns);
+}
+function markResult(correct,ans){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['meaning','direct','scale','quiz']);
+  if(t==='meaning') speak('比例的意义与性质：内项相乘等于外项相乘。');
+  if(t==='direct') updateDirect();
+  if(t==='scale') updateScale();
+  if(t==='quiz') nextQ();
+}
+updateMeaning(); updateDirect(); updateScale();
+speak('欢迎来到比例！认识比例的意义、正反比例，还有比例尺的用法。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

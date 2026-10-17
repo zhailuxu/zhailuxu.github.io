@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏乐园｜慧陪学</title>
+<meta name="description" content="慧陪学游戏乐园，集中提供拼豆、观察、记忆、逻辑、空间和专注力小游戏。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#3f4f47;--muted:#718078;--green:#4d7c52;--brown:#6d4c41}
+body{min-height:100vh;padding:22px 14px 42px;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:linear-gradient(145deg,#dcefd8 0%,#edf5d9 48%,#f6ead5 100%)}
+.container{max-width:1040px;margin:0 auto}
+.hero{position:relative;overflow:hidden;padding:28px 24px 24px;border:1px solid rgba(255,255,255,.7);border-radius:28px;background:rgba(249,252,245,.88);box-shadow:0 10px 34px rgba(66,91,67,.12);text-align:center}
+.hero::before,.hero::after{content:"";position:absolute;width:120px;height:120px;border-radius:30px;opacity:.18;transform:rotate(24deg)}
+.hero::before{left:-45px;top:-52px;background:#d94d78}.hero::after{right:-42px;bottom:-55px;background:#4f87c7}
+.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:3px;color:#7a896f}.hero h1{margin:7px 0 8px;font-size:clamp(2rem,6vw,3.25rem);letter-spacing:5px;color:var(--brown);text-shadow:2px 3px #ddd0bc}.hero p{max-width:620px;margin:auto;color:var(--muted);font-size:.94rem;line-height:1.7}
+.quick-stats{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:17px}.quick-stats span{padding:6px 12px;border-radius:999px;background:#e5efdf;color:#526653;font-size:.78rem;font-weight:750}
+.difficulty-guide{margin:18px 0 4px;border:1px solid rgba(255,255,255,.75);border-radius:22px;background:rgba(249,252,245,.82);box-shadow:0 5px 20px rgba(53,76,55,.08);overflow:hidden}.difficulty-guide summary{padding:14px 18px;color:#526653;font-size:.92rem;font-weight:850;cursor:pointer;text-align:center}.difficulty-guide summary::marker{color:#7c927a}.difficulty-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px 14px}.difficulty-item{padding:13px;border-radius:16px;background:#edf4e9}.difficulty-item:nth-child(2){background:#f3efdf}.difficulty-item:nth-child(3){background:#eee8f2}.difficulty-item h2{font-size:.96rem;color:#4f6451}.difficulty-item:nth-child(2) h2{color:#74633f}.difficulty-item:nth-child(3) h2{color:#6e5775}.difficulty-item p{margin-top:5px;color:#718078;font-size:.77rem;line-height:1.65}.difficulty-note{padding:0 18px 15px;text-align:center;color:#778279;font-size:.73rem;line-height:1.6}
+.daily-entry,.progress-entry,.achievement-entry{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 0 4px;padding:14px 18px;border:1px solid rgba(255,255,255,.75);border-radius:18px;background:#e8f0e3;color:#546756;text-decoration:none;box-shadow:0 4px 15px rgba(53,76,55,.08)}.daily-entry{padding:18px;background:linear-gradient(105deg,#fff3d9,#e5f1dd);border-left:6px solid #d49b47}.achievement-entry{background:#f2eadf}.daily-entry strong,.progress-entry strong,.achievement-entry strong{display:block;font-size:.96rem}.daily-entry span span,.progress-entry span span,.achievement-entry span span{display:block;margin-top:3px;color:#738076;font-size:.76rem;line-height:1.5}.daily-entry b,.progress-entry b,.achievement-entry b{flex:0 0 auto;color:#55715b;font-size:.82rem}
+.library-panel{margin:14px 0;padding:17px;border:1px solid rgba(255,255,255,.78);border-radius:21px;background:rgba(249,252,245,.9);box-shadow:0 5px 20px rgba(53,76,55,.08)}.continue-game{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:15px;background:#fff0d3;color:#6b5a43;text-decoration:none}.continue-game strong{font-size:.9rem}.continue-game span{font-size:.75rem;font-weight:800}.shelf{margin-top:15px}.shelf h2{margin-bottom:8px;color:#5b685e;font-size:.9rem}.mini-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}.mini-game{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:13px;background:#edf3e9;color:#536157;text-decoration:none}.mini-game i{font-style:normal;font-size:1.35rem}.mini-game b{display:block;font-size:.78rem}.mini-game small{display:block;margin-top:2px;color:#748077;font-size:.66rem}.library-note{margin-top:12px;color:#7b857d;font-size:.69rem;text-align:center}
+.filters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0 17px}.filter{border:2px solid #c7d7c2;border-radius:999px;padding:8px 15px;background:rgba(255,255,255,.72);color:#5d6c5d;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer;transition:.16s transform,.16s background,.16s color}.filter:hover{transform:translateY(-1px)}.filter.on{border-color:var(--green);background:var(--green);color:#fff}.filter:focus-visible,.game-card:focus-visible,.home-link:focus-visible{outline:4px solid rgba(21,101,192,.28);outline-offset:3px}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px}
+.game-card-wrap{position:relative;min-width:0}.game-card-wrap[hidden]{display:none}.game-card-wrap .game-card{height:100%}.favorite-btn{position:absolute;z-index:2;right:13px;top:55px;display:grid;width:42px;height:42px;place-items:center;border:2px solid rgba(255,255,255,.9);border-radius:50%;background:#edf2e9;color:#7a806f;font:inherit;font-size:1.15rem;cursor:pointer;box-shadow:0 3px 10px rgba(56,71,58,.12)}.favorite-btn[aria-pressed="true"]{background:#fff0c9;color:#9a6c24}.favorite-btn:focus-visible{outline:4px solid rgba(21,101,192,.28);outline-offset:2px}
+.game-card{--accent:#6d4c41;position:relative;display:flex;min-height:255px;flex-direction:column;gap:10px;padding:20px;border:1px solid rgba(255,255,255,.78);border-top:6px solid var(--accent);border-radius:22px;background:rgba(255,255,255,.88);box-shadow:0 6px 22px rgba(53,76,55,.1);color:inherit;text-decoration:none;transition:.18s transform,.18s box-shadow}.game-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(53,76,55,.16)}.game-card[hidden]{display:none}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.icon{display:grid;width:54px;height:54px;place-items:center;border-radius:17px;background:color-mix(in srgb,var(--accent) 14%,white);font-size:2rem}.age{padding:4px 9px;border-radius:999px;background:#edf2e9;color:#6c786b;font-size:.68rem;font-weight:750;white-space:nowrap}
+.game-card h2{font-size:1.22rem;color:#39443e}.game-card p{flex:1;color:#718078;font-size:.84rem;line-height:1.65}.skills{display:flex;gap:6px;flex-wrap:wrap}.skills span{padding:4px 8px;border-radius:8px;background:color-mix(in srgb,var(--accent) 10%,white);color:var(--accent);font-size:.7rem;font-weight:800}.play{margin-top:3px;color:var(--accent);font-size:.85rem;font-weight:850}
+.empty{display:none;padding:28px;border-radius:20px;background:rgba(255,255,255,.75);text-align:center;color:var(--muted)}.empty.show{display:block}
+.footer{text-align:center;margin-top:24px;color:#7a877d;font-size:.82rem}.home-link{display:inline-block;margin-bottom:10px;color:var(--green);font-weight:800;text-decoration:none}.footer p{line-height:1.7}.footer a{color:#657568}
+@media(max-width:560px){body{padding:14px 10px 32px}.hero{padding:24px 15px 20px;border-radius:22px}.hero h1{letter-spacing:3px}.difficulty-grid{grid-template-columns:1fr}.game-grid{grid-template-columns:1fr;gap:12px}.game-card{min-height:0;padding:17px}.mini-grid{grid-template-columns:1fr 1fr}.filters{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:1px 2px 7px}.filter{flex:0 0 auto}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="hero">
+    <div class="eyebrow">PLAY · THINK · GROW</div>
+    <h1>🎮 游戏乐园</h1>
+    <p>选一个喜欢的小游戏，在观察、记忆、逻辑和创造中轻松动脑。每个游戏都可以反复尝试，做错了也能留在当前题继续挑战。</p>
+    <div class="quick-stats"><span>30 个游戏</span><span>幼儿园～六年级</span><span>自由练习 + 关卡挑战</span></div>
+  </header>
+
+  <details class="difficulty-guide" open>
+    <summary>怎么选择难度？查看统一的三级说明</summary>
+    <div class="difficulty-grid">
+      <article class="difficulty-item"><h2>🌱 低年级 · 先理解玩法</h2><p>以4×4左右的小网格、少量颜色或选项、短指令为主。默认不制造倒计时压力，允许提示和当前题重试。</p></article>
+      <article class="difficulty-item"><h2>🌿 中年级 · 增加信息量</h2><p>以6×6左右的网格、更多干扰项和多步骤规则为主。需要时可以选择计时，但正确理解仍比速度重要。</p></article>
+      <article class="difficulty-item"><h2>🌳 高年级 · 处理复合规则</h2><p>以8×8左右的大网格、复合记忆、规则切换和可选限时挑战为主，同时保留暂停、提示或重新尝试。</p></article>
+    </div>
+    <p class="difficulty-note">不同游戏会按玩法调整具体尺寸；“低、中、高”表示信息量和规则复杂度，不代表孩子必须按年龄选择。</p>
+  </details>
+
+  <a class="daily-entry" href="daily-camp.html"><span><strong>🌤️ 开始今日训练</strong><span>自动搭配计算、逻辑和专注 3 个短任务，约 12 分钟完成。</span></span><b>进入训练营 →</b></a>
+  <a class="progress-entry" href="game-progress.html"><span><strong>🌱 查看游戏成长记录</strong><span>完成次数、练习时长、最近活动和需要加强的方向，只保存在当前设备。</span></span><b>查看报告 →</b></a>
+  <a class="achievement-entry" href="achievements.html"><span><strong>🏅 查看我的成就</strong><span>收集坚持、探索、进步和独立完成类徽章，不设置儿童排名。</span></span><b>查看徽章 →</b></a>
+
+  <section class="library-panel" id="libraryPanel" hidden aria-label="我的游戏快捷入口">
+    <a class="continue-game" id="continueGame" href="#"><strong>▶ 继续上次游戏</strong><span id="continueText"></span></a>
+    <div class="shelf" id="favoriteShelf" hidden><h2>⭐ 我的收藏</h2><div class="mini-grid" id="favoriteGames"></div></div>
+    <div class="shelf" id="recentShelf" hidden><h2>🕘 最近玩过</h2><div class="mini-grid" id="recentGames"></div></div>
+    <p class="library-note">收藏和最近记录只保存在当前浏览器。</p>
+  </section>
+
+  <nav class="filters" aria-label="按能力筛选游戏">
+    <button class="filter on" type="button" data-filter="all" aria-pressed="true">全部游戏</button>
+    <button class="filter" type="button" data-filter="observe" aria-pressed="false">👀 观察力</button>
+    <button class="filter" type="button" data-filter="memory" aria-pressed="false">🧠 记忆力</button>
+    <button class="filter" type="button" data-filter="logic" aria-pressed="false">💡 逻辑力</button>
+    <button class="filter" type="button" data-filter="space" aria-pressed="false">🧊 空间力</button>
+    <button class="filter" type="button" data-filter="focus" aria-pressed="false">🎯 专注力</button>
+    <button class="filter" type="button" data-filter="create" aria-pressed="false">🎨 创造力</button>
+  </nav>
+
+  <section class="game-grid" id="gameGrid" aria-label="游戏列表">
+    <a class="game-card" href="pinball.html" data-skills="focus observe" style="--accent:#d58418">
+      <div class="card-top"><span class="icon">🦖</span><span class="age">幼儿园～六年级</span></div><h2>恐龙弹珠大冒险</h2>
+      <p>按住按钮蓄力发射，控制机台方向，让弹珠碰撞转盘、蘑菇灯和星星，挑战更高得分。</p>
+      <div class="skills"><span>专注力</span><span>手眼协调</span><span>反应控制</span></div><div class="play">开始发射 →</div>
+    </a>
+    <a class="game-card" href="beads.html" data-skills="create observe" style="--accent:#6d4c41">
+      <div class="card-top"><span class="icon">📿</span><span class="age">幼儿园～二年级</span></div><h2>拼豆乐园</h2>
+      <p>选择图案照着拼、上传自己的参考图，或者进入自由绘画模式，用一颗颗彩豆完成作品。</p>
+      <div class="skills"><span>创造力</span><span>观察力</span><span>精细操作</span></div><div class="play">开始创作 →</div>
+    </a>
+    <a class="game-card" href="bead-memory.html" data-skills="memory focus observe" style="--accent:#8a7654">
+      <div class="card-top"><span class="icon">✨</span><span class="age">幼儿园～六年级</span></div><h2>闪记拼豆</h2>
+      <p>短暂观察程序生成的彩豆图案，隐藏后凭记忆还原；可调观察时长、网格尺寸和颜色数量。</p>
+      <div class="skills"><span>记忆力</span><span>专注力</span><span>精细操作</span></div><div class="play">开始闪记 →</div>
+    </a>
+    <a class="game-card" href="mirror-puzzle.html" data-skills="observe space" style="--accent:#d94d78">
+      <div class="card-top"><span class="icon">🪞</span><span class="age">幼儿园～六年级</span></div><h2>镜像拼图</h2>
+      <p>观察半幅像素图，补全左右或上下对称的另一半，从 4×4 逐步挑战到 8×8。</p>
+      <div class="skills"><span>观察力</span><span>空间力</span><span>对称认知</span></div><div class="play">开始拼图 →</div>
+    </a>
+    <a class="game-card" href="pixel-difference.html" data-skills="observe focus" style="--accent:#4d7c52">
+      <div class="card-top"><span class="icon">🔍</span><span class="age">幼儿园～六年级</span></div><h2>像素找不同</h2>
+      <p>对照两幅程序生成的像素图，找出颜色或空白不同的格子，支持自由练习和限时挑战。</p>
+      <div class="skills"><span>观察力</span><span>专注力</span><span>视觉搜索</span></div><div class="play">开始寻找 →</div>
+    </a>
+    <a class="game-card" href="pattern-sequence.html" data-skills="observe logic" style="--accent:#8a6b38">
+      <div class="card-top"><span class="icon">🔶</span><span class="age">幼儿园～六年级</span></div><h2>图案接龙</h2>
+      <p>观察颜色、形状和大小怎样变化，找出正确的下一项，难度会从单一规律逐步升级。</p>
+      <div class="skills"><span>逻辑力</span><span>观察力</span><span>规律推理</span></div><div class="play">开始接龙 →</div>
+    </a>
+    <a class="game-card" href="route-memory.html" data-skills="memory focus" style="--accent:#507ba6">
+      <div class="card-top"><span class="icon">🐾</span><span class="age">幼儿园～六年级</span></div><h2>路线复现</h2>
+      <p>先看方格中的移动路线，路线隐藏后再按原顺序走一遍，训练短时记忆和顺序控制。</p>
+      <div class="skills"><span>记忆力</span><span>专注力</span><span>顺序控制</span></div><div class="play">开始记路线 →</div>
+    </a>
+    <a class="game-card" href="block-rotation.html" data-skills="space logic" style="--accent:#8a68b5">
+      <div class="card-top"><span class="icon">🔄</span><span class="age">幼儿园～六年级</span></div><h2>方块旋转</h2>
+      <p>在脑海中把像素图旋转 90°、180° 或 270°，从包含镜像干扰项的选项中找出答案。</p>
+      <div class="skills"><span>空间力</span><span>逻辑力</span><span>心理旋转</span></div><div class="play">开始旋转 →</div>
+    </a>
+    <a class="game-card" href="color-code.html" data-skills="logic memory" style="--accent:#c56d42">
+      <div class="card-top"><span class="icon">🔐</span><span class="age">幼儿园～六年级</span></div><h2>颜色密码</h2>
+      <p>根据颜色和位置反馈逐轮排除，破解三位或四位隐藏密码，高难度还会出现重复颜色。</p>
+      <div class="skills"><span>逻辑力</span><span>记忆力</span><span>排除推理</span></div><div class="play">开始破译 →</div>
+    </a>
+    <a class="game-card" href="schulte-grid.html" data-skills="focus observe" style="--accent:#668c68">
+      <div class="card-top"><span class="icon">👀</span><span class="age">幼儿园～六年级</span></div><h2>舒尔特方格</h2>
+      <p>在随机方格中按顺序寻找数字、倒序数字、字母或中文数字，也可以关闭用时显示。</p>
+      <div class="skills"><span>专注力</span><span>观察力</span><span>视觉搜索</span></div><div class="play">开始寻找 →</div>
+    </a>
+    <a class="game-card" href="instruction-challenge.html" data-skills="memory focus logic" style="--accent:#765d7b">
+      <div class="card-top"><span class="icon">🧭</span><span class="age">幼儿园～六年级</span></div><h2>指令挑战</h2>
+      <p>读懂或听清两到四步指令，按顺序寻找指定颜色、形状和数字，还可开启隐藏文字的记忆模式。</p>
+      <div class="skills"><span>记忆力</span><span>专注力</span><span>执行控制</span></div><div class="play">开始行动 →</div>
+    </a>
+    <a class="game-card" href="reaction-control.html" data-skills="focus logic" style="--accent:#55725b">
+      <div class="card-top"><span class="icon">🚦</span><span class="age">幼儿园～六年级</span></div><h2>反应控制</h2>
+      <p>根据当前颜色或形状规则，决定快速点击还是耐心等待；高难度还会在两种规则之间切换。</p>
+      <div class="skills"><span>专注力</span><span>执行控制</span><span>规则切换</span></div><div class="play">开始判断 →</div>
+    </a>
+    <a class="game-card" href="number-maze.html" data-skills="logic focus" style="--accent:#4f7d68">
+      <div class="card-top"><span class="icon">🧩</span><span class="age">一年级～六年级</span></div><h2>数字迷宫</h2>
+      <p>计算每层目标数，从两到三扇算式门中选出正确道路，逐步挑战加减、乘法和四则运算。</p>
+      <div class="skills"><span>计算力</span><span>逻辑力</span><span>耐心规划</span></div><div class="play">开始闯迷宫 →</div>
+    </a>
+    <a class="game-card" href="hanzi-components.html" data-skills="observe logic" style="--accent:#8a604f">
+      <div class="card-top"><span class="icon">🧱</span><span class="age">一年级～六年级</span></div><h2>汉字部件拼装</h2>
+      <p>观察目标汉字，把偏旁和基础部件放回正确位置，认识左右、上下、包围与三部件结构。</p>
+      <div class="skills"><span>识字</span><span>观察力</span><span>字形结构</span></div><div class="play">开始拼汉字 →</div>
+    </a>
+    <a class="game-card" href="little-programmer.html" data-skills="logic space focus" style="--accent:#55739a">
+      <div class="card-top"><span class="icon">🤖</span><span class="age">一年级～六年级</span></div><h2>小小程序员</h2>
+      <p>先观察地图，再排列前进和转向指令，帮助机器人避开障碍到达终点；运行失败后可以保留程序继续调试。</p>
+      <div class="skills"><span>规划力</span><span>逻辑力</span><span>程序思维</span></div><div class="play">开始编程 →</div>
+    </a>
+    <a class="game-card" href="rhythm-echo.html" data-skills="memory focus" style="--accent:#775b82">
+      <div class="card-top"><span class="icon">🎵</span><span class="age">幼儿园～六年级</span></div><h2>节奏回声</h2>
+      <p>听一段由浏览器现场生成的柔和节奏，再按原顺序敲回来；支持视觉闪亮、静音替代和高年级停顿拍。</p>
+      <div class="skills"><span>听觉记忆</span><span>专注力</span><span>顺序控制</span></div><div class="play">开始听节奏 →</div>
+    </a>
+    <a class="game-card" href="quantity-flash.html" data-skills="observe memory" style="--accent:#52745f">
+      <div class="card-top"><span class="icon">🔵</span><span class="age">幼儿园～六年级</span></div><h2>数量闪视</h2>
+      <p>短暂观察程序生成的圆点阵列，隐藏后凭数量直觉作答；从5以内直接感知逐步过渡到较大数量估算。</p>
+      <div class="skills"><span>数感</span><span>观察力</span><span>数量估算</span></div><div class="play">开始闪视 →</div>
+    </a>
+    <a class="game-card" href="rule-switch-station.html" data-skills="logic focus observe" style="--accent:#a77955">
+      <div class="card-top"><span class="icon">🚉</span><span class="age">幼儿园～六年级</span></div><h2>规则切换分类站</h2>
+      <p>同一张卡有颜色、形状、大小和数量多个特点；看清当前口令，在规则切换后送进正确站台。</p>
+      <div class="skills"><span>执行控制</span><span>专注力</span><span>认知灵活性</span></div><div class="play">开始分类 →</div>
+    </a>
+    <a class="game-card" href="balance-reasoning.html" data-skills="logic observe" style="--accent:#92704f">
+      <div class="card-top"><span class="icon">⚖️</span><span class="age">幼儿园～六年级</span></div><h2>天平推理</h2>
+      <p>观察天平的轻重关系，从一次直接比较进阶到传递推理和等量代换，同时认识克与千克。</p>
+      <div class="skills"><span>逻辑力</span><span>数量关系</span><span>单位换算</span></div><div class="play">开始推理 →</div>
+    </a>
+    <a class="game-card" href="shape-packing.html" data-skills="space logic focus" style="--accent:#5f8580">
+      <div class="card-top"><span class="icon">📦</span><span class="age">幼儿园～六年级</span></div><h2>图形装箱</h2>
+      <p>选择并旋转程序生成的几何拼块，在有限方格中安排位置，把箱子完整铺满且不重叠。</p>
+      <div class="skills"><span>空间力</span><span>规划力</span><span>几何直觉</span></div><div class="play">开始装箱 →</div>
+    </a>
+    <a class="game-card" href="shape-sudoku.html" data-skills="logic observe focus" style="--accent:#68739a">
+      <div class="card-top"><span class="icon">🧩</span><span class="age">幼儿园～六年级</span></div><h2>图形数独</h2>
+      <p>让图形或数字在每一行、每一列和每个粗线分区中都不重复，从4×4逐步挑战到9×9。</p>
+      <div class="skills"><span>约束推理</span><span>观察力</span><span>专注力</span></div><div class="play">开始推理 →</div>
+    </a>
+    <a class="game-card" href="block-escape.html" data-skills="logic space focus" style="--accent:#a66f4f">
+      <div class="card-top"><span class="icon">🚪</span><span class="age">幼儿园～六年级</span></div><h2>方块脱困</h2>
+      <p>移动程序生成的横竖方块，为橙色目标清理通往右侧出口的路线，挑战更少移动步数。</p>
+      <div class="skills"><span>策略规划</span><span>空间力</span><span>专注力</span></div><div class="play">开始脱困 →</div>
+    </a>
+    <a class="game-card" href="probability-lab.html" data-skills="logic observe" style="--accent:#667b72">
+      <div class="card-top"><span class="icon">🔬</span><span class="age">一年级～六年级</span></div><h2>概率实验室</h2>
+      <p>先预测彩球、转盘或双骰结果，再连续运行随机实验，对比理论可能性与实际频率。</p>
+      <div class="skills"><span>概率直觉</span><span>数据观察</span><span>科学探究</span></div><div class="play">开始实验 →</div>
+    </a>
+    <a class="game-card" href="clue-detective.html" data-skills="logic observe focus" style="--accent:#796852">
+      <div class="card-top"><span class="icon">🕵️</span><span class="age">一年级～六年级</span></div><h2>真假线索侦探</h2>
+      <p>辨认不可靠线索，在人物、物品和地点推理表中逐项排除，解释案件的唯一结论。</p>
+      <div class="skills"><span>条件推理</span><span>信息辨别</span><span>专注力</span></div><div class="play">开始破案 →</div>
+    </a>
+    <a class="game-card" href="time-planner.html" data-skills="logic focus" style="--accent:#617c70">
+      <div class="card-top"><span class="icon">🗓️</span><span class="age">一年级～六年级</span></div><h2>时间规划站</h2>
+      <p>安排合适的生活时刻，计算任务结束时间，再从可视化日程中找出唯一不冲突的空档。</p>
+      <div class="skills"><span>时间观念</span><span>生活规划</span><span>冲突判断</span></div><div class="play">开始规划 →</div>
+    </a>
+    <a class="game-card" href="pinyin-listening.html" data-skills="memory focus" style="--accent:#796b87">
+      <div class="card-top"><span class="icon">🎧</span><span class="age">幼儿园～二年级</span></div><h2>拼音听辨挑战</h2>
+      <p>主动播放浏览器中文语音，从声母、韵母进阶到平翘舌、前后鼻音和声调易混音辨认。</p>
+      <div class="skills"><span>拼音听辨</span><span>语音意识</span><span>专注力</span></div><div class="play">开始听辨 →</div>
+    </a>
+    <a class="game-card" href="coordinate-treasure.html" data-skills="space logic observe" style="--accent:#637d70">
+      <div class="card-top"><span class="icon">🧭</span><span class="age">幼儿园～六年级</span></div><h2>坐标寻宝</h2>
+      <p>从东南西北移动和行列定位开始，逐步使用左下角原点的平面坐标执行路线、寻找宝藏。</p>
+      <div class="skills"><span>方向感</span><span>坐标意识</span><span>空间推理</span></div><div class="play">开始寻宝 →</div>
+    </a>
+    <a class="game-card" href="arithmetic-blocks.html" data-skills="logic focus" style="--accent:#8a714f">
+      <div class="card-top"><span class="icon">🧱</span><span class="age">一年级～六年级</span></div><h2>算式积木</h2>
+      <p>组合一次性数字块、四则运算符和括号得到目标数，接受多种答案并挑战最少数字积木。</p>
+      <div class="skills"><span>计算力</span><span>运算顺序</span><span>策略优化</span></div><div class="play">开始搭建 →</div>
+    </a>
+    <a class="game-card" href="money-shop.html" data-skills="logic focus" style="--accent:#8f7139">
+      <div class="card-top"><span class="icon">🛍️</span><span class="age">一年级～三年级</span></div><h2>货币商店</h2>
+      <p>使用抽象练习币凑出指定金额，计算购物篮总价，再挑战付款后的正确找零。</p>
+      <div class="skills"><span>人民币</span><span>计算力</span><span>生活应用</span></div><div class="play">开始购物 →</div>
+    </a>
+    <a class="game-card" href="story-order.html" data-skills="logic memory focus" style="--accent:#756a88">
+      <div class="card-top"><span class="icon">📚</span><span class="age">一年级～六年级</span></div><h2>故事排序</h2>
+      <p>根据时间和因果线索排列原创故事卡，进阶识别无关句，并说清事情为什么这样发展。</p>
+      <div class="skills"><span>阅读理解</span><span>逻辑力</span><span>因果表达</span></div><div class="play">开始排序 →</div>
+    </a>
+  </section>
+
+  <p class="empty" id="emptyState">这个分类还没有游戏，先看看其他能力吧。</p>
+  <footer class="footer">
+    <a class="home-link" href="index.html">← 返回慧陪学首页</a>
+    <p>轻松玩，慢慢想，做错了也可以再试一次。</p>
+    <p><a href="copyright.html">版权与内容来源</a></p>
+  </footer>
+</main>
+<script src="hpx-game-progress.js"></script>
+<script src="hpx-game-library.js"></script>
+<script>
+(function(){
+  'use strict';
+  const buttons=Array.from(document.querySelectorAll('.filter'));
+  const cards=Array.from(document.querySelectorAll('.game-card'));
+  const empty=document.getElementById('emptyState');
+  const cardMeta=new Map();
+  cards.forEach(card=>{
+    const id=card.getAttribute('href').replace(/\.html$/,''),name=card.querySelector('h2').textContent,icon=card.querySelector('.icon').textContent;
+    const wrapper=document.createElement('article');wrapper.className='game-card-wrap';card.parentNode.insertBefore(wrapper,card);wrapper.appendChild(card);
+    const favorite=document.createElement('button');favorite.className='favorite-btn';favorite.type='button';favorite.dataset.gameId=id;favorite.addEventListener('click',()=>{HpxGameLibrary.toggle(id);renderLibrary()});wrapper.appendChild(favorite);
+    cardMeta.set(id,{id,name,icon,card,wrapper,favorite});
+  });
+  function mini(meta,label){return '<a class="mini-game" href="'+meta.id+'.html"><i>'+meta.icon+'</i><span><b>'+meta.name+'</b><small>'+label+'</small></span></a>'}
+  function renderLibrary(){
+    const favorites=HpxGameLibrary.load().filter(id=>cardMeta.has(id)),recent=HpxGameLibrary.recent(HpxGameProgress.load(),6).filter(item=>cardMeta.has(item.gameId));
+    cardMeta.forEach(meta=>{const on=favorites.includes(meta.id);meta.favorite.textContent=on?'★':'☆';meta.favorite.setAttribute('aria-pressed',String(on));meta.favorite.setAttribute('aria-label',(on?'取消收藏 ':'收藏 ')+meta.name)});
+    const panel=document.getElementById('libraryPanel'),favoriteShelf=document.getElementById('favoriteShelf'),recentShelf=document.getElementById('recentShelf'),continueGame=document.getElementById('continueGame');
+    panel.hidden=!favorites.length&&!recent.length;favoriteShelf.hidden=!favorites.length;recentShelf.hidden=!recent.length;continueGame.hidden=!recent.length;
+    document.getElementById('favoriteGames').innerHTML=favorites.map(id=>mini(cardMeta.get(id),'已收藏')).join('');
+    document.getElementById('recentGames').innerHTML=recent.map(item=>mini(cardMeta.get(item.gameId),'上次玩：'+HpxGameLibrary.dayLabel(item.lastAt))).join('');
+    if(recent.length){const latest=cardMeta.get(recent[0].gameId);continueGame.href=latest.id+'.html';document.getElementById('continueText').textContent=latest.name+' · '+HpxGameLibrary.dayLabel(recent[0].lastAt)}
+  }
+  buttons.forEach(button=>button.addEventListener('click',()=>{
+    const filter=button.dataset.filter;
+    buttons.forEach(item=>{const on=item===button;item.classList.toggle('on',on);item.setAttribute('aria-pressed',String(on));});
+    let visible=0;
+    cards.forEach(card=>{const show=filter==='all'||card.dataset.skills.split(' ').includes(filter);card.closest('.game-card-wrap').hidden=!show;if(show)visible++;});
+    empty.classList.toggle('show',visible===0);
+  }));
+  renderLibrary();
+})();
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

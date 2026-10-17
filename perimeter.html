@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周长计算</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8f5e9 0%,#e3f2fd 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#1b5e20;letter-spacing:3px;text-shadow:2px 3px 0 #a5d6a7;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.grid-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:12px;cursor:crosshair;}
+.info-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.info-tag{background:#e8f5e9;border-radius:10px;padding:8px 18px;font-size:1rem;font-weight:bold;color:#2e7d32;}
+.info-tag span{font-size:1.4rem;color:#ad1457;}
+.formula-box{background:#fffde7;border-radius:12px;padding:12px 18px;font-size:1rem;color:#555;text-align:center;line-height:2;}
+.slider-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.85rem;color:#777;}
+input[type=range]{width:130px;accent-color:#2e7d32;}
+.sl-val{font-weight:bold;font-size:1.1rem;color:#2e7d32;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8f5e9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#2e7d32;}
+.quiz-q{font-size:1.2rem;color:#333;margin-bottom:12px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #a5d6a7;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#2e7d32;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#2e7d32;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#2e7d32;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.highlight-side{stroke-dasharray:8;animation:dash 1s linear infinite;}
+@keyframes dash{to{stroke-dashoffset:-20;}}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#2e7d32">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📐</div>
+    <h1>周长计算</h1>
+    <p>拖动格子，感受周长变化</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识周长</button>
+    <button class="tab-btn" onclick="switchTab('drag')">🖱️ 拖动探索</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识周长 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div style="text-align:center;font-size:1rem;color:#777;margin-bottom:12px;">点击「播放」看周长是怎么围一圈的</div>
+      <div class="grid-wrap"><canvas id="learnCanvas" width="320" height="240"></canvas></div>
+      <div style="text-align:center;margin-top:10px;">
+        <button onclick="playAnim()" style="padding:8px 24px;border:none;border-radius:14px;background:#2e7d32;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;">▶ 播放动画</button>
+      </div>
+      <div id="learnDesc" style="font-size:.95rem;color:#555;text-align:center;margin-top:10px;line-height:1.8;"></div>
+    </div>
+    <div class="card formula-box">
+      <div>长方形周长 = <b style="color:#ad1457">（长 + 宽）× 2</b></div>
+      <div style="color:#aaa;font-size:.85rem;">例：长 6 格，宽 4 格 → 周长 = (6+4)×2 = <b style="color:#2e7d32">20 格</b></div>
+      <div style="margin-top:8px;">正方形周长 = <b style="color:#1565c0">边长 × 4</b></div>
+      <div style="color:#aaa;font-size:.85rem;">例：边长 5 格 → 周长 = 5×4 = <b style="color:#2e7d32">20 格</b></div>
+    </div>
+  </div>
+
+  <!-- 拖动探索 -->
+  <div id="tab-drag" style="display:none;">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group">
+          <label>长（格）</label>
+          <input type="range" id="lengthSlider" min="1" max="12" value="6" oninput="updateDrag()">
+          <span class="sl-val" id="lengthVal">6</span>
+        </div>
+        <div class="sl-group">
+          <label>宽（格）</label>
+          <input type="range" id="widthSlider" min="1" max="10" value="4" oninput="updateDrag()">
+          <span class="sl-val" id="widthVal">4</span>
+        </div>
+        <div id="shapeSwitch" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <label style="font-size:.85rem;color:#777;">形状</label>
+          <button onclick="toggleShape()" id="shapeBtn" style="padding:6px 14px;border:2px solid #2e7d32;border-radius:10px;background:#fff;color:#2e7d32;font-weight:bold;cursor:pointer;font-family:inherit;">长方形</button>
+        </div>
+      </div>
+      <div class="grid-wrap"><canvas id="dragCanvas" width="360" height="280"></canvas></div>
+      <div class="info-row">
+        <div class="info-tag">长 <span id="dLen">6</span> 格</div>
+        <div class="info-tag">宽 <span id="dWid">4</span> 格</div>
+        <div class="info-tag">周长 = <span id="dPeri">20</span> 格</div>
+      </div>
+      <div class="formula-box" id="dragFormula"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="grid-wrap"><canvas id="quizCanvas" width="280" height="220"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+
+const CELL=30;
+let isSquare=false;
+let animTimer=null;
+let _dragTimer=null;
+
+function drawGrid(canvas,L,W,cellSize,highlightPeri,progress){
+  const ctx=canvas.getContext('2d');
+  const ox=(canvas.width-L*cellSize)/2, oy=(canvas.height-W*cellSize)/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // grid bg
+  ctx.fillStyle='#f1f8e9';
+  ctx.beginPath();ctx.roundRect(ox,oy,L*cellSize,W*cellSize,8);ctx.fill();
+  // grid lines
+  ctx.strokeStyle='#c8e6c9';ctx.lineWidth=1;
+  for(let i=1;i<L;i++){ctx.beginPath();ctx.moveTo(ox+i*cellSize,oy);ctx.lineTo(ox+i*cellSize,oy+W*cellSize);ctx.stroke();}
+  for(let j=1;j<W;j++){ctx.beginPath();ctx.moveTo(ox,oy+j*cellSize);ctx.lineTo(ox+L*cellSize,oy+j*cellSize);ctx.stroke();}
+  // labels
+  ctx.fillStyle='#2e7d32';ctx.font=`bold ${cellSize*.55}px 微软雅黑,sans-serif`;ctx.textAlign='center';
+  ctx.fillText('长 = '+L+' 格',ox+L*cellSize/2,oy-8);
+  ctx.save();ctx.translate(ox-8,oy+W*cellSize/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('宽='+W+'格',0,0);ctx.restore();
+  // perimeter highlight
+  if(highlightPeri!==undefined){
+    ctx.save();
+    ctx.strokeStyle='#ad1457';ctx.lineWidth=4;ctx.lineJoin='round';
+    const perim=2*(L+W)*cellSize;
+    const total=perim*(progress??1);
+    ctx.setLineDash([6,3]);
+    // top
+    const segs=[[ox,oy,ox+L*cellSize,oy],[ox+L*cellSize,oy,ox+L*cellSize,oy+W*cellSize],[ox+L*cellSize,oy+W*cellSize,ox,oy+W*cellSize],[ox,oy+W*cellSize,ox,oy]];
+    let drawn=0;
+    for(const [x1,y1,x2,y2] of segs){
+      const segLen=Math.hypot(x2-x1,y2-y1);
+      const rem=total-drawn;
+      if(rem<=0) break;
+      const d=Math.min(rem,segLen);
+      const t=d/segLen;
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1+(x2-x1)*t,y1+(y2-y1)*t);ctx.stroke();
+      drawn+=segLen;
+    }
+    ctx.restore();
+  } else {
+    ctx.strokeStyle='#388e3c';ctx.lineWidth=3;ctx.setLineDash([]);
+    ctx.beginPath();ctx.roundRect(ox,oy,L*cellSize,W*cellSize,4);ctx.stroke();
+  }
+}
+
+function playAnim(){
+  const canvas=document.getElementById('learnCanvas');
+  const L=6,W=4,cs=CELL;
+  let prog=0;
+  if(animTimer) clearInterval(animTimer);
+  document.getElementById('learnDesc').innerHTML='';
+  animTimer=setInterval(()=>{
+    prog+=0.015;
+    if(prog>=1){prog=1;clearInterval(animTimer);
+      document.getElementById('learnDesc').innerHTML=`围一圈走过了 <b style="color:#ad1457">${2*(L+W)}</b> 格，<br>这就是周长！周长 = (${L}+${W})×2 = <b style="color:#2e7d32">20</b> 格`;
+      speak(`周长就是围一圈的总长度！长${L}加宽${W}，再乘以二，等于${2*(L+W)}格。`);
+    }
+    drawGrid(canvas,L,W,cs,true,prog);
+  },20);
+}
+
+function updateDrag(){
+  const L=parseInt(document.getElementById('lengthSlider').value);
+  let W=isSquare?L:parseInt(document.getElementById('widthSlider').value);
+  if(isSquare){document.getElementById('widthSlider').value=L;}
+  document.getElementById('lengthVal').textContent=L;
+  document.getElementById('widthVal').textContent=W;
+  document.getElementById('dLen').textContent=L;
+  document.getElementById('dWid').textContent=W;
+  const p=isSquare?L*4:2*(L+W);
+  document.getElementById('dPeri').textContent=p;
+  const fml=isSquare?`边长×4 = ${L}×4 = <b style="color:#2e7d32">${p}</b> 格`:`(长+宽)×2 = (${L}+${W})×2 = <b style="color:#2e7d32">${p}</b> 格`;
+  document.getElementById('dragFormula').innerHTML=fml;
+  drawGrid(document.getElementById('dragCanvas'),L,W,28);
+  if(_dragTimer) clearTimeout(_dragTimer);
+  _dragTimer=setTimeout(()=>{speak(isSquare?`正方形边长${L}格，周长等于${p}格。`:`长方形长${L}格，宽${W}格，周长等于${p}格。`);},600);
+}
+
+function toggleShape(){
+  isSquare=!isSquare;
+  speak(isSquare?'切换为正方形模式。':'切换为长方形模式。');
+  document.getElementById('shapeBtn').textContent=isSquare?'正方形':'长方形';
+  document.getElementById('widthSlider').disabled=isSquare;
+  updateDrag();
+}
+
+// quiz
+let qScore={c:0,w:0},qAns=0;
+function focusQuizInput(){
+  const input=document.getElementById('quizInput');
+  // 等练习区域完成显示和题目渲染后再聚焦，进入练习及切题时都可直接作答。
+  requestAnimationFrame(()=>input.focus({preventScroll:true}));
+}
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const sq=Math.random()<0.3;
+  const L=2+Math.floor(Math.random()*9);
+  const W=sq?L:2+Math.floor(Math.random()*7);
+  qAns=sq?L*4:2*(L+W);
+  const canvas=document.getElementById('quizCanvas');
+  drawGrid(canvas,L,W,22);
+  const shape=sq?'正方形':'长方形';
+  document.getElementById('quizQ').innerHTML=`上面${shape}的周长是多少格？`;
+  speak(`上面${shape}的周长是多少格？`);
+  focusQuizInput();
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns+' 格';
+    speak('答案是'+qAns+'格，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','drag','quiz']);
+  if(t==='learn') speak('认识周长：点击播放，看周长是怎么围一圈的。');
+  if(t==='drag') updateDrag();
+  if(t==='quiz') nextQ();
+}
+// init learn tab
+drawGrid(document.getElementById('learnCanvas'),6,4,CELL);
+speak('欢迎来到周长计算！点击播放动画，看周长是怎么围一圈的。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

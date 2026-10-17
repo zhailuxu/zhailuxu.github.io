@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小数乘法与除法</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e3f2fd 50%,#ede7f6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#1a237e;letter-spacing:2px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.calc-box{background:#e8eaf6;border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;}
+.calc-expr{font-size:1.6rem;font-weight:bold;color:#1a237e;margin-bottom:10px;letter-spacing:1px;}
+.shift{color:#e64a19;font-weight:bold;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#3949ab;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+/* 步骤演示（参考 multiply2d.html 的竖式演示样式） */
+.step-nav{display:flex;gap:8px;align-items:center;justify-content:center;}
+.sn-btn{padding:7px 18px;border:none;border-radius:10px;background:#e8eaf6;color:#1a237e;font-weight:bold;cursor:pointer;font-family:inherit;}
+.sn-btn:hover{background:#1a237e;color:#fff;}
+.step-info{font-size:.9rem;color:#999;min-width:80px;text-align:center;}
+.vert-calc{font-family:'Courier New',monospace;font-size:1.5rem;font-weight:bold;text-align:right;line-height:2;min-width:220px;}
+.vc-row{display:flex;justify-content:center;align-items:center;gap:4px;}
+.vc-digit{width:34px;text-align:center;border-radius:6px;transition:background .3s,color .3s;}
+.vc-digit.hi-a{background:#c5cae9;color:#1a237e;}
+.vc-digit.hi-b{background:#d1c4e9;color:#4527a0;}
+.vc-digit.hi-c{background:#c8e6c9;color:#2e7d32;}
+.vc-digit.hi-dot{background:#ffccbc;color:#e64a19;width:16px;}
+.vc-line{border-top:3px solid #ccc;width:80%;margin:2px auto;}
+.vc-arrow{text-align:center;font-size:.82rem;color:#e64a19;font-weight:bold;margin:2px 0;}
+.step-desc{text-align:center;font-size:1rem;color:#555;min-height:48px;line-height:1.8;background:#fffde7;border-radius:10px;padding:8px 12px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#1a237e;}
+.quiz-q{font-size:1.2rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
+.quiz-input{font-size:1.2rem;width:100px;border:2px solid #9fa8da;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#1a237e;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#1a237e;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#1a237e;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#1a237e">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">✖️➗</div>
+    <h1>小数乘法与除法</h1>
+    <p>把小数变整数来算，算完再把小数点移回去</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('mul')">✖️ 小数乘法</button>
+    <button class="tab-btn" onclick="switchTab('div')">➗ 小数除法</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 小数乘法 -->
+  <div id="tab-mul">
+    <div class="card">
+      <div class="net-desc">先当成整数乘法算出积，再数一数两个因数一共有几位小数，把小数点从右往左移回去</div>
+      <div class="calc-box">
+        <div class="calc-expr" id="mulExpr"></div>
+        <input type="text" id="mulInput" class="quiz-input" placeholder="?">
+        <div class="result-msg" id="mulMsg"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextMul()">🔄 换一题</button></div>
+      <div style="margin-top:14px;">
+        <div class="step-nav">
+          <button class="sn-btn" onclick="prevMulStep()">◀ 上一步</button>
+          <span class="step-info" id="mulStepInfo">第1步</span>
+          <button class="sn-btn" onclick="nextMulStep()">下一步 ▶</button>
+        </div>
+        <div style="margin:14px 0;display:flex;justify-content:center;">
+          <div class="vert-calc" id="mulVcDisplay"></div>
+        </div>
+        <div class="step-desc" id="mulStepDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 小数除法 -->
+  <div id="tab-div" style="display:none;">
+    <div class="card">
+      <div class="net-desc">把除数变成整数（小数点往右移几位），被除数的小数点也要跟着往右移相同的位数</div>
+      <div class="calc-box">
+        <div class="calc-expr" id="divExpr"></div>
+        <input type="text" id="divInput" class="quiz-input" placeholder="?">
+        <div class="result-msg" id="divMsg"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextDiv()">🔄 换一题</button></div>
+      <div style="margin-top:14px;">
+        <div class="step-nav">
+          <button class="sn-btn" onclick="prevDivStep()">◀ 上一步</button>
+          <span class="step-info" id="divStepInfo">第1步</span>
+          <button class="sn-btn" onclick="nextDivStep()">下一步 ▶</button>
+        </div>
+        <div style="margin:14px 0;display:flex;justify-content:center;">
+          <div class="vert-calc" id="divVcDisplay"></div>
+        </div>
+        <div class="step-desc" id="divStepDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <input type="text" id="quizInput" class="quiz-input" placeholder="?">
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// 把整数 intVal 按 decimals 位小数格式化成字符串，如 (840,2)->"8.4"，(840,0)->"840"
+function formatShifted(intVal, decimals){
+  if(decimals===0) return String(intVal);
+  const s=String(intVal).padStart(decimals+1,'0');
+  const intPart=s.slice(0,s.length-decimals);
+  let decPart=s.slice(s.length-decimals);
+  let str=intPart+'.'+decPart;
+  // 去掉小数部分末尾多余的0（但至少保留原始位数信息用于讲解，显示时可以化简）
+  str=str.replace(/0+$/,'').replace(/\.$/,'');
+  return str;
+}
+function numFromShifted(intVal, decimals){ return intVal/Math.pow(10,decimals); }
+function closeEnough(a,b){ return Math.abs(a-b)<1e-6; }
+
+// ── 小数乘法 ──
+let mulState=null;
+let mulDemoSteps=[], mulDemoStep=0;
+function genMul(){
+  const da=randInt(1,2), db=randInt(1,2);
+  const aInt=randInt(2,99), bInt=randInt(2,99);
+  const a=numFromShifted(aInt,da), b=numFromShifted(bInt,db);
+  const productInt=aInt*bInt;
+  const ans=numFromShifted(productInt, da+db);
+  return {a,b,da,db,aInt,bInt,productInt,ans,aStr:formatShifted(aInt,da),bStr:formatShifted(bInt,db)};
+}
+// 演示步骤：先去掉小数点当整数算，再数小数位数把小数点移回去（参考 multiply2d.html 的竖式分步演示样式）
+function buildMulDemoSteps(s){
+  const {aInt,bInt,productInt,da,db,aStr,bStr}=s;
+  const finalStr=formatShifted(productInt,da+db);
+  return [
+    {desc:`先不管小数点，把 ${aStr} 和 ${bStr} 当成整数：<b style="color:#1a237e">${aInt}</b> × <b style="color:#4527a0">${bInt}</b>`, hi:'ab', showResult:false, showFinal:false},
+    {desc:`整数乘法：${aInt} × ${bInt} = <b style="color:#2e7d32">${productInt}</b>`, hi:'result', showResult:true, showFinal:false},
+    {desc:`数一数小数位数：${aStr} 有 <span class="shift">${da}</span> 位小数，${bStr} 有 <span class="shift">${db}</span> 位小数，一共 <span class="shift">${da+db}</span> 位`, hi:'result', showResult:true, showFinal:false},
+    {desc:`把 ${productInt} 的小数点从右边数 <span class="shift">${da+db}</span> 位点上，结果是 <b style="color:#ad1457">${finalStr}</b> ✅`, hi:'final', showResult:false, showFinal:true},
+  ];
+}
+function renderMulDemo(){
+  const s=mulState, step=mulDemoSteps[mulDemoStep];
+  document.getElementById('mulStepInfo').textContent=`第 ${mulDemoStep+1} / ${mulDemoSteps.length} 步`;
+  document.getElementById('mulStepDesc').innerHTML=step.desc;
+  let html='';
+  html+=`<div class="vc-row">${[...String(s.aInt)].map(d=>`<div class="vc-digit ${step.hi==='ab'?'hi-a':''}">${d}</div>`).join('')}</div>`;
+  html+=`<div class="vc-row"><span style="color:#888;font-size:1.2rem;margin-right:4px;">×</span>${[...String(s.bInt)].map(d=>`<div class="vc-digit ${step.hi==='ab'?'hi-b':''}">${d}</div>`).join('')}</div>`;
+  html+=`<div class="vc-line"></div>`;
+  if(step.showResult){
+    html+=`<div class="vc-row">${[...String(s.productInt)].map(d=>`<div class="vc-digit hi-c">${d}</div>`).join('')}</div>`;
+  }
+  if(step.showFinal){
+    const finalStr=formatShifted(s.productInt,s.da+s.db);
+    html+=`<div class="vc-arrow">↓ 移 ${s.da+s.db} 位小数点</div>`;
+    html+=`<div class="vc-row">${[...finalStr].map(ch=>ch==='.'?`<div class="vc-digit hi-dot">.</div>`:`<div class="vc-digit hi-c">${ch}</div>`).join('')}</div>`;
+  }
+  document.getElementById('mulVcDisplay').innerHTML=html;
+}
+function nextMulStep(){ if(mulDemoStep<mulDemoSteps.length-1){mulDemoStep++; renderMulDemo(); speak(mulDemoSteps[mulDemoStep].desc.replace(/<[^>]+>/g,''));} }
+function prevMulStep(){ if(mulDemoStep>0){mulDemoStep--; renderMulDemo(); speak(mulDemoSteps[mulDemoStep].desc.replace(/<[^>]+>/g,''));} }
+
+function nextMul(){
+  mulState=genMul();
+  document.getElementById('mulExpr').textContent=`${mulState.aStr} × ${mulState.bStr} = ?`;
+  document.getElementById('mulInput').value='';
+  document.getElementById('mulInput').disabled=false;
+  document.getElementById('mulMsg').textContent='';
+  mulDemoSteps=buildMulDemoSteps(mulState);
+  mulDemoStep=0;
+  renderMulDemo();
+  speak(`${mulState.aStr}乘以${mulState.bStr}等于多少？`);
+}
+function checkMul(){
+  const mulInp=document.getElementById('mulInput');
+  if(mulInp.disabled) return;
+  const v=parseFloat(mulInp.value);
+  if(isNaN(v)) return;
+  mulInp.disabled=true;
+  const {productInt,da,db,ans}=mulState;
+  const msg=document.getElementById('mulMsg');
+  if(closeEnough(v,ans)){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+formatShifted(productInt,da+db);
+    speak('答案是'+formatShifted(productInt,da+db)+'，再想想！可以点下面的"下一步"看看怎么算的');
+  }
+}
+
+// ── 小数除法 ──
+let divState=null;
+let divDemoSteps=[], divDemoStep=0;
+function genDiv(){
+  const dd=randInt(1,2);
+  const dInt=randInt(2,30);
+  const quotient=randInt(2,15);
+  const dividendInt=dInt*quotient;
+  const divisor=numFromShifted(dInt,dd);
+  const dividend=numFromShifted(dividendInt,dd);
+  return {divisor,dividend,dInt,dividendInt,dd,quotient,divisorStr:formatShifted(dInt,dd),dividendStr:formatShifted(dividendInt,dd)};
+}
+// 演示步骤：先把除数变成整数（连带被除数一起移小数点），再算整数除法（参考 multiply2d.html 的竖式分步演示样式）
+function buildDivDemoSteps(s){
+  const {dInt,dividendInt,dd,quotient,divisorStr,dividendStr}=s;
+  return [
+    {desc:`把除数 ${divisorStr} 的小数点向右移 <span class="shift">${dd}</span> 位，变成整数 <b style="color:#1a237e">${dInt}</b>`, stage:0},
+    {desc:`被除数 ${dividendStr} 也要跟着向右移 <span class="shift">${dd}</span> 位，变成 <b style="color:#4527a0">${dividendInt}</b>`, stage:1},
+    {desc:`现在是整数除法：${dividendInt} ÷ ${dInt} = <b style="color:#2e7d32">${quotient}</b>`, stage:2},
+    {desc:`所以 ${dividendStr} ÷ ${divisorStr} = <b style="color:#ad1457">${quotient}</b> ✅`, stage:3},
+  ];
+}
+function renderDivDemo(){
+  const s=divState, step=divDemoSteps[divDemoStep];
+  document.getElementById('divStepInfo').textContent=`第 ${divDemoStep+1} / ${divDemoSteps.length} 步`;
+  document.getElementById('divStepDesc').innerHTML=step.desc;
+  let html='';
+  html+=`<div class="vc-row">${[...s.dividendStr].map(ch=>ch==='.'?`<div class="vc-digit hi-dot">.</div>`:`<div class="vc-digit">${ch}</div>`).join('')}<span style="color:#888;font-size:1.2rem;margin:0 4px;">÷</span>${[...s.divisorStr].map(ch=>ch==='.'?`<div class="vc-digit ${step.stage===0?'hi-dot':''}">.</div>`:`<div class="vc-digit ${step.stage===0?'hi-a':''}">${ch}</div>`).join('')}</div>`;
+  if(step.stage>=1){
+    html+=`<div class="vc-arrow">↓ 一起向右移 ${s.dd} 位</div>`;
+    html+=`<div class="vc-row">${[...String(s.dividendInt)].map(ch=>`<div class="vc-digit ${step.stage===1?'hi-b':''}">${ch}</div>`).join('')}<span style="color:#888;font-size:1.2rem;margin:0 4px;">÷</span>${[...String(s.dInt)].map(ch=>`<div class="vc-digit">${ch}</div>`).join('')}</div>`;
+  }
+  if(step.stage>=2){
+    html+=`<div class="vc-line"></div>`;
+    html+=`<div class="vc-row">${[...String(s.quotient)].map(ch=>`<div class="vc-digit hi-c">${ch}</div>`).join('')}</div>`;
+  }
+  document.getElementById('divVcDisplay').innerHTML=html;
+}
+function nextDivStep(){ if(divDemoStep<divDemoSteps.length-1){divDemoStep++; renderDivDemo(); speak(divDemoSteps[divDemoStep].desc.replace(/<[^>]+>/g,''));} }
+function prevDivStep(){ if(divDemoStep>0){divDemoStep--; renderDivDemo(); speak(divDemoSteps[divDemoStep].desc.replace(/<[^>]+>/g,''));} }
+
+function nextDiv(){
+  divState=genDiv();
+  document.getElementById('divExpr').textContent=`${divState.dividendStr} ÷ ${divState.divisorStr} = ?`;
+  document.getElementById('divInput').value='';
+  document.getElementById('divInput').disabled=false;
+  document.getElementById('divMsg').textContent='';
+  divDemoSteps=buildDivDemoSteps(divState);
+  divDemoStep=0;
+  renderDivDemo();
+  speak(`${divState.dividendStr}除以${divState.divisorStr}等于多少？`);
+}
+function checkDiv(){
+  const divInp=document.getElementById('divInput');
+  if(divInp.disabled) return;
+  const v=parseFloat(divInp.value);
+  if(isNaN(v)) return;
+  divInp.disabled=true;
+  const {quotient}=divState;
+  const msg=document.getElementById('divMsg');
+  if(closeEnough(v,quotient)){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+quotient;
+    speak('答案是'+quotient+'，再想想！可以点下面的"下一步"看看怎么算的');
+  }
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, quizAns=0, qDone=false;
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  if(Math.random()<0.5){
+    const s=genMul();
+    quizAns=s.ans;
+    document.getElementById('quizQ').textContent=`${s.aStr} × ${s.bStr} = ?`;
+    speak(`${s.aStr}乘以${s.bStr}等于多少？`);
+  } else {
+    const s=genDiv();
+    quizAns=s.quotient;
+    document.getElementById('quizQ').textContent=`${s.dividendStr} ÷ ${s.divisorStr} = ?`;
+    speak(`${s.dividendStr}除以${s.divisorStr}等于多少？`);
+  }
+}
+function checkQuiz(){
+  if(qDone) return;
+  const v=parseFloat(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  if(closeEnough(v,quizAns)){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+quizAns;
+    speak('答案是'+quizAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQuiz();});
+document.getElementById('quizInput').addEventListener('blur',()=>{if(document.getElementById('quizInput').value.trim())checkQuiz();});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['mul','div','quiz']);
+  if(t==='mul') speak('小数乘法：先当整数算，再把小数点移回去。');
+  if(t==='div') speak('小数除法：把除数变成整数，被除数也要跟着移动小数点。');
+  if(t==='quiz') nextQ();
+}
+document.getElementById('mulInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkMul();});
+document.getElementById('mulInput').addEventListener('blur',()=>{if(document.getElementById('mulInput').value.trim())checkMul();});
+document.getElementById('divInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkDiv();});
+document.getElementById('divInput').addEventListener('blur',()=>{if(document.getElementById('divInput').value.trim())checkDiv();});
+nextMul();
+nextDiv();
+speak('欢迎来到小数乘法与除法！把小数变成整数来计算，会简单很多。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

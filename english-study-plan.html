@@ -275,6 +275,15 @@
   .thread-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
   .thread-row .label { flex: none; width: 112px; font-weight: 600; font-size: 13px; padding-top: 1px; }
   .thread-row .text { color: var(--ink-soft); }
+  .study-links { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 8px; vertical-align: middle; }
+  .study-link {
+    display: inline-flex; align-items: center; min-height: 28px; padding: 2px 9px;
+    border: 1px solid currentColor; border-radius: 999px; color: var(--accent);
+    background: var(--accent-soft); font-size: 12px; font-weight: 600;
+    line-height: 1.4; text-decoration: none; white-space: nowrap;
+  }
+  .study-link:hover { background: var(--card-bg); }
+  .study-link::after { content: "\2192"; margin-left: 4px; }
 
   .keypoint {
     margin-top: 16px;
@@ -427,10 +436,10 @@
         <div class="grade-titles"><p class="grade-name">一年级 · 语音启蒙，磨耳朵</p></div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">26个字母认读与书写（大小写），单个字母的自然拼读入门，30–50个高频词（颜色、数字、简单物品）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">26个字母认读与书写（大小写），单个字母的自然拼读入门，30–50个高频词（颜色、数字、简单物品）<span class="study-links"><a class="study-link" href="english.html">字母与单词</a><a class="study-link" href="grade1-daily-english.html">每日英语练习</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听儿歌童谣、简单课堂指令（stand up / sit down），培养语音敏感度</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">简单问候语（Hello / Hi / Bye-bye），简单自我介绍</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">认读单词卡片，不要求独立阅读句子</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">认读单词卡片，不要求独立阅读句子<span class="study-links"><a class="study-link" href="english-reader-1a.html">启蒙阅读</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">描红字母，抄写简单单词</span></div>
       </div>
       <div class="keypoint"><b>关键点</b>一年级的核心任务是「磨耳朵」和培养兴趣，不要过早追求语法正确性和书写工整度——语音输入量比任何讲解都重要。</div>
@@ -444,10 +453,10 @@
         <div class="grade-titles"><p class="grade-name">二年级 · 词汇积累与简单句型</p></div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">自然拼读规则（元音字母组合），词汇量扩展到150词左右（家庭、动物、食物、日常动作）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">自然拼读规则（元音字母组合），词汇量扩展到150词左右（家庭、动物、食物、日常动作）<span class="study-links"><a class="study-link" href="english.html">单词学习</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听懂课堂常用语，简单对话理解</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">简单句型问答（What's this? It's a...；I like...）</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">认读简单句子，图文对照阅读</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">认读简单句子，图文对照阅读<span class="study-links"><a class="study-link" href="english-reader-1a.html">启蒙阅读</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">抄写句子，看图填词</span></div>
       </div>
       <div class="keypoint"><b>关键点</b>这个阶段是词汇量的爬坡期，词汇量决定后面能不能开口说完整句子。用「高频词卡 + 情境重复」，不要孤立背单词表。</div>
@@ -461,7 +470,7 @@
         <div class="grade-titles"><p class="grade-name">三年级 · 正式起点，句型系统化</p></div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">系统学习自然拼读（辅音组合、常见词族），词汇量到300词左右</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">系统学习自然拼读（辅音组合、常见词族），词汇量到300词左右<span class="study-links"><a class="study-link" href="english.html">单词学习</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听懂课堂指令与简单对话，能听辨关键信息</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">日常交际用语（打招呼、介绍、简单请求），角色扮演</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">独立朗读简单课文，理解简短对话</span></div>
@@ -478,9 +487,9 @@
         <div class="grade-titles"><p class="grade-name">四年级 · 语法意识萌芽，句子结构化</p></div>
       </div>
       <div class="thread-rows">
-        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">词汇量到500词左右，初步区分名词/动词/形容词</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">词汇量到500词左右，初步区分名词/动词/形容词<span class="study-links"><a class="study-link" href="english_grade4.html">四年级语法</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听懂稍长对话，抓住时间、地点等细节信息</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">连续说3–4句话描述一件事（家庭成员、方位介词 in / on / under 等）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">连续说3–4句话描述一件事（家庭成员、方位介词 in / on / under 等）<span class="study-links"><a class="study-link" href="english_grade4.html">家庭与方位</a></span></span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">读懂小短文，能回答 who / what / where 等简单问题</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写连续3–5句话（看图写话），一般现在时第三人称单数变化规则</span></div>
       </div>
@@ -498,8 +507,8 @@
         <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">词汇量到700词左右，学习词汇的多种搭配</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听懂中等长度短文，抓主旨与细节</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">能就熟悉话题连续表达观点，简单转述</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">读懂多段短文，理解文章大意和顺序</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写一段连贯短文（5–6句），学习时态变化（现在进行时、一般将来时）</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">读懂多段短文，理解文章大意和顺序<span class="study-links"><a class="study-link" href="english_grade56.html">时态与阅读</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写一段连贯短文（5–6句），学习时态变化（现在进行时、一般将来时）<span class="study-links" aria-label="五年级写作配套学习"><a class="study-link" href="english_grade56.html">时态练习</a><a class="study-link" href="english_grammar_writing.html">书面表达</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>五年级要建立「时态对比」意识——一般现在时、现在进行时、一般将来时各自对应什么场景。这是初中系统学习时态体系的直接铺垫，混淆时态是这个阶段最常见的错误。</div>
     </div>
@@ -515,8 +524,8 @@
         <div class="thread-row"><span class="label" style="color:var(--thread-phon)">语音与词汇</span><span class="text">词汇量到900–1000词（小学毕业要求），系统复习查漏补缺</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-listen)">听力</span><span class="text">听懂对话与短文并做笔记式理解，适应稍快语速</span></div>
         <div class="thread-row"><span class="label" style="color:var(--thread-speak)">口语</span><span class="text">能就话题进行简单讨论、看图讲述完整故事</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">篇章阅读理解综合练习，理解段落大意、细节和简单推理</span></div>
-        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写完整短文（6–8句），一般现在/进行/将来/过去四种时态综合运用</span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-read)">阅读</span><span class="text">篇章阅读理解综合练习，理解段落大意、细节和简单推理<span class="study-links"><a class="study-link" href="english_grade56.html">综合阅读</a></span></span></div>
+        <div class="thread-row"><span class="label" style="color:var(--thread-write)">写作</span><span class="text">写完整短文（6–8句），一般现在/进行/将来/过去四种时态综合运用<span class="study-links" aria-label="六年级写作配套学习"><a class="study-link" href="english_grade56.html">四态综合</a><a class="study-link" href="english_grammar_writing.html">书面表达</a></span></span></div>
       </div>
       <div class="keypoint"><b>关键点</b>下学期务必做一次系统性总复习，把六年词汇、语法点、时态重新梳理一遍，同时提前适应初中「语法系统化讲解 + 长篇阅读」的学习节奏。</div>
     </div>
@@ -571,3 +580,5 @@
 </div>
 <script src="hpx-page-speech.js"></script>
 <script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+<script src="feedback.js?v=20260906-2"></script>

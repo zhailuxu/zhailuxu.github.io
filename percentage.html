@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百分数应用与扇形统计图</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e8f5e9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.75rem;color:#e65100;letter-spacing:1px;text-shadow:2px 3px 0 #ffcc80;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.calc-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;}
+.calc-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.calc-group label{font-size:.82rem;color:#777;font-weight:bold;}
+.calc-group input{width:90px;font-size:1.05rem;border:2px solid #ffcc80;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.calc-group input:focus{border-color:#e65100;}
+.discount-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.discount-btn{padding:7px 14px;border:2px solid #ffcc80;border-radius:14px;background:#fff;color:#e65100;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.discount-btn.on{background:#e65100;color:#fff;border-color:#e65100;}
+.result-box{background:#fff3e0;border-radius:12px;padding:12px 18px;text-align:center;font-size:1.05rem;color:#5d4037;line-height:1.9;}
+.result-box b{color:#c62828;}
+.preset-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.preset-btn{padding:7px 14px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:.82rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.preset-btn.on{background:#6a1b9a;color:#fff;border-color:#6a1b9a;}
+.pie-wrap{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;align-items:center;}
+canvas{border-radius:10px;}
+.legend-list{display:flex;flex-direction:column;gap:6px;font-size:.85rem;}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fff3e0;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #ffcc80;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#e65100;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#e65100">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">💯</div>
+    <h1>百分数应用与扇形统计图</h1>
+    <p>打折成数、利息税率、读懂扇形统计图</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('discount')">🏷️ 折扣与成数</button>
+    <button class="tab-btn" onclick="switchTab('interest')">🏦 税率与利率</button>
+    <button class="tab-btn" onclick="switchTab('pie')">🥧 扇形统计图</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 折扣与成数 -->
+  <div id="tab-discount">
+    <div class="card">
+      <div class="calc-row">
+        <div class="calc-group"><label>原价（元）</label><input type="number" id="priceInput" value="200" oninput="updateDiscount()"></div>
+      </div>
+      <div class="discount-row" id="discountRow"></div>
+      <div class="result-box" id="discountResult"></div>
+      <div style="font-size:.82rem;color:#999;text-align:center;margin-top:10px;">📌 几折 = 十分之几 = 百分之几十；例如"8折"="十分之八"="80%"；"三成"="十分之三"="30%"</div>
+    </div>
+  </div>
+
+  <!-- 税率与利率 -->
+  <div id="tab-interest" style="display:none;">
+    <div class="card">
+      <div class="calc-row">
+        <div class="calc-group"><label>本金（元）</label><input type="number" id="principalInput" value="1000" oninput="updateInterest()"></div>
+        <div class="calc-group"><label>年利率（%）</label><input type="number" id="rateInput" value="3" step="0.1" oninput="updateInterest()"></div>
+        <div class="calc-group"><label>存期（年）</label><input type="number" id="yearsInput" value="2" oninput="updateInterest()"></div>
+      </div>
+      <div class="result-box" id="interestResult"></div>
+      <div style="font-size:.82rem;color:#999;text-align:center;margin-top:10px;">📌 利息 = 本金 × 利率 × 时间；税额 = 收入 × 税率，算法和利息一样，只是把"利率"换成"税率"</div>
+    </div>
+  </div>
+
+  <!-- 扇形统计图 -->
+  <div id="tab-pie" style="display:none;">
+    <div class="card">
+      <div class="preset-row" id="pieRow"></div>
+      <div class="pie-wrap">
+        <canvas id="pieCanvas" width="220" height="220"></canvas>
+        <div class="legend-list" id="pieLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?" step="0.01">
+        <span id="quizUnit"></span>
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 折扣与成数 ──
+const DISCOUNTS=[9,8.5,8,7,6,5];
+let curDiscount=8;
+function buildDiscountRow(){
+  const row=document.getElementById('discountRow');
+  row.innerHTML='';
+  DISCOUNTS.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='discount-btn'+(d===curDiscount?' on':'');
+    b.textContent=d+'折';
+    b.onclick=()=>{curDiscount=d;buildDiscountRow();updateDiscount();};
+    row.appendChild(b);
+  });
+}
+function updateDiscount(){
+  const price=parseFloat(document.getElementById('priceInput').value)||0;
+  const sale=price*curDiscount/10;
+  const saved=price-sale;
+  document.getElementById('discountResult').innerHTML=
+    `原价 ${price} 元，打 ${curDiscount} 折 = 原价 × ${curDiscount}/10（即${curDiscount*10}%）<br>现价 = ${price} × ${(curDiscount/10).toFixed(2)} = <b>${sale.toFixed(2)}</b> 元，省了 <b>${saved.toFixed(2)}</b> 元`;
+  speak(`原价${price}元，打${curDiscount}折，现价是${sale.toFixed(2)}元。`);
+}
+
+// ── 税率与利率 ──
+function updateInterest(){
+  const p=parseFloat(document.getElementById('principalInput').value)||0;
+  const r=parseFloat(document.getElementById('rateInput').value)||0;
+  const y=parseFloat(document.getElementById('yearsInput').value)||0;
+  const interest=p*r/100*y;
+  document.getElementById('interestResult').innerHTML=
+    `利息 = 本金 × 利率 × 时间 = ${p} × ${r}% × ${y} = <b>${interest.toFixed(2)}</b> 元<br>到期本金+利息 = ${p} + ${interest.toFixed(2)} = <b>${(p+interest).toFixed(2)}</b> 元`;
+  speak(`本金${p}元，年利率${r}%，存${y}年，利息是${interest.toFixed(2)}元。`);
+}
+
+// ── 扇形统计图 ──
+const PIE_PRESETS=[
+  {title:'全班最喜欢的运动（共40人）',data:[{label:'篮球',value:12,color:'#42a5f5'},{label:'足球',value:10,color:'#66bb6a'},{label:'羽毛球',value:8,color:'#ffa726'},{label:'其他',value:10,color:'#ab47bc'}]},
+  {title:'家庭月支出（共5000元）',data:[{label:'饮食',value:2000,color:'#ef5350'},{label:'教育',value:1200,color:'#42a5f5'},{label:'交通',value:800,color:'#66bb6a'},{label:'其他',value:1000,color:'#ffa726'}]},
+  {title:'图书馆藏书类型（共2000册）',data:[{label:'文学',value:800,color:'#5c6bc0'},{label:'科学',value:600,color:'#26a69a'},{label:'历史',value:300,color:'#ffb74d'},{label:'其他',value:300,color:'#ec407a'}]}
+];
+let curPreset=0;
+function buildPieRow(){
+  const row=document.getElementById('pieRow');
+  row.innerHTML='';
+  PIE_PRESETS.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='preset-btn'+(i===curPreset?' on':'');
+    b.textContent=p.title;
+    b.onclick=()=>{curPreset=i;buildPieRow();renderPie();};
+    row.appendChild(b);
+  });
+}
+function drawPieChart(canvas,data){
+  const ctx=canvas.getContext('2d');
+  const total=data.reduce((s,d)=>s+d.value,0);
+  const cx=canvas.width/2, cy=canvas.height/2, r=Math.min(cx,cy)-10;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let start=-Math.PI/2;
+  data.forEach(d=>{
+    const angle=d.value/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,start+angle);ctx.closePath();
+    ctx.fillStyle=d.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    const mid=start+angle/2;
+    const lx=cx+Math.cos(mid)*r*0.65, ly=cy+Math.sin(mid)*r*0.65;
+    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(Math.round(d.value/total*100)+'%',lx,ly);
+    start+=angle;
+  });
+}
+function renderPie(){
+  const p=PIE_PRESETS[curPreset];
+  drawPieChart(document.getElementById('pieCanvas'),p.data);
+  const total=p.data.reduce((s,d)=>s+d.value,0);
+  document.getElementById('pieLegend').innerHTML=`<b>${p.title}</b>`+p.data.map(d=>
+    `<div class="legend-item"><span class="legend-dot" style="background:${d.color}"></span>${d.label}：${d.value}（${Math.round(d.value/total*100)}%）</div>`
+  ).join('');
+  speak(p.title+'，看看各部分占总数的百分之几。');
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0, qUnit='元';
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const type=randInt(0,2);
+  if(type===0){
+    const price=randInt(50,500), d=DISCOUNTS[randInt(0,DISCOUNTS.length-1)];
+    qAns=Math.round(price*d/10*100)/100; qUnit='元';
+    document.getElementById('quizQ').textContent=`一件商品原价 ${price} 元，打 ${d} 折出售，现价是多少元？`;
+    speak(`一件商品原价${price}元，打${d}折出售，现价是多少元？`);
+  } else if(type===1){
+    const p=randInt(500,5000), r=randInt(1,5), y=randInt(1,5);
+    qAns=Math.round(p*r/100*y*100)/100; qUnit='元';
+    document.getElementById('quizQ').textContent=`本金 ${p} 元，年利率 ${r}%，存 ${y} 年，利息是多少元？`;
+    speak(`本金${p}元，年利率${r}%，存${y}年，利息是多少元？`);
+  } else {
+    const preset=PIE_PRESETS[randInt(0,PIE_PRESETS.length-1)];
+    const total=preset.data.reduce((s,d)=>s+d.value,0);
+    const item=preset.data[randInt(0,preset.data.length-1)];
+    qAns=Math.round(item.value/total*100); qUnit='%';
+    document.getElementById('quizQ').innerHTML=`${preset.title}中，"${item.label}"占总数的百分之几？（只填数字）`;
+    speak(`${preset.title}中，${item.label}占总数的百分之几？`);
+  }
+  document.getElementById('quizUnit').textContent=qUnit;
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseFloat(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(Math.abs(v-qAns)<0.05){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns+qUnit;
+    speak('答案是'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['discount','interest','pie','quiz']);
+  if(t==='discount') speak('折扣与成数：输入原价，选一个折扣，看看现价是多少。');
+  if(t==='interest') speak('税率与利率：利息等于本金乘利率乘时间。');
+  if(t==='pie') speak('扇形统计图：看看各部分占总数的百分之几。');
+  if(t==='quiz') nextQ();
+}
+buildDiscountRow(); updateDiscount();
+updateInterest();
+buildPieRow(); renderPie();
+speak('欢迎来到百分数应用与扇形统计图！算一算打折和利息，读一读扇形统计图。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

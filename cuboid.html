@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长方体和正方体</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e3f2fd 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#1a237e;letter-spacing:2px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:10px;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:110px;accent-color:#283593;}
+.sl-val{font-weight:bold;font-size:1rem;color:#283593;}
+.formula-box{background:#e8eaf6;border-radius:12px;padding:12px 18px;text-align:center;font-size:1rem;color:#283593;line-height:1.9;}
+.net-wrap{display:flex;justify-content:center;margin:14px 0;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:6px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#283593;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #9fa8da;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#283593;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#283593">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📦</div>
+    <h1>长方体和正方体</h1>
+    <p>拖动滑块，看看表面积和体积怎么变化</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('cuboid')">📦 长方体</button>
+    <button class="tab-btn" onclick="switchTab('cube')">🧊 正方体</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 长方体 -->
+  <div id="tab-cuboid">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group"><label>长</label><input type="range" id="cbL" min="2" max="10" value="5" oninput="updateCuboid()"><span class="sl-val" id="cbLVal">5</span></div>
+        <div class="sl-group"><label>宽</label><input type="range" id="cbW" min="2" max="10" value="3" oninput="updateCuboid()"><span class="sl-val" id="cbWVal">3</span></div>
+        <div class="sl-group"><label>高</label><input type="range" id="cbH" min="2" max="10" value="4" oninput="updateCuboid()"><span class="sl-val" id="cbHVal">4</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="cuboidCanvas" width="300" height="220"></canvas></div>
+      <div class="formula-box" id="cuboidFormula"></div>
+      <div class="net-desc">📐 展开图：6个面两两相等（上下、左右、前后）</div>
+      <div class="net-wrap"><canvas id="netCanvas" width="280" height="180"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 正方体 -->
+  <div id="tab-cube" style="display:none;">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group"><label>边长</label><input type="range" id="cubeA" min="2" max="10" value="4" oninput="updateCube()"><span class="sl-val" id="cubeAVal">4</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="cubeCanvas" width="300" height="220"></canvas></div>
+      <div class="formula-box" id="cubeFormula"></div>
+      <div class="net-desc">📌 正方体是特殊的长方体：长=宽=高，6个面完全相同</div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+        <span id="quizUnit"></span>
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+function poly(ctx, pts, fill) {
+  ctx.beginPath();
+  pts.forEach((p,i)=> i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+  ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.5; ctx.stroke();
+}
+function drawBox3D(canvas, l, w, h, colors) {
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const PX=13;
+  const boxW=l*PX, boxH=h*PX, boxD=w*PX;
+  const ox=(canvas.width-boxW-boxD*0.55)/2+10, oy=canvas.height-40;
+  const dx=boxD*0.55, dy=-boxD*0.32;
+  const A=[ox,oy], B=[ox+boxW,oy], C=[ox+boxW,oy-boxH], D=[ox,oy-boxH];
+  const A2=[A[0]+dx,A[1]+dy], B2=[B[0]+dx,B[1]+dy], C2=[C[0]+dx,C[1]+dy], D2=[D[0]+dx,D[1]+dy];
+  poly(ctx,[B,B2,C2,C],colors.right);
+  poly(ctx,[D,C,C2,D2],colors.top);
+  poly(ctx,[A,B,C,D],colors.front);
+  ctx.fillStyle='#37474f'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('长='+l, (A[0]+B[0])/2, oy+18);
+  ctx.fillText('高='+h, A[0]-22, (A[1]+D[1])/2);
+  ctx.save(); ctx.translate((B[0]+B2[0])/2+16,(B[1]+B2[1])/2); ctx.fillText('宽='+w,0,0); ctx.restore();
+}
+function drawNet(canvas, l, w, h) {
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const PX=10;
+  const lw=l*PX, ww=w*PX, hh=h*PX;
+  const ox=(canvas.width - (ww+lw+ww))/2, oy=(canvas.height-(ww+hh+ww))/2 + ww;
+  function rect(x,y,rw,rh,color,label){
+    ctx.fillStyle=color; ctx.fillRect(x,y,rw,rh);
+    ctx.strokeStyle='#333'; ctx.lineWidth=1; ctx.strokeRect(x,y,rw,rh);
+    ctx.fillStyle='#333'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(label, x+rw/2, y+rh/2+3);
+  }
+  rect(ox, oy, ww, ww, '#c8e6c9', '宽×宽');
+  rect(ox+ww, oy-hh, lw, hh, '#bbdefb', '上：长×宽');
+  rect(ox+ww, oy, lw, ww, '#ffe0b2', '前：长×高');
+  rect(ox+ww, oy+ww, lw, hh, '#bbdefb', '下：长×宽');
+  rect(ox+ww+lw, oy, ww, ww, '#c8e6c9', '宽×宽');
+  rect(ox+ww*2+lw, oy, lw, ww, '#ffe0b2', '后：长×高');
+}
+
+// ── 长方体 ──
+function updateCuboid(){
+  const l=+document.getElementById('cbL').value, w=+document.getElementById('cbW').value, h=+document.getElementById('cbH').value;
+  document.getElementById('cbLVal').textContent=l; document.getElementById('cbWVal').textContent=w; document.getElementById('cbHVal').textContent=h;
+  drawBox3D(document.getElementById('cuboidCanvas'), l, w, h, {top:'#c5cae9', right:'#9fa8da', front:'#7986cb'});
+  drawNet(document.getElementById('netCanvas'), l, w, h);
+  const S=2*(l*w+l*h+w*h), V=l*w*h;
+  document.getElementById('cuboidFormula').innerHTML=
+    `表面积 = 2×(长×宽+长×高+宽×高) = 2×(${l}×${w}+${l}×${h}+${w}×${h}) = <b>${S}</b><br>体积 = 长×宽×高 = ${l}×${w}×${h} = <b>${V}</b>`;
+  speak(`长方体的长是${l}，宽是${w}，高是${h}，体积是${V}。`);
+}
+
+// ── 正方体 ──
+function updateCube(){
+  const a=+document.getElementById('cubeA').value;
+  document.getElementById('cubeAVal').textContent=a;
+  drawBox3D(document.getElementById('cubeCanvas'), a, a, a, {top:'#ffe0b2', right:'#ffb74d', front:'#ffa726'});
+  const S=6*a*a, V=a*a*a;
+  document.getElementById('cubeFormula').innerHTML=
+    `表面积 = 6×边长² = 6×${a}² = <b>${S}</b><br>体积 = 边长³ = ${a}³ = <b>${V}</b>`;
+  speak(`正方体的边长是${a}，体积是${V}。`);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0, qUnit='';
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const type=randInt(0,3);
+  if(type===0){
+    const l=randInt(2,12),w=randInt(2,12),h=randInt(2,12);
+    qAns=l*w*h; qUnit='立方厘米';
+    document.getElementById('quizQ').textContent=`一个长方体的长是${l}cm，宽是${w}cm，高是${h}cm，体积是多少立方厘米？`;
+    speak(`长方体的长是${l}，宽是${w}，高是${h}，体积是多少？`);
+  } else if(type===1){
+    const l=randInt(2,10),w=randInt(2,10),h=randInt(2,10);
+    qAns=2*(l*w+l*h+w*h); qUnit='平方厘米';
+    document.getElementById('quizQ').textContent=`一个长方体的长是${l}cm，宽是${w}cm，高是${h}cm，表面积是多少平方厘米？`;
+    speak(`长方体的长是${l}，宽是${w}，高是${h}，表面积是多少？`);
+  } else if(type===2){
+    const a=randInt(2,12);
+    qAns=a*a*a; qUnit='立方厘米';
+    document.getElementById('quizQ').textContent=`一个正方体的边长是${a}cm，体积是多少立方厘米？`;
+    speak(`正方体的边长是${a}，体积是多少？`);
+  } else {
+    const a=randInt(2,12);
+    qAns=6*a*a; qUnit='平方厘米';
+    document.getElementById('quizQ').textContent=`一个正方体的边长是${a}cm，表面积是多少平方厘米？`;
+    speak(`正方体的边长是${a}，表面积是多少？`);
+  }
+  document.getElementById('quizUnit').textContent=qUnit;
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseFloat(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns+qUnit;
+    speak('答案是'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['cuboid','cube','quiz']);
+  if(t==='cuboid') speak('长方体：拖动长宽高滑块，看看表面积和体积怎么变化。');
+  if(t==='cube') speak('正方体：正方体的长宽高都相等。');
+  if(t==='quiz') nextQ();
+}
+updateCuboid(); updateCube();
+speak('欢迎来到长方体和正方体！拖动滑块，探索表面积和体积的秘密。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

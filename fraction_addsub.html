@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分数的加法和减法</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.75rem;color:#880e4f;letter-spacing:1px;text-shadow:2px 3px 0 #f8bbd0;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+.calc-box{background:#fce4ec;border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;}
+.frac-disp{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 6px;}
+.frac-disp .n{font-size:1.3rem;font-weight:bold;color:#880e4f;}
+.frac-disp .line{width:36px;height:2px;background:#880e4f;margin:2px 0;}
+.frac-disp .d{font-size:1.3rem;font-weight:bold;color:#880e4f;}
+.calc-expr{font-size:1.3rem;font-weight:bold;color:#333;margin-bottom:12px;}
+.frac-input{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;gap:4px;}
+.frac-input input{width:56px;font-size:1.1rem;text-align:center;border:2px solid #f48fb1;border-radius:8px;padding:4px;outline:none;font-family:inherit;}
+.frac-input input:focus{border-color:#880e4f;}
+.frac-line-i{width:56px;height:2px;background:#880e4f;margin:2px 0;}
+.calc-steps{background:#fff;border-radius:10px;padding:12px 16px;font-size:.95rem;color:#6a1b4d;line-height:2;text-align:left;display:none;margin-top:10px;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#ad1457;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#880e4f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#fce4ec;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#880e4f;}
+.quiz-q{font-size:1.15rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#880e4f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#880e4f">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🍰</div>
+    <h1>分数的加法和减法</h1>
+    <p>同分母直接加减，异分母先通分再加减</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('same')">🟰 同分母</button>
+    <button class="tab-btn" onclick="switchTab('diff')">🔄 异分母（通分）</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 同分母 -->
+  <div id="tab-same">
+    <div class="card">
+      <div class="net-desc">分母不变，分子直接相加或相减，结果要化成最简分数</div>
+      <div class="calc-box">
+        <div class="calc-expr" id="sameExpr"></div>
+        <div class="frac-input">
+          <input type="number" id="sameN">
+          <div class="frac-line-i"></div>
+          <input type="number" id="sameD">
+        </div>
+        <div class="result-msg" id="sameMsg"></div>
+        <div class="calc-steps" id="sameSteps"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextSame()">🔄 换一题</button></div>
+    </div>
+  </div>
+
+  <!-- 异分母 -->
+  <div id="tab-diff" style="display:none;">
+    <div class="card">
+      <div class="net-desc">分母不同时，要先找到两个分母的最小公倍数作公分母（通分），再把分子相加或相减</div>
+      <div class="calc-box">
+        <div class="calc-expr" id="diffExpr"></div>
+        <div class="frac-input">
+          <input type="number" id="diffN">
+          <div class="frac-line-i"></div>
+          <input type="number" id="diffD">
+        </div>
+        <div class="result-msg" id="diffMsg"></div>
+        <div class="calc-steps" id="diffSteps"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextDiff()">🔄 换一题</button></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="frac-input">
+        <input type="number" id="quizN">
+        <div class="frac-line-i"></div>
+        <input type="number" id="quizD">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
+function lcm(a,b){return a/gcd(a,b)*b;}
+function simplify(n,d){const g=gcd(n,d)||1; return [n/g, d/g];}
+function fracHtml(n,d){return `<span class="frac-disp"><span class="n">${n}</span><span class="line"></span><span class="d">${d}</span></span>`;}
+
+// ── 同分母加减法 ──
+let sameState=null;
+function genSame(){
+  const d=randInt(4,12);
+  const op=Math.random()<0.5?'+':'-';
+  let a,b;
+  if(op==='+'){ a=randInt(1,d-2); b=randInt(1,d-1-a); }
+  else { a=randInt(2,d-1); b=randInt(1,a-1); }
+  const rawN = op==='+' ? a+b : a-b;
+  const [ansN,ansD]=simplify(rawN,d);
+  return {a,b,d,op,rawN,ansN,ansD};
+}
+function nextSame(){
+  sameDone=false;
+  sameState=genSame();
+  const {a,b,d,op}=sameState;
+  document.getElementById('sameExpr').innerHTML=`${fracHtml(a,d)} ${op} ${fracHtml(b,d)} = ?`;
+  document.getElementById('sameN').value=''; document.getElementById('sameD').value='';
+  document.querySelectorAll('#tab-same input').forEach(i=>i.disabled=false);
+  document.getElementById('sameMsg').textContent='';
+  document.getElementById('sameSteps').style.display='none';
+  speak(`${a}分之${d}...不对，是${d}分之${a} ${op==='+'?'加':'减'} ${d}分之${b}，等于多少？`);
+  const sN=document.getElementById('sameN'), sD=document.getElementById('sameD');
+  const maybeCheckSame=()=>{ if(sN.value.length>0 && sD.value.length>0) checkSame(); };
+  sN.addEventListener('input',maybeCheckSame); sD.addEventListener('input',maybeCheckSame);
+  sD.addEventListener('blur',maybeCheckSame);
+}
+let sameDone=false;
+function checkSame(){
+  if(sameDone) return;
+  const un=parseInt(document.getElementById('sameN').value), ud=parseInt(document.getElementById('sameD').value);
+  if(isNaN(un)||isNaN(ud)) return;
+  sameDone=true;
+  document.querySelectorAll('#tab-same input').forEach(i=>i.disabled=true);
+  const {a,b,d,op,rawN,ansN,ansD}=sameState;
+  const steps=document.getElementById('sameSteps');
+  steps.style.display='block';
+  steps.innerHTML=`分母不变还是 ${d}，分子 ${a} ${op} ${b} = ${rawN}，得到 ${rawN}/${d}<br>
+    化成最简分数：${rawN}/${d} = <b>${ansN}/${ansD}</b>`;
+  const msg=document.getElementById('sameMsg');
+  if(un===ansN && ud===ansD){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent=`❌ 正确答案是 ${ansN}/${ansD}`;
+    speak(`答案是${ansN}分之${ansD}，再想想！`);
+  }
+}
+
+// ── 异分母加减法（通分）──
+let diffState=null;
+function genDiff(){
+  let d1,d2;
+  do{ d1=randInt(2,9); d2=randInt(2,9); }while(d1===d2);
+  const L=lcm(d1,d2);
+  const op=Math.random()<0.5?'+':'-';
+  let a=randInt(1,d1-1), b=randInt(1,d2-1);
+  const a2=a*(L/d1), b2=b*(L/d2);
+  let rawN = op==='+' ? a2+b2 : a2-b2;
+  if(op==='-' && rawN<=0){
+    if(rawN===0) return genDiff(); // 结果为0没有练习价值，重新生成
+    [a,b]=[b,a]; [d1,d2]=[d2,d1];
+  }
+  const a2f=a*(L/d1), b2f=b*(L/d2);
+  const rawNf = op==='+' ? a2f+b2f : a2f-b2f;
+  const [ansN,ansD]=simplify(rawNf,L);
+  return {a,d1,b,d2,op,L,a2:a2f,b2:b2f,rawN:rawNf,ansN,ansD};
+}
+let diffDone=false;
+function nextDiff(){
+  diffDone=false;
+  diffState=genDiff();
+  const {a,d1,b,d2,op}=diffState;
+  document.getElementById('diffExpr').innerHTML=`${fracHtml(a,d1)} ${op} ${fracHtml(b,d2)} = ?`;
+  document.getElementById('diffN').value=''; document.getElementById('diffD').value='';
+  document.querySelectorAll('#tab-diff input').forEach(i=>i.disabled=false);
+  document.getElementById('diffMsg').textContent='';
+  document.getElementById('diffSteps').style.display='none';
+  speak(`${d1}分之${a} ${op==='+'?'加':'减'} ${d2}分之${b}，先通分，等于多少？`);
+  const dN=document.getElementById('diffN'), dD=document.getElementById('diffD');
+  const maybeCheckDiff=()=>{ if(dN.value.length>0 && dD.value.length>0) checkDiff(); };
+  dN.addEventListener('input',maybeCheckDiff); dD.addEventListener('input',maybeCheckDiff);
+  dD.addEventListener('blur',maybeCheckDiff);
+}
+function checkDiff(){
+  if(diffDone) return;
+  const un=parseInt(document.getElementById('diffN').value), ud=parseInt(document.getElementById('diffD').value);
+  if(isNaN(un)||isNaN(ud)) return;
+  diffDone=true;
+  document.querySelectorAll('#tab-diff input').forEach(i=>i.disabled=true);
+  const {a,d1,b,d2,op,L,a2,b2,rawN,ansN,ansD}=diffState;
+  const steps=document.getElementById('diffSteps');
+  steps.style.display='block';
+  steps.innerHTML=`${d1} 和 ${d2} 的最小公倍数是 <b>${L}</b>，把它当作公分母（通分）<br>
+    ${d1}分之${a} = ${L}分之${a2}　　${d2}分之${b} = ${L}分之${b2}<br>
+    分子相${op==='+'?'加':'减'}：${a2} ${op} ${b2} = ${rawN}，得到 ${rawN}/${L}<br>
+    化成最简分数：${rawN}/${L} = <b>${ansN}/${ansD}</b>`;
+  const msg=document.getElementById('diffMsg');
+  if(un===ansN && ud===ansD){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent=`❌ 正确答案是 ${ansN}/${ansD}`;
+    speak(`答案是${ansN}分之${ansD}，再想想！`);
+  }
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, quizAnsN=0, quizAnsD=0, qDone=false;
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizN').value=''; document.getElementById('quizD').value='';
+  document.querySelectorAll('#tab-quiz input').forEach(i=>i.disabled=false);
+  if(Math.random()<0.5){
+    const s=genSame();
+    quizAnsN=s.ansN; quizAnsD=s.ansD;
+    document.getElementById('quizQ').innerHTML=`${fracHtml(s.a,s.d)} ${s.op} ${fracHtml(s.b,s.d)} = ?`;
+    speak(`${s.d}分之${s.a} ${s.op==='+'?'加':'减'} ${s.d}分之${s.b}，等于多少？`);
+  } else {
+    const s=genDiff();
+    quizAnsN=s.ansN; quizAnsD=s.ansD;
+    document.getElementById('quizQ').innerHTML=`${fracHtml(s.a,s.d1)} ${s.op} ${fracHtml(s.b,s.d2)} = ?`;
+    speak(`${s.d1}分之${s.a} ${s.op==='+'?'加':'减'} ${s.d2}分之${s.b}，等于多少？`);
+  }
+  const nInp=document.getElementById('quizN'), dInp=document.getElementById('quizD');
+  const maybeCheck=()=>{
+    if(nInp.value.length>=String(quizAnsN).length && dInp.value.length>=String(quizAnsD).length) checkQuiz();
+  };
+  nInp.addEventListener('input',maybeCheck); dInp.addEventListener('input',maybeCheck);
+  dInp.addEventListener('blur',()=>{ if(nInp.value.length>0 && dInp.value.length>0) checkQuiz(); });
+}
+function checkQuiz(){
+  if(qDone) return;
+  const un=parseInt(document.getElementById('quizN').value), ud=parseInt(document.getElementById('quizD').value);
+  if(isNaN(un)||isNaN(ud)) return;
+  qDone=true;
+  document.querySelectorAll('#tab-quiz input').forEach(i=>i.disabled=true);
+  if(un===quizAnsN && ud===quizAnsD){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent=`❌ 正确答案是：${quizAnsN}/${quizAnsD}`;
+    speak(`答案是${quizAnsN}分之${quizAnsD}，再想想！`);
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['same','diff','quiz']);
+  if(t==='same') speak('同分母加减法：分母不变，分子直接加减。');
+  if(t==='diff') speak('异分母加减法：要先通分，把分母变成一样的。');
+  if(t==='quiz') nextQ();
+}
+nextSame();
+nextDiff();
+speak('欢迎来到分数的加法和减法！同分母直接算，异分母要先通分。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

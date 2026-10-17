@@ -1,0 +1,24 @@
+/* 慧陪学游戏移动端公共交互层：项目原创，不依赖外部 UI 库。 */
+@media(max-width:700px){
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{max-width:100%;overflow-x:hidden;overflow-wrap:anywhere;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+  button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+  button,[role="button"],a{touch-action:manipulation}
+  input,select,textarea{font-size:max(16px,1em)}
+  .grid,.board,.pixel-board,.route-board,.maze,.program{-webkit-user-select:none;user-select:none}
+  .container,.card,.workspace,.panel{box-sizing:border-box;min-width:0;max-width:100%}
+  .container,.card{min-width:0!important;width:100%!important}
+  .workspace{width:100%!important;grid-template-columns:minmax(0,1fr)!important}
+  .workspace>*,.panel{min-width:0!important;width:100%!important}
+  .board,.grid,.pixel-board,.route-board{max-width:100%!important}
+  .instruction,.message{max-width:100%;white-space:normal}
+  .chip,.action,.filter,.option,.command,.control-btn,.tab-btn,.mode-btn,.level-btn,.sound-btn,.station,.bin,.piece-card,.color-btn{min-height:44px}
+  .back,.home-link{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:8px 12px}
+  .toolbar,.filters{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .toolbar::-webkit-scrollbar,.filters::-webkit-scrollbar{display:none}
+  .toolbar>*,.filters>*{scroll-snap-align:start}
+  .actions{row-gap:10px}
+  details summary{min-height:44px;padding-block:9px;touch-action:manipulation}
+}
+@media(max-width:700px) and (hover:none){.chip:hover,.action:hover,.option:hover,.filter:hover,.game-card:hover,.piece-card:hover,.station:hover{transform:none!important}}
+@media(max-width:700px) and (prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}

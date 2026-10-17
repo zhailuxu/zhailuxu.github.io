@@ -202,6 +202,75 @@ body {
 .q-feedback.show-ok   { color: #2e7d32; }
 .q-feedback.show-fail { color: #c62828; }
 
+/* ══════════════════════════════════════
+   TAB 4 — 可选范围方格填写
+══════════════════════════════════════ */
+.grid-intro { text-align:center; color:#777; font-size:.88rem; line-height:1.7; margin-bottom:12px; }
+.grid-hash-marker { display:block; height:0; scroll-margin-top:12px; }
+.grid-toolbar { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.grid-size-label {
+  display:inline-flex; align-items:center; gap:6px; color:#4a148c; font-size:.9rem; font-weight:bold;
+}
+.grid-size-select {
+  border:2px solid #ce93d8; border-radius:10px; padding:6px 28px 6px 10px;
+  background:#fff; color:#4a148c; font-family:inherit; font-size:.9rem; font-weight:bold; cursor:pointer;
+}
+.grid-size-select:focus-visible { outline:3px solid #7b1fa2; outline-offset:2px; }
+.grid-progress { color:#4a148c; font-weight:bold; font-size:.95rem; }
+.grid-guide-toggle {
+  border:2px solid #ffb300; border-radius:12px; padding:7px 13px;
+  background:#fff8e1; color:#8d5600; font-family:inherit; font-size:.85rem; font-weight:bold;
+  cursor:pointer; transition:background .15s,color .15s,box-shadow .15s;
+}
+.grid-guide-toggle.on { background:#ffca28; color:#4e342e; box-shadow:0 2px 8px rgba(255,179,0,.3); }
+.grid-guide-toggle:focus-visible { outline:3px solid #7b1fa2; outline-offset:2px; }
+.grid-speech-toggle {
+  border:2px solid #80cbc4; border-radius:12px; padding:7px 13px;
+  background:#e0f2f1; color:#00695c; font-family:inherit; font-size:.85rem; font-weight:bold;
+  cursor:pointer; transition:background .15s,color .15s,box-shadow .15s;
+}
+.grid-speech-toggle.on { background:#00897b; color:#fff; box-shadow:0 2px 8px rgba(0,137,123,.28); }
+.grid-speech-toggle:focus-visible { outline:3px solid #7b1fa2; outline-offset:2px; }
+.grid-auto-toggle {
+  border:2px solid #90caf9; border-radius:12px; padding:7px 13px;
+  background:#e3f2fd; color:#0d47a1; font-family:inherit; font-size:.85rem; font-weight:bold;
+  cursor:pointer; transition:background .15s,color .15s,box-shadow .15s;
+}
+.grid-auto-toggle.on { background:#1976d2; color:#fff; box-shadow:0 2px 8px rgba(25,118,210,.28); }
+.grid-auto-toggle:focus-visible { outline:3px solid #7b1fa2; outline-offset:2px; }
+.grid-current {
+  min-height:36px; width:max-content; min-width:180px; max-width:100%; margin:0 auto 10px;
+  padding:6px 16px; border-radius:12px; background:#fff8e1; color:#6d4c41;
+  text-align:center; font-size:1rem; font-weight:bold;
+}
+.grid-current strong { color:#4a148c; font-size:1.15rem; }
+.grid-scroll { overflow-x:auto; padding:3px 2px 8px; }
+.fill-grid { border-collapse:separate; border-spacing:5px; margin:0 auto; }
+.fill-grid th {
+  width:42px; min-width:42px; height:42px; border-radius:10px;
+  background:#ede7f6; color:#4a148c; font-size:.95rem; font-weight:bold;
+  transition:background .15s,color .15s,box-shadow .15s,transform .15s;
+}
+.fill-grid .grid-corner { background:#4a148c; color:#fff; font-size:1.05rem; }
+.fill-grid th.guide-active {
+  background:#ffca28; color:#4e342e; box-shadow:0 0 0 3px rgba(255,152,0,.32);
+  transform:scale(1.08);
+}
+.fill-grid td { position:relative; width:52px; min-width:52px; height:64px; text-align:center; vertical-align:top; }
+.grid-input {
+  width:52px; height:44px; border:2px solid #ce93d8; border-radius:10px;
+  background:#fff; color:#333; text-align:center; font-family:inherit; font-size:1.05rem; font-weight:700;
+  outline:none; -moz-appearance:textfield; transition:border-color .15s,background .15s,box-shadow .15s;
+}
+.grid-input::-webkit-inner-spin-button,.grid-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+.grid-input:focus { border-color:#7b1fa2; box-shadow:0 0 0 3px rgba(123,31,162,.15); }
+.grid-input.correct { border-color:#43a047; background:#e8f5e9; color:#2e7d32; }
+.grid-input.wrong { border-color:#e53935; background:#ffebee; color:#c62828; }
+.grid-cell-feedback { display:block; min-height:16px; margin-top:2px; color:#c62828; font-size:.63rem; font-weight:bold; line-height:1.15; }
+.grid-live { min-height:24px; margin-top:8px; text-align:center; color:#555; font-weight:bold; }
+.grid-live.ok { color:#2e7d32; }
+.grid-live.fail { color:#c62828; }
+
 /* 结果面板 */
 .quiz-result { display: none; text-align: center; }
 .quiz-result.show { display: block; }
@@ -250,7 +319,7 @@ body {
 .toast-add b   { color: #e53935; }
 
 /* ══════════════════════════════════════
-   TAB 4 — 错题本
+   TAB 5 — 错题本
 ══════════════════════════════════════ */
 .wr-book-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
 .wr-book-hint { color:#888; font-size:.85rem; margin:0; }
@@ -284,6 +353,11 @@ body {
   .fc-formula { font-size:.83rem; }
   .q-equation { font-size:2.2rem; }
   .memo-card { width:110px; height:90px; }
+  .card-panel.grid-panel { padding:16px 8px; }
+  .fill-grid { border-spacing:3px; }
+  .fill-grid th { width:36px; min-width:36px; height:40px; }
+  .fill-grid td { width:48px; min-width:48px; }
+  .grid-input { width:48px; }
 }
 </style>
   <link rel="manifest" href="/manifest.json">
@@ -300,13 +374,14 @@ body {
 
 <div class="header">
   <h1>🌟 九九乘法口诀 🌟</h1>
-  <p>点击口诀可以朗读 · 三种模式全面掌握</p>
+  <p>点击口诀可以朗读 · 四种模式全面掌握</p>
 </div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('table')">📊 口诀表</button>
   <button class="tab-btn" onclick="switchTab('memo')">📖 背诵</button>
   <button class="tab-btn" onclick="switchTab('quiz')">✏️ 测验</button>
+  <button class="tab-btn" onclick="switchTab('grid')">🔢 方格填写</button>
   <button class="tab-btn" onclick="switchTab('wrongbook')">📕 错题本</button>
 </div>
 
@@ -423,7 +498,39 @@ body {
   </div>
 </div>
 
-<!-- ══ TAB 4: 错题本 ══ -->
+<!-- ══ TAB 4: 可选范围方格填写 ══ -->
+<div id="tab-grid" class="hidden">
+  <span class="grid-hash-marker" id="grid" aria-hidden="true"></span>
+  <div class="card-panel grid-panel">
+    <p class="grid-intro">看左边和上方的数字，在方格里填写它们相乘的得数。行列提示开启时，当前两个乘数会同步高亮。</p>
+    <div class="grid-toolbar">
+      <label class="grid-size-label" for="gridSizeSelect">乘法范围
+        <select class="grid-size-select" id="gridSizeSelect" onchange="setGridSize(this.value)">
+          <option value="2">2 以内</option>
+          <option value="3">3 以内</option>
+          <option value="4">4 以内</option>
+          <option value="5">5 以内</option>
+          <option value="6">6 以内</option>
+          <option value="7">7 以内</option>
+          <option value="8">8 以内</option>
+          <option value="9" selected>9 以内</option>
+        </select>
+      </label>
+      <span class="grid-progress" id="gridProgress">已完成 0 / 81</span>
+      <button class="grid-guide-toggle on" id="gridGuideToggle" type="button" onclick="toggleGridGuide()" aria-pressed="true">🔦 行列提示 开</button>
+      <button class="grid-auto-toggle on" id="gridAutoToggle" type="button" onclick="toggleGridAutoAdvance()" aria-pressed="true">➡️ 自动跳格 开</button>
+      <button class="grid-speech-toggle" id="gridSpeechToggle" type="button" onclick="toggleGridSpeech()" aria-pressed="false">🔇 声音解说 关</button>
+      <button class="btn btn-gray" type="button" onclick="resetFillGrid()">↻ 清空重填</button>
+    </div>
+    <div class="grid-current" id="gridCurrent" aria-live="polite">点一个方格，查看当前乘法</div>
+    <div class="grid-scroll">
+      <table class="fill-grid" id="fillGrid" aria-label="9 以内乘法方格填写"></table>
+    </div>
+    <div class="grid-live" id="gridLive" role="status" aria-live="polite">从任意一格开始填写吧！</div>
+  </div>
+</div>
+
+<!-- ══ TAB 5: 错题本 ══ -->
 <div id="tab-wrongbook" class="hidden">
   <div class="card-panel">
     <div class="wr-book-empty" id="wrongBookEmpty">还没有错题，加油保持哦！🎉</div>
@@ -514,10 +621,33 @@ const multiplicationSpeech=Hpx.speech.install({rate:0.82,pitch:1.1,startDelayMs:
 // ══════════════════════════════════════
 //  Tab 切换
 // ══════════════════════════════════════
-function switchTab(name) {
-  Hpx.tabs.activate(name,['table','memo','quiz','wrongbook'],{activeClass:'active',hiddenClass:'hidden'});
+const MULTIPLICATION_TABS=['table','memo','quiz','grid','wrongbook'];
+
+function tabFromHash() {
+  const name=decodeURIComponent(window.location.hash.slice(1));
+  return MULTIPLICATION_TABS.includes(name) ? name : null;
+}
+
+function updateTabHash(name) {
+  const nextHash=`#${name}`;
+  if (window.location.hash===nextHash) return;
+  try { window.history.replaceState(null,'',nextHash); }
+  catch (error) { window.location.hash=name; }
+}
+
+function scrollToTabMarker(name) {
+  if (name!=='grid') return;
+  window.requestAnimationFrame(()=>document.getElementById('grid')?.scrollIntoView({block:'start'}));
+}
+
+function switchTab(name,syncHash=true,scrollToMarker=false) {
+  if (!MULTIPLICATION_TABS.includes(name)) return;
+  Hpx.tabs.activate(name,MULTIPLICATION_TABS,{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'memo' && !memoInited) initMemo();
+  if (name === 'grid' && !gridInited) initFillGrid();
   if (name === 'wrongbook') renderWrongBook();
+  if (syncHash) updateTabHash(name);
+  if (scrollToMarker) scrollToTabMarker(name);
 }
 
 // ══════════════════════════════════════
@@ -953,7 +1083,291 @@ function resetQuiz() {
 }
 
 // ══════════════════════════════════════
-//  TAB 4 — 错题本（自动收集测验答错的题，持久化）
+//  TAB 4 — 可选范围方格填写
+// ══════════════════════════════════════
+let gridInited = false;
+let gridCompleted = false;
+let gridSize = 9;
+let gridGuideEnabled = true;
+let gridActiveInput = null;
+let gridSpeechEnabled = false;
+let gridSuppressFocusSpeech = false;
+let gridAutoAdvanceEnabled = true;
+
+function initFillGrid() {
+  gridInited = true;
+  buildFillGrid();
+}
+
+function setGridSize(value) {
+  const nextSize = Math.min(9,Math.max(2,Number(value) || 9));
+  gridSize = nextSize;
+  const select = document.getElementById('gridSizeSelect');
+  if (select) select.value = String(nextSize);
+  if (gridInited) buildFillGrid();
+}
+
+function buildFillGrid() {
+  const table = document.getElementById('fillGrid');
+  table.innerHTML = '';
+  table.setAttribute('aria-label',`${gridSize} 以内乘法方格填写`);
+  gridCompleted = false;
+  gridActiveInput = null;
+  const head = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  const corner = document.createElement('th');
+  corner.className = 'grid-corner';
+  corner.scope = 'col';
+  corner.textContent = '×';
+  headRow.appendChild(corner);
+  for (let b = 1; b <= gridSize; b++) {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.dataset.gridCol = b;
+    th.textContent = b;
+    headRow.appendChild(th);
+  }
+  head.appendChild(headRow);
+  table.appendChild(head);
+
+  const body = document.createElement('tbody');
+  for (let a = 1; a <= gridSize; a++) {
+    const row = document.createElement('tr');
+    const th = document.createElement('th');
+    th.scope = 'row';
+    th.dataset.gridRow = a;
+    th.textContent = a;
+    row.appendChild(th);
+    for (let b = 1; b <= gridSize; b++) {
+      const cell = document.createElement('td');
+      const input = document.createElement('input');
+      const feedback = document.createElement('span');
+      const feedbackId = `grid-feedback-${a}-${b}`;
+      input.className = 'grid-input';
+      input.type = 'text';
+      input.inputMode = 'numeric';
+      input.maxLength = 2;
+      input.autocomplete = 'off';
+      input.dataset.a = a;
+      input.dataset.b = b;
+      input.setAttribute('aria-label',`${a} 乘 ${b} 的答案`);
+      input.setAttribute('aria-describedby',feedbackId);
+      input.addEventListener('focus',()=>showGridGuide(input));
+      input.addEventListener('input',()=>handleGridInput(input));
+      input.addEventListener('blur',()=>checkGridCell(input,true));
+      input.addEventListener('keydown',event=>handleGridKeydown(event,input));
+      feedback.className = 'grid-cell-feedback';
+      feedback.id = feedbackId;
+      feedback.setAttribute('aria-live','polite');
+      cell.append(input,feedback);
+      row.appendChild(cell);
+    }
+    body.appendChild(row);
+  }
+  table.appendChild(body);
+  document.getElementById('gridCurrent').textContent = gridGuideEnabled
+    ? '点一个方格，查看当前乘法'
+    : '行列提示已关闭';
+  const live = document.getElementById('gridLive');
+  live.textContent = `已生成 ${gridSize} 以内乘法方格，从任意一格开始填写吧！`;
+  live.className = 'grid-live';
+  updateGridProgress();
+}
+
+function showGridGuide(input) {
+  gridActiveInput = input;
+  clearGridGuide();
+  const current = document.getElementById('gridCurrent');
+  if (!gridGuideEnabled) {
+    current.textContent = '行列提示已关闭';
+    if (!gridSuppressFocusSpeech) speakGridPrompt(input);
+    return;
+  }
+  const a = Number(input.dataset.a);
+  const b = Number(input.dataset.b);
+  const rowHeader = document.querySelector(`#fillGrid th[data-grid-row="${a}"]`);
+  const colHeader = document.querySelector(`#fillGrid th[data-grid-col="${b}"]`);
+  [rowHeader,colHeader].forEach(header=>{
+    if (!header) return;
+    header.classList.add('guide-active');
+    header.setAttribute('aria-current','true');
+  });
+  current.innerHTML = `当前：<strong>${a} × ${b}</strong>`;
+  if (!gridSuppressFocusSpeech) speakGridPrompt(input);
+}
+
+function clearGridGuide() {
+  document.querySelectorAll('#fillGrid th.guide-active').forEach(header=>{
+    header.classList.remove('guide-active');
+    header.removeAttribute('aria-current');
+  });
+}
+
+function toggleGridGuide() {
+  gridGuideEnabled = !gridGuideEnabled;
+  const button = document.getElementById('gridGuideToggle');
+  button.classList.toggle('on',gridGuideEnabled);
+  button.setAttribute('aria-pressed',String(gridGuideEnabled));
+  button.textContent = gridGuideEnabled ? '🔦 行列提示 开' : '🔦 行列提示 关';
+  if (gridGuideEnabled && gridActiveInput) showGridGuide(gridActiveInput);
+  else {
+    clearGridGuide();
+    document.getElementById('gridCurrent').textContent = gridGuideEnabled
+      ? '点一个方格，查看当前乘法'
+      : '行列提示已关闭';
+  }
+}
+
+function speakGridPrompt(input) {
+  if (!gridSpeechEnabled || !input) return;
+  const a = Number(input.dataset.a);
+  const b = Number(input.dataset.b);
+  multiplicationSpeech.speak(`${a}乘${b}等于几？`,{rate:0.82,pitch:1.1});
+}
+
+function toggleGridSpeech() {
+  gridSpeechEnabled = !gridSpeechEnabled;
+  const button = document.getElementById('gridSpeechToggle');
+  button.classList.toggle('on',gridSpeechEnabled);
+  button.setAttribute('aria-pressed',String(gridSpeechEnabled));
+  button.textContent = gridSpeechEnabled ? '🔊 声音解说 开' : '🔇 声音解说 关';
+  if (!gridSpeechEnabled) {
+    multiplicationSpeech.stop();
+    return;
+  }
+  if (gridActiveInput) {
+    const a = Number(gridActiveInput.dataset.a);
+    const b = Number(gridActiveInput.dataset.b);
+    multiplicationSpeech.unlock(`${a}乘${b}等于几？`,{rate:0.82,pitch:1.1});
+  } else {
+    multiplicationSpeech.unlock('方格声音解说已开启。',{rate:0.82,pitch:1.1});
+  }
+}
+
+function toggleGridAutoAdvance() {
+  gridAutoAdvanceEnabled = !gridAutoAdvanceEnabled;
+  const button = document.getElementById('gridAutoToggle');
+  button.classList.toggle('on',gridAutoAdvanceEnabled);
+  button.setAttribute('aria-pressed',String(gridAutoAdvanceEnabled));
+  button.textContent = gridAutoAdvanceEnabled ? '➡️ 自动跳格 开' : '⏸️ 自动跳格 关';
+}
+
+function handleGridInput(input) {
+  input.value = input.value.replace(/\D/g,'').slice(0,2);
+  input.classList.remove('correct','wrong');
+  input.removeAttribute('aria-invalid');
+  input.nextElementSibling.textContent = '';
+  const expected = Number(input.dataset.a) * Number(input.dataset.b);
+  if (input.value.length >= String(expected).length) {
+    const correct = checkGridCell(input,false);
+    if (correct) {
+      const next = gridAutoAdvanceEnabled ? focusNextGridInput(input,true) : null;
+      speakGridCorrectAndNext(input,next);
+    }
+  } else updateGridProgress();
+}
+
+function checkGridCell(input,fromBlur) {
+  const value = input.value.trim();
+  if (!value) {
+    input.classList.remove('correct','wrong');
+    input.removeAttribute('aria-invalid');
+    input.nextElementSibling.textContent = '';
+    updateGridProgress();
+    return false;
+  }
+  const a = Number(input.dataset.a);
+  const b = Number(input.dataset.b);
+  const expected = a * b;
+  const correct = Number(value) === expected;
+  input.classList.toggle('correct',correct);
+  input.classList.toggle('wrong',!correct);
+  input.setAttribute('aria-invalid',String(!correct));
+  input.nextElementSibling.textContent = correct ? '' : '再想想';
+  const live = document.getElementById('gridLive');
+  if (correct) {
+    live.textContent = `${a} × ${b} 正确！`;
+    live.className = 'grid-live ok';
+  } else {
+    live.textContent = `${a} × ${b} 不对，再想一想。`;
+    live.className = 'grid-live fail';
+    if (!fromBlur) {
+      playFail();
+      if (gridSpeechEnabled) multiplicationSpeech.speak(`${a}乘${b}还不对，再想一想。`,{rate:0.82,pitch:1.1});
+    }
+  }
+  updateGridProgress();
+  return correct;
+}
+
+function handleGridKeydown(event,input) {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  if (!checkGridCell(input,false)) return;
+  const next = focusNextGridInput(input,true);
+  speakGridCorrectAndNext(input,next);
+}
+
+function focusNextGridInput(input,suppressSpeech=false) {
+  const inputs = [...document.querySelectorAll('#fillGrid .grid-input')];
+  const next = inputs[inputs.indexOf(input) + 1];
+  if (next) {
+    gridSuppressFocusSpeech = suppressSpeech;
+    next.focus();
+    gridSuppressFocusSpeech = false;
+  }
+  return next || null;
+}
+
+function speakGridCorrectAndNext(input,next) {
+  if (!gridSpeechEnabled) return;
+  const a = Number(input.dataset.a);
+  const b = Number(input.dataset.b);
+  const lines = [`${a}乘${b}等于${a*b}，回答正确。`];
+  if (next) {
+    const nextA = Number(next.dataset.a);
+    const nextB = Number(next.dataset.b);
+    lines.push(`下一格，${nextA}乘${nextB}等于几？`);
+  }
+  multiplicationSpeech.sequence(lines,{rate:0.82,pitch:1.1,gapMs:120});
+}
+
+function updateGridProgress() {
+  const inputs = [...document.querySelectorAll('#fillGrid .grid-input')];
+  const total = inputs.length;
+  const correct = inputs.filter(input=>input.classList.contains('correct')).length;
+  document.getElementById('gridProgress').textContent = `已完成 ${correct} / ${total}`;
+  if (total > 0 && correct === total && !gridCompleted) {
+    gridCompleted = true;
+    const live = document.getElementById('gridLive');
+    live.textContent = `🎉 ${gridSize} 以内的 ${total} 个方格全部填写正确！`;
+    live.className = 'grid-live ok';
+    playOk();
+    if (gridSpeechEnabled) speak(`太棒了，${gridSize}以内乘法方格全部填写正确！`);
+    launchConfetti();
+  } else if (correct < total) {
+    gridCompleted = false;
+  }
+}
+
+function resetFillGrid() {
+  if (!gridInited) return;
+  document.querySelectorAll('#fillGrid .grid-input').forEach(input=>{
+    input.value = '';
+    input.className = 'grid-input';
+    input.removeAttribute('aria-invalid');
+    input.nextElementSibling.textContent = '';
+  });
+  gridCompleted = false;
+  document.getElementById('gridLive').textContent = '已清空，从任意一格重新开始吧！';
+  document.getElementById('gridLive').className = 'grid-live';
+  updateGridProgress();
+  const firstInput = document.querySelector('#fillGrid .grid-input');
+  if (firstInput) firstInput.focus();
+}
+
+// ══════════════════════════════════════
+//  TAB 5 — 错题本（自动收集测验答错的题，持久化）
 // ══════════════════════════════════════
 const WRONG_KEY = 'multiWrongBook_v1';
 let wrongBook = {}; // key = "a×b", value = {a,b,result,formula,count,lastAt}
@@ -1140,6 +1554,12 @@ function launchConfetti() {
 // ══════════════════════════════════════
 buildTable();
 loadWrongBook();
+const initialTab=tabFromHash();
+if (initialTab) switchTab(initialTab,false,true);
+window.addEventListener('hashchange',()=>{
+  const name=tabFromHash();
+  if (name) switchTab(name,false,true);
+});
 </script>
 <script>
 if ('serviceWorker' in navigator) {
@@ -1148,7 +1568,9 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
-<script src="feedback.js"></script>
+<script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

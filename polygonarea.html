@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多边形面积</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#f3e5f5 0%,#ede7f6 50%,#e8eaf6 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.9rem;color:#4a148c;letter-spacing:2px;text-shadow:2px 3px 0 #ce93d8;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:12px;background:#fff;touch-action:none;}
+.slider-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:120px;accent-color:#8e24aa;}
+.sl-val{font-weight:bold;font-size:1rem;color:#8e24aa;}
+.hint-tip{text-align:center;font-size:.85rem;color:#999;margin-bottom:8px;}
+.formula-box{background:#f3e5f5;border-radius:12px;padding:12px 18px;text-align:center;font-size:1rem;color:#4a148c;line-height:1.8;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#ede7f6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#8e24aa;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:12px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #ce93d8;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#8e24aa;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#8e24aa;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#8e24aa;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#8e24aa">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🔶</div>
+    <h1>多边形面积</h1>
+    <p>拖动顶点，推导平行四边形、三角形、梯形的面积公式</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('pg')">▱ 平行四边形</button>
+    <button class="tab-btn" onclick="switchTab('tri')">🔺 三角形</button>
+    <button class="tab-btn" onclick="switchTab('trap')">⏢ 梯形</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 平行四边形 -->
+  <div id="tab-pg">
+    <div class="card">
+      <div class="hint-tip">拖动紫色端点：左右拖不变面积（只改斜边），上下拖才改变高</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>底（格）</label><input type="range" id="pgBaseSlider" min="3" max="12" value="6" oninput="pgSetBase()"><span class="sl-val" id="pgBaseVal">6</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="pgCanvas" width="320" height="240"></canvas></div>
+      <div class="formula-box" id="pgArea"></div>
+    </div>
+  </div>
+
+  <!-- 三角形 -->
+  <div id="tab-tri" style="display:none;">
+    <div class="card">
+      <div class="hint-tip">拖动红色顶点：左右拖高不变，上下拖改变高（顶点可以拖到底边外面）</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>底（格）</label><input type="range" id="triBaseSlider" min="3" max="12" value="6" oninput="triSetBase()"><span class="sl-val" id="triBaseVal">6</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="triCanvas" width="320" height="240"></canvas></div>
+      <div class="formula-box" id="triArea"></div>
+    </div>
+  </div>
+
+  <!-- 梯形 -->
+  <div id="tab-trap" style="display:none;">
+    <div class="card">
+      <div class="hint-tip">拖动蓝色顶点调整高和斜边，滑块调整上底和下底长度</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>下底（格）</label><input type="range" id="trapBottomSlider" min="4" max="14" value="8" oninput="trapSetLen()"><span class="sl-val" id="trapBottomVal">8</span></div>
+        <div class="sl-group"><label>上底（格）</label><input type="range" id="trapTopSlider" min="2" max="10" value="4" oninput="trapSetLen()"><span class="sl-val" id="trapTopVal">4</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="trapCanvas" width="320" height="240"></canvas></div>
+      <div class="formula-box" id="trapArea"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+        <span>格²</span>
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+const CELL=22, YBASE=210;
+function drawGridBg(ctx,canvas){
+  ctx.strokeStyle='rgba(0,0,0,.05)';ctx.lineWidth=1;
+  for(let x=0;x<=canvas.width;x+=CELL){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<=canvas.height;y+=CELL){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+}
+function makeDraggable(canvas, pt, clamp, onChange){
+  let dragging=false;
+  function getPos(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+    const src=e.touches?e.touches[0]:e;
+    return [(src.clientX-rect.left)*scaleX,(src.clientY-rect.top)*scaleY];
+  }
+  function start(e){e.preventDefault();const [x,y]=getPos(e);if(Math.hypot(pt.x-x,pt.y-y)<28) dragging=true;}
+  function move(e){
+    if(!dragging) return;
+    let [x,y]=getPos(e);
+    pt.x=Math.max(clamp.x[0],Math.min(clamp.x[1],x));
+    pt.y=Math.max(clamp.y[0],Math.min(clamp.y[1],y));
+    onChange();
+  }
+  function end(){dragging=false;}
+  canvas.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+// ── 平行四边形 ──
+let pgBaseLen=6, pgD={x:0,y:130};
+function pgOx(){return (320-pgBaseLen*CELL)/2;}
+function pgSetBase(){
+  pgBaseLen=parseInt(document.getElementById('pgBaseSlider').value);
+  document.getElementById('pgBaseVal').textContent=pgBaseLen;
+  pgD.x=pgOx()+30;
+  drawPg();
+}
+function drawPg(){
+  const canvas=document.getElementById('pgCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height); drawGridBg(ctx,canvas);
+  const ox=pgOx(), A=[ox,YBASE], B=[ox+pgBaseLen*CELL,YBASE], D=[pgD.x,pgD.y], C=[D[0]+pgBaseLen*CELL,D[1]];
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.lineTo(C[0],C[1]);ctx.lineTo(D[0],D[1]);ctx.closePath();
+  ctx.fillStyle='rgba(142,36,170,.22)';ctx.fill();ctx.strokeStyle='#8e24aa';ctx.lineWidth=3;ctx.stroke();
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='#e65100';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(D[0],D[1]);ctx.lineTo(D[0],YBASE);ctx.stroke();ctx.restore();
+  ctx.beginPath();ctx.arc(D[0],D[1],9,0,Math.PI*2);ctx.fillStyle='#8e24aa';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  const hUnits=(YBASE-D[1])/CELL;
+  ctx.fillStyle='#4a148c';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('底='+pgBaseLen+'格',(A[0]+B[0])/2,YBASE+16);
+  ctx.fillText('高≈'+hUnits.toFixed(1)+'格',D[0]+34,(D[1]+YBASE)/2);
+  const area=pgBaseLen*hUnits;
+  document.getElementById('pgArea').innerHTML=`面积 = 底 × 高 = ${pgBaseLen} × ${hUnits.toFixed(1)} = <b style="color:#8e24aa">${area.toFixed(1)}</b> 格²`;
+}
+function initPg(){
+  pgD.x=pgOx()+30;
+  makeDraggable(document.getElementById('pgCanvas'), pgD, {x:[10,310],y:[40,190]}, drawPg);
+  drawPg();
+}
+
+// ── 三角形 ──
+let triBaseLen=6, triP={x:0,y:120};
+function triOx(){return (320-triBaseLen*CELL)/2;}
+function triSetBase(){
+  triBaseLen=parseInt(document.getElementById('triBaseSlider').value);
+  document.getElementById('triBaseVal').textContent=triBaseLen;
+  triP.x=triOx()+triBaseLen*CELL/2;
+  drawTri();
+}
+function drawTri(){
+  const canvas=document.getElementById('triCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height); drawGridBg(ctx,canvas);
+  const ox=triOx(), A=[ox,YBASE], B=[ox+triBaseLen*CELL,YBASE], P=[triP.x,triP.y];
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.lineTo(P[0],P[1]);ctx.closePath();
+  ctx.fillStyle='rgba(198,40,40,.2)';ctx.fill();ctx.strokeStyle='#c62828';ctx.lineWidth=3;ctx.stroke();
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='#e65100';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(P[0],YBASE);ctx.stroke();ctx.restore();
+  // baseline extended dashed if P.x outside AB
+  if(P[0]<A[0]||P[0]>B[0]){
+    ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='#bbb';
+    ctx.beginPath();ctx.moveTo(Math.min(A[0],P[0]),YBASE);ctx.lineTo(Math.max(B[0],P[0]),YBASE);ctx.stroke();ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(P[0],P[1],9,0,Math.PI*2);ctx.fillStyle='#c62828';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  const hUnits=(YBASE-P[1])/CELL;
+  ctx.fillStyle='#7f0000';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('底='+triBaseLen+'格',(A[0]+B[0])/2,YBASE+16);
+  ctx.fillText('高≈'+hUnits.toFixed(1)+'格',P[0]+34,(P[1]+YBASE)/2);
+  const area=triBaseLen*hUnits/2;
+  document.getElementById('triArea').innerHTML=`面积 = 底 × 高 ÷ 2 = ${triBaseLen} × ${hUnits.toFixed(1)} ÷ 2 = <b style="color:#c62828">${area.toFixed(1)}</b> 格²`;
+}
+function initTri(){
+  triP.x=triOx()+triBaseLen*CELL/2;
+  makeDraggable(document.getElementById('triCanvas'), triP, {x:[10,310],y:[40,190]}, drawTri);
+  drawTri();
+}
+
+// ── 梯形 ──
+let trapBottom=8, trapTop=4, trapD={x:0,y:130};
+function trapOx(){return (320-trapBottom*CELL)/2;}
+function trapSetLen(){
+  trapBottom=parseInt(document.getElementById('trapBottomSlider').value);
+  trapTop=parseInt(document.getElementById('trapTopSlider').value);
+  document.getElementById('trapBottomVal').textContent=trapBottom;
+  document.getElementById('trapTopVal').textContent=trapTop;
+  trapD.x=trapOx()+ (trapBottom*CELL-trapTop*CELL)/2;
+  drawTrap();
+}
+function drawTrap(){
+  const canvas=document.getElementById('trapCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height); drawGridBg(ctx,canvas);
+  const ox=trapOx(), A=[ox,YBASE], B=[ox+trapBottom*CELL,YBASE], D=[trapD.x,trapD.y], C=[D[0]+trapTop*CELL,D[1]];
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.lineTo(C[0],C[1]);ctx.lineTo(D[0],D[1]);ctx.closePath();
+  ctx.fillStyle='rgba(21,101,192,.2)';ctx.fill();ctx.strokeStyle='#1565c0';ctx.lineWidth=3;ctx.stroke();
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='#e65100';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(D[0],D[1]);ctx.lineTo(D[0],YBASE);ctx.stroke();ctx.restore();
+  ctx.beginPath();ctx.arc(D[0],D[1],9,0,Math.PI*2);ctx.fillStyle='#1565c0';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  const hUnits=(YBASE-D[1])/CELL;
+  ctx.fillStyle='#0d47a1';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('下底='+trapBottom+'格',(A[0]+B[0])/2,YBASE+16);
+  ctx.fillText('上底='+trapTop+'格',(D[0]+C[0])/2,D[1]-10);
+  ctx.fillText('高≈'+hUnits.toFixed(1)+'格',D[0]-38,(D[1]+YBASE)/2);
+  const area=(trapBottom+trapTop)*hUnits/2;
+  document.getElementById('trapArea').innerHTML=`面积 = (上底+下底) × 高 ÷ 2 = (${trapTop}+${trapBottom}) × ${hUnits.toFixed(1)} ÷ 2 = <b style="color:#1565c0">${area.toFixed(1)}</b> 格²`;
+}
+function initTrap(){
+  trapD.x=trapOx()+(trapBottom*CELL-trapTop*CELL)/2;
+  makeDraggable(document.getElementById('trapCanvas'), trapD, {x:[10,310-trapTop*CELL],y:[40,190]}, drawTrap);
+  drawTrap();
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const type=randInt(0,2);
+  if(type===0){
+    const b=randInt(3,15),h=randInt(2,12);
+    qAns=b*h;
+    document.getElementById('quizQ').textContent=`平行四边形的底是 ${b} 格，高是 ${h} 格，面积是多少平方格？`;
+    speak(`平行四边形的底是${b}格，高是${h}格，面积是多少平方格？`);
+  } else if(type===1){
+    const b=randInt(4,16),h=randInt(1,6)*2;
+    qAns=b*h/2;
+    document.getElementById('quizQ').textContent=`三角形的底是 ${b} 格，高是 ${h} 格，面积是多少平方格？`;
+    speak(`三角形的底是${b}格，高是${h}格，面积是多少平方格？`);
+  } else {
+    const top=randInt(2,10), bottom=randInt(top+1,16), h=randInt(1,6)*2;
+    qAns=(top+bottom)*h/2;
+    document.getElementById('quizQ').textContent=`梯形的上底是 ${top} 格，下底是 ${bottom} 格，高是 ${h} 格，面积是多少平方格？`;
+    speak(`梯形的上底是${top}格，下底是${bottom}格，高是${h}格，面积是多少平方格？`);
+  }
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseFloat(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(Math.abs(v-qAns)<0.01){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns+' 格²';
+    speak('答案是'+qAns+'平方格，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['pg','tri','trap','quiz']);
+  if(t==='pg') speak('平行四边形：拖动紫色端点，看看底和高怎么决定面积。');
+  if(t==='tri') speak('三角形：拖动红色顶点，面积等于底乘高再除以2。');
+  if(t==='trap') speak('梯形：面积等于上底加下底的和，乘高，再除以2。');
+  if(t==='quiz') nextQ();
+}
+initPg(); initTri(); initTrap();
+speak('欢迎来到多边形面积！拖动顶点，探索平行四边形、三角形和梯形的面积公式。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

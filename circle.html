@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圆的周长与面积</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e3f2fd 0%,#e8eaf6 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.95rem;color:#0d47a1;letter-spacing:2px;text-shadow:2px 3px 0 #90caf9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;flex-wrap:wrap;gap:16px;}
+canvas{border-radius:12px;touch-action:none;}
+.info-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.info-tag{background:#e3f2fd;border-radius:10px;padding:8px 16px;font-size:.95rem;font-weight:bold;color:#0d47a1;}
+.formula-box{background:#e3f2fd;border-radius:12px;padding:12px 18px;text-align:center;font-size:1rem;color:#0d47a1;line-height:1.9;}
+.derive-desc{font-size:.9rem;color:#666;text-align:center;line-height:1.8;margin-bottom:10px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e3f2fd;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#1565c0;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #90caf9;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#1565c0;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#1565c0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#1565c0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#1565c0">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">⭕</div>
+    <h1>圆的周长与面积</h1>
+    <p>拖动半径，探索周长和面积的公式</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识圆</button>
+    <button class="tab-btn" onclick="switchTab('derive')">🔪 面积公式推导</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识圆 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:6px;">拖动蓝色端点，改变半径的长度</div>
+      <div class="canvas-wrap"><canvas id="learnCanvas" width="280" height="220"></canvas></div>
+      <div class="info-row">
+        <div class="info-tag">半径 r = <span id="rVal">4</span> cm</div>
+        <div class="info-tag">直径 d = <span id="dVal">8</span> cm</div>
+      </div>
+      <div class="formula-box" id="learnFormula"></div>
+    </div>
+  </div>
+
+  <!-- 面积公式推导 -->
+  <div id="tab-derive" style="display:none;">
+    <div class="card">
+      <div class="derive-desc">把圆平均分成很多个小扇形，拼起来就近似一个长方形：<br>长 ≈ 圆周长的一半（πr），宽 ≈ 半径（r）</div>
+      <div class="canvas-wrap">
+        <canvas id="pieCanvas" width="180" height="180"></canvas>
+        <canvas id="rectCanvas" width="180" height="180"></canvas>
+      </div>
+      <div class="formula-box">长方形面积 = 长 × 宽 = πr × r = <b>πr²</b><br>这就是圆的面积公式！</div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?" step="0.01">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+const PI=3.14;
+
+// ── 认识圆（拖动半径）──
+const CX=140, CY=110, PX_PER_CM=10;
+let radiusPx=40;
+function drawLearn(){
+  const canvas=document.getElementById('learnCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.beginPath();ctx.arc(CX,CY,radiusPx,0,Math.PI*2);
+  ctx.fillStyle='rgba(21,101,192,.12)';ctx.fill();
+  ctx.strokeStyle='#1565c0';ctx.lineWidth=3;ctx.stroke();
+  // diameter line
+  ctx.strokeStyle='#90a4ae';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(CX-radiusPx,CY);ctx.lineTo(CX+radiusPx,CY);ctx.stroke();
+  ctx.setLineDash([]);
+  // radius line (draggable handle side)
+  ctx.strokeStyle='#0d47a1';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(CX+radiusPx,CY);ctx.stroke();
+  // center dot
+  ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);ctx.fillStyle='#0d47a1';ctx.fill();
+  // handle
+  ctx.beginPath();ctx.arc(CX+radiusPx,CY,9,0,Math.PI*2);ctx.fillStyle='#1565c0';ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  const r=(radiusPx/PX_PER_CM);
+  document.getElementById('rVal').textContent=r.toFixed(1);
+  document.getElementById('dVal').textContent=(r*2).toFixed(1);
+  const C=2*PI*r, S=PI*r*r;
+  document.getElementById('learnFormula').innerHTML=
+    `周长 C = 2πr = 2×3.14×${r.toFixed(1)} = <b>${C.toFixed(2)}</b> cm<br>面积 S = πr² = 3.14×${r.toFixed(1)}² = <b>${S.toFixed(2)}</b> cm²`;
+}
+function bindLearnDrag(){
+  const canvas=document.getElementById('learnCanvas');
+  let dragging=false;
+  function getPos(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width;
+    const src=e.touches?e.touches[0]:e;
+    return (src.clientX-rect.left)*scaleX;
+  }
+  function start(e){e.preventDefault();dragging=true;}
+  function move(e){
+    if(!dragging) return;
+    const x=getPos(e);
+    radiusPx=Math.max(15,Math.min(100,x-CX));
+    drawLearn();
+  }
+  function end(){dragging=false;}
+  canvas.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+// ── 面积公式推导（静态示意图）──
+function drawPie(){
+  const canvas=document.getElementById('pieCanvas'), ctx=canvas.getContext('2d');
+  const cx=90,cy=90,r=70,slices=16;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<slices;i++){
+    const a1=i/slices*Math.PI*2, a2=(i+1)/slices*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,a1,a2);
+    ctx.closePath();
+    ctx.fillStyle= i%2===0 ? '#64b5f6' : '#bbdefb';
+    ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
+  }
+}
+function drawRectApprox(){
+  const canvas=document.getElementById('rectCanvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const slices=16, r=70, segW=(Math.PI*r)/ (slices/2) , h=r;
+  const ox=10, oy=(canvas.height-h)/2;
+  for(let i=0;i<slices;i++){
+    const col= i%2===0 ? '#64b5f6' : '#bbdefb';
+    ctx.fillStyle=col;
+    // alternate up/down triangle-ish strips to mimic interlocking sectors
+    ctx.beginPath();
+    if(i%2===0){
+      ctx.moveTo(ox+i*segW/2, oy+h);
+      ctx.lineTo(ox+(i+1)*segW/2, oy+h);
+      ctx.lineTo(ox+(i+1)*segW/2, oy);
+      ctx.lineTo(ox+i*segW/2, oy);
+    } else {
+      ctx.moveTo(ox+i*segW/2, oy);
+      ctx.lineTo(ox+(i+1)*segW/2, oy);
+      ctx.lineTo(ox+(i+1)*segW/2, oy+h);
+      ctx.lineTo(ox+i*segW/2, oy+h);
+    }
+    ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.strokeStyle='#0d47a1';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+  ctx.strokeRect(ox,oy,segW*slices/2,h);
+  ctx.setLineDash([]);
+  ctx.fillStyle='#0d47a1';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+  ctx.fillText('长 ≈ πr', ox+segW*slices/4, oy+h+16);
+  ctx.save();ctx.translate(ox-8,oy+h/2);ctx.rotate(-Math.PI/2);ctx.fillText('宽≈r',0,0);ctx.restore();
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const r=randInt(2,20);
+  const askArea=Math.random()<0.5;
+  if(askArea){
+    qAns=Math.round(PI*r*r*100)/100;
+    document.getElementById('quizQ').textContent=`一个圆的半径是 ${r} cm，它的面积是多少平方厘米？（π取3.14）`;
+    speak(`一个圆的半径是${r}厘米，它的面积是多少平方厘米？`);
+  } else {
+    qAns=Math.round(2*PI*r*100)/100;
+    document.getElementById('quizQ').textContent=`一个圆的半径是 ${r} cm，它的周长是多少厘米？（π取3.14）`;
+    speak(`一个圆的半径是${r}厘米，它的周长是多少厘米？`);
+  }
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseFloat(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(Math.abs(v-qAns)<0.05){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns;
+    speak('答案是'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','derive','quiz']);
+  if(t==='learn') speak('认识圆：拖动蓝色端点，看看半径怎么决定周长和面积。');
+  if(t==='derive') speak('面积公式推导：把圆切成很多小扇形，拼成近似的长方形。');
+  if(t==='quiz') nextQ();
+}
+bindLearnDrag(); drawLearn();
+drawPie(); drawRectApprox();
+speak('欢迎来到圆的周长与面积！拖动半径，探索圆的秘密。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

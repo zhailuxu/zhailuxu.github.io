@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间计算</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#e8eaf6 50%,#fff9c4 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#00695c;letter-spacing:3px;text-shadow:2px 3px 0 #80cbc4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 26px;font-size:.95rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.clocks-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+.clock-box{text-align:center;}
+.clock-label{font-size:.95rem;font-weight:bold;color:#555;margin-bottom:6px;}
+canvas{border-radius:50%;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.time-display{font-size:1.5rem;font-weight:bold;color:#00695c;margin-top:6px;}
+.slider-pair{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.sl-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.82rem;color:#777;}
+input[type=range]{width:100px;accent-color:#00695c;}
+.arrow-box{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#00695c;padding:0 4px;}
+.result-box{text-align:center;background:#e0f7fa;border-radius:14px;padding:14px;margin-top:12px;}
+.result-box .elapsed{font-size:1.6rem;font-weight:bold;color:#ad1457;}
+.result-box .formula{font-size:.9rem;color:#777;margin-top:4px;}
+/* 24h */
+.h24-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:400px;margin:0 auto;}
+.h24-cell{background:#e0f7fa;border-radius:10px;padding:8px;text-align:center;cursor:pointer;transition:all .18s;}
+.h24-cell:hover{background:#00695c;color:#fff;}
+.h24-cell.active{background:#00695c;color:#fff;}
+.h24-cell .am{font-size:.95rem;font-weight:bold;}
+.h24-cell .pm{font-size:.85rem;color:#80cbc4;}
+.h24-cell.active .pm{color:#b2dfdb;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e0f7fa;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#00695c;}
+.quiz-q{font-size:1.1rem;color:#333;margin-bottom:14px;line-height:1.9;}
+.options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.opt-btn{padding:10px 22px;border:2px solid #80cbc4;border-radius:14px;background:#fff;font-size:1rem;font-weight:bold;color:#00695c;cursor:pointer;transition:all .18s;font-family:inherit;}
+.opt-btn:hover{background:#e0f7fa;}
+.opt-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.opt-btn.wrong{background:#ffebee;border-color:#ef9a9a;color:#c62828;}
+.result-msg{font-size:1.1rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#00695c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#00695c">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">⏱️</div>
+    <h1>时间计算</h1>
+    <p>学会算经过的时间，掌握24小时制</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('elapsed')">⏳ 经过时间</button>
+    <button class="tab-btn" onclick="switchTab('h24')">🕛 24小时制</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 经过时间 -->
+  <div id="tab-elapsed">
+    <div class="card">
+      <div style="text-align:center;font-size:.95rem;color:#777;margin-bottom:12px;">拨动时针，看经过了多少时间</div>
+      <div class="clocks-row">
+        <div class="clock-box">
+          <div class="clock-label">🟢 开始时间</div>
+          <canvas id="c1" width="160" height="160"></canvas>
+          <div class="time-display" id="t1">8:00</div>
+          <div class="slider-pair">
+            <div class="sl-wrap"><span>时</span><input type="range" id="s1h" min="0" max="23" value="8" oninput="updateClocks()"></div>
+            <div class="sl-wrap"><span>分</span><input type="range" id="s1m" min="0" max="59" value="0" oninput="updateClocks()"></div>
+          </div>
+        </div>
+        <div class="arrow-box">→</div>
+        <div class="clock-box">
+          <div class="clock-label">🔴 结束时间</div>
+          <canvas id="c2" width="160" height="160"></canvas>
+          <div class="time-display" id="t2">10:30</div>
+          <div class="slider-pair">
+            <div class="sl-wrap"><span>时</span><input type="range" id="s2h" min="0" max="23" value="10" oninput="updateClocks()"></div>
+            <div class="sl-wrap"><span>分</span><input type="range" id="s2m" min="0" max="59" value="30" oninput="updateClocks()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box">
+        <div style="font-size:.95rem;color:#777;">经过时间</div>
+        <div class="elapsed" id="elapsedResult">2小时30分钟</div>
+        <div class="formula" id="elapsedFormula"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24小时制 -->
+  <div id="tab-h24" style="display:none;">
+    <div class="card">
+      <div style="text-align:center;font-size:1rem;color:#555;margin-bottom:14px;">点击时间格，看12小时制和24小时制的对应关系</div>
+      <div class="h24-grid" id="h24Grid"></div>
+      <div id="h24Desc" style="text-align:center;margin-top:14px;font-size:1rem;color:#555;min-height:60px;line-height:2;"></div>
+    </div>
+    <div class="card" style="background:#fffde7;">
+      <div style="font-size:.95rem;color:#555;line-height:2.2;text-align:center;">
+        <div>🌅 0:00 ~ 11:59 → <b style="color:#00695c">上午（AM）</b></div>
+        <div>🌆 12:00 ~ 23:59 → <b style="color:#ad1457">下午（PM）</b></div>
+        <div>下午时间 = 24小时制 - 12 &nbsp;|&nbsp; 如：14:00 = <b>下午 2:00</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="options" id="quizOpts"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+let _clockTimer=null;
+
+function drawClock(canvas, h, m, color='#00695c'){
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2, cy=canvas.height/2, r=cx-8;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // face
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#b2dfdb';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  // ticks
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2-Math.PI/2;
+    const r1=r-6, r2=r-14;
+    ctx.strokeStyle='#80cbc4';ctx.lineWidth=i%3===0?2.5:1.5;
+    ctx.beginPath();ctx.moveTo(cx+r1*Math.cos(a),cy+r1*Math.sin(a));ctx.lineTo(cx+r2*Math.cos(a),cy+r2*Math.sin(a));ctx.stroke();
+  }
+  // numbers
+  ctx.fillStyle='#555';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(let i=1;i<=12;i++){const a=(i/12)*Math.PI*2-Math.PI/2;ctx.fillText(i,cx+(r-22)*Math.cos(a),cy+(r-22)*Math.sin(a));}
+  // hour hand
+  const ha=((h%12+m/60)/12)*Math.PI*2-Math.PI/2;
+  ctx.strokeStyle=color;ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+(r-35)*Math.cos(ha),cy+(r-35)*Math.sin(ha));ctx.stroke();
+  // min hand
+  const ma=(m/60)*Math.PI*2-Math.PI/2;
+  ctx.strokeStyle='#555';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+(r-20)*Math.cos(ma),cy+(r-20)*Math.sin(ma));ctx.stroke();
+  // center
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
+}
+
+function pad(n){return n<10?'0'+n:n;}
+function updateClocks(){
+  const h1=parseInt(document.getElementById('s1h').value),m1=parseInt(document.getElementById('s1m').value);
+  const h2=parseInt(document.getElementById('s2h').value),m2=parseInt(document.getElementById('s2m').value);
+  drawClock(document.getElementById('c1'),h1,m1,'#2e7d32');
+  drawClock(document.getElementById('c2'),h2,m2,'#c62828');
+  document.getElementById('t1').textContent=pad(h1)+':'+pad(m1);
+  document.getElementById('t2').textContent=pad(h2)+':'+pad(m2);
+  let diff=(h2*60+m2)-(h1*60+m1);
+  if(diff<0) diff+=24*60;
+  const dh=Math.floor(diff/60),dm=diff%60;
+  let txt='';
+  if(dh>0) txt+=dh+'小时';
+  if(dm>0) txt+=dm+'分钟';
+  if(!txt) txt='0分钟';
+  document.getElementById('elapsedResult').textContent=txt;
+  const total2=h2*60+m2, total1=h1*60+m1;
+  document.getElementById('elapsedFormula').innerHTML=
+    `结束 ${pad(h2)}:${pad(m2)} = <b>${total2}</b> 分钟 &nbsp;−&nbsp; 开始 ${pad(h1)}:${pad(m1)} = <b>${total1}</b> 分钟 = <b style="color:#ad1457">${diff}</b> 分钟`;
+  if(_clockTimer) clearTimeout(_clockTimer);
+  _clockTimer=setTimeout(()=>{speak(`开始时间${pad(h1)}点${m1>0?m1+'分':'整'}，结束时间${pad(h2)}点${m2>0?m2+'分':'整'}，经过了${txt}。`);},700);
+}
+updateClocks();
+
+// 24h grid
+const H24_DATA=[
+  {h24:'0:00',label:'凌晨12点',pm:false},{h24:'1:00',label:'凌晨1点',pm:false},{h24:'2:00',label:'凌晨2点',pm:false},{h24:'3:00',label:'凌晨3点',pm:false},
+  {h24:'4:00',label:'凌晨4点',pm:false},{h24:'5:00',label:'清晨5点',pm:false},{h24:'6:00',label:'早上6点',pm:false},{h24:'7:00',label:'早上7点',pm:false},
+  {h24:'8:00',label:'上午8点',pm:false},{h24:'9:00',label:'上午9点',pm:false},{h24:'10:00',label:'上午10点',pm:false},{h24:'11:00',label:'上午11点',pm:false},
+  {h24:'12:00',label:'中午12点',pm:true},{h24:'13:00',label:'下午1点',pm:true},{h24:'14:00',label:'下午2点',pm:true},{h24:'15:00',label:'下午3点',pm:true},
+  {h24:'16:00',label:'下午4点',pm:true},{h24:'17:00',label:'下午5点',pm:true},{h24:'18:00',label:'傍晚6点',pm:true},{h24:'19:00',label:'晚上7点',pm:true},
+  {h24:'20:00',label:'晚上8点',pm:true},{h24:'21:00',label:'晚上9点',pm:true},{h24:'22:00',label:'夜里10点',pm:true},{h24:'23:00',label:'深夜11点',pm:true},
+];
+function buildH24(){
+  const grid=document.getElementById('h24Grid');
+  H24_DATA.forEach((d,i)=>{
+    const cell=document.createElement('div');
+    cell.className='h24-cell'+(d.pm?' pm-cell':'');
+    cell.style.background=d.pm?'#fce4ec':'#e0f7fa';
+    cell.innerHTML=`<div class="am" style="color:${d.pm?'#ad1457':'#00695c'}">${d.h24}</div><div class="pm" style="color:${d.pm?'#f48fb1':'#80cbc4'}">${d.label}</div>`;
+    cell.onclick=()=>{
+      document.querySelectorAll('.h24-cell').forEach(c=>c.classList.remove('active'));
+      cell.classList.add('active');
+      const h=parseInt(d.h24);
+      let desc=`<b style="color:${d.pm?'#ad1457':'#00695c'}">${d.h24}</b> 就是 <b>${d.label}</b>`;
+      if(d.pm&&h>12) desc+=`<br>（24小时制 ${h} = 12小时制 ${h-12}点，即下午${h-12}时）`;
+      else if(h===12) desc+=`<br>（正午12点，也是24小时制的 12:00）`;
+      document.getElementById('h24Desc').innerHTML=desc;
+      speak(`${d.h24}就是${d.label}。`);
+    };
+    grid.appendChild(cell);
+  });
+}
+buildH24();
+
+// quiz
+let qScore={c:0,w:0},qAns='';
+const QUIZ_TYPES=['elapsed','h24_convert'];
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.querySelectorAll('.opt-btn').forEach(b=>{b.disabled=false;b.className='opt-btn';});
+  const type=QUIZ_TYPES[Math.floor(Math.random()*QUIZ_TYPES.length)];
+  if(type==='elapsed'){
+    const h1=7+Math.floor(Math.random()*4),m1=[0,15,30][Math.floor(Math.random()*3)];
+    const dur=Math.floor(Math.random()*5+1)*30;
+    const total=h1*60+m1+dur;
+    const h2=Math.floor(total/60)%24,m2=total%60;
+    const dh=Math.floor(dur/60),dm=dur%60;
+    qAns=(dh>0?dh+'小时':'')+(dm>0?dm+'分钟':'');
+    document.getElementById('quizQ').innerHTML=`小明 <b>${pad(h1)}:${pad(m1)}</b> 开始做作业，<b>${pad(h2)}:${pad(m2)}</b> 做完，<br>一共用了多少时间？`;
+    speak(`小明${pad(h1)}点${m1>0?m1+'分':'整'}开始做作业，${pad(h2)}点${m2>0?m2+'分':'整'}做完，一共用了多少时间？`);
+    const wrong=new Set([qAns]);
+    while(wrong.size<4){const wd=Math.floor(Math.random()*4+1)*30;const wh=Math.floor(wd/60),wm=wd%60;wrong.add((wh>0?wh+'小时':'')+(wm>0?wm+'分钟':''));}
+    renderOpts([...wrong].sort(()=>Math.random()-.5));
+  } else {
+    const h=13+Math.floor(Math.random()*8);
+    qAns=`下午${h-12}:00`;
+    document.getElementById('quizQ').innerHTML=`<b>${h}:00</b>（24小时制）是几点几分？（用"下午X点"表示）`;
+    speak(`${h}:00用24小时制表示，是下午几点？`);
+    const wrong=new Set([qAns]);
+    while(wrong.size<4){const wh=13+Math.floor(Math.random()*8);wrong.add(`下午${wh-12}:00`);}
+    renderOpts([...wrong].sort(()=>Math.random()-.5));
+  }
+}
+function renderOpts(arr){
+  const cont=document.getElementById('quizOpts');
+  cont.innerHTML='';
+  arr.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';b.textContent=o;
+    b.onclick=()=>{
+      document.querySelectorAll('.opt-btn').forEach(x=>x.disabled=true);
+      if(o===qAns){b.classList.add('correct');qScore.c++;document.getElementById('quizMsg').className='result-msg ok';document.getElementById('quizMsg').textContent='✅ 答对啦！';speak('答对了！真棒！');}
+      else{b.classList.add('wrong');qScore.w++;document.querySelectorAll('.opt-btn').forEach(x=>{if(x.textContent===qAns)x.classList.add('correct');});document.getElementById('quizMsg').className='result-msg no';document.getElementById('quizMsg').textContent='❌ 正确答案是 '+qAns;speak('正确答案是'+qAns+'，再加油！');}
+      document.getElementById('qC').textContent=qScore.c;document.getElementById('qW').textContent=qScore.w;
+      document.getElementById('nextBtn').style.display='inline-block';
+    };
+    cont.appendChild(b);
+  });
+}
+function switchTab(t){
+  Hpx.tabs.activate(t, ['elapsed','h24','quiz']);
+  if(t==='elapsed') speak('经过时间：拨动时针，看经过了多少时间。');
+  if(t==='h24') speak('24小时制：点击时间格，看12小时制和24小时制的对应关系。');
+  if(t==='quiz') nextQ();
+}
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="慧陪学原创校舍图标">
+  <!-- 2026-08-09 本项目原创几何图标，不含第三方 Emoji 字形或图库素材。 -->
+  <rect width="64" height="64" rx="14" fill="#6a1b9a"/>
+  <path d="M11 27 32 12l21 15v4H11z" fill="#f3e5f5"/>
+  <path d="M16 29h32v23H16z" fill="#fff"/>
+  <path d="M27 39h10v13H27z" fill="#ce93d8"/>
+  <path d="M20 34h5v6h-5zm19 0h5v6h-5z" fill="#7e57c2"/>
+  <path d="M12 52h40" stroke="#f3e5f5" stroke-width="4" stroke-linecap="round"/>
+</svg>

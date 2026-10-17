@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+const root=new URL('../',import.meta.url);
+const source=fs.readFileSync(new URL('hpx-game-library.js',root),'utf8');
+const dailySource=fs.readFileSync(new URL('hpx-daily-camp.js',root),'utf8');
+const paradise=fs.readFileSync(new URL('game-paradise.html',root),'utf8');
+const daily=fs.readFileSync(new URL('daily-camp.html',root),'utf8');
+const roadmap=fs.readFileSync(new URL('ROADMAP.md',root),'utf8');
+const sources=fs.readFileSync(new URL('CONTENT_SOURCES.md',root),'utf8');
+const store=new Map();
+const localStorage={getItem:key=>store.get(key)||null,setItem:(key,value)=>store.set(key,value),removeItem:key=>store.delete(key)};
+const context={globalThis:{localStorage},Date};
+vm.runInContext(source,vm.createContext(context),{filename:'hpx-game-library.js'});
+const api=context.globalThis.HpxGameLibrary;
+assert.ok(api,'游戏收藏API没有初始化');
+assert.equal(api.toggle('shape-sudoku'),true,'第一次收藏没有成功');
+assert.equal(api.has('shape-sudoku'),true,'收藏状态没有保存');
+assert.equal(api.toggle('shape-sudoku'),false,'取消收藏没有成功');
+assert.equal(api.has('shape-sudoku'),false,'取消收藏后状态仍存在');
+assert.deepEqual(Array.from(api.clean(['a','a','bad id','b'])),['a','b'],'收藏清理与去重错误');
+const recent=api.recent({games:{a:{id:'a',lastPlayed:100,completed:1},b:{id:'b',lastPlayed:300,completed:2},c:{id:'c',lastPlayed:null}}},2);
+assert.deepEqual(Array.from(recent,item=>item.gameId),['b','a'],'最近玩过排序错误');
+const now=new Date(2026,7,20,12).getTime();
+assert.equal(api.dayLabel(now,now),'今天','今天的相对日期错误');
+assert.equal(api.dayLabel(new Date(2026,7,19,8).getTime(),now),'昨天','昨天的相对日期错误');
+
+store.set('hpxGameFavoritesV1',JSON.stringify(['number-maze']));
+const dailyContext={globalThis:{localStorage},Date};
+vm.runInContext(dailySource,vm.createContext(dailyContext),{filename:'hpx-daily-camp.js'});
+assert.equal(dailyContext.globalThis.HpxDailyCamp.favoriteBoost('number-maze'),.35,'收藏没有轻量影响每日推荐');
+assert.equal(dailyContext.globalThis.HpxDailyCamp.favoriteBoost('shape-sudoku'),0,'未收藏游戏不应获得偏好权重');
+
+assert.equal((paradise.match(/<a class="game-card"/g)||[]).length,30,'游戏乐园不是30张卡片');
+assert.ok(paradise.includes('id="favoriteShelf"'),'游戏乐园缺少我的收藏区域');
+assert.ok(paradise.includes('id="recentShelf"'),'游戏乐园缺少最近玩过区域');
+assert.ok(paradise.includes('id="continueGame"'),'游戏乐园缺少继续上次游戏入口');
+assert.ok(paradise.includes("favorite.className='favorite-btn'"),'游戏卡没有独立收藏按钮');
+assert.ok(paradise.includes("panel.hidden=!favorites.length&&!recent.length"),'空收藏和空历史没有隐藏');
+assert.ok(daily.includes('id="continueNext"'),'每日训练营缺少继续未完成任务入口');
+assert.ok(roadmap.includes('**游戏收藏与最近玩过（第一版）**'),'路线图没有标记收藏功能完成');
+assert.ok(sources.includes('`hpx-game-library.js` / `game-paradise.html` 收藏与最近玩过'),'内容来源没有登记收藏功能');
+console.log('游戏收藏检查通过：30卡收藏、最近排序、继续入口、空态隐藏、本地隐私和训练偏好联动完整。');

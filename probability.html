@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>可能性与掷一掷</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#e8f5e9 50%,#e3f2fd 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.85rem;color:#4e342e;letter-spacing:1px;text-shadow:2px 3px 0 #d7ccc8;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.event-card{background:#f5f0e8;border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+.event-text{font-size:.98rem;color:#3e2723;margin-bottom:8px;}
+.event-choices{display:flex;gap:8px;}
+.event-btn{flex:1;padding:8px 6px;border:2px solid #d7ccc8;border-radius:10px;background:#fff;color:#5d4037;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.event-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.event-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.event-explain{font-size:.85rem;color:#6d4c41;margin-top:8px;min-height:18px;}
+/* 摸球 */
+.ball-ctrl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.ball-ctrl{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.ball-ctrl .dot{width:22px;height:22px;border-radius:50%;}
+.ball-ctrl-btns{display:flex;gap:6px;align-items:center;}
+.ball-ctrl-btns button{width:26px;height:26px;border:none;border-radius:8px;background:#8d6e63;color:#fff;font-weight:bold;cursor:pointer;}
+.bag-wrap{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;min-height:50px;background:#efebe9;border-radius:14px;padding:10px;margin-bottom:12px;}
+.bag-wrap span{font-size:1.4rem;}
+.draw-btn{display:block;margin:0 auto 12px;padding:9px 24px;border:none;border-radius:14px;background:#6d4c41;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.draw-result{text-align:center;font-size:1.1rem;font-weight:bold;color:#4e342e;margin-bottom:10px;min-height:26px;}
+.freq-table{border-collapse:collapse;margin:0 auto;font-size:.88rem;}
+.freq-table th,.freq-table td{border:1px solid #d7ccc8;padding:6px 12px;text-align:center;}
+.freq-table th{background:#efebe9;color:#4e342e;}
+/* 掷一掷 */
+.dice-row{display:flex;justify-content:center;gap:16px;margin-bottom:10px;}
+.dice-face{width:56px;height:56px;background:#fff;border:3px solid #4e342e;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:bold;color:#4e342e;}
+.sum-display{text-align:center;font-size:1.3rem;font-weight:bold;color:#c62828;margin-bottom:12px;}
+.roll-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.hist-wrap{display:flex;justify-content:center;align-items:flex-end;gap:4px;height:120px;margin-bottom:8px;}
+.hist-bar{width:24px;background:#8d6e63;border-radius:4px 4px 0 0;position:relative;transition:height .3s;}
+.hist-bar .cnt{position:absolute;top:-16px;left:0;right:0;text-align:center;font-size:.7rem;color:#4e342e;font-weight:bold;}
+.hist-labels{display:flex;justify-content:center;gap:4px;}
+.hist-labels span{width:24px;text-align:center;font-size:.72rem;color:#777;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#efebe9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#6d4c41;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.2rem;width:70px;border:2px solid #d7ccc8;border-radius:10px;padding:6px 8px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#6d4c41;}
+.frac-input{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.frac-input input{width:60px;font-size:1.1rem;text-align:center;border:2px solid #d7ccc8;border-radius:8px;padding:4px;outline:none;font-family:inherit;}
+.frac-line{width:60px;height:2px;background:#4e342e;margin:2px 0;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#6d4c41;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.choice-btn{padding:10px 18px;border:2px solid #d7ccc8;border-radius:14px;background:#fff;color:#5d4037;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-btn:hover{background:#efebe9;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#6d4c41;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#6d4c41">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🎲</div>
+    <h1>可能性与掷一掷</h1>
+    <p>一定 · 可能 · 不可能，用分数表示可能性大小</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('events')">📖 一定/可能/不可能</button>
+    <button class="tab-btn" onclick="switchTab('ball')">🎨 摸球实验</button>
+    <button class="tab-btn" onclick="switchTab('dice')">🎲 掷一掷</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 一定/可能/不可能 -->
+  <div id="tab-events">
+    <div class="card" id="eventsCard"></div>
+  </div>
+
+  <!-- 摸球实验 -->
+  <div id="tab-ball" style="display:none;">
+    <div class="card">
+      <div class="ball-ctrl-row" id="ballCtrlRow"></div>
+      <div class="bag-wrap" id="bagWrap"></div>
+      <button class="draw-btn" onclick="drawBall()">🤚 摸一个</button>
+      <button class="draw-btn" onclick="drawBall(20)" style="background:#8d6e63;">🤚 连摸20次</button>
+      <div class="draw-result" id="drawResult"></div>
+      <table class="freq-table" id="freqTable"></table>
+    </div>
+  </div>
+
+  <!-- 掷一掷 -->
+  <div id="tab-dice" style="display:none;">
+    <div class="card">
+      <div class="dice-row">
+        <div class="dice-face" id="dice1">⚀</div>
+        <div class="dice-face" id="dice2">⚀</div>
+      </div>
+      <div class="sum-display" id="diceSum">点击掷骰子试试看！</div>
+      <div class="roll-row">
+        <button class="draw-btn" style="margin:0;" onclick="rollDice()">🎲 掷一次</button>
+        <button class="draw-btn" style="margin:0;background:#8d6e63;" onclick="rollDice(50)">🎲 连掷50次</button>
+      </div>
+      <div class="hist-wrap" id="histWrap"></div>
+      <div class="hist-labels" id="histLabels"></div>
+      <div class="event-explain" style="text-align:center;">中间的和（如6、7、8）出现的组合更多，所以更容易掷到；两端的和（2、12）只有1种组合，最难掷到。</div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
+
+// ── 一定/可能/不可能 ──
+const EVENTS=[
+  {text:'太阳从东边升起',ans:'一定',explain:'这是自然规律，每天都会发生。'},
+  {text:'掷一枚骰子，掷出7点',ans:'不可能',explain:'骰子只有1～6点，不会出现7点。'},
+  {text:'明天会下雨',ans:'可能',explain:'天气不确定，有可能下雨，也可能不下雨。'},
+  {text:'从只装红球的袋子里摸出一个白球',ans:'不可能',explain:'袋子里没有白球，摸不出来。'},
+  {text:'扔一枚硬币，正面朝上',ans:'可能',explain:'硬币有正反两面，落地时哪面朝上是不确定的。'},
+  {text:'一年有12个月',ans:'一定',explain:'这是日历规定的事实，一定成立。'},
+  {text:'从装有5个红球的袋子里摸出红球',ans:'一定',explain:'袋子里全是红球，摸出的必定是红球。'},
+  {text:'人不吃不喝能活到100岁',ans:'不可能',explain:'人不吃不喝无法长期生存，这是不可能发生的。'}
+];
+let curEvent=0;
+function renderEvent(){
+  const card=document.getElementById('eventsCard');
+  const e=EVENTS[curEvent];
+  card.innerHTML=`<div class="event-card">
+    <div class="event-text">${curEvent+1}. "${e.text}"，这是一件____的事？</div>
+    <div class="event-choices">
+      <button class="event-btn" onclick="checkEvent(this,'一定')">一定</button>
+      <button class="event-btn" onclick="checkEvent(this,'可能')">可能</button>
+      <button class="event-btn" onclick="checkEvent(this,'不可能')">不可能</button>
+    </div>
+    <div class="event-explain" id="eventExplain"></div>
+  </div>
+  <button class="draw-btn" onclick="nextEvent()">下一句 →</button>`;
+  speak(e.text+'，这是一件什么样的事？');
+}
+function checkEvent(btn,choice){
+  const e=EVENTS[curEvent];
+  document.querySelectorAll('.event-btn').forEach(b=>{b.disabled=true; if(b.textContent===e.ans) b.classList.add('correct');});
+  if(choice!==e.ans) btn.classList.add('wrong');
+  document.getElementById('eventExplain').textContent='💡 '+e.explain;
+  speak(choice===e.ans?'正确！':'答案是'+e.ans);
+  speak(e.explain);
+}
+function nextEvent(){curEvent=(curEvent+1)%EVENTS.length; renderEvent();}
+
+// ── 摸球实验 ──
+let ballCounts={'🔴':3,'🔵':2,'🟡':1};
+const BALL_COLORS=['🔴','🔵','🟡'];
+const BALL_NAMES={'🔴':'红球','🔵':'蓝球','🟡':'黄球'};
+let drawStats={'🔴':0,'🔵':0,'🟡':0}, drawTotal=0;
+function buildBallCtrl(){
+  const row=document.getElementById('ballCtrlRow');
+  row.innerHTML='';
+  BALL_COLORS.forEach(c=>{
+    const wrap=document.createElement('div'); wrap.className='ball-ctrl';
+    wrap.innerHTML=`<div>${BALL_NAMES[c]} ${c}</div><div class="ball-ctrl-btns"><button onclick="changeBall('${c}',-1)">−</button><span id="cnt-${c}">${ballCounts[c]}</span><button onclick="changeBall('${c}',1)">+</button></div>`;
+    row.appendChild(wrap);
+  });
+  renderBag();
+}
+function changeBall(c,delta){
+  const total=Object.values(ballCounts).reduce((s,v)=>s+v,0);
+  if(delta<0 && ballCounts[c]<=0) return;
+  if(delta<0 && total<=1) return;
+  ballCounts[c]=Math.max(0,Math.min(8,ballCounts[c]+delta));
+  document.getElementById('cnt-'+c).textContent=ballCounts[c];
+  renderBag();
+}
+function renderBag(){
+  const wrap=document.getElementById('bagWrap');
+  wrap.innerHTML='';
+  BALL_COLORS.forEach(c=>{ for(let i=0;i<ballCounts[c];i++){ const s=document.createElement('span'); s.textContent=c; wrap.appendChild(s); } });
+  const total=Object.values(ballCounts).reduce((s,v)=>s+v,0);
+  let fracHtml=BALL_COLORS.filter(c=>ballCounts[c]>0).map(c=>{
+    const g=gcd(ballCounts[c],total)||1;
+    return `摸到${BALL_NAMES[c]}的可能性是 <b>${ballCounts[c]/g}/${total/g}</b>`;
+  }).join('，');
+  document.getElementById('drawResult').innerHTML=fracHtml;
+}
+function renderFreqTable(){
+  const total=Object.values(ballCounts).reduce((s,v)=>s+v,0);
+  let html='<tr><th>颜色</th>'+BALL_COLORS.map(c=>`<th>${c}</th>`).join('')+'<th>共</th></tr>';
+  html+='<tr><th>摸到次数</th>'+BALL_COLORS.map(c=>`<td>${drawStats[c]}</td>`).join('')+`<td>${drawTotal}</td></tr>`;
+  html+='<tr><th>实验频率</th>'+BALL_COLORS.map(c=>`<td>${drawTotal?((drawStats[c]/drawTotal*100).toFixed(0)+'%'):'-'}</td>`).join('')+'<td></td></tr>';
+  document.getElementById('freqTable').innerHTML=html;
+}
+function drawBall(times){
+  times=times||1;
+  const total=Object.values(ballCounts).reduce((s,v)=>s+v,0);
+  if(total===0) return;
+  let last=null;
+  for(let t=0;t<times;t++){
+    let r=Math.random()*total, acc=0, picked=BALL_COLORS[0];
+    for(const c of BALL_COLORS){ acc+=ballCounts[c]; if(r<acc){picked=c;break;} }
+    drawStats[picked]++; drawTotal++; last=picked;
+  }
+  renderFreqTable();
+  if(times===1){ speak('摸到了'+BALL_NAMES[last]+'。'); }
+  else { speak('连续摸了'+times+'次，看看频率表。'); }
+}
+
+// ── 掷一掷 ──
+const DICE_FACES=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+let diceHist=new Array(13).fill(0);
+function buildHist(){
+  const wrap=document.getElementById('histWrap'), lbl=document.getElementById('histLabels');
+  wrap.innerHTML=''; lbl.innerHTML='';
+  for(let s=2;s<=12;s++){
+    const bar=document.createElement('div'); bar.className='hist-bar'; bar.id='bar-'+s; bar.style.height='2px';
+    bar.innerHTML=`<span class="cnt" id="cnt-${s}">0</span>`;
+    wrap.appendChild(bar);
+    const l=document.createElement('span'); l.textContent=s; lbl.appendChild(l);
+  }
+}
+function updateHist(){
+  const maxV=Math.max(1,...diceHist);
+  for(let s=2;s<=12;s++){
+    const h=Math.max(2, diceHist[s]/maxV*100);
+    document.getElementById('bar-'+s).style.height=h+'px';
+    document.getElementById('cnt-'+s).textContent=diceHist[s];
+  }
+}
+function rollDice(times){
+  times=times||1;
+  let lastSum=0;
+  for(let t=0;t<times;t++){
+    const a=randInt(1,6), b=randInt(1,6);
+    lastSum=a+b;
+    diceHist[lastSum]++;
+    if(t===times-1 || times===1){
+      document.getElementById('dice1').textContent=DICE_FACES[a];
+      document.getElementById('dice2').textContent=DICE_FACES[b];
+    }
+  }
+  document.getElementById('diceSum').textContent=`点数和 = ${lastSum}（共掷了 ${diceHist.reduce((s,v)=>s+v,0)} 次）`;
+  updateHist();
+  speak(times===1?`两个骰子的和是${lastSum}。`:`连续掷了${times}次，看看哪个和出现得最多。`);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qDone=false;
+function attachNumAutoCheck(ans){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(ans).length) checkNum(ans); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNum(ans); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNum(ans); });
+}
+function attachFracAutoCheck(n,d){
+  const nInp=document.getElementById('ansN'), dInp=document.getElementById('ansD');
+  const maybeCheck=()=>{ if(nInp.value.length>0 && dInp.value.length>0) checkFrac(n,d); };
+  nInp.addEventListener('input',maybeCheck); dInp.addEventListener('input',maybeCheck);
+  dInp.addEventListener('blur',maybeCheck);
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,2);
+  if(type===0){
+    const e=EVENTS[randInt(0,EVENTS.length-1)];
+    document.getElementById('quizQ').innerHTML=`"${e.text}"，这是一件____的事？`;
+    area.innerHTML='<div class="choice-row"></div>';
+    const row=area.querySelector('.choice-row');
+    ['一定','可能','不可能'].forEach(name=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=name;
+      b.onclick=()=>checkChoiceQ(b,name,e.ans); row.appendChild(b);
+    });
+    speak(e.text+'，这是一件什么样的事？');
+  } else if(type===1){
+    const red=randInt(1,6), blue=randInt(1,6), yellow=randInt(0,4);
+    const total=red+blue+yellow;
+    const g=gcd(red,total)||1;
+    document.getElementById('quizQ').innerHTML=`袋子里有 ${red} 个红球、${blue} 个蓝球${yellow?'、'+yellow+'个黄球':''}，摸到红球的可能性是多少？（填最简分数）`;
+    area.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <div class="frac-input"><input type="number" id="ansN"><div class="frac-line"></div><input type="number" id="ansD"></div>
+      </div>`;
+    attachFracAutoCheck(red/g,total/g);
+    speak(`袋子里有${red}个红球，${blue}个蓝球，摸到红球的可能性是多少？`);
+  } else {
+    const s=randInt(2,12);
+    const count=6-Math.abs(s-7);
+    document.getElementById('quizQ').innerHTML=`掷两个骰子，点数和是 ${s}，一共有多少种不同的组合？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(count);
+    speak(`掷两个骰子，点数和是${s}，一共有多少种组合？`);
+  }
+}
+function checkChoiceQ(btn,val,ans){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent===ans) b.classList.add('correct');});
+  if(val!==ans) btn.classList.add('wrong');
+  markResult(val===ans,ans);
+}
+function checkFrac(n,d){
+  if(qDone) return;
+  const un=parseInt(document.getElementById('ansN').value), ud=parseInt(document.getElementById('ansD').value);
+  if(isNaN(un)||isNaN(ud)) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea input').forEach(i=>i.disabled=true);
+  markResult(un===n&&ud===d, n+'/'+d);
+}
+function checkNum(ans){
+  if(qDone) return;
+  const v=parseInt(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(v===ans, ans);
+}
+function markResult(correct,ans){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['events','ball','dice','quiz']);
+  if(t==='events') renderEvent();
+  if(t==='ball') speak('摸球实验：调整每种颜色球的数量，看看摸到的可能性怎么变化。');
+  if(t==='dice') speak('掷一掷：猜猜看，掷两个骰子，哪个点数和最容易出现？');
+  if(t==='quiz') nextQ();
+}
+renderEvent();
+buildBallCtrl();
+buildHist();
+speak('欢迎来到可能性与掷一掷！猜猜看，哪些事一定发生，哪些事只是可能发生。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

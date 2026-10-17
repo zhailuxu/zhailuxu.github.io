@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学广角（一）：推理·集合·等量代换·搭配</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#ede7f6 0%,#e8eaf6 50%,#e1f5fe 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:760px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.7rem;color:#4527a0;letter-spacing:1px;text-shadow:2px 3px 0 #d1c4e9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
+/* 推理 */
+.reason-clues{background:#ede7f6;border-radius:14px;padding:14px 18px;margin-bottom:14px;font-size:1rem;color:#4527a0;line-height:1.9;list-style:none;}
+.reason-clues li::before{content:"💡 ";}
+.elim-wrap{display:flex;justify-content:center;margin-bottom:14px;overflow-x:auto;}
+.elim-table{border-collapse:collapse;}
+.elim-table th,.elim-table td{border:1px solid #b39ddb;padding:8px 14px;text-align:center;font-size:.92rem;white-space:nowrap;}
+.elim-table th{background:#ede7f6;color:#4527a0;}
+.elim-cell{cursor:pointer;font-size:1.15rem;font-weight:bold;color:#673ab7;user-select:none;min-width:40px;}
+.reason-answer-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.reason-answer-row .who{font-size:.85rem;color:#777;margin-bottom:4px;text-align:center;}
+.reason-answer-row select{padding:6px 10px;border:2px solid #b39ddb;border-radius:10px;font-size:.95rem;font-family:inherit;color:#4527a0;font-weight:bold;}
+.reason-answer-row select:focus{border-color:#4527a0;}
+/* 集合 */
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:110px;accent-color:#4527a0;}
+.sl-val{font-weight:bold;font-size:1rem;color:#4527a0;}
+.venn-wrap{display:flex;justify-content:center;margin:12px 0;}
+.formula-box{background:#ede7f6;border-radius:12px;padding:12px 18px;text-align:center;font-size:.98rem;color:#4527a0;line-height:1.9;}
+/* 等量代换 */
+.chain-box{background:#e8eaf6;border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;}
+.chain-eq{font-size:1.2rem;color:#283593;font-weight:bold;margin-bottom:8px;line-height:1.8;}
+.chain-q{font-size:1.15rem;color:#4527a0;font-weight:bold;margin:12px 0;}
+.chain-steps{background:#fff;border-radius:10px;padding:10px 14px;font-size:.95rem;color:#3949ab;line-height:1.9;margin-top:10px;text-align:left;display:none;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#5c6bc0;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+/* 搭配 */
+.subtitle{font-size:1.02rem;font-weight:bold;color:#4527a0;margin-bottom:8px;}
+.digit-row{display:flex;gap:10px;justify-content:center;margin:10px 0;flex-wrap:wrap;}
+.digit-card{width:44px;height:56px;background:#fff;border:2px solid #7e57c2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:bold;color:#4527a0;}
+.perm-list{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.perm-chip{background:#ede7f6;border-radius:10px;padding:6px 12px;font-size:1.05rem;font-weight:bold;color:#4527a0;}
+.outfit-grid{display:grid;gap:6px;margin:12px auto;justify-content:center;}
+.outfit-cell{background:#ede7f6;border-radius:8px;padding:8px 6px;text-align:center;font-size:1.3rem;min-width:50px;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#ede7f6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#4527a0;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.2rem;width:80px;border:2px solid #b39ddb;border-radius:10px;padding:6px 8px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#4527a0;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#4527a0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#4527a0;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#4527a0">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🧩</div>
+    <h1>数学广角（一）</h1>
+    <p>推理 · 集合（韦恩图）· 等量代换 · 搭配 —— 二三年级思维训练</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('reason')">🕵️ 推理</button>
+    <button class="tab-btn" onclick="switchTab('sets')">⭕ 集合</button>
+    <button class="tab-btn" onclick="switchTab('subst')">🔄 等量代换</button>
+    <button class="tab-btn" onclick="switchTab('combo')">👕 搭配</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 推理 -->
+  <div id="tab-reason">
+    <div class="card">
+      <div class="net-desc">读线索，用排除法在表格里做记号（点击格子切换 ✓ / ✗），再选出每个人对应的答案</div>
+      <ul class="reason-clues" id="reasonClues"></ul>
+      <div class="elim-wrap"><table class="elim-table" id="elimTable"></table></div>
+      <div class="reason-answer-row" id="reasonAnswerRow"></div>
+      <div style="text-align:center;">
+        <button class="gen-btn" onclick="nextReason()">下一题 →</button>
+      </div>
+      <div class="result-msg" id="reasonMsg"></div>
+    </div>
+  </div>
+
+  <!-- 集合 -->
+  <div id="tab-sets" style="display:none;">
+    <div class="card">
+      <div class="net-desc">拖动滑块调整"只喜欢画画""两个都喜欢""只喜欢唱歌"的人数，看总人数怎么算</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>只喜欢画画</label><input type="range" id="vennA" min="0" max="15" value="8" oninput="updateVenn()"><span class="sl-val" id="vennAVal">8</span></div>
+        <div class="sl-group"><label>两个都喜欢</label><input type="range" id="vennO" min="0" max="10" value="4" oninput="updateVenn()"><span class="sl-val" id="vennOVal">4</span></div>
+        <div class="sl-group"><label>只喜欢唱歌</label><input type="range" id="vennB" min="0" max="15" value="6" oninput="updateVenn()"><span class="sl-val" id="vennBVal">6</span></div>
+      </div>
+      <div class="venn-wrap"><svg id="vennSvg" width="320" height="200" viewBox="0 0 320 200"></svg></div>
+      <div class="formula-box" id="vennFormula"></div>
+    </div>
+  </div>
+
+  <!-- 等量代换 -->
+  <div id="tab-subst" style="display:none;">
+    <div class="card">
+      <div class="net-desc">看等量关系，一步步代换，算出最终答案</div>
+      <div class="chain-box">
+        <div class="chain-eq" id="substEq"></div>
+        <div class="chain-q" id="substQ"></div>
+        <input type="number" id="substInput" class="quiz-input" placeholder="?">
+        <div class="result-msg" id="substMsg"></div>
+        <div class="chain-steps" id="substSteps"></div>
+      </div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextSubst()">🔄 换一批</button></div>
+    </div>
+  </div>
+
+  <!-- 搭配 -->
+  <div id="tab-combo" style="display:none;">
+    <div class="card">
+      <div class="subtitle">🔢 数字卡片摆两位数（排列，顺序不同算不同）</div>
+      <div class="net-desc">拖动滑块选卡片数量，看看能摆出多少个不同的两位数</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>卡片数量</label><input type="range" id="comboN" min="2" max="5" value="3" oninput="updateCombo()"><span class="sl-val" id="comboNVal">3</span></div>
+      </div>
+      <div class="digit-row" id="digitRow"></div>
+      <div class="perm-list" id="permList"></div>
+      <div class="formula-box" id="permFormula"></div>
+    </div>
+    <div class="card">
+      <div class="subtitle">👕 穿衣搭配（组合，只看有几种不同搭配）</div>
+      <div class="net-desc">拖动滑块调整上衣和裤子的数量，看看一共有多少种穿法</div>
+      <div class="slider-row">
+        <div class="sl-group"><label>上衣数</label><input type="range" id="comboTops" min="2" max="5" value="2" oninput="updateOutfit()"><span class="sl-val" id="comboTopsVal">2</span></div>
+        <div class="sl-group"><label>裤子数</label><input type="range" id="comboBottoms" min="2" max="5" value="3" oninput="updateOutfit()"><span class="sl-val" id="comboBottomsVal">3</span></div>
+      </div>
+      <div class="outfit-grid" id="outfitGrid"></div>
+      <div class="formula-box" id="outfitFormula"></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 推理 ──
+const REASON_PUZZLES=[
+  { people:['小明','小红','小刚'], category:'水果', options:['苹果','香蕉','葡萄'],
+    clues:['小明不喜欢苹果。','小红喜欢的是香蕉。','小刚喜欢的不是香蕉。'],
+    answer:{'小明':'葡萄','小红':'香蕉','小刚':'苹果'},
+    explain:'小红喜欢香蕉，那小明、小刚就只剩苹果和葡萄。小明不喜欢苹果，所以小明喜欢葡萄，剩下的苹果就是小刚的。' },
+  { people:['小丽','小华','小强'], category:'宠物', options:['小猫','小狗','兔子'],
+    clues:['小丽养的不是小狗。','小华养的是兔子。','小强不养兔子，也不养小猫。'],
+    answer:{'小丽':'小猫','小华':'兔子','小强':'小狗'},
+    explain:'小华养兔子，小强不养兔子也不养小猫，所以小强养小狗；剩下的小猫就是小丽的（也符合小丽不养小狗）。' },
+  { people:['甲','乙','丙'], category:'颜色', options:['红色','蓝色','绿色'],
+    clues:['甲不喜欢绿色，也不喜欢蓝色。','丙喜欢的不是红色，也不是绿色。','乙不喜欢红色。'],
+    answer:{'甲':'红色','乙':'绿色','丙':'蓝色'},
+    explain:'甲不喜欢绿色和蓝色，所以甲喜欢红色；丙不喜欢红色和绿色，所以丙喜欢蓝色；剩下的绿色就是乙的（也符合乙不喜欢红色）。' },
+  { people:['小雨','小晴','小阳'], category:'运动', options:['跳绳','跑步','踢球'],
+    clues:['小雨喜欢的不是跑步。','小晴不喜欢跳绳，也不喜欢跑步。','小阳喜欢跑步。'],
+    answer:{'小雨':'跳绳','小晴':'踢球','小阳':'跑步'},
+    explain:'小阳喜欢跑步；小晴不喜欢跳绳和跑步，所以小晴喜欢踢球；剩下的跳绳就是小雨的（也符合小雨不喜欢跑步）。' }
+];
+let reasonIdx=0, elimState={};
+function renderReason(){
+  const p=REASON_PUZZLES[reasonIdx];
+  const clueList=document.getElementById('reasonClues');
+  clueList.innerHTML=p.clues.map(c=>`<li>${c}</li>`).join('');
+
+  const table=document.getElementById('elimTable');
+  elimState={};
+  let thead='<tr><th>姓名 \\ '+p.category+'</th>'+p.options.map(o=>`<th>${o}</th>`).join('')+'</tr>';
+  let rows='';
+  p.people.forEach(person=>{
+    rows+=`<tr><th>${person}</th>`;
+    p.options.forEach(opt=>{
+      const key=person+'|'+opt;
+      elimState[key]='';
+      rows+=`<td class="elim-cell" id="elim_${key.replace(/\\s/g,'')}" onclick="toggleElim('${person}','${opt}')"></td>`;
+    });
+    rows+='</tr>';
+  });
+  table.innerHTML=thead+rows;
+
+  const row=document.getElementById('reasonAnswerRow');
+  row.innerHTML=p.people.map((person,i)=>`
+    <div>
+      <div class="who">${person}喜欢的${p.category}</div>
+      <select id="reasonSel${i}">
+        <option value="">选择</option>
+        ${p.options.map(o=>`<option value="${o}">${o}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  document.getElementById('reasonMsg').textContent='';
+  document.querySelectorAll('#reasonAnswerRow select').forEach(s=>{s.disabled=false;s.value='';});
+  reasonDone=false;
+  p.people.forEach((_,i)=>{
+    document.getElementById('reasonSel'+i).addEventListener('change',()=>{
+      if(p.people.every((_,j)=>document.getElementById('reasonSel'+j).value!=='')) checkReason();
+    });
+  });
+  speak('读一读线索，用排除法想一想，'+p.people.join('、')+'分别喜欢哪种'+p.category+'？');
+}
+function toggleElim(person,opt){
+  const key=person+'|'+opt;
+  const order=['','✗','✓'];
+  const cur=order.indexOf(elimState[key]);
+  elimState[key]=order[(cur+1)%order.length];
+  document.getElementById('elim_'+key.replace(/\s/g,'')).textContent=elimState[key];
+}
+let reasonDone=false;
+function checkReason(){
+  if(reasonDone) return;
+  reasonDone=true;
+  const p=REASON_PUZZLES[reasonIdx];
+  let allOk=true;
+  p.people.forEach((person,i)=>{
+    const sel=document.getElementById('reasonSel'+i);
+    sel.disabled=true;
+    if(sel.value!==p.answer[person]) allOk=false;
+  });
+  const msg=document.getElementById('reasonMsg');
+  if(allOk){
+    msg.className='result-msg ok';
+    msg.textContent='✅ 全部正确！'+p.explain;
+    speak('全部正确！'+p.explain);
+  } else {
+    msg.className='result-msg no';
+    msg.textContent='❌ 再想想。正确答案：'+p.people.map(person=>person+'→'+p.answer[person]).join('，')+'。'+p.explain;
+    speak('再想想。'+p.explain);
+  }
+}
+function nextReason(){ reasonIdx=(reasonIdx+1)%REASON_PUZZLES.length; renderReason(); }
+
+// ── 集合（韦恩图）──
+function updateVenn(){
+  const a=+document.getElementById('vennA').value;
+  const o=+document.getElementById('vennO').value;
+  const b=+document.getElementById('vennB').value;
+  document.getElementById('vennAVal').textContent=a;
+  document.getElementById('vennOVal').textContent=o;
+  document.getElementById('vennBVal').textContent=b;
+  const total=a+o+b, totalA=a+o, totalB=b+o;
+  const svg=document.getElementById('vennSvg');
+  svg.innerHTML=`
+    <circle cx="130" cy="100" r="75" fill="#7e57c2" opacity="0.35"/>
+    <circle cx="200" cy="100" r="75" fill="#26a69a" opacity="0.35"/>
+    <text x="95" y="55" font-size="13" fill="#4527a0" font-weight="bold">画画</text>
+    <text x="225" y="55" font-size="13" fill="#00695c" font-weight="bold" text-anchor="end">唱歌</text>
+    <text x="100" y="105" font-size="22" font-weight="bold" fill="#4527a0" text-anchor="middle">${a}</text>
+    <text x="165" y="105" font-size="22" font-weight="bold" fill="#333" text-anchor="middle">${o}</text>
+    <text x="230" y="105" font-size="22" font-weight="bold" fill="#00695c" text-anchor="middle">${b}</text>
+  `;
+  document.getElementById('vennFormula').innerHTML=
+    `只喜欢画画 = ${a}　两个都喜欢 = ${o}　只喜欢唱歌 = ${b}<br>
+     喜欢画画的一共 = ${a}+${o} = <b>${totalA}</b>　　喜欢唱歌的一共 = ${b}+${o} = <b>${totalB}</b><br>
+     💡 两样加起来一共有人 = 只喜欢画画 + 两个都喜欢 + 只喜欢唱歌 = ${a}+${o}+${b} = <b>${total}</b> 人`;
+  speak(`只喜欢画画的有${a}人，两个都喜欢的有${o}人，只喜欢唱歌的有${b}人，一共有${total}人。`);
+}
+
+// ── 等量代换 ──
+const SUBST_ITEMS=[['🍉','西瓜'],['🍎','苹果'],['🍌','香蕉'],['🍇','葡萄'],['🍑','桃子'],['🍊','橘子']];
+let substChain=null;
+function genChain(){
+  const picked=[]; const pool=[...SUBST_ITEMS];
+  for(let i=0;i<3;i++){ const idx=randInt(0,pool.length-1); picked.push(pool[idx]); pool.splice(idx,1); }
+  const r1=randInt(2,5), r2=randInt(2,5);
+  return { a:picked[0], b:picked[1], c:picked[2], r1, r2, ans:r1*r2 };
+}
+function renderSubst(){
+  substChain=genChain();
+  const {a,b,c,r1,r2}=substChain;
+  document.getElementById('substEq').innerHTML=`1个${a[0]}${a[1]} ＝ ${r1}个${b[0]}${b[1]}　　1个${b[0]}${b[1]} ＝ ${r2}个${c[0]}${c[1]}`;
+  document.getElementById('substQ').textContent=`1个${a[1]} ＝ 多少个${c[1]}？`;
+  document.getElementById('substInput').value='';
+  document.getElementById('substInput').disabled=false;
+  document.getElementById('substMsg').textContent='';
+  document.getElementById('substSteps').style.display='none';
+  substDone=false;
+  speak(`1个${a[1]}等于${r1}个${b[1]}，1个${b[1]}等于${r2}个${c[1]}，那1个${a[1]}等于多少个${c[1]}？`);
+  const subI=document.getElementById('substInput');
+  subI.addEventListener('input',()=>{ if(subI.value.length>0 && subI.value.length>=String(substChain.ans).length) checkSubst(); });
+  subI.addEventListener('blur',()=>{ if(subI.value.length>0) checkSubst(); });
+}
+let substDone=false;
+function checkSubst(){
+  if(substDone) return;
+  const v=parseInt(document.getElementById('substInput').value);
+  if(isNaN(v)) return;
+  substDone=true;
+  document.getElementById('substInput').disabled=true;
+  const {a,b,c,r1,r2,ans}=substChain;
+  const steps=document.getElementById('substSteps');
+  steps.style.display='block';
+  steps.innerHTML=`1个${a[1]} ＝ ${r1}个${b[1]} ＝ ${r1}个×${r2}(每个${b[1]}换${r2}个${c[1]}) ＝ ${ans}个${c[1]}`;
+  const msg=document.getElementById('substMsg');
+  if(v===ans){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+ans+'个'+c[1];
+    speak('答案是'+ans+'个'+c[1]+'，再想想！');
+  }
+}
+function nextSubst(){ renderSubst(); }
+
+// ── 搭配：数字卡片摆两位数（排列）──
+let comboDigits=[];
+function genDigits(n){
+  const pool=shuffle([1,2,3,4,5,6,7,8,9]);
+  return pool.slice(0,n);
+}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function permCount(n){ return n*(n-1); }
+function updateCombo(){
+  const n=+document.getElementById('comboN').value;
+  document.getElementById('comboNVal').textContent=n;
+  comboDigits=genDigits(n);
+  document.getElementById('digitRow').innerHTML=comboDigits.map(d=>`<div class="digit-card">${d}</div>`).join('');
+  const perms=[];
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++) if(i!==j) perms.push(comboDigits[i]*10+comboDigits[j]);
+  document.getElementById('permList').innerHTML=perms.map(p=>`<div class="perm-chip">${p}</div>`).join('');
+  document.getElementById('permFormula').innerHTML=
+    `${n} 张卡片，每次选2张排成两位数，顺序不同就是不同的数<br>
+     能摆出的两位数个数 = ${n}×(${n}-1) = <b>${permCount(n)}</b> 个`;
+  speak(`${n}张数字卡片，每次选2张排成两位数，一共能摆出${permCount(n)}个不同的两位数。`);
+}
+function updateOutfit(){
+  const tops=+document.getElementById('comboTops').value;
+  const bottoms=+document.getElementById('comboBottoms').value;
+  document.getElementById('comboTopsVal').textContent=tops;
+  document.getElementById('comboBottomsVal').textContent=bottoms;
+  const grid=document.getElementById('outfitGrid');
+  grid.style.gridTemplateColumns=`repeat(${bottoms},1fr)`;
+  let cells='';
+  for(let t=0;t<tops;t++) for(let b=0;b<bottoms;b++) cells+=`<div class="outfit-cell">👕${t+1}+👖${b+1}</div>`;
+  grid.innerHTML=cells;
+  document.getElementById('outfitFormula').innerHTML=
+    `${tops} 件上衣，${bottoms} 条裤子，每件上衣都能配每条裤子<br>
+     一共有 = ${tops}×${bottoms} = <b>${tops*bottoms}</b> 种穿法`;
+  speak(`${tops}件上衣，${bottoms}条裤子，一共有${tops*bottoms}种不同的穿法。`);
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0}, qDone=false;
+function attachNumAutoCheck(ans){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(ans).length) checkNumQ(ans); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNumQ(ans); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNumQ(ans); });
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,3);
+  if(type===0){
+    const p=REASON_PUZZLES[randInt(0,REASON_PUZZLES.length-1)];
+    document.getElementById('quizQ').innerHTML=p.clues.map(c=>'💡 '+c).join('<br>')+`<br>请判断${p.people.join('、')}分别喜欢哪种${p.category}？`;
+    area.innerHTML=p.people.map((person,i)=>`
+      <div style="display:inline-block;margin:4px 8px;">
+        <div class="net-desc" style="margin:0;">${person}</div>
+        <select id="qSel${i}">
+          <option value="">选择</option>
+          ${p.options.map(o=>`<option value="${o}">${o}</option>`).join('')}
+        </select>
+      </div>`).join('');
+    window._curReasonP=p;
+    p.people.forEach((_,i)=>{
+      document.getElementById('qSel'+i).addEventListener('change',()=>{
+        if(p.people.every((_,j)=>document.getElementById('qSel'+j).value!=='')) checkReasonQ();
+      });
+    });
+    speak('读一读线索，判断每个人的答案。');
+  } else if(type===1){
+    const a=randInt(3,15), o=randInt(1,8), b=randInt(3,15);
+    const total=a+o+b;
+    document.getElementById('quizQ').innerHTML=`班里只喜欢画画的有 ${a} 人，两个都喜欢的有 ${o} 人，只喜欢唱歌的有 ${b} 人，一共有多少人喜欢画画或唱歌？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(total);
+    speak(`只喜欢画画的有${a}人，两个都喜欢的有${o}人，只喜欢唱歌的有${b}人，一共有多少人？`);
+  } else if(type===2){
+    const chain=genChain();
+    window._curChainQ=chain;
+    document.getElementById('quizQ').innerHTML=`1个${chain.a[0]}${chain.a[1]} ＝ ${chain.r1}个${chain.b[0]}${chain.b[1]}，1个${chain.b[0]}${chain.b[1]} ＝ ${chain.r2}个${chain.c[0]}${chain.c[1]}，<br>1个${chain.a[1]} ＝ 多少个${chain.c[1]}？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck(chain.ans);
+    speak(`1个${chain.a[1]}等于${chain.r1}个${chain.b[1]}，1个${chain.b[1]}等于${chain.r2}个${chain.c[1]}，1个${chain.a[1]}等于多少个${chain.c[1]}？`);
+  } else {
+    if(Math.random()<0.5){
+      const n=randInt(2,5);
+      const digits=genDigits(n);
+      document.getElementById('quizQ').innerHTML=`用 ${digits.join('、')} 这 ${n} 张数字卡片，每次选2张排成两位数，一共能摆出多少个不同的两位数？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+      attachNumAutoCheck(permCount(n));
+      speak(`${n}张数字卡片，每次选2张排成两位数，一共能摆出多少个？`);
+    } else {
+      const tops=randInt(2,5), bottoms=randInt(2,5);
+      document.getElementById('quizQ').innerHTML=`${tops} 件上衣，${bottoms} 条裤子，每件上衣都能配每条裤子，一共有多少种穿法？`;
+      area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+      attachNumAutoCheck(tops*bottoms);
+      speak(`${tops}件上衣，${bottoms}条裤子，一共有多少种穿法？`);
+    }
+  }
+}
+function checkReasonQ(){
+  if(qDone) return;
+  qDone=true;
+  const p=window._curReasonP;
+  let allOk=true;
+  p.people.forEach((person,i)=>{
+    const sel=document.getElementById('qSel'+i);
+    sel.disabled=true;
+    if(sel.value!==p.answer[person]) allOk=false;
+  });
+  markResult(allOk, p.people.map(person=>person+'→'+p.answer[person]).join('，'));
+}
+function checkNumQ(ans){
+  if(qDone) return;
+  const v=parseInt(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(v===ans, ans);
+}
+function markResult(correct,ans){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['reason','sets','subst','combo','quiz']);
+  if(t==='reason') speak('推理：读一读线索，用排除法想一想每个人的答案。');
+  if(t==='sets') speak('集合：拖动滑块，看看只喜欢一样和两样都喜欢的人怎么加起来。');
+  if(t==='subst') speak('等量代换：一步步替换，算出最终的答案。');
+  if(t==='combo') speak('搭配：数字卡片摆两位数要看顺序，穿衣搭配要用乘法。');
+  if(t==='quiz') nextQ();
+}
+renderReason();
+updateVenn();
+renderSubst();
+updateCombo();
+updateOutfit();
+speak('欢迎来到数学广角！今天我们来玩推理游戏、认识集合、神奇的等量代换，还有搭配问题。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

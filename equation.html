@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简易方程</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#ffebee 0%,#fff3e0 50%,#efebe9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#b71c1c;letter-spacing:3px;text-shadow:2px 3px 0 #ef9a9a;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 20px;font-size:.92rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+/* balance scale */
+.scale-wrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 16px;}
+.beam{width:280px;height:6px;background:#795548;border-radius:3px;}
+.pivot{width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:28px solid #5d4037;margin-top:-3px;}
+.pans-row{display:flex;justify-content:space-between;width:300px;margin-top:8px;}
+.pan{width:120px;min-height:66px;border:3px solid #8d6e63;border-radius:0 0 44px 44px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:bold;color:#5d4037;padding:8px;text-align:center;transition:all .3s;}
+.eq-display{text-align:center;font-size:1.5rem;font-weight:bold;color:#b71c1c;margin:10px 0;letter-spacing:1px;}
+.step-btn{display:block;margin:12px auto 0;padding:10px 26px;border:none;border-radius:16px;background:#c62828;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.step-log{background:#fff8e1;border-radius:12px;padding:10px 16px;font-size:.85rem;color:#5d4037;line-height:1.8;margin-top:12px;min-height:24px;}
+.solved-box{text-align:center;font-size:1.4rem;font-weight:bold;color:#2e7d32;margin-top:10px;}
+.verify-box{background:#e8f5e9;border-radius:12px;padding:10px 16px;font-size:.9rem;color:#33691e;text-align:center;margin-top:10px;line-height:1.8;}
+.new-eq-btn{display:block;margin:14px auto 0;padding:8px 22px;border:none;border-radius:14px;background:#8d6e63;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.rule-box{background:#fff3e0;border-radius:12px;padding:12px 16px;font-size:.9rem;color:#5d4037;line-height:1.8;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#ffebee;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#c62828;}
+.quiz-q{font-size:1.35rem;color:#333;margin-bottom:12px;font-weight:bold;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #ef9a9a;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#c62828;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#c62828;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#c62828;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#c62828">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🎯</div>
+    <h1>简易方程</h1>
+    <p>天平两边一起变，慢慢把 x 请出来</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识方程</button>
+    <button class="tab-btn" onclick="switchTab('solve')">⚖️ 天平解方程</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识方程 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div class="eq-display">x + 3 = 8</div>
+      <div class="scale-wrap">
+        <div class="beam"></div><div class="pivot"></div>
+        <div class="pans-row">
+          <div class="pan">x + 3</div>
+          <div class="pan">8</div>
+        </div>
+      </div>
+      <div class="rule-box">
+        📌 含有未知数（比如 x）的等式，叫做<b>方程</b>。<br>
+        📌 天平两边相等，就像等式两边相等；如果两边同时加、减、乘、除同一个数，天平仍然保持平衡——这就是<b>等式的性质</b>，也是解方程的关键！
+      </div>
+    </div>
+  </div>
+
+  <!-- 天平解方程 -->
+  <div id="tab-solve" style="display:none;">
+    <div class="card">
+      <div class="eq-display" id="eqDisplay"></div>
+      <div class="scale-wrap">
+        <div class="beam"></div><div class="pivot"></div>
+        <div class="pans-row">
+          <div class="pan" id="panLeft"></div>
+          <div class="pan" id="panRight"></div>
+        </div>
+      </div>
+      <button class="step-btn" id="stepBtn" onclick="applyStep()"></button>
+      <div class="step-log" id="stepLog"></div>
+      <div class="solved-box" id="solvedBox" style="display:none;"></div>
+      <div class="verify-box" id="verifyBox" style="display:none;"></div>
+      <button class="new-eq-btn" onclick="initEquation()">🔄 换一道方程</button>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        x = <input type="number" id="quizInput" class="quiz-input" placeholder="?">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 方程生成 ──
+function genEquation(){
+  const type=randInt(0,2);
+  const x=randInt(2,15);
+  let coef,constLeft;
+  if(type===0){coef=1;constLeft=randInt(-12,12);if(constLeft===0)constLeft=3;}
+  else if(type===1){coef=randInt(2,9);constLeft=0;}
+  else {coef=randInt(2,6);constLeft=randInt(-10,10);if(constLeft===0)constLeft=2;}
+  const constRight=coef*x+constLeft;
+  return {coef,constLeft,constRight,x};
+}
+function fmtMid(v){ if(v>0) return ' + '+v; if(v<0) return ' − '+(-v); return ''; }
+function eqText(st){ const c = st.coef===1?'x':st.coef+'x'; return `${c}${fmtMid(st.constLeft)} = ${st.constRight}`; }
+function panLeftText(st){ const c = st.coef===1?'x':st.coef+'x'; return `${c}${fmtMid(st.constLeft)}`; }
+
+let orig=null, cur=null, targetX=0;
+function initEquation(){
+  orig=genEquation();
+  cur={coef:orig.coef, constLeft:orig.constLeft, constRight:orig.constRight};
+  targetX=orig.x;
+  document.getElementById('solvedBox').style.display='none';
+  document.getElementById('verifyBox').style.display='none';
+  document.getElementById('stepLog').innerHTML='';
+  render();
+  speak('这是一道方程：'+eqText(cur).replace(/x/g,'x').replace(/−/g,'减').replace(/\+/g,'加')+'。想一想，先做哪一步？');
+}
+function render(){
+  document.getElementById('eqDisplay').textContent=eqText(cur);
+  document.getElementById('panLeft').textContent=panLeftText(cur);
+  document.getElementById('panRight').textContent=cur.constRight;
+  const btn=document.getElementById('stepBtn');
+  if(cur.constLeft!==0){
+    const op=cur.constLeft>0?'−':'+';
+    btn.textContent=`两边同时 ${op} ${Math.abs(cur.constLeft)}`;
+    btn.style.display='';
+  } else if(cur.coef!==1){
+    btn.textContent=`两边同时 ÷ ${cur.coef}`;
+    btn.style.display='';
+  } else {
+    btn.style.display='none';
+    document.getElementById('solvedBox').style.display='';
+    document.getElementById('solvedBox').textContent=`🎉 解出来了！x = ${cur.constRight}`;
+    document.getElementById('verifyBox').style.display='';
+    const left=orig.coef*targetX+orig.constLeft;
+    document.getElementById('verifyBox').innerHTML=`✅ 验证：把 x=${targetX} 代入原方程 → ${orig.coef===1?'':orig.coef}×${targetX}${fmtMid(orig.constLeft)} = ${left}，等于右边 ${orig.constRight}，方程成立！`;
+    speak(`解出来了，x等于${cur.constRight}。代入原方程验证一下，两边都相等，说明我们做对了！`);
+  }
+}
+function applyStep(){
+  const log=document.getElementById('stepLog');
+  if(cur.constLeft!==0){
+    const op=cur.constLeft>0?'−':'+';
+    log.innerHTML+=`<div>➡️ 两边同时${op}${Math.abs(cur.constLeft)}：${panLeftText(cur)} = ${cur.constRight} → x = ${cur.constRight-cur.constLeft}</div>`;
+    cur.constRight-=cur.constLeft; cur.constLeft=0;
+  } else if(cur.coef!==1){
+    log.innerHTML+=`<div>➡️ 两边同时÷${cur.coef}：${panLeftText(cur)} = ${cur.constRight} → x = ${cur.constRight/cur.coef}</div>`;
+    cur.constRight/=cur.coef; cur.coef=1;
+  }
+  render();
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const eq=genEquation();
+  qAns=eq.x;
+  document.getElementById('quizQ').textContent=eqText(eq);
+  speak('解方程：'+eqText(eq).replace(/−/g,'减').replace(/\+/g,'加'));
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseInt(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(v===qAns){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 x = '+qAns;
+    speak('答案是x等于'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('input',()=>{
+  const v=document.getElementById('quizInput').value;
+  if(v.length>0 && v.length>=String(qAns).length) checkQ();
+});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','solve','quiz']);
+  if(t==='learn') speak('认识方程：含有未知数的等式叫方程，天平两边相等，就像等式两边相等。');
+  if(t==='solve') initEquation();
+  if(t==='quiz') nextQ();
+}
+speak('欢迎来到简易方程！用天平的办法，一步一步把x解出来。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

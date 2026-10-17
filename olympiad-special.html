@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学思维专项训练营 · 慧陪学</title>
+<meta name="description" content="按年级选择数学思维专项，学习方法、完成分层练习并记录本机进度。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--ink:#213d57;--blue:#2577ae;--deep:#18537c;--paper:#fff;--soft:#edf7ff;--line:#d7e7f1;--muted:#60778b;--gold:#f0b33a}*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#eff9ff,#fff8e9 60%,#f7efff);font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);line-height:1.6}.page{max-width:1040px;margin:auto;padding:24px 16px 50px}.back{color:#285b80;text-decoration:none;font-weight:700}.hero{margin-top:16px;border-radius:25px;padding:30px;background:linear-gradient(125deg,#17537e,#2993ba);color:#fff;box-shadow:0 12px 30px #1e61892e}.hero h1{margin:0 0 7px;font-size:clamp(1.7rem,5vw,2.45rem);line-height:1.2}.hero p{margin:0;max-width:720px;color:#e7f8ff}.panel{margin-top:18px;background:var(--paper);border:1px solid #e0edf5;border-radius:19px;padding:21px;box-shadow:0 5px 16px #21455b0d}.panel h2{margin:0 0 7px;color:var(--deep);font-size:1.28rem}.muted{margin:0;color:var(--muted);font-size:.93rem}.grade-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.grade-tab,.module,.check-btn,.next-btn{font:inherit;cursor:pointer}.grade-tab{border:1px solid #b9d7e9;border-radius:999px;padding:7px 13px;background:#fff;color:#386887;font-weight:700}.grade-tab.on{background:var(--deep);color:#fff;border-color:var(--deep)}.guide{margin-top:13px;border-left:4px solid var(--gold);background:#fff7df;border-radius:10px;padding:10px 13px;color:#75510b;font-size:.9rem}.module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}.module{min-height:177px;text-align:left;border:1px solid var(--line);border-top:5px solid var(--blue);border-radius:16px;padding:15px;background:linear-gradient(150deg,#fff,#f7fbff);color:var(--ink);transition:.16s transform,.16s box-shadow}.module:hover,.module:focus-visible{transform:translateY(-3px);box-shadow:0 8px 18px #315f7c22;outline:3px solid #80c7ed88;outline-offset:2px}.module[data-key="model"]{border-top-color:#53a56c}.module[data-key="geometry"]{border-top-color:#d59a34}.module[data-key="number"]{border-top-color:#8960ad}.module[data-key="logic"]{border-top-color:#e16b5b}.module[data-key="challenge"]{border-top-color:#576f9f}.module .icon{font-size:1.55rem}.module h3{margin:4px 0;color:#225d88;font-size:1.02rem}.module p{margin:0;color:var(--muted);font-size:.87rem}.tag{display:inline-block;margin-top:9px;padding:2px 8px;border-radius:99px;background:#e9f5fd;color:#39769e;font-size:.77rem;font-weight:700}.lesson{display:none}.lesson.show{display:block}.lesson-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.lesson-head h2{margin-bottom:4px}.close{border:0;background:#eaf3f9;color:#336789;border-radius:9px;padding:7px 10px;font-weight:700;cursor:pointer}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:18px 0}.step{border-radius:12px;padding:11px;background:#f3f8fb;border:1px solid #dceaf2;font-size:.86rem}.step strong{display:block;color:#266a9b;margin-bottom:2px}.method{background:#eef9f2;border-radius:13px;padding:14px;margin:12px 0;color:#275a3b}.method strong{color:#19723a}.practice{border:1px solid #d8e7ef;border-radius:15px;padding:16px;margin-top:13px}.practice h3{margin:0 0 6px;font-size:1rem;color:#245d87}.choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.choice{border:1px solid #b9d7e8;border-radius:10px;padding:8px 11px;background:#fff;color:#305d7d;cursor:pointer;font:inherit}.choice.selected{border-color:#216c9b;background:#e7f5ff;color:#174e73;font-weight:700}.check-btn,.next-btn{margin-top:12px;border:0;border-radius:10px;padding:9px 14px;background:#2475a7;color:#fff;font-weight:700}.next-btn{background:#507792;margin-left:7px}.answer-input,.review-select,.review-note{width:100%;margin-top:10px;border:1px solid #b9d7e8;border-radius:10px;padding:9px 11px;font:inherit;color:var(--ink)}.review-note{min-height:82px;resize:vertical}.checklist{display:grid;gap:7px;margin:11px 0;font-size:.91rem}.checklist label{cursor:pointer}.result{min-height:26px;margin:9px 0 0;font-size:.92rem;font-weight:700}.result.ok{color:#18713a}.result.no{color:#b34233}.progress{display:flex;gap:6px;margin:15px 0 3px}.dot{height:8px;flex:1;border-radius:99px;background:#dceaf2}.dot.done{background:#3d9c68}.complete{background:#eaf8ef;border:1px solid #bae2c7;border-radius:13px;padding:14px;color:#21633a}.study-list{margin:10px 0 0;padding-left:20px}.study-list li{margin:5px 0}@media(max-width:750px){.module-grid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}}@media(max-width:440px){.page{padding:16px 12px 44px}.hero,.panel{padding:20px 16px}.module-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="back" href="olympiad-roadmap.html">← 返回奥数专项地图</a>
+  <header class="hero"><h1>数学思维专项训练营</h1><p>每次只练一个方法：先看清问题，再选择表示法，最后解释和检验。完成的进度只保存在这台设备上。</p></header>
+  <section class="panel" aria-labelledby="chooseTitle"><h2 id="chooseTitle">1. 选择当前年级</h2><p class="muted">页面会给出适龄的训练重点。年级只是建议，不是限制。</p><div class="grade-tabs" role="group" aria-label="选择年级"><button class="grade-tab on" data-grade="12">一～二年级</button><button class="grade-tab" data-grade="34">三～四年级</button><button class="grade-tab" data-grade="56">五～六年级</button></div><p id="guide" class="guide"></p></section>
+  <section class="panel" aria-labelledby="moduleTitle"><h2 id="moduleTitle">2. 选择一个专项</h2><p class="muted">每个专项都按“认识方法 → 看懂示例 → 跟着练 → 独立挑战”推进，现已开放一组由浅入深的入门练习。</p><div class="module-grid" id="moduleGrid">
+    <button class="module" data-key="number"><span class="icon">🔢</span><h3>数与运算</h3><p>凑整、拆分、规律、倍数与余数，练习看见数的结构。</p><span class="tag">数感与巧算</span></button>
+    <button class="module" data-key="model"><span class="icon">🧩</span><h3>应用与建模</h3><p>把文字条件变成线段图、表格和数量关系。</p><span class="tag">和差倍 · 行程 · 比例</span></button>
+    <button class="module" data-key="geometry"><span class="icon">📐</span><h3>图形与几何</h3><p>通过拼拆、补形和观察理解面积、角度与空间关系。</p><span class="tag">看图 · 画图 · 验证</span></button>
+    <button class="module" data-key="logic"><span class="icon">🕵️</span><h3>逻辑与组合</h3><p>排除、对应、列表和有序枚举，确保不重不漏。</p><span class="tag">排除与枚举</span></button>
+    <button class="module" data-key="numberTheory"><span class="icon">🔷</span><h3>数论启蒙</h3><p>从奇偶、约数、倍数和周期认识整数之间的关系。</p><span class="tag">整数结构</span></button>
+    <button class="module" data-key="challenge"><span class="icon">🏁</span><h3>综合挑战</h3><p>面对陌生题选择策略，尝试一题多解，并复盘方法。</p><span class="tag">迁移与表达</span></button>
+  </div></section>
+  <section class="panel lesson" id="lesson" aria-live="polite"></section>
+</main>
+<script src="feedback.js?v=20260906-2"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+<script>
+const gradeNotes={12:'这个阶段先把“看懂、摆一摆、说出来”做好。每次 10～15 分钟，规律、分类、图形拼拆和简单排除最合适。',34:'这个阶段开始练“画图、列表、有序试”。每次 15～20 分钟，做完要能说清楚自己用了什么方法。',56:'这个阶段练“建模、检验和迁移”。每次 20～25 分钟，建议保留错因记录，并隔几天独立重做。'};
+const gradeCatalog={
+  12:{number:['数感与凑十','数的分合、凑十与简单规律','看数字怎样更好算'],model:['分一分与小图','平均分、合并与剩余','圈关键词，先画小图'],geometry:['图形观察站','数边、认图形与简单拼搭','边、角和小图形'],numberTheory:['奇偶与轮流','两两配对、奇偶与周期','看个位，找轮流规律'],logic:['分类小侦探','对应、排除与简单排列','确定一条，排除一条'],challenge:['小小综合关','加减、平均分与读题','圈数字，再选方法']},
+  34:{number:['巧算与规律','凑整、拆分、等差变化','先观察，再简算'],model:['线段图与数量关系','平均分、比较与乘法问题','总量、每份、份数'],geometry:['周长面积探索','数图形、周长和面积','沿边走一圈，再列式'],numberTheory:['倍数与周期','倍数、奇偶、星期循环','列几个例子来验证'],logic:['推理表与枚举','条件排除、有序列举','不重不漏地列可能'],challenge:['两步综合挑战','分步计算与结果检验','先求什么，再求什么']},
+  56:{number:['运算策略与数列','巧算、数列与整数结构','变形、估算与验证'],model:['比例与应用建模','比例、工程、行程思想','画关系图，建立模型'],geometry:['几何割补与推理','面积割补、角度和空间观察','补形、转化、再计算'],numberTheory:['约数倍数与余数','整除、质数、余数规律','列式验证整数关系'],logic:['组合计数与策略','分类计数、最优安排','分类讨论，确保不漏'],challenge:['综合建模挑战','多条件问题与一题多解','选择策略，完整表达']}
+};
+const modules={
+  number:{name:'数与运算',method:'先不急着算，把数改写成更好算的样子：凑整、拆分、交换顺序或观察变化。',example:'例：计算 48＋27，可以先把 48 凑成 50：50＋27－2。这样每一步都更容易检查。',focus:['一二年级：数的分合、相邻数、简单规律','三四年级：巧算、周期、等差变化','五六年级：整除、余数、数列规律']},
+  numberTheory:{name:'数论启蒙',method:'先观察整数的共同特点，例如能否被 2、3、5 整除、余数是否循环；再用几个例子验证自己的猜想。',example:'例：判断一个数能否被 5 整除，可以先观察个位。个位是 0 或 5 的整数都符合这个特点。',focus:['一二年级：奇偶与轮流规律','三四年级：倍数、约数与周期','五六年级：整除、余数与质数直觉']},
+  model:{name:'应用与建模',method:'读题后先问：谁和谁有关系？把文字变成线段图、表格或算式，再决定计算。',example:'例：两个数量相差 6，一个是另一个的 2 倍。先画两条线段，较长的由两个相同小段组成，差的部分就是一个小段。',focus:['一二年级：对应、比较、画简单图','三四年级：和差倍、列表、简单行程','五六年级：比例、工程、浓度与检验']},
+  geometry:{name:'图形与几何',method:'遇到复杂图形，先圈出已知边和角；必要时补成规则图形，再用“总量减去多余部分”。',example:'例：L 形面积不必硬算，可以补成一个长方形，再减去缺掉的小长方形。',focus:['一二年级：拼搭、对称、数一数','三四年级：数图形、周长与面积','五六年级：割补、角度、立体观察']},
+  logic:{name:'逻辑与组合',method:'条件多时，不要靠猜。先列出所有可能，再依据条件逐条划掉；每划一次都要说明理由。',example:'例：三位同学分别喜欢红、黄、蓝三种颜色。已知小安不喜欢红，小贝喜欢蓝。先固定小贝，再从剩余颜色中排除小安，最后得到唯一对应。',focus:['一二年级：分类、对应、简单排除','三四年级：推理表、有序枚举','五六年级：分类计数、最优安排、不变量']},
+  challenge:{name:'综合挑战',method:'先判断题目属于数、图、逻辑还是应用；若看不出来，尝试画图、列表或从简单情况开始。',example:'例：一题可先列出前几种情况找规律，再回到一般情况验证。找到答案后仍要检查有没有遗漏。',focus:['一二年级：讲清自己的发现','三四年级：选择合适表示法','五六年级：一题多解与完整检验']}
+};
+const gradeLessonGuides={12:{
+  number:{method:'先把两个数凑成 10，或者把一个数拆开再算。每一步都可以用小圆点或手指帮忙检查。',example:'例：9＋6，可以把 6 拆成 1 和 5，先算 9＋1=10，再加 5 得 15。'},
+  model:{method:'把题里的“每份一样多”“一共有”“还剩下”圈出来；能画小图就先画小图。',example:'例：12 颗糖分给 3 个小朋友，画 3 个圈，每个圈里轮流放糖，直到分完。'},
+  geometry:{method:'先数边、角和小图形；可以用手沿着图形边缘走一圈，帮助观察。',example:'例：找正方形时，要看它有 4 条边，而且 4 条边一样长。'},
+  numberTheory:{method:'先看个位：能两两配完的是偶数，剩下一个的是奇数；再观察轮流出现的规律。',example:'例：1、2、1、2、1、2 是轮流规律，下一项应该回到 1。'},
+  logic:{method:'先把已经确定的条件放好，再把不可能的情况划掉，不需要靠猜。',example:'例：两个人排队，甲不在前面，那么乙就在前面。'},
+  challenge:{method:'先读一遍题，再圈数字和问题；想一想是加、减、分一分，还是需要画图。',example:'例：12 个苹果每袋装 3 个，问能装几袋，就是把 12 平均分成每份 3 个。'}
+},34:{
+  number:{method:'先观察数字之间的关系，再选择凑整、拆分或换顺序计算。算完用估算检查。',example:'例：49＋38 可以先算 50＋38，再减去多加的 1。'},
+  model:{method:'把数量关系画成线段或整理成表格；先确定总量、每份和份数，再列式。',example:'例：总数平均分成若干盒，用“总数÷盒数”求每盒。'},
+  geometry:{method:'数图形时按大小规律数，不重数也不漏数；计算周长时沿边走一圈。',example:'例：长方形周长把长和宽各算两次。'},
+  numberTheory:{method:'观察倍数、奇偶和周期；把几个例子列出来，确认规律是否一直成立。',example:'例：星期几的问题每 7 天循环一次。'},
+  logic:{method:'条件多时做推理表或分情况列表，每排除一种可能就做一个标记。',example:'例：三人三色对应，先固定已知的一对，再排除其余情况。'},
+  challenge:{method:'把陌生题拆成小问题：先求哪一步，再求哪一步；最后检查单位和答案。',example:'例：先算一组有多少，再算几组共有多少。'}
+},56:{
+  number:{method:'优先寻找凑整、分配、换元或数列结构；得到结果后用估算确认数量级。',example:'例：125×8 可以看成 1000，因为 125 是 1000 的八分之一。'},
+  model:{method:'把多条件文字题转为关系图、线段图或比例表；明确每一步的量和单位。',example:'例：工程问题先写“工作总量=效率×时间”，再补已知条件。'},
+  geometry:{method:'面对不规则图形先补成规则图形，或切成若干简单图形；计算后检查面积单位。',example:'例：L 形面积可以用大长方形面积减去缺角的小长方形面积。'},
+  numberTheory:{method:'用整除、余数和因数关系约束可能值；必要时从小数值试验并归纳。',example:'例：判断余数时，先找离原数最近的整倍数。'},
+  logic:{method:'先分类，再在每类中列举；每种情况只算一次，最后核对是否覆盖全部可能。',example:'例：计数时先按“首位是什么”分类，后面再分别安排。'},
+  challenge:{method:'综合题先选择主方法，再把结果代回题意验证；鼓励写出第二种可行路径。',example:'例：比例题既可用单位量，也可用方程，最后比较哪种表达更清楚。'}
+}};
+const questionBanks={logic:[
+  {q:'小安、小贝、小程三人分别带了红、黄、蓝三面不同颜色的小旗。小贝带蓝旗，小安不带红旗。小安带哪面旗？',choices:['红旗','黄旗','蓝旗'],answer:1,why:'小贝已经带蓝旗；小安不带红旗，也不能带已被小贝带走的蓝旗，所以只能带黄旗。'},
+  {q:'用数字 1、2、3 组成两位数（数字不能重复），一共能组成多少个？',choices:['3 个','5 个','6 个'],answer:2,why:'十位有 3 种选法；个位剩下 2 种选法，共 3×2=6 种。也可以按十位是 1、2、3 分三组列出。'},
+  {q:'三张卡片写着甲、乙、丙。甲不在最左边，乙不在最右边，丙在中间。最左边是谁？',choices:['甲','乙','丙'],answer:1,why:'丙已在中间；甲不在最左边，只能在最右边，因此乙在最左边。'}
+],number:[
+  {q:'计算 49＋38，先把 49 看成 50，最方便的算式是哪一个？',choices:['50＋38＋1','50＋38－1','49＋40－2'],answer:1,why:'49 比 50 少 1，所以先算 50＋38，再减去 1，结果是 87。'},
+  {q:'观察数列：5，8，11，14，□。方框里应填什么？',choices:['16','17','18'],answer:1,why:'每次都增加 3，所以 14 后面是 17。'},
+  {q:'125×8 的结果是多少？',choices:['800','900','1000'],answer:2,why:'把 125 看成 1000÷8，因此 125×8=1000。'}
+],model:[
+  {q:'一本故事书有 48 页，小雨每天读 8 页，几天可以读完？最合适的算式是？',choices:['48＋8','48－8','48÷8'],answer:2,why:'总页数平均分成每天读 8 页，应该用 48÷8，得到 6 天。'},
+  {q:'红球有 18 个，蓝球比红球少 5 个。先求蓝球个数，应该画哪种图？',choices:['两条长度不同的线段并标出相差 5','一张圆形统计图','一条没有刻度的数轴'],answer:0,why:'“比……少 5”是比较关系，用两条线段最容易看清谁多谁少。'},
+  {q:'3 个同样的盒子一共装了 24 支笔。每盒几支？',choices:['24×3','24÷3','24－3'],answer:1,why:'把 24 支笔平均分到 3 个盒子，用除法，答案是每盒 8 支。'}
+],geometry:[
+  {q:'一个长方形长 7 厘米、宽 3 厘米，它的周长是多少？',choices:['10 厘米','20 厘米','21 平方厘米'],answer:1,why:'周长是四条边的总长：7＋3＋7＋3=20 厘米。'},
+  {q:'把一个 5×4 的长方形剪去一个 1×2 的小长方形，剩下的面积是多少？',choices:['17','18','20'],answer:1,why:'先算大长方形面积 5×4=20，再减去剪掉的 1×2=2，剩下 18。'},
+  {q:'正方形有几条边？',choices:['3 条','4 条','5 条'],answer:1,why:'正方形有 4 条一样长的边。'}
+],numberTheory:[
+  {q:'下面哪个数一定能被 5 整除？',choices:['42','57','80'],answer:2,why:'个位是 0 或 5 的整数能被 5 整除，80 的个位是 0。'},
+  {q:'1 到 10 中一共有几个奇数？',choices:['4 个','5 个','6 个'],answer:1,why:'1、3、5、7、9 共 5 个。'},
+  {q:'今天是星期二，过 9 天是星期几？',choices:['星期三','星期四','星期五'],answer:1,why:'一周有 7 天，9 天等于 7 天再加 2 天；星期二往后 2 天是星期四。'}
+],challenge:[
+  {q:'把 1、2、3、4 四个数字各用一次组成两位数，最大的两位数是多少？',choices:['43','42','34'],answer:0,why:'要组成最大的两位数，十位先选最大的 4，个位再选剩下最大的 3，得到 43。'},
+  {q:'一张桌子坐 4 人，3 张桌子坐多少人？后来又来了 2 人，一共有多少人？',choices:['12','14','16'],answer:1,why:'先求 3×4=12 人，再加 2 人，共 14 人。'},
+  {q:'解决一道陌生题时，下面哪一步最适合先做？',choices:['立刻猜答案','圈出条件并选择画图或列表','只等别人讲解'],answer:1,why:'先整理条件并选择表示法，能让问题变清楚，再决定怎样计算或推理。'}
+]};
+const gradeQuestionBanks={12:{
+  number:[
+    {q:'计算 9＋6，最方便的想法是哪一个？',choices:['9＋1 先凑成 10，再加 5','把 9 变成 8 再算','只从 1 数到 15'],answer:0,why:'把 6 拆成 1 和 5，先凑成 10，计算更方便。'},
+    {q:'找规律：2，4，6，□。方框里应填什么？',choices:['7','8','9'],answer:1,why:'每次增加 2，所以 6 后面是 8。'},
+    {q:'20－7 的结果是多少？',choices:['12','13','14'],answer:1,why:'从 20 退 7 步：20−7=13。'}
+  ],
+  model:[
+    {q:'15 颗糖平均分给 3 个小朋友，每人几颗？',choices:['3 颗','5 颗','12 颗'],answer:1,why:'把 15 平均分成 3 份，15÷3=5。'},
+    {q:'每个盒子放 4 支铅笔，3 个盒子一共有几支？',choices:['7 支','12 支','16 支'],answer:1,why:'有 3 份，每份 4 支，4＋4＋4=12。'},
+    {q:'小红有 16 张贴纸，送给朋友 5 张，还剩多少张？',choices:['11 张','12 张','21 张'],answer:0,why:'从原来的 16 张拿走 5 张，用减法：16−5=11。'}
+  ],
+  geometry:[
+    {q:'三角形有几条边？',choices:['2 条','3 条','4 条'],answer:1,why:'三角形有 3 条边和 3 个角。'},
+    {q:'下面哪种图形有 4 条一样长的边？',choices:['三角形','长方形','正方形'],answer:2,why:'正方形有 4 条一样长的边。'},
+    {q:'一个正方形和一个三角形一共有几条边？',choices:['6 条','7 条','8 条'],answer:1,why:'正方形有 4 条边，三角形有 3 条边，4＋3=7。'}
+  ],
+  numberTheory:[
+    {q:'下面哪个数是偶数？',choices:['7','12','19'],answer:1,why:'12 可以两两配完，没有剩下一个，所以是偶数。'},
+    {q:'数列 1，2，1，2，1，□ 的下一项是？',choices:['1','2','3'],answer:1,why:'这组数按 1、2 轮流出现，下一项是 2。'},
+    {q:'从 1 数到 9，一共有几个奇数？',choices:['4 个','5 个','6 个'],answer:1,why:'1、3、5、7、9 共 5 个奇数。'}
+  ],
+  logic:[
+    {q:'小猫、小狗、小兔各拿一个球，球有红、黄、蓝三种颜色。小狗拿蓝球，小猫不拿红球。小猫拿什么球？',choices:['红球','黄球','蓝球'],answer:1,why:'小狗已经拿了蓝球；小猫不拿红球，所以小猫只能拿黄球。'},
+    {q:'甲、乙两人排队，甲不在前面。谁在前面？',choices:['甲','乙','不能确定'],answer:1,why:'只有两个位置，甲不在前面，乙就在前面。'},
+    {q:'用数字 1 和 2 可以组成几个不同的两位数？',choices:['1 个','2 个','3 个'],answer:1,why:'可以组成 12 和 21，一共 2 个。'}
+  ],
+  challenge:[
+    {q:'小明有 8 个苹果，又买了 6 个，一共有多少个？',choices:['12 个','14 个','16 个'],answer:1,why:'把原来的 8 个和买来的 6 个合起来，8＋6=14。'},
+    {q:'一条绳子剪成 4 段，每段一样长。原来有 20 厘米，每段几厘米？',choices:['4 厘米','5 厘米','16 厘米'],answer:1,why:'20 平均分成 4 段，20÷4=5。'},
+    {q:'一排有 5 个圆形，另一排有 3 个圆形。两排一共有几个圆形？',choices:['2 个','8 个','15 个'],answer:1,why:'把两排合起来，5＋3=8。'}
+  ]
+},34:{
+  number:[
+    {q:'计算 48＋27，先把 48 看成 50，正确的算式是？',choices:['50＋27＋2','50＋27－2','48＋30－1'],answer:1,why:'48 比 50 少 2，所以要减去 2。'},
+    {q:'数列 3，6，9，12，□，下一项是？',choices:['14','15','16'],answer:1,why:'每次增加 3，所以是 15。'},
+    {q:'用简便方法计算 25＋75＋18，结果是？',choices:['108','118','128'],answer:1,why:'25 和 75 先凑成 100，再加 18。'}
+  ],
+  model:[
+    {q:'48 本书平均放进 6 个盒子，每盒几本？',choices:['6 本','8 本','42 本'],answer:1,why:'平均分用 48÷6=8。'},
+    {q:'红绳 30 米，蓝绳比红绳短 8 米，蓝绳多少米？',choices:['22 米','38 米','240 米'],answer:0,why:'比红绳短 8 米，用 30−8=22。'},
+    {q:'每排坐 7 人，坐了 5 排，一共有多少人？',choices:['12 人','30 人','35 人'],answer:2,why:'5 个 7 相加，7×5=35。'}
+  ],
+  geometry:[
+    {q:'长方形长 8 厘米、宽 3 厘米，周长是多少？',choices:['11 厘米','22 厘米','24 平方厘米'],answer:1,why:'周长=(8＋3)×2=22 厘米。'},
+    {q:'边长 5 厘米的正方形，周长是多少？',choices:['10 厘米','20 厘米','25 平方厘米'],answer:1,why:'4 条边都长 5 厘米，5×4=20。'},
+    {q:'一个 4×3 的长方形面积是多少？',choices:['7','12','14'],answer:1,why:'面积=长×宽，4×3=12。'}
+  ],
+  numberTheory:[
+    {q:'下面哪个数是 3 的倍数？',choices:['14','18','25'],answer:1,why:'18=3×6。'},
+    {q:'今天星期一，经过 10 天是星期几？',choices:['星期三','星期四','星期五'],answer:1,why:'10 天等于 7 天加 3 天，星期一往后 3 天是星期四。'},
+    {q:'1 到 20 中有多少个 5 的倍数？',choices:['3 个','4 个','5 个'],answer:1,why:'5、10、15、20 共 4 个。'}
+  ],
+  logic:[
+    {q:'甲、乙、丙三人比赛，甲不是第一，乙不是第三，丙是第一。谁是第二？',choices:['甲','乙','丙'],answer:1,why:'丙第一；乙不第三，所以乙第二。'},
+    {q:'用 1、2、3 组成没有重复数字的两位数，一共有几个？',choices:['3 个','6 个','9 个'],answer:1,why:'十位有 3 种选法，个位有 2 种选法，共 6 个。'},
+    {q:'三种饮料中，小明不选果汁，小丽选牛奶。小明可以选什么？',choices:['果汁','牛奶','另一种饮料'],answer:2,why:'牛奶已被小丽选，果汁又被排除，只能选另一种。'}
+  ],
+  challenge:[
+    {q:'一箱有 6 袋饼干，每袋 8 块，吃掉 9 块，还剩多少块？',choices:['39 块','48 块','57 块'],answer:0,why:'先算 6×8=48，再减去 9，得到 39。'},
+    {q:'一根绳子长 24 米，剪成每段 3 米，可以剪几段？',choices:['7 段','8 段','21 段'],answer:1,why:'24÷3=8。'},
+    {q:'小华有 35 张卡片，小雨比小华多 7 张，两人一共有多少张？',choices:['42 张','70 张','77 张'],answer:2,why:'小雨有 35＋7=42 张；两人共 35＋42=77 张。'}
+  ]
+},56:{
+  number:[
+    {q:'计算 125×16，最合适的拆分是？',choices:['125×(8×2)','125＋16','(125＋16)×2'],answer:0,why:'先算 125×8=1000，再乘 2，得到 2000。'},
+    {q:'数列 2，6，12，20，□ 的规律是连续整数相乘，方框里是？',choices:['25','30','36'],answer:1,why:'依次是 1×2、2×3、3×4、4×5，下一项是 5×6=30。'},
+    {q:'估算 398×21 最接近下面哪个数？',choices:['800','8000','80000'],answer:1,why:'398 约等于 400，21 约等于 20，400×20=8000。'}
+  ],
+  model:[
+    {q:'一项工作，甲单独做 6 天完成。每天完成全工作的几分之几？',choices:['1/5','1/6','6'],answer:1,why:'把全部工作看作 1，平均 6 天完成，每天完成 1/6。'},
+    {q:'一辆车 3 小时行 180 千米，照这个速度 5 小时行多少千米？',choices:['300','360','900'],answer:0,why:'每小时 180÷3=60 千米，5 小时行 60×5=300 千米。'},
+    {q:'一杯糖水中糖与水的比是 1∶4，糖有 30 克，水有多少克？',choices:['34','120','150'],answer:1,why:'糖是 1 份，水是 4 份，30×4=120 克。'}
+  ],
+  geometry:[
+    {q:'一个长方形长 12 厘米、宽 8 厘米，剪去角上一个边长 3 厘米的正方形，剩余面积是多少？',choices:['87','96','99'],answer:0,why:'原面积 12×8=96，剪去 3×3=9，剩余 87。'},
+    {q:'一个三角形底 10 厘米、高 6 厘米，面积是多少？',choices:['16','30','60'],answer:1,why:'三角形面积=底×高÷2，10×6÷2=30。'},
+    {q:'边长 4 厘米的正方体，表面积是多少平方厘米？',choices:['24','64','96'],answer:2,why:'6 个面，每个面 4×4=16，6×16=96。'}
+  ],
+  numberTheory:[
+    {q:'47 除以 6，余数是多少？',choices:['4','5','6'],answer:1,why:'6×7=42，47−42=5。'},
+    {q:'下面哪个数既是 6 的倍数又是 8 的倍数？',choices:['24','36','48'],answer:2,why:'48÷6=8，48÷8=6。'},
+    {q:'一个数除以 5 余 2，除以 5 的商是 7，这个数是？',choices:['33','35','37'],answer:2,why:'被除数=除数×商＋余数=5×7＋2=37。'}
+  ],
+  logic:[
+    {q:'用 1、2、3、4 组成没有重复数字的三位数，百位是 1 的有多少个？',choices:['3','6','9'],answer:1,why:'百位固定 1，十位有 3 种选法，个位有 2 种，共 6 个。'},
+    {q:'甲、乙、丙三人中两人参加比赛。甲和乙不能同时参加，一共有几种选法？',choices:['1','2','3'],answer:1,why:'可选甲丙或乙丙，共 2 种。'},
+    {q:'有红、黄、蓝三种球各一个，任选两个，一共有几种不同选法？',choices:['2','3','6'],answer:1,why:'红黄、红蓝、黄蓝，共 3 种。'}
+  ],
+  challenge:[
+    {q:'一件商品原价 200 元，先打八折，再减 10 元，现价多少元？',choices:['150','160','170'],answer:0,why:'八折后是 200×0.8=160 元，再减 10 元得 150 元。'},
+    {q:'甲乙两数的比是 3∶5，和是 64，甲是多少？',choices:['24','32','40'],answer:0,why:'共 8 份，每份 64÷8=8，甲有 3 份即 24。'},
+    {q:'一个水箱先注入全箱的 1/3，又注入全箱的 1/4，一共注入全箱的几分之几？',choices:['5/7','7/12','1/12'],answer:1,why:'1/3=4/12，1/4=3/12，合计 7/12。'}
+  ]
+},34:{
+  number:[
+    {q:'99＋36 最方便的算式是？',choices:['100＋36－1','99＋30','99×36'],answer:0,why:'把 99 凑成 100，再减 1。'},
+    {q:'规律：4，8，12，16，□。',choices:['18','20','22'],answer:1,why:'每次增加 4。'},
+    {q:'125＋75＋29 的结果是？',choices:['219','229','239'],answer:1,why:'125＋75=200，再加 29。'}
+  ],
+  model:[
+    {q:'60 千克苹果装入每箱 5 千克的箱子，需要几箱？',choices:['10 箱','12 箱','15 箱'],answer:1,why:'60÷5=12。'},
+    {q:'甲有 24 张卡片，乙比甲多 9 张，乙有多少张？',choices:['15 张','33 张','216 张'],answer:1,why:'24＋9=33。'},
+    {q:'4 天做 28 个零件，照这样 7 天做几个？',choices:['35','42','49'],answer:2,why:'每天 7 个，7 天做 49 个。'}
+  ],
+  geometry:[
+    {q:'长方形长 9、宽 4，周长是？',choices:['13','26','36'],answer:1,why:'(9＋4)×2=26。'},
+    {q:'边长 6 的正方形面积是？',choices:['12','24','36'],answer:2,why:'6×6=36。'},
+    {q:'一个大正方形由 4 个同样小正方形拼成，大正方形边长是小正方形的几倍？',choices:['1 倍','2 倍','4 倍'],answer:1,why:'每边由 2 个小边组成。'}
+  ],
+  numberTheory:[
+    {q:'36 是下面哪个数的倍数？',choices:['5','6','7'],answer:1,why:'36=6×6。'},
+    {q:'今天星期三，14 天后星期几？',choices:['星期三','星期五','星期日'],answer:0,why:'14 是两个星期。'},
+    {q:'45 除以 7 余几？',choices:['2','3','4'],answer:1,why:'7×6=42，余 3。'}
+  ],
+  logic:[
+    {q:'甲乙丙排队，甲在乙前面，丙最后。中间是谁？',choices:['甲','乙','丙'],answer:1,why:'丙最后，甲在乙前，乙在中间。'},
+    {q:'从 1、2、3 中选两个不同数字，有几种选法？',choices:['2','3','6'],answer:1,why:'12、13、23 共 3 种。'},
+    {q:'红黄蓝三球，小军不拿红也不拿蓝，他拿什么？',choices:['红','黄','蓝'],answer:1,why:'排除后只剩黄。'}
+  ],
+  challenge:[
+    {q:'5 盒每盒 9 支笔，送出 8 支，剩几支？',choices:['37','45','53'],answer:0,why:'5×9=45，45−8=37。'},
+    {q:'48 米绳剪成 6 段一样长，每段几米？',choices:['7','8','9'],answer:1,why:'48÷6=8。'},
+    {q:'一班 36 人，男生比女生多 4 人，女生多少人？',choices:['16','18','20'],answer:0,why:'先去掉多出的 4 人，32 平分为 16。'}
+  ]
+}};
+const independentChallenges={
+  number:{12:{q:'不看提示，计算：8＋7＝？',answer:'15',why:'可以先凑成 10：8＋2＋5=15。'},34:{q:'不看提示，计算：49＋51＝？',answer:'100',why:'49 和 51 合起来正好是 100。'},56:{q:'不看提示，计算：125×8＝？',answer:'1000',why:'125 是 1000 的八分之一，所以 125×8=1000。'}},
+  model:{12:{q:'12 颗糖平均分给 3 个小朋友，每人几颗？',answer:'4',why:'平均分用 12÷3=4。'},34:{q:'56 本书平均放进 7 个同样的盒子，每盒多少本？',answer:'8',why:'平均分用除法：56÷7=8。'},56:{q:'一根绳子长 36 米，剪成每段 4 米，可以剪几段？',answer:'9',why:'总长度除以每段长度：36÷4=9。'}},
+  geometry:{12:{q:'一个正方形有几条边？',answer:'4',why:'正方形有 4 条边。'},34:{q:'一个长方形长 6 厘米、宽 4 厘米，面积是多少平方厘米？',answer:'24',why:'长方形面积=长×宽，6×4=24。'},56:{q:'一个长方形长 9 厘米、宽 5 厘米，面积是多少平方厘米？',answer:'45',why:'长方形面积=长×宽，9×5=45。'}},
+  numberTheory:{12:{q:'数字 17 是奇数还是偶数？填写“奇数”或“偶数”。',answer:'奇数',why:'个位是 1、3、5、7、9 的数是奇数。'},34:{q:'最小的两位、并且能被 5 整除的数是？',answer:'10',why:'两位数从 10 开始，10 的个位是 0，可以被 5 整除。'},56:{q:'35 除以 6，余数是多少？',answer:'5',why:'6×5=30，35−30=5。'}},
+  logic:{12:{q:'甲、乙排队，甲不在前面。前面是谁？',answer:'乙',why:'只有两个位置；甲不在前面，乙就在前面。'},34:{q:'甲、乙、丙排成一队。丙在最前面，甲不在最后面。最后面是谁？',answer:'乙',why:'丙已在最前；甲又不在最后，因此最后只能是乙。'},56:{q:'甲、乙、丙三人中只有一人获奖。甲说“乙获奖”，乙说“我没获奖”，丙说“乙说得对”。已知只有一句真话，谁获奖？',answer:'乙',why:'若乙获奖，甲真、乙假、丙假，正好只有一句真话。'}},
+  challenge:{12:{q:'12 个苹果，每袋装 3 个，能装几袋？',answer:'4',why:'按每袋 3 个平均分，用 12÷3=4。'},34:{q:'24 个苹果，每袋装 6 个，能装几袋？',answer:'4',why:'按每袋 6 个平均分，用 24÷6=4。'},56:{q:'48 个苹果，先装 5 袋，每袋 6 个，剩下的平均装入 3 袋，每袋几个？',answer:'6',why:'先装走 5×6=30 个，剩下 18 个；18÷3=6。'}}
+};
+const gradeExtensionBanks={12:{
+  number:[
+    {q:'计算 8＋8，结果是多少？',choices:['14','15','16'],answer:2,why:'两个 8 合起来是 16。'},
+    {q:'找规律：10，9，8，□，6。方框里是？',choices:['5','7','9'],answer:1,why:'每次少 1，所以是 7。'},
+    {q:'15－9 可以先算哪一步？',choices:['15－5=10，再减 4','15＋9','9－15'],answer:0,why:'把 9 拆成 5 和 4，先凑整更方便。'}
+  ],
+  model:[
+    {q:'有 4 盘草莓，每盘 5 个，一共有几个？',choices:['9 个','20 个','25 个'],answer:1,why:'4 个 5 相加，5×4=20。'},
+    {q:'18 个气球，平均分给 6 人，每人几个？',choices:['3 个','6 个','12 个'],answer:0,why:'18÷6=3。'},
+    {q:'原来有 14 条鱼，又游来 7 条，后来游走 5 条，现在有几条？',choices:['16 条','21 条','26 条'],answer:0,why:'先合起来 14＋7=21，再游走 5 条，剩 16 条。'}
+  ],
+  geometry:[
+    {q:'一个长方形有几个角？',choices:['3 个','4 个','5 个'],answer:1,why:'长方形有 4 个角。'},
+    {q:'把两个一样大的正方形并排放，一共有几个小正方形？',choices:['1 个','2 个','4 个'],answer:1,why:'每个正方形算一个，一共 2 个。'},
+    {q:'下面哪种图形没有角？',choices:['圆形','三角形','正方形'],answer:0,why:'圆形没有边和角。'}
+  ],
+  numberTheory:[
+    {q:'下面哪个数是奇数？',choices:['14','18','21'],answer:2,why:'21 不能两两配完，剩下一个，所以是奇数。'},
+    {q:'红、蓝、红、蓝、□，下一面小旗是什么颜色？',choices:['红','蓝','黄'],answer:0,why:'红和蓝轮流出现，下一面是红。'},
+    {q:'2、4、6、8 都有什么共同点？',choices:['都是奇数','都是偶数','都是 5 的倍数'],answer:1,why:'它们都能两两配完，是偶数。'}
+  ],
+  logic:[
+    {q:'小明、小丽、小军坐三把不同颜色的椅子。小明坐红椅，小丽不坐蓝椅。小丽坐什么椅？',choices:['红椅','黄椅','蓝椅'],answer:1,why:'红椅已被小明坐，小丽又不坐蓝椅，只能坐黄椅。'},
+    {q:'有大、中、小三个盒子。小球不在大盒，也不在中盒，它在哪个盒？',choices:['大盒','中盒','小盒'],answer:2,why:'排除大盒和中盒后，只能在小盒。'},
+    {q:'数字 1、2、3 中，哪个最大？',choices:['1','2','3'],answer:2,why:'比较数的大小，3 最大。'}
+  ],
+  challenge:[
+    {q:'妈妈买了 3 袋面包，每袋 6 个，早餐吃了 4 个，还剩多少个？',choices:['10 个','14 个','18 个'],answer:1,why:'先算 3×6=18 个，再减去 4 个，剩 14 个。'},
+    {q:'一根彩带长 16 厘米，剪成 4 段一样长，每段几厘米？',choices:['3 厘米','4 厘米','12 厘米'],answer:1,why:'16÷4=4。'},
+    {q:'小华有 9 本书，小芳比小华多 3 本，两人一共有多少本？',choices:['12 本','18 本','21 本'],answer:2,why:'小芳有 12 本，两人共 9＋12=21 本。'}
+  ]
+}};
+let grade='12',selected=-1,current=0,currentKey='logic',reviewMode=false,reviewQueue=[],reviewIndex=0;
+const guide=document.getElementById('guide'),lesson=document.getElementById('lesson');
+function renderCatalog(){const catalog=gradeCatalog[grade];document.querySelectorAll('.module').forEach(card=>{const item=catalog[card.dataset.key];card.querySelector('h3').textContent=item[0];card.querySelector('p').textContent=item[1];card.querySelector('.tag').textContent=item[2]})}
+function setGrade(value){grade=value;document.querySelectorAll('.grade-tab').forEach(b=>b.classList.toggle('on',b.dataset.grade===grade));guide.textContent=gradeNotes[grade];renderCatalog();if(lesson.classList.contains('show'))showLesson(currentKey)}
+function activeQuestions(){const base=gradeQuestionBanks[grade]?.[currentKey]||questionBanks[currentKey];const extension=gradeExtensionBanks[grade]?.[currentKey]||[];const sharedExtension=(grade==='34'||grade==='56')?questionBanks[currentKey]:[];return [...base,...extension,...sharedExtension]}
+function doneKey(){return `hpx_olympiad_${currentKey}_${grade}_v1`}
+function wrongKey(){return `hpx_olympiad_${currentKey}_${grade}_wrong_v1`}
+function getDone(){return JSON.parse(localStorage.getItem(doneKey())||'[]')}
+function getWrong(){return JSON.parse(localStorage.getItem(wrongKey())||'[]')}
+function recordActivity(){const d=new Date(),today=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,key='hpx_olympiad_activity_dates_v1';let dates=[];try{dates=JSON.parse(localStorage.getItem(key)||'[]')}catch{}if(!dates.includes(today)){dates.push(today);localStorage.setItem(key,JSON.stringify(dates.slice(-90)))}}
+function dots(){const done=getDone();return `<div class="progress" aria-label="专项进度">${activeQuestions().map((_,i)=>`<span class="dot ${done.includes(i)?'done':''}"></span>`).join('')}</div>`}
+function showLesson(key){if(!modules[key]||!questionBanks[key])return;currentKey=key;current=0;selected=-1;reviewMode=false;reviewQueue=[];reviewIndex=0;renderPractice();lesson.classList.add('show');lesson.scrollIntoView({behavior:'smooth',block:'start'})}
+function lessonSteps(){return `<div class="steps"><div class="step"><strong>1. 认识方法</strong>知道它解决什么问题。</div><div class="step"><strong>2. 看懂示例</strong>关注每一步的依据。</div><div class="step"><strong>3. 跟着练</strong>从提示题到变式题。</div><div class="step"><strong>4. 独立挑战</strong>无提示作答并完成复盘。</div></div>`}
+function renderPractice(){const m={...modules[currentKey],...(gradeLessonGuides[grade]?.[currentKey]||{}),name:gradeCatalog[grade][currentKey][0]},item=activeQuestions()[current],title=reviewMode?`${m.name} · 错题复练 ${reviewIndex+1}/${reviewQueue.length}`:`${m.name} · 第 ${current+1} 关`,hint=reviewMode?'把这道题重新想一遍；答对后会从错题记录中移除。':'先理解方法，再完成三道由浅入深的入门练习。';lesson.innerHTML=`<div class="lesson-head"><div><h2>${title}</h2><p class="muted">${hint}</p></div><button class="close" onclick="closeLesson()">收起</button></div>${dots()}${lessonSteps()}<div class="method"><strong>本专项方法：</strong>${m.method}</div><p>${m.example}</p><article class="practice"><h3>${reviewMode?'复练题':'挑战题'}</h3><p>${item.q}</p><div class="choices">${item.choices.map((x,i)=>`<button class="choice ${selected===i?'selected':''}" onclick="pick(${i})">${String.fromCharCode(65+i)}. ${x}</button>`).join('')}</div><button class="check-btn" onclick="checkAnswer()">检查我的思路</button><button class="next-btn" onclick="nextQuestion()">${reviewMode?(reviewIndex===reviewQueue.length-1?'完成本轮复练':'下一道错题'):(current===activeQuestions().length-1?'进入独立挑战':'下一关')}</button><p id="result" class="result"></p></article><p class="muted" style="margin-top:12px">复盘提示：先判断是“漏条件”“方法没选对”，还是“计算或检查出了错”。</p>`}
+function pick(i){selected=i;renderPractice()}
+function checkAnswer(){const result=document.getElementById('result');if(selected<0){result.className='result no';result.textContent='先选择一个答案，再说说你依据了什么条件。';return}const item=activeQuestions()[current];if(selected===item.answer){const done=getDone();if(!done.includes(current)){done.push(current);localStorage.setItem(doneKey(),JSON.stringify(done))}recordActivity();if(reviewMode){localStorage.setItem(wrongKey(),JSON.stringify(getWrong().filter(i=>i!==current)))}result.className='result ok';result.textContent=reviewMode?'复练答对，已从错题记录中移除！'+item.why:'答对了！'+item.why}else{const wrong=getWrong();if(!wrong.includes(current)){wrong.push(current);localStorage.setItem(wrongKey(),JSON.stringify(wrong))}result.className='result no';result.textContent='再想一想：'+item.why}}
+function nextQuestion(){if(!getDone().includes(current)){const result=document.getElementById('result');result.className='result no';result.textContent='先答对本题，才能进入下一关。';return}if(reviewMode){if(reviewIndex===reviewQueue.length-1){reviewMode=false;showStageSummary();return}reviewIndex+=1;current=reviewQueue[reviewIndex];selected=-1;renderPractice();return}if(current===activeQuestions().length-1){showStageSummary();return}current+=1;selected=-1;renderPractice()}
+function startWrongReview(){const wrong=getWrong();if(!wrong.length){showStageSummary();return}reviewMode=true;reviewQueue=[...wrong];reviewIndex=0;current=reviewQueue[0];selected=-1;renderPractice()}
+function showStageSummary(){reviewMode=false;const total=activeQuestions().length,wrong=getWrong(),reviewButton=wrong.length?`<button class="next-btn" onclick="startWrongReview()">错题复练（${wrong.length}）</button>`:'';lesson.innerHTML=`<div class="lesson-head"><div><h2>单元完成小结</h2><p class="muted">基础与进阶练习已完成，可以进入无提示独立挑战。</p></div><button class="close" onclick="closeLesson()">收起</button></div><article class="complete"><strong>完成率：${getDone().length}/${total}</strong><p>本次记录了 ${wrong.length} 道需要复练的题。复练答对后会自动清除对应记录。</p><button class="check-btn" onclick="showIndependentChallenge()">进入独立挑战</button>${reviewButton}</article>`}
+function currentChallenge(){return independentChallenges[currentKey][grade]}
+function showIndependentChallenge(){const m=modules[currentKey],task=currentChallenge();lesson.innerHTML=`<div class="lesson-head"><div><h2>${m.name} · 第四步：独立挑战</h2><p class="muted">这题没有提示，也不提供选项。先独立完成，再检查答案。</p></div><button class="close" onclick="closeLesson()">收起</button></div>${dots()}${lessonSteps()}<article class="practice"><h3>${grade==='12'?'一～二年级':grade==='34'?'三～四年级':'五～六年级'}独立挑战</h3><p>${task.q}</p><input id="independentAnswer" class="answer-input" inputmode="text" autocomplete="off" aria-label="填写独立挑战答案" placeholder="填写你的答案"><button class="check-btn" onclick="checkIndependent()">检查答案</button><p id="independentResult" class="result"></p></article>`}
+function checkIndependent(){const task=currentChallenge(),input=document.getElementById('independentAnswer'),result=document.getElementById('independentResult');const answer=input.value.trim().replace(/\s+/g,'');if(!answer){result.className='result no';result.textContent='先独立填写答案，再检查。';return}if(answer===task.answer){result.className='result ok';result.innerHTML=`独立挑战完成！${task.why}<br><button class="next-btn" onclick="showReview()">进入复盘卡</button>`}else{result.className='result no';result.textContent='还不对。回到题目条件，再自己检查一次。'}}
+function reviewKey(){return `hpx_olympiad_${currentKey}_${grade}_review_v1`}
+function showReview(){const m=modules[currentKey];lesson.innerHTML=`<div class="lesson-head"><div><h2>${m.name} · 复盘卡</h2><p class="muted">把过程留下来，比只记住答案更重要。</p></div><button class="close" onclick="closeLesson()">收起</button></div><article class="practice"><h3>记录你的方法和错因</h3><label for="reviewMethod">这次主要用了什么方法？</label><select id="reviewMethod" class="review-select"><option value="画图或列表">画图或列表</option><option value="拆分或计算">拆分或计算</option><option value="逐条排除">逐条排除</option><option value="观察规律">观察规律</option><option value="其他方法">其他方法</option></select><p style="margin:13px 0 5px">这次有没有遇到卡点？（可多选）</p><div class="checklist"><label><input type="checkbox" value="漏看条件"> 漏看条件</label><label><input type="checkbox" value="方法没想到"> 方法没想到</label><label><input type="checkbox" value="计算出错"> 计算出错</label><label><input type="checkbox" value="没有检查"> 没有检查</label><label><input type="checkbox" value="没有卡住"> 没有卡住</label></div><label for="reviewNote">我下次想提醒自己：</label><textarea id="reviewNote" class="review-note" maxlength="120" placeholder="例如：先画线段图，再计算。"></textarea><button class="check-btn" onclick="saveReview()">保存复盘卡</button><p id="reviewResult" class="result"></p></article>`}
+function saveReview(){const checks=[...document.querySelectorAll('.checklist input:checked')].map(x=>x.value);const data={method:document.getElementById('reviewMethod').value,issues:checks,note:document.getElementById('reviewNote').value.trim(),savedAt:new Date().toISOString()};localStorage.setItem(reviewKey(),JSON.stringify(data));const result=document.getElementById('reviewResult');result.className='result ok';result.textContent='复盘卡已保存在这台设备。你完成了本专项的第四步！'}
+function closeLesson(){lesson.classList.remove('show');lesson.innerHTML=''}
+document.querySelectorAll('.grade-tab').forEach(b=>b.addEventListener('click',()=>setGrade(b.dataset.grade)));document.querySelectorAll('.module').forEach(b=>b.addEventListener('click',()=>showLesson(b.dataset.key)));const requested=new URLSearchParams(location.search),requestedGrade=requested.get('grade'),requestedModule=requested.get('module');if(['12','34','56'].includes(requestedGrade))grade=requestedGrade;setGrade(grade);if(modules[requestedModule]){showLesson(requestedModule);if(requested.get('review')==='1')startWrongReview()}
+</script>
+</body>
+</html>

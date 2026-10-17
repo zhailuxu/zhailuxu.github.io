@@ -51,6 +51,8 @@ body {
 }
 .ng-cell:hover  { transform:scale(1.15); box-shadow:0 4px 12px rgba(0,0,0,.22); z-index:1; }
 .ng-cell.picked { transform:scale(1.22); box-shadow:0 0 0 3px #fff,0 0 0 6px #e91e63; z-index:2; }
+.ng-cell.unrevealed { visibility:hidden; pointer-events:none; }
+.ng-cell.just-revealed { animation:revealPop .4s ease-out; }
 /* decade gradients */
 .d1 { background:linear-gradient(135deg,#ef9a9a,#e53935); }
 .d2 { background:linear-gradient(135deg,#ffcc80,#e65100); }
@@ -62,6 +64,12 @@ body {
 .d8 { background:linear-gradient(135deg,#ce93d8,#6a1b9a); }
 .d9 { background:linear-gradient(135deg,#f48fb1,#880e4f); }
 .d10{ background:linear-gradient(135deg,#b0bec5,#37474f); }
+
+/* ── Reveal Progress (Tab 1) ── */
+.rv-bar-wrap { background:#ffe0eb; border-radius:8px; height:10px; overflow:hidden; margin-bottom:10px; }
+.rv-bar { height:100%; background:linear-gradient(90deg,#ff80ab,#e91e63); border-radius:8px; transition:width .3s; }
+.rv-status { text-align:center; font-size:.85rem; color:#aaa; margin-bottom:10px; }
+.rv-status b { color:#e91e63; }
 
 /* ── Zoom Panel ── */
 .zoom-panel {
@@ -93,10 +101,11 @@ body {
 .lv-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
 
 .obj-area {
-  min-height:110px; display:flex; flex-wrap:wrap;
-  gap:3px; justify-content:center; align-items:center;
-  background:#fff9e6; border-radius:14px; padding:10px;
-  margin-bottom:14px; font-size:1.7rem; line-height:1.3;
+  min-height:110px; display:grid; grid-template-columns:repeat(5,1fr);
+  gap:8px 12px; justify-items:center; align-items:center;
+  background:#fff9e6; border-radius:14px; padding:14px 10px;
+  margin:0 auto 14px; font-size:1.7rem; line-height:1.3;
+  max-width:260px;
 }
 .obj-area span { display:inline-block; animation:popIn .2s ease-out; }
 
@@ -115,6 +124,12 @@ body {
 .choice-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
 
 /* ── Find Number Game ── */
+.fl-btn {
+  padding:7px 16px; border:2.5px solid #9fa8da; border-radius:16px;
+  background:#fff; color:#3f51b5; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.fl-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
 .fm-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
 .fm-btn {
   padding:6px 14px; border:2px solid #9fa8da; border-radius:14px;
@@ -140,6 +155,23 @@ body {
 .find-btn:hover { transform:scale(1.06); }
 .find-btn.ok   { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; animation:celebrate .4s ease; }
 .find-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
+
+/* ── Cross-ten practice ── */
+.cross-rule { text-align:center; color:#6a4c93; font-size:1rem; line-height:1.65; margin:0 0 14px; }
+.cross-q { text-align:center; font-size:1.05rem; color:#777; margin-bottom:4px; }
+.cross-equation { display:flex; align-items:center; justify-content:center; gap:12px; margin:8px 0 16px; }
+.cross-num { min-width:90px; padding:8px 12px; border-radius:18px; font-size:3.7rem; font-weight:bold; line-height:1.1; color:#e91e63; background:#fff0f5; box-shadow:0 3px 10px rgba(233,30,99,.14); }
+.cross-arrow { font-size:2.1rem; font-weight:bold; color:#ff9800; }
+.cross-answer { min-width:90px; padding:8px 12px; border-radius:18px; font-size:3.7rem; font-weight:bold; line-height:1.1; color:#fff; background:linear-gradient(135deg,#9575cd,#5e35b1); box-shadow:0 3px 10px rgba(94,53,177,.22); }
+.cross-place { display:flex; gap:10px; justify-content:center; margin:0 auto 16px; max-width:390px; }
+.place-card { flex:1; min-width:0; padding:10px 8px; border-radius:16px; text-align:center; background:#f3e5f5; }
+.place-card.ones { background:#fff3e0; }
+.place-label { font-size:.84rem; color:#777; margin-bottom:4px; }
+.place-change { display:flex; align-items:center; justify-content:center; gap:7px; font-size:1.9rem; font-weight:bold; }
+.place-before { color:#777; text-decoration:line-through; text-decoration-thickness:2px; }
+.place-turn { color:#ff9800; font-size:1.2rem; }
+.place-after { color:#5e35b1; }
+.cross-tip { min-height:28px; text-align:center; color:#6a4c93; font-weight:bold; font-size:.95rem; }
 
 /* ── Auto Play ── */
 .auto-num {
@@ -169,6 +201,39 @@ body {
 }
 .sp-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
 
+/* ── Sort game ── */
+.sr-btn {
+  padding:7px 16px; border:2.5px solid #64b5f6; border-radius:16px;
+  background:#fff; color:#1565c0; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.sr-btn.on { background:#1565c0; color:#fff; border-color:#1565c0; }
+.sort-q { text-align:center; font-size:.95rem; color:#777; margin-bottom:10px; }
+.sort-slots, .sort-pool {
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  margin:6px 0 16px; min-height:70px; align-items:center;
+}
+.sort-slot {
+  width:58px; height:58px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; font-weight:bold; color:#bbb;
+  border:2.5px dashed #ccc; background:#fafafa;
+  transition:all .15s;
+}
+.sort-slot.hover-target { border-color:#1565c0; background:#e3f2fd; }
+.sort-slot.filled { border-style:solid; border-color:#2e7d32; color:#fff; background:linear-gradient(135deg,#81c784,#2e7d32); }
+.sort-tile {
+  width:58px; height:58px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; font-weight:bold; color:#fff;
+  background:linear-gradient(135deg,#64b5f6,#1565c0);
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+  cursor:grab; user-select:none; touch-action:none;
+  transition:box-shadow .15s;
+  position:relative; z-index:1;
+}
+.sort-tile.dragging { cursor:grabbing; z-index:10; box-shadow:0 8px 20px rgba(0,0,0,.3); }
+
 /* ── Shared feedback ── */
 .fb { text-align:center; font-size:1.15rem; font-weight:bold; min-height:34px; margin-bottom:8px; }
 .fb.ok   { color:#2e7d32; }
@@ -183,6 +248,7 @@ body {
 @keyframes celebrate { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 75%{transform:scale(.94)} 100%{transform:scale(1)} }
 @keyframes shake     { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px)} 75%{transform:translateX(9px)} }
 @keyframes numPop    { 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
+@keyframes revealPop { 0%{opacity:0;transform:scale(.3) rotate(-8deg)} 60%{opacity:1;transform:scale(1.25) rotate(4deg)} 100%{transform:scale(1) rotate(0)} }
 
 @media(max-width:400px){
   .ng-cell { font-size:.82rem; border-radius:7px; }
@@ -194,7 +260,7 @@ body {
   <meta name="theme-color" content="#e91e63">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="学习乐园">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
   <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
@@ -213,6 +279,8 @@ body {
   <button class="tab-btn"    id="tab5" onclick="switchTab(5)">✍️ 写数字</button>
   <button class="tab-btn"    id="tab6" onclick="switchTab(6)">⚖️ 比大小</button>
   <button class="tab-btn"    id="tab7" onclick="switchTab(7)">🔗 数字接龙</button>
+  <button class="tab-btn"    id="tab8" onclick="switchTab(8)">🔀 排序</button>
+  <button class="tab-btn"    id="tab9" onclick="switchTab(9)">🚀 过十闯关</button>
 </div>
 
 <!-- ══ Tab 1 ══ -->
@@ -223,10 +291,24 @@ body {
     <div class="zoom-blocks" id="zBlk"></div>
     <div class="zoom-nav">
       <button class="znav" onclick="zoomMove(-1)">◀ 上一个</button>
-      <button class="znav" onclick="zoomMove(1)">下一个 ▶</button>
+      <button class="znav" id="zNextBtn" onclick="zoomOrRevealNext()">下一个 ▶</button>
     </div>
   </div>
   <div class="card">
+    <div class="rv-status" id="rvStatus">已认识 <b>1</b> 个数字，共 100 个</div>
+    <div class="rv-bar-wrap"><div class="rv-bar" id="rvBar" style="width:1%"></div></div>
+    <div class="row-ctrl">
+      <button class="btn btn-gray"   onclick="revealReset()">↺ 从头开始</button>
+    </div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue" id="rvAutoBtn" onclick="toggleRevealAuto()">▶ 自动揭晓</button>
+    </div>
+    <div style="text-align:center;color:#aaa;font-size:.82rem;margin-bottom:10px">
+      速度：
+      <button class="sp-btn on" data-rvsp="1300" onclick="setRevealSp(1300,this)">慢</button>
+      <button class="sp-btn"    data-rvsp="750"  onclick="setRevealSp(750,this)">正常</button>
+      <button class="sp-btn"    data-rvsp="380"  onclick="setRevealSp(380,this)">快</button>
+    </div>
     <div class="num-grid" id="numGrid"></div>
   </div>
 </div>
@@ -252,6 +334,12 @@ body {
 <!-- ══ Tab 3 ══ -->
 <div id="p3" class="hidden">
   <div class="card">
+    <div class="lv-row">
+      <button class="fl-btn" data-fl="10"  onclick="setFindLv(10,this)">10以内</button>
+      <button class="fl-btn" data-fl="20"  onclick="setFindLv(20,this)">20以内</button>
+      <button class="fl-btn" data-fl="50"  onclick="setFindLv(50,this)">50以内</button>
+      <button class="fl-btn on" data-fl="100" onclick="setFindLv(100,this)">100以内</button>
+    </div>
     <div class="fm-row">
       <button class="fm-btn on" data-m="num2cn" onclick="setFM('num2cn',this)">数字 → 名字</button>
       <button class="fm-btn"    data-m="cn2num" onclick="setFM('cn2num',this)">名字 → 数字</button>
@@ -325,6 +413,43 @@ body {
   border:2.5px dashed #ff9800;}
 .seq-blank.ok{background:#c8e6c9;color:#2e7d32;border:2.5px solid #2e7d32;}
 .seq-sep{font-size:1.2rem;color:#bbb;}
+/* ── 解题 Toast ── */
+#seqToast{
+  position:fixed;bottom:-220px;left:50%;transform:translateX(-50%);
+  background:#fff;border-radius:20px;padding:18px 20px 16px;
+  box-shadow:0 10px 36px rgba(0,0,0,.18);
+  max-width:360px;width:calc(100% - 32px);
+  text-align:center;z-index:9999;
+  border:2px solid #ffcdd2;
+  transition:bottom .38s cubic-bezier(.34,1.46,.64,1);
+}
+#seqToast.show{bottom:24px;}
+.toast-seq{display:flex;align-items:center;justify-content:center;
+  gap:5px;flex-wrap:wrap;margin:10px 0;}
+.toast-sn{min-width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  font-size:1.35rem;font-weight:bold;border-radius:10px;
+  background:#e3f2fd;color:#1565c0;}
+.toast-sn.ans{background:#2e7d32;color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.4);}
+.toast-arrow{color:#bbb;font-size:1rem;}
+.toast-rule{font-size:.92rem;color:#555;margin-top:8px;line-height:1.7;}
+.toast-rule b{color:#e91e63;}
+.toast-calc{font-size:.85rem;color:#888;margin-top:4px;}
+
+/* ── 数字圆点 Toast ── */
+#numToast{
+  position:fixed;bottom:-320px;left:50%;transform:translateX(-50%);
+  background:#fff;border-radius:20px;padding:18px 20px 16px;
+  box-shadow:0 10px 36px rgba(0,0,0,.18);
+  max-width:400px;width:calc(100% - 32px);
+  text-align:center;z-index:9999;
+  border:2px solid #f8bbd0;
+  transition:bottom .38s cubic-bezier(.34,1.46,.64,1);
+}
+#numToast.show{bottom:24px;}
+.nt-num{font-size:2.2rem;font-weight:bold;color:#e91e63;margin-bottom:10px;line-height:1;}
+.nt-dots{display:grid;grid-template-columns:repeat(10,26px);gap:8px;justify-content:center;}
+.nt-dot{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#e91e63);
+  box-shadow:0 2px 4px rgba(0,0,0,.18);}
 </style>
 
 <!-- ══ Tab 5: 写数字 ══ -->
@@ -351,6 +476,7 @@ body {
       <button class="btn btn-gray"   onclick="clearTrace()">🗑️ 清除</button>
       <button class="btn btn-pink"   onclick="speak(numCN(traceDigit))">🔊 读数字</button>
     </div>
+    <div id="traceResult" style="text-align:center;font-size:1.1rem;font-weight:bold;min-height:36px;margin-top:10px;transition:color .25s;letter-spacing:.5px;"></div>
   </div>
 </div>
 
@@ -399,7 +525,57 @@ body {
   </div>
 </div>
 
+<!-- ══ Tab 8: 排序 ══ -->
+<div id="p8" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="sr-btn" data-sr="10" onclick="setSortLv(10,this)">10以内</button>
+      <button class="sr-btn" data-sr="20" onclick="setSortLv(20,this)">20以内</button>
+      <button class="sr-btn" data-sr="50" onclick="setSortLv(50,this)">50以内</button>
+      <button class="sr-btn on" data-sr="100" onclick="setSortLv(100,this)">100以内</button>
+    </div>
+    <div class="sort-q">👉 把下面的数字一个个拖到上面的格子里，从小到大放好</div>
+    <div class="sort-slots" id="sortSlots"></div>
+    <div class="sort-pool" id="sortPool"></div>
+    <div class="fb" id="sortFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genSort()">换一题 🔄</button>
+    </div>
+    <div class="score" id="sortScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
 </div>
+
+<!-- ══ Tab 9: 过十闯关 ══ -->
+<div id="p9" class="hidden">
+  <div class="card">
+    <p class="cross-rule">看到个位是 <b>9</b>，再数 1 个：<br>个位回到 <b>0</b>，十位就加 <b>1</b>！</p>
+    <div class="cross-q" id="crossQ">19 后面是几？</div>
+    <div class="cross-equation">
+      <div class="cross-num" id="crossStart">19</div>
+      <div class="cross-arrow">＋1 →</div>
+      <div class="cross-answer" id="crossAnswer">？</div>
+    </div>
+    <div class="cross-place" aria-label="十位和个位的变化">
+      <div class="place-card">
+        <div class="place-label">十位</div>
+        <div class="place-change"><span class="place-before" id="crossTensBefore">1</span><span class="place-turn">→</span><span class="place-after" id="crossTensAfter">2</span></div>
+      </div>
+      <div class="place-card ones">
+        <div class="place-label">个位</div>
+        <div class="place-change"><span class="place-before">9</span><span class="place-turn">→</span><span class="place-after">0</span></div>
+      </div>
+    </div>
+    <div class="choices4" id="crossChoices"></div>
+    <div class="cross-tip" id="crossTip"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCrossTen()">换一关 🔄</button>
+    </div>
+    <div class="score" id="crossScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+</div>
+<script src="hpx-core.js"></script>
 <script>
 // ─── Utils ───
 const EMOJIS = ['🍎','🐱','⭐','🦋','🍭','🌸','🐠','🎈','🍓','🐸',
@@ -407,13 +583,14 @@ const EMOJIS = ['🍎','🐱','⭐','🦋','🍭','🌸','🐠','🎈','🍓','�
 
 function numCN(n) {
   const d = ['','一','二','三','四','五','六','七','八','九','十'];
+  if (n === 100) return '一百';
   if (n <= 10) return d[n];
   if (n < 20)  return '十' + (n > 10 ? d[n % 10] : '');
   const t = Math.floor(n/10), r = n%10;
   return d[t] + '十' + (r ? d[r] : '');
 }
 
-function ri(lo,hi){ return Math.floor(Math.random()*(hi-lo+1))+lo; }
+const ri=Hpx.random.int;
 
 function shuffle(a) {
   for (let i=a.length-1;i>0;i--) {
@@ -430,6 +607,8 @@ function genChoices(correct, lo, hi, n) {
 
 // ─── Tab 1 — Grid ───
 let zNum = 1;
+let revealed = 1; // 已经"揭晓"到的数字个数：1 表示只显示数字 1
+let numToastTimer = null;
 
 function decCls(n){
   if(n<=10) return 'd1';
@@ -447,11 +626,99 @@ function decCls(n){
 function buildGrid() {
   let h='';
   for(let i=1;i<=100;i++)
-    h+=`<div class="ng-cell ${decCls(i)}" id="ngc-${i}" onclick="zoomTo(${i})">${i}</div>`;
+    h+=`<div class="ng-cell ${decCls(i)} unrevealed" id="ngc-${i}" onclick="zoomTo(${i})">${i}</div>`;
   document.getElementById('numGrid').innerHTML=h;
+  applyReveal(false);
+}
+
+// 把 1..revealed 的格子显示出来，其余保持隐藏
+function applyReveal(animateLast){
+  for(let i=1;i<=100;i++){
+    const cell=document.getElementById(`ngc-${i}`);
+    if(!cell) continue;
+    cell.classList.toggle('unrevealed', i>revealed);
+    cell.classList.remove('just-revealed');
+  }
+  if(animateLast){
+    const last=document.getElementById(`ngc-${revealed}`);
+    if(last){ void last.offsetWidth; last.classList.add('just-revealed'); }
+  }
+  document.getElementById('rvBar').style.width = revealed+'%';
+  document.getElementById('rvStatus').innerHTML =
+    revealed>=100
+      ? `🎉 恭喜！已经认识全部 <b>100</b> 个数字啦！`
+      : `已认识 <b>${revealed}</b> 个数字，共 100 个`;
+  const zBtn=document.getElementById('zNextBtn');
+  if(zBtn){
+    zBtn.disabled = revealed>=100 && zNum>=100;
+    zBtn.style.opacity = (revealed>=100 && zNum>=100) ? .5 : 1;
+  }
+}
+
+function revealNext(fromAuto){
+  if(revealed>=100) return;
+  if(!fromAuto) stopRevealAuto();
+  revealed++;
+  applyReveal(true);
+  zoomTo(revealed);
+}
+
+// 合并后的"下一个"按钮：如果当前看的数字还没到揭晓上限，先在已揭晓范围内移动；
+// 如果已经在最新揭晓的数字上，就揭晓一个新数字并跳过去
+function zoomOrRevealNext(){
+  stopRevealAuto();
+  if(zNum<revealed){
+    zoomTo(zNum+1);
+  } else {
+    revealNext(true); // 传 true 避免重复调用 stopRevealAuto
+  }
+}
+
+function revealReset(){
+  stopRevealAuto();
+  revealed=1;
+  applyReveal(false);
+  zoomTo(1);
+  document.getElementById('numGrid').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ─── 自动连续揭晓 ───
+let rvAutoPlaying=false, rvAutoTimer=null, rvAutoSp=1300;
+
+function toggleRevealAuto(){
+  if(rvAutoPlaying){
+    stopRevealAuto();
+  } else {
+    if(revealed>=100) revealReset();
+    rvAutoPlaying=true;
+    document.getElementById('rvAutoBtn').textContent='⏸ 暂停';
+    rvAutoStep();
+  }
+}
+
+function rvAutoStep(){
+  if(!rvAutoPlaying) return;
+  if(revealed>=100){ stopRevealAuto(); return; }
+  revealNext(true);
+  if(revealed>=100){ stopRevealAuto(); return; }
+  rvAutoTimer=setTimeout(rvAutoStep, rvAutoSp);
+}
+
+function stopRevealAuto(){
+  rvAutoPlaying=false;
+  clearTimeout(rvAutoTimer);
+  const btn=document.getElementById('rvAutoBtn');
+  if(btn) btn.textContent='▶ 自动揭晓';
+}
+
+function setRevealSp(sp,btn){
+  rvAutoSp=sp;
+  document.querySelectorAll('[data-rvsp]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
 }
 
 function zoomTo(n) {
+  if(n>revealed) return; // 还没揭晓的数字不能点
   zNum=n;
   document.querySelectorAll('.ng-cell').forEach(c=>c.classList.remove('picked'));
   document.getElementById(`ngc-${n}`).classList.add('picked');
@@ -477,9 +744,33 @@ function zoomTo(n) {
   panel.scrollIntoView({behavior:'smooth',block:'nearest'});
   speak(numCN(n));
   tone(280+n*1.2,.14);
+  showNumDotToast(n);
 }
 
-function zoomMove(d){ zoomTo(Math.max(1,Math.min(100,zNum+d))); }
+function zoomMove(d){ zoomTo(Math.max(1,Math.min(revealed,zNum+d))); }
+
+function showNumDotToast(n){
+  const old=document.getElementById('numToast');
+  if(old) old.remove();
+  clearTimeout(numToastTimer);
+
+  let dotsHtml='';
+  for(let i=0;i<n;i++) dotsHtml+='<div class="nt-dot"></div>';
+
+  const toast=document.createElement('div');
+  toast.id='numToast';
+  toast.innerHTML=`
+    <div class="nt-num">${n}</div>
+    <div class="nt-dots">${dotsHtml}</div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+
+  numToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },2200);
+}
 
 // ─── Tab 2 — Count ───
 let cntLv=10, cntAns=0, cntOk=0, cntBad=0, cntDone=false;
@@ -527,7 +818,7 @@ function checkCount(val,btn){
 }
 
 // ─── Tab 3 — Find ───
-let fm='num2cn', findOk=0, findBad=0, findDone=false;
+let fm='num2cn', findOk=0, findBad=0, findDone=false, findMax=100;
 
 function setFM(m,btn){
   fm=m;
@@ -536,38 +827,56 @@ function setFM(m,btn){
   genFind();
 }
 
+function setFindLv(max,btn){
+  findMax=max;
+  document.querySelectorAll('.fl-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genFind();
+}
+
+// 保证候选数量足够（哪怕范围很小，比如"10以内"），从理想区间往两边扩到 [hardMin,hardMax] 为止
+// 注意：判断"够不够"要用裁剪到硬边界之后的宽度，否则区间一端越界会误判为"已经够宽"
+function safeChoices(correct, idealLo, idealHi, want, hardMin, hardMax){
+  let lo=idealLo, hi=idealHi;
+  while((Math.min(hardMax,hi)-Math.max(hardMin,lo)+1)<want && (lo>hardMin || hi<hardMax)){
+    if(lo>hardMin) lo--;
+    if(hi<hardMax) hi++;
+  }
+  return genChoices(correct, Math.max(hardMin,lo), Math.min(hardMax,hi), want);
+}
+
 function genFind(){
   findDone=false;
   setFb('findFb','','');
 
   if(fm==='num2cn'){
-    const n=ri(1,100);
+    const n=ri(1,findMax);
     document.getElementById('findQ').textContent='这个数字叫什么名字？';
     document.getElementById('findT').textContent=n;
-    const ch=genChoices(n,1,100,6);
+    const ch=genChoices(n,1,findMax,6);
     buildFindGrid(ch, v=>v===n, v=>numCN(v));
     setTimeout(()=>speak(numCN(n)),300);
   } else if(fm==='cn2num'){
-    const n=ri(1,100);
+    const n=ri(1,findMax);
     document.getElementById('findQ').textContent='找到这个数字！';
     document.getElementById('findT').textContent=numCN(n);
-    const ch=genChoices(n,1,100,6);
+    const ch=genChoices(n,1,findMax,6);
     buildFindGrid(ch, v=>v===n, v=>v);
     setTimeout(()=>speak(numCN(n)),300);
   } else if(fm==='next'){
-    const n=ri(1,99);
+    const n=ri(1,findMax-1);
     const ans=n+1;
     document.getElementById('findQ').textContent=`${n} 的下一个是几？`;
     document.getElementById('findT').textContent=n;
-    const ch=genChoices(ans,Math.max(1,n-3),Math.min(100,n+5),6);
+    const ch=safeChoices(ans,n-3,n+5,6,1,findMax);
     buildFindGrid(ch, v=>v===ans, v=>v);
     setTimeout(()=>speak(`${numCN(n)}，下一个是几？`),300);
   } else {
-    const n=ri(2,100);
+    const n=ri(2,findMax);
     const ans=n-1;
     document.getElementById('findQ').textContent=`${n} 的上一个是几？`;
     document.getElementById('findT').textContent=n;
-    const ch=genChoices(ans,Math.max(1,n-5),Math.min(100,n+3),6);
+    const ch=safeChoices(ans,n-5,n+3,6,1,findMax);
     buildFindGrid(ch, v=>v===ans, v=>v);
     setTimeout(()=>speak(`${numCN(n)}，上一个是几？`),300);
   }
@@ -746,8 +1055,8 @@ function initTraceTab(){
     ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
     lastX=x; lastY=y;
   });
-  tc.addEventListener('pointerup',()=>isDrawing=false);
-  tc.addEventListener('pointercancel',()=>isDrawing=false);
+  tc.addEventListener('pointerup',()=>{ isDrawing=false; checkMatch(); });
+  tc.addEventListener('pointercancel',()=>{ isDrawing=false; checkMatch(); });
   selectDigit(1);
 }
 
@@ -774,6 +1083,8 @@ function drawGuide(){
 function clearTrace(){
   clearTimeout(hintTimer);
   document.getElementById('traceCanvas').getContext('2d').clearRect(0,0,280,280);
+  const r=document.getElementById('traceResult');
+  if(r) r.textContent='';
 }
 
 function setPen(c,btn){
@@ -797,9 +1108,73 @@ function showHint(){
     else{ctx.lineTo(px,py);ctx.stroke();ctx.beginPath();ctx.moveTo(px,py);}
     ctx.save();ctx.fillStyle='rgba(255,23,68,.85)';
     ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();ctx.restore();
-    idx++; hintTimer=setTimeout(step,28);
+    idx++; hintTimer=setTimeout(step,150);
   }
   step();
+}
+
+// ─── 手写匹配度检测 ───
+function checkMatch(){
+  const S=280, GRID=28, STEP=S/GRID;
+  const tCtx=document.getElementById('traceCanvas').getContext('2d');
+  const gCtx=document.getElementById('guideCanvas').getContext('2d');
+  const tPx=tCtx.getImageData(0,0,S,S).data;
+  const gPx=gCtx.getImageData(0,0,S,S).data;
+
+  let tCells=0, gCells=0, both=0;
+  for(let row=0;row<GRID;row++){
+    for(let col=0;col<GRID;col++){
+      let tSum=0, gSum=0;
+      for(let dy=0;dy<STEP;dy++){
+        for(let dx=0;dx<STEP;dx++){
+          const px=Math.floor(col*STEP+dx), py=Math.floor(row*STEP+dy);
+          const i=(py*S+px)*4;
+          tSum+=tPx[i+3]; gSum+=gPx[i+3];
+        }
+      }
+      const area=STEP*STEP;
+      const tOn=(tSum/area)>25;
+      const gOn=(gSum/area)>12; // guide是半透明 alpha≈128，阈值低一些
+      if(tOn) tCells++;
+      if(gOn) gCells++;
+      if(tOn&&gOn) both++;
+    }
+  }
+
+  if(tCells<3){ showMatchResult(-1); return; } // 几乎没写
+  if(gCells===0) return;
+
+  const recall=both/gCells;           // 覆盖了多少参考区域
+  const prec=both/tCells;             // 有多少笔迹在参考区域内
+  const f1=(recall+prec>0)?2*recall*prec/(recall+prec):0;
+  showMatchResult(Math.round(f1*100));
+}
+
+function showMatchResult(pct){
+  const el=document.getElementById('traceResult');
+  if(!el) return;
+  if(pct<0){
+    el.style.color='#aaa';
+    el.textContent='✍️ 在格子里写写看！';
+    return;
+  }
+  if(pct>=60){
+    el.style.color='#2e7d32';
+    if(pct>=75){
+      el.textContent=`🌟 棒极了！匹配度 ${pct}%，自动进入下一个…`;
+      chime();
+      setTimeout(()=>selectDigit((traceDigit+1)%10), 1200);
+    } else {
+      el.textContent=`✅ 不错哦！匹配度 ${pct}%`;
+    }
+  } else if(pct>=40){
+    el.style.color='#f57c00';
+    el.textContent=`⚠️ 接近了！匹配度 ${pct}%，再仔细一点！`;
+  } else {
+    el.style.color='#e53935';
+    el.textContent=`❌ 写得不像哦，匹配度 ${pct}%，看看笔顺提示再试试！`;
+    tone(200,.18,'sawtooth');
+  }
 }
 
 // ─── Tab 6: 比大小 ───
@@ -851,6 +1226,8 @@ function checkCmp(sign){
 
 // ─── Tab 7: 数字接龙 ───
 let seqStep=1, seqOk=0, seqBad=0, seqDone=false, seqAns=0;
+let seqArr=[], seqBlankIdx=0;
+let seqToastTimer = null;
 const SEQ_CFG={1:{max:20},2:{max:40},5:{max:50},10:{max:100}};
 
 function setSeqStep(s,btn){
@@ -861,18 +1238,21 @@ function setSeqStep(s,btn){
 
 function genSeq(){
   seqDone=false;
+  clearTimeout(seqToastTimer);
+  const old=document.getElementById('seqToast');
+  if(old){old.classList.remove('show');setTimeout(()=>old.remove(),400);}
   const cfg=SEQ_CFG[seqStep]||{max:20};
   const maxStart=Math.max(1, cfg.max - seqStep*4);
   const start=ri(1,maxStart);
-  const seq=Array.from({length:5},(_,i)=>start+i*seqStep);
-  const blankIdx=ri(0,4);
-  seqAns=seq[blankIdx];
+  seqArr=Array.from({length:5},(_,i)=>start+i*seqStep);
+  seqBlankIdx=ri(0,4);
+  seqAns=seqArr[seqBlankIdx];
 
   const row=document.getElementById('seqRow');
   let seqHtml='';
-  seq.forEach((n,i)=>{
+  seqArr.forEach((n,i)=>{
     if(i>0) seqHtml+=`<div class="seq-sep">→</div>`;
-    if(i===blankIdx) seqHtml+=`<div class="seq-blank" id="seqBlank">?</div>`;
+    if(i===seqBlankIdx) seqHtml+=`<div class="seq-blank" id="seqBlank">?</div>`;
     else seqHtml+=`<div class="seq-n">${n}</div>`;
   });
   row.innerHTML=seqHtml;
@@ -887,8 +1267,7 @@ function genSeq(){
     b.onclick=()=>checkSeq(c,b); g.appendChild(b);
   });
   setFb('seqFb','','');
-  // Speak the sequence with blank as "空"
-  const txt=seq.map((n,i)=>i===blankIdx?'空':numCN(n)).join('，');
+  const txt=seqArr.map((n,i)=>i===seqBlankIdx?'空':numCN(n)).join('，');
   setTimeout(()=>speak(txt),300);
 }
 
@@ -902,35 +1281,232 @@ function checkSeq(val,btn){
     speak(`${numCN(seqAns)}，真棒`); chime(); setTimeout(genSeq,1600);
   } else {
     seqBad++; btn.classList.add('fail');
-    setFb('seqFb','fail','❌ 再想想！');
+    setFb('seqFb','fail',`❌ 答错了！答案是 ${seqAns}`);
     tone(200,.2,'sawtooth');
-    setTimeout(()=>{btn.classList.remove('fail');seqDone=false;setFb('seqFb','','');},900);
+    setTimeout(()=>btn.classList.remove('fail'), 600);
+    showSeqToast();
   }
   document.getElementById('seqScore').textContent=`✅ ${seqOk}  ❌ ${seqBad}`;
 }
 
+function showSeqToast(){
+  clearTimeout(seqToastTimer);
+  const old=document.getElementById('seqToast');
+  if(old){old.classList.remove('show');old.remove();}
+
+  // 序列展示（空格填正确答案，绿色高亮）
+  const seqHtml=seqArr.map((n,i)=>{
+    const cls=i===seqBlankIdx?'toast-sn ans':'toast-sn';
+    return `<div class="${cls}">${n}</div>${i<4?'<div class="toast-arrow">→</div>':''}`;
+  }).join('');
+
+  // 解题步骤
+  const bi=seqBlankIdx;
+  let calcHtml='';
+  if(bi>0){
+    calcHtml=`${seqArr[bi-1]} + ${seqStep} = <b style="color:#2e7d32">${seqAns}</b>`;
+  } else {
+    calcHtml=`<b style="color:#2e7d32">${seqAns}</b> + ${seqStep} = ${seqArr[1]}`;
+  }
+
+  const toast=document.createElement('div');
+  toast.id='seqToast';
+  toast.innerHTML=`
+    <div style="font-size:.9rem;font-weight:bold;color:#e53935;margin-bottom:2px">❌ 解题思路</div>
+    <div class="toast-seq">${seqHtml}</div>
+    <div class="toast-rule">规律：每次 <b>＋${seqStep}</b>，所以空格是</div>
+    <div class="toast-calc">${calcHtml}</div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+  seqToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },5000);
+}
+
+// ─── Tab 9: 过十闯关 ───
+// 只选 9 到 89：让孩子先把“个位 9 变 0、十位加 1”这一条规律练熟。
+let crossStart=19, crossAns=20, crossOk=0, crossBad=0, crossDone=false;
+
+function genCrossTen(){
+  crossDone=false;
+  crossStart=ri(1,9)*10-1;
+  crossAns=crossStart+1;
+  const tensBefore=Math.floor(crossStart/10);
+  const tensAfter=Math.floor(crossAns/10);
+
+  document.getElementById('crossQ').textContent=`${crossStart} 后面是几？`;
+  document.getElementById('crossStart').textContent=crossStart;
+  document.getElementById('crossAnswer').textContent='？';
+  document.getElementById('crossTensBefore').textContent=tensBefore;
+  document.getElementById('crossTensAfter').textContent=tensAfter;
+  document.getElementById('crossTip').textContent='';
+
+  const choices=genChoices(crossAns,Math.max(1,crossStart-2),Math.min(100,crossStart+3),4);
+  const grid=document.getElementById('crossChoices');
+  grid.innerHTML='';
+  choices.forEach(choice=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=choice;
+    btn.onclick=()=>checkCrossTen(choice,btn);
+    grid.appendChild(btn);
+  });
+  setTimeout(()=>speak(`${crossStart} 后面是几`),250);
+}
+
+function checkCrossTen(value,btn){
+  if(crossDone) return;
+  crossDone=true;
+  const answer=document.getElementById('crossAnswer');
+  answer.textContent=crossAns;
+  if(value===crossAns){
+    crossOk++;
+    btn.classList.add('ok');
+    document.getElementById('crossTip').textContent=`✅ 个位 9 变 0，十位 ${Math.floor(crossStart/10)} 变 ${Math.floor(crossAns/10)}，所以是 ${crossAns}！`;
+    speak(`答对了。个位九变零，十位加一，${crossAns}`);
+    chime();
+    setTimeout(genCrossTen,2200);
+  } else {
+    crossBad++;
+    btn.classList.add('fail');
+    document.getElementById('crossTip').textContent=`💡 看个位：9 加 1 变 0；十位 ${Math.floor(crossStart/10)} 加 1 变 ${Math.floor(crossAns/10)}。答案是 ${crossAns}。`;
+    speak(`再看一看。个位九加一变零，十位加一，所以是${crossAns}`);
+    tone(200,.2,'sawtooth');
+  }
+  document.getElementById('crossScore').textContent=`✅ ${crossOk}  ❌ ${crossBad}`;
+}
+
+// ─── Tab 8: 排序（拖到格子里，错了马上提示重试）───
+let sortRange=100, sortSorted=[], sortFilled=[], sortPoolVals=[];
+let sortOk=0, sortBad=0, sortDragEl=null, sortDragValue=null, sortStartX=0, sortStartY=0;
+
+function setSortLv(max,btn){
+  sortRange=max;
+  document.querySelectorAll('.sr-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genSort();
+}
+
+function genSort(){
+  const N=Math.min(6,sortRange);
+  const set=new Set();
+  while(set.size<N) set.add(ri(1,sortRange));
+  sortPoolVals=shuffle([...set]);
+  sortSorted=[...sortPoolVals].sort((a,b)=>a-b);
+  sortFilled=new Array(N).fill(null);
+  renderSortSlots();
+  renderSortPool();
+  setFb('sortFb','','');
+  setTimeout(()=>speak('把这些数字从小到大拖到格子里'),200);
+}
+
+function renderSortSlots(){
+  const wrap=document.getElementById('sortSlots');
+  wrap.innerHTML='';
+  sortFilled.forEach((v,idx)=>{
+    const d=document.createElement('div');
+    d.className='sort-slot'+(v!==null?' filled':'');
+    d.textContent = v!==null ? v : '';
+    d.dataset.idx=idx;
+    wrap.appendChild(d);
+  });
+}
+
+function renderSortPool(){
+  const wrap=document.getElementById('sortPool');
+  wrap.innerHTML='';
+  sortPoolVals.forEach(v=>{
+    if(sortFilled.includes(v)) return; // 已经放对的数字不再出现在数字池里
+    const d=document.createElement('div');
+    d.className='sort-tile';
+    d.textContent=v;
+    d.dataset.value=v;
+    attachSortDrag(d);
+    wrap.appendChild(d);
+  });
+}
+
+function attachSortDrag(el){
+  el.addEventListener('pointerdown', e=>{
+    sortDragEl=el; sortDragValue=+el.dataset.value;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+    sortStartX=e.clientX; sortStartY=e.clientY;
+  });
+  el.addEventListener('pointermove', e=>{
+    if(sortDragEl!==el) return;
+    const dx=e.clientX-sortStartX, dy=e.clientY-sortStartY;
+    el.style.transform=`translate(${dx}px,${dy}px)`;
+    el.style.pointerEvents='none';
+    const hover=document.elementFromPoint(e.clientX,e.clientY);
+    el.style.pointerEvents='';
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('hover-target'));
+    const slot = hover ? hover.closest('.sort-slot') : null;
+    if(slot && !slot.classList.contains('filled')) slot.classList.add('hover-target');
+  });
+  el.addEventListener('pointerup', e=>{
+    if(sortDragEl!==el) return;
+    sortDragEl=null;
+    el.classList.remove('dragging');
+    el.style.transform='';
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('hover-target'));
+    el.style.pointerEvents='none';
+    const target=document.elementFromPoint(e.clientX,e.clientY);
+    el.style.pointerEvents='';
+    const slot = target ? target.closest('.sort-slot') : null;
+    if(!slot || slot.classList.contains('filled')) return; // 放到格子外或已占用的格子：悄悄弹回去，不算错
+
+    const slotIdx=+slot.dataset.idx;
+    const correctVal=sortSorted[slotIdx];
+    if(sortDragValue===correctVal){
+      sortOk++;
+      sortFilled[slotIdx]=sortDragValue;
+      renderSortSlots();
+      renderSortPool();
+      setFb('sortFb','ok','✅ 放对了！');
+      speak('放对了'); tone(523,.1);
+      if(sortFilled.every(v=>v!==null)){
+        setFb('sortFb','ok','🎉 全部排好啦！从小到大完全正确！');
+        speak('全部排好了，真棒'); chime();
+        setTimeout(genSort,1600);
+      }
+    } else {
+      sortBad++;
+      setFb('sortFb','fail','❌ 这个位置不对，再试试！');
+      speak('不对，再想想'); tone(200,.2,'sawtooth');
+    }
+    document.getElementById('sortScore').textContent=`✅ ${sortOk}  ❌ ${sortBad}`;
+  });
+  el.addEventListener('pointercancel', ()=>{
+    if(sortDragEl===el){ sortDragEl=null; el.classList.remove('dragging'); el.style.transform=''; }
+  });
+}
+
 // ─── Tab switch ───
 function pauseAll(){
+  // 停自动揭晓数字（Tab 1）
+  if(rvAutoPlaying) stopRevealAuto();
   // 停自动数数
   if(autoPlaying){ autoPlaying=false; clearTimeout(autoTimer); document.getElementById('autoBtn').textContent='▶ 继续'; }
   // 停笔顺动画
   if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
   // 停语音
-  if(window.speechSynthesis) speechSynthesis.cancel();
+  numbersSpeech.stop();
 }
 
 function switchTab(n){
   pauseAll();
-  for(let i=1;i<=7;i++){
-    document.getElementById(`p${i}`).classList.toggle('hidden',i!==n);
-    document.getElementById(`tab${i}`).classList.toggle('on',i===n);
-  }
+  Hpx.tabs.activate(n,[1,2,3,4,5,6,7,8,9],{hiddenClass:'hidden',panelId:id=>`p${id}`});
   if(n===2) genCount();
   if(n===3) genFind();
   if(n===4) showAutoN(autoN);
   if(n===5) initTraceTab();
   if(n===6) genCmp();
   if(n===7) genSeq();
+  if(n===8) genSort();
+  if(n===9) genCrossTen();
 }
 
 // ─── Helpers ───
@@ -959,38 +1535,27 @@ function chime(){
 }
 
 // ─── Speech ───
-let _voices=[], _voiceReady=false;
-function _loadVoices(){
-  _voices=speechSynthesis.getVoices();
-  _voiceReady=true;
-}
-if(window.speechSynthesis){
-  _loadVoices();
-  speechSynthesis.onvoiceschanged=_loadVoices;
-}
-function speak(text, rate){
-  if(!window.speechSynthesis) return;
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='zh-CN';
-  u.rate=rate||0.88;
-  u.pitch=1.1;
-  // 优先选中文声音
-  const zhVoice=_voices.find(v=>v.lang.startsWith('zh'));
-  if(zhVoice) u.voice=zhVoice;
-  speechSynthesis.speak(u);
-}
+const numbersSpeech=Hpx.speech.create({rate:0.88,pitch:1.1});
+function speak(text,rate){return numbersSpeech.speak(text,{rate:rate||0.88});}
 
 // ─── Init ───
 buildGrid();
 genCount();
 genFind();
 showAutoN(1);
+zoomTo(1);
+genCrossTen();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 }
 </script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

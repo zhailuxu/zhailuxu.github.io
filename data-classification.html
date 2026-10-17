@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>分类统计小调查｜慧陪学</title>
+<meta name="description" content="适合小学低年级的分类整理与数据收集练习，先分类，再记录数量并回答统计问题。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}button{font:inherit}
+:root{--ink:#435047;--muted:#718078;--accent:#58795d}
+body{min-height:100vh;padding:16px 12px 40px;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:linear-gradient(145deg,#e0f0dc,#eef3da 52%,#f6ead6)}
+.container{max-width:900px;margin:auto}.header{text-align:center;margin-bottom:14px}.header h1{font-size:clamp(1.75rem,5vw,2.45rem);letter-spacing:3px;color:#645747;text-shadow:2px 3px #ddd5c6}.header p{margin-top:6px;color:var(--muted);font-size:.9rem;line-height:1.6}
+.card{margin-bottom:14px;padding:16px;border:1px solid rgba(255,255,255,.72);border-radius:22px;background:rgba(249,252,246,.92);box-shadow:0 5px 22px rgba(54,79,57,.1)}
+.toolbar,.group,.actions,.options{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.group-label{font-size:.78rem;font-weight:800;color:#748174}.chip,.action,.option{border:2px solid #cad8c6;border-radius:14px;padding:8px 13px;background:#fff;color:#59675c;cursor:pointer;font-weight:800}.chip.on{border-color:var(--accent);background:var(--accent);color:#fff}.action{border:0;box-shadow:0 3px 9px rgba(0,0,0,.1)}.primary{background:linear-gradient(135deg,#739177,#527157);color:#fff}.secondary{background:#e2ecdD;color:#49654d}.muted{background:#e8e9e3;color:#626861}.action:disabled,.option:disabled{opacity:.48;cursor:default}.chip:focus-visible,.action:focus-visible,.item:focus-visible,.bin:focus-visible,.option:focus-visible{outline:4px solid rgba(21,101,192,.25);outline-offset:2px}
+.status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}.stat{padding:8px;border-radius:13px;background:#e1eddd;text-align:center;color:#6d796b;font-size:.74rem}.stat b{display:block;margin-top:2px;color:#5f5748;font-size:1.03rem}
+.rule{padding:12px 14px;border-radius:16px;background:#ebe8d7;text-align:center}.rule small{display:block;color:#77796f}.rule strong{display:block;margin-top:4px;color:#615847;font-size:1.08rem}.rule em{color:#397148;font-style:normal}
+.workbench{display:grid;grid-template-columns:minmax(220px,.85fr) minmax(300px,1.4fr);gap:14px;margin-top:14px}.panel{padding:13px;border-radius:18px;background:#edf4e9}.panel h2{margin-bottom:10px;color:#59685b;font-size:.9rem;text-align:center}.items{display:grid;grid-template-columns:repeat(4,minmax(48px,1fr));gap:8px}.item{min-height:72px;border:2px solid transparent;border-radius:14px;background:#fff;cursor:pointer;box-shadow:0 2px 7px rgba(48,69,51,.08)}.item.selected{border-color:#557fbc;background:#edf5ff}.item.sorted{opacity:.22;pointer-events:none}.visual{--c:#72a87a;display:block;width:30px;height:30px;margin:0 auto 5px;background:var(--c)}.circle{border-radius:50%}.square{border-radius:7px}.triangle{clip-path:polygon(50% 3%,98% 96%,2% 96%)}.diamond{transform:rotate(45deg) scale(.78);border-radius:5px}.item-label{display:block;color:#6d756e;font-size:.66rem}
+.bins{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:9px}.bin{min-height:94px;padding:10px;border:2px dashed #aebfa9;border-radius:16px;background:#fbfdf9;color:#56665a;cursor:pointer}.bin:hover{background:#f1f7ed}.bin-name{display:block;font-weight:900}.bin-count{display:block;margin-top:8px;color:#47704c;font-size:1.35rem}.bin-mark{display:block;margin-top:4px;min-height:17px;color:#748174;font-size:.75rem;letter-spacing:2px}
+.message{min-height:47px;margin-top:12px;padding:11px;border-radius:14px;background:#e3ede0;color:#5d6e60;text-align:center;line-height:1.55}.message.ok{background:#dcefdc;color:#27733b;font-weight:750}.message.bad{background:#f5e2dd;color:#a43b34;font-weight:750}
+.summary[hidden]{display:none}.summary h2{text-align:center;color:#5f5748;font-size:1.05rem}.data-table{width:100%;max-width:560px;margin:12px auto;border-collapse:separate;border-spacing:6px}.data-table th,.data-table td{padding:9px;border-radius:10px;background:#e7f0e3;text-align:center}.data-table th{color:#59675b;font-size:.8rem}.data-table td{color:#3e6845;font-size:1.15rem;font-weight:900}.question{text-align:center;margin:10px 0 12px;color:#5d574c;font-weight:850;line-height:1.6}.option{min-width:72px}.option.good{border-color:#6da875;background:#e0f0df;color:#26723b}.option.bad{border-color:#d78a80;background:#f7e6e2;color:#a43b34}.next-wrap{text-align:center;margin-top:12px}.back{display:block;margin-top:15px;text-align:center;color:#527156;text-decoration:none;font-size:.86rem}
+@media(max-width:650px){.workbench{grid-template-columns:1fr}.items{grid-template-columns:repeat(4,1fr)}.status-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:390px){.items{grid-template-columns:repeat(3,1fr)}.bins{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body data-sound-standard="speech">
+<main class="container">
+  <header class="header"><h1>🗂️ 分类统计小调查</h1><p>先找到分类标准，再整理、记录和比较数据。</p></header>
+  <section class="card">
+    <div class="toolbar">
+      <div class="group" id="modeGroup"><span class="group-label">模式</span><button class="chip on" data-mode="practice">自由练习</button><button class="chip" data-mode="challenge">5关挑战</button></div>
+      <div class="group" id="levelGroup"><span class="group-label">难度</span><button class="chip on" data-level="easy">低年级</button><button class="chip" data-level="medium">中年级</button><button class="chip" data-level="hard">高年级</button></div>
+      <button class="chip" id="speakToggle" type="button">🔊 声音解说 开</button>
+    </div>
+    <div class="status-row"><div class="stat">当前关卡<b id="roundText">自由练习</b></div><div class="stat">已分类<b id="sortedText">0 / 8</b></div><div class="stat">本轮误选<b id="mistakeText">0 次</b></div><div class="stat">连续完成<b id="streakText">0 轮</b></div></div>
+  </section>
+  <section class="card">
+    <div class="rule"><small>本轮分类标准</small><strong id="ruleText">请按<em>颜色</em>分类</strong></div>
+    <div class="workbench">
+      <div class="panel"><h2>① 先点一张卡片</h2><div class="items" id="items"></div></div>
+      <div class="panel"><h2>② 再点它应该进入的分类盒</h2><div class="bins" id="bins"></div></div>
+    </div>
+    <div class="message" id="message" aria-live="polite">观察卡片，选择一个，再放进正确的分类盒。</div>
+    <div class="actions" style="margin-top:12px"><button class="action secondary" id="readBinsBtn">🔊 朗读分类盒</button><button class="action secondary" id="hintBtn">提示当前卡片</button><button class="action muted" id="newBtn">换一组</button></div>
+  </section>
+  <section class="card summary" id="summary" hidden>
+    <h2>📋 数据整理表</h2><table class="data-table"><thead><tr id="tableHead"></tr></thead><tbody><tr id="tableValues"></tr></tbody></table>
+    <p class="question" id="question"></p><div class="options" id="options"></div>
+    <div class="next-wrap"><button class="action primary" id="nextBtn" hidden>下一组 →</button></div>
+  </section>
+  <a class="back" href="index.html">← 返回慧陪学</a>
+</main>
+<script src="hpx-core.js"></script>
+<script>
+(function(){'use strict';
+const CONFIG={easy:{categories:2,count:8},medium:{categories:3,count:12},hard:{categories:4,count:16}};
+const COLORS=[{key:'green',name:'绿色',hex:'#79a881'},{key:'blue',name:'蓝色',hex:'#759abd'},{key:'orange',name:'橙色',hex:'#d49a65'},{key:'purple',name:'紫色',hex:'#9c83b2'}];
+const SHAPES=[{key:'circle',name:'圆形'},{key:'square',name:'正方形'},{key:'triangle',name:'三角形'},{key:'diamond',name:'菱形'}];
+function shuffle(items,rng=Math.random){const out=items.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
+const DISTRIBUTIONS={easy:[[2,6],[3,5]],medium:[[2,4,6],[1,4,7],[2,3,7],[1,5,6]],hard:[[1,3,5,7],[1,2,5,8],[1,2,6,7],[2,3,4,7]]};
+function generateRound(level,rng=Math.random){const cfg=CONFIG[level],rule=rng()<.5?'color':'shape',source=rule==='color'?COLORS:SHAPES,categories=shuffle(source,rng).slice(0,cfg.categories),distribution=shuffle(DISTRIBUTIONS[level][Math.floor(rng()*DISTRIBUTIONS[level].length)],rng),items=[];categories.forEach((target,index)=>{for(let n=0;n<distribution[index];n++){const other=(rule==='color'?SHAPES:COLORS)[Math.floor(rng()*4)];items.push(rule==='color'?{id:items.length,color:target,shape:other}:{id:items.length,color:other,shape:target})}});return{level,rule,categories,items:shuffle(items,rng)}}
+function summarize(round){const counts=Object.fromEntries(round.categories.map(cat=>[cat.key,0]));round.items.forEach(item=>counts[item[round.rule].key]++);return counts}
+function categoryPositionSpeech(round){const names=round.categories.map(cat=>cat.name),rule=round.rule==='color'?'颜色':'形状';if(names.length===2)return`请按${rule}分类。左侧是${names[0]}，右侧是${names[1]}。`;if(names.length===3)return`请按${rule}分类。左侧是${names[0]}，中间是${names[1]}，右侧是${names[2]}。`;return`请按${rule}分类。分类盒从左到右依次是：${names.join('，')}。`}
+function questionSpeech(question){return`分类完成。${question.text}选择项：${question.options.map((value,index)=>`选项${index+1}，${value}`).join('；')}。`}
+function numberOptions(answer){const values=[answer,answer+1,Math.max(0,answer-1),answer+2];return [...new Set(values)].slice(0,3)}
+function createQuestion(round,counts,rng=Math.random){const cats=round.categories,total=round.items.length,typePool=round.level==='easy'?['count','most']:round.level==='medium'?['count','most','least','difference']:['count','most','least','difference','total'],type=typePool[Math.floor(rng()*typePool.length)];let text,answer,options;if(type==='total'){text='这次一共整理了多少张卡片？';answer=total;options=numberOptions(answer)}else if(type==='most'||type==='least'){const values=cats.map(cat=>counts[cat.key]),target=type==='most'?Math.max(...values):Math.min(...values),cat=cats[values.indexOf(target)],kind=round.rule==='color'?'颜色':'形状';text=`哪种${kind}的卡片${type==='most'?'最多':'最少'}？`;answer=cat.name;options=cats.map(x=>x.name)}else if(type==='difference'){const values=cats.map(cat=>counts[cat.key]);answer=Math.max(...values)-Math.min(...values);text='数量最多的一类比最少的一类多几张？';options=numberOptions(answer)}else{const cat=cats[Math.floor(rng()*cats.length)];text=`${cat.name}有多少张卡片？`;answer=counts[cat.key];options=numberOptions(answer)}return{text,answer,options:shuffle(options,rng)}}
+window.DataClassification={CONFIG,generateRound,summarize,createQuestion,categoryPositionSpeech,questionSpeech};
+if(typeof document==='undefined')return;
+const $=id=>document.getElementById(id),STORE='hpx-data-classification-v1',speech=window.Hpx&&Hpx.speech?Hpx.speech.create({buttonId:'speakToggle',rate:.88,pitch:1.05}):null;
+const say=text=>speech&&speech.speak(text);
+let state={mode:'practice',level:'easy',step:1,round:null,counts:{},sorted:new Set(),selected:null,mistakes:0,streak:0,question:null,answered:false};
+try{state.streak=Number(JSON.parse(localStorage.getItem(STORE)||'{}').streak)||0}catch(e){}
+function labelOf(item){return `${item.color.name}${item.shape.name}`}
+function visual(item){return `<span class="visual ${item.shape.key}" style="--c:${item.color.hex}"></span><span class="item-label">${labelOf(item)}</span>`}
+function setMessage(text,type=''){$('message').textContent=text;$('message').className='message'+(type?' '+type:'')}
+function setSelected(group,key,value){document.querySelectorAll(`#${group} [data-${key}]`).forEach(btn=>btn.classList.toggle('on',btn.dataset[key]===value))}
+function updateStatus(){$('roundText').textContent=state.mode==='challenge'?`${state.step} / 5`:'自由练习';$('sortedText').textContent=`${state.sorted.size} / ${state.round.items.length}`;$('mistakeText').textContent=`${state.mistakes} 次`;$('streakText').textContent=`${state.streak} 轮`}
+function renderRound(){const round=state.round;$('ruleText').innerHTML=`请按<em>${round.rule==='color'?'颜色':'形状'}</em>分类`;$('items').innerHTML=round.items.map(item=>`<button class="item" data-id="${item.id}" aria-label="${labelOf(item)}">${visual(item)}</button>`).join('');$('bins').innerHTML=round.categories.map(cat=>`<button class="bin" data-key="${cat.key}"><span class="bin-name">${cat.name}</span><span class="bin-count">0 张</span><span class="bin-mark"></span></button>`).join('');$('summary').hidden=true;$('nextBtn').hidden=true;setMessage('观察卡片，选择一个，再放进正确的分类盒。');updateStatus();say(categoryPositionSpeech(round))}
+function startRound(resetChallenge=false){if(resetChallenge)state.step=1;state.round=generateRound(state.level);state.counts=Object.fromEntries(state.round.categories.map(cat=>[cat.key,0]));state.sorted=new Set();state.selected=null;state.mistakes=0;state.question=null;state.answered=false;renderRound()}
+function selectItem(id){if(state.sorted.has(id))return;state.selected=id;document.querySelectorAll('.item').forEach(item=>item.classList.toggle('selected',Number(item.dataset.id)===id));setMessage('已选中卡片，现在点一个分类盒。')}
+function placeIn(key){if(state.selected===null){setMessage('请先点一张还没有分类的卡片。','bad');return}const item=state.round.items.find(x=>x.id===state.selected),correct=item[state.round.rule].key;if(key!==correct){state.mistakes++;setMessage(`再看看：${labelOf(item)}应该按本轮的“${state.round.rule==='color'?'颜色':'形状'}”来分。`,'bad');updateStatus();return}state.sorted.add(item.id);state.counts[key]++;const itemEl=document.querySelector(`.item[data-id="${item.id}"]`);itemEl.classList.remove('selected');itemEl.classList.add('sorted');const bin=document.querySelector(`.bin[data-key="${key}"]`);bin.querySelector('.bin-count').textContent=`${state.counts[key]} 张`;bin.querySelector('.bin-mark').textContent='●'.repeat(state.counts[key]);state.selected=null;setMessage('分类正确，继续整理下一张。','ok');updateStatus();if(state.sorted.size===state.round.items.length)showSummary()}
+function showSummary(){const cats=state.round.categories;$('tableHead').innerHTML=cats.map(cat=>`<th>${cat.name}</th>`).join('');$('tableValues').innerHTML=cats.map(cat=>`<td>${state.counts[cat.key]}</td>`).join('');state.question=createQuestion(state.round,state.counts);$('question').textContent=state.question.text;$('options').innerHTML=state.question.options.map(value=>`<button class="option" data-value="${value}">${value}</button>`).join('');$('summary').hidden=false;$('summary').scrollIntoView({behavior:'smooth',block:'nearest'});setMessage('分类完成！请根据整理表回答问题。','ok');say(questionSpeech(state.question))}
+function answer(value,button){if(state.answered)return;if(String(value)!==String(state.question.answer)){state.mistakes++;button.classList.add('bad');setMessage('答案还不对，再读一次统计表。','bad');updateStatus();return}state.answered=true;button.classList.add('good');document.querySelectorAll('.option').forEach(x=>x.disabled=true);state.streak++;try{localStorage.setItem(STORE,JSON.stringify({streak:state.streak}))}catch(e){};$('nextBtn').hidden=false;$('nextBtn').textContent=state.mode==='challenge'&&state.step===5?'再挑战一次 ↻':'下一组 →';setMessage(state.mode==='challenge'&&state.step===5?'5关完成！你已经会分类、记录和比较数据了。':'回答正确！分类结果已经读懂了。','ok');updateStatus()}
+function next(){if(state.mode==='challenge'){if(state.step===5){startRound(true);return}state.step++}startRound(false)}
+$('items').addEventListener('click',e=>{const button=e.target.closest('.item');if(button)selectItem(Number(button.dataset.id))});$('bins').addEventListener('click',e=>{const button=e.target.closest('.bin');if(button)placeIn(button.dataset.key)});$('options').addEventListener('click',e=>{const button=e.target.closest('.option');if(button)answer(button.dataset.value,button)});$('nextBtn').addEventListener('click',next);$('newBtn').addEventListener('click',()=>startRound(state.mode==='challenge'));$('readBinsBtn').addEventListener('click',()=>say(categoryPositionSpeech(state.round)));$('speakToggle').addEventListener('click',()=>speech&&speech.toggle());$('hintBtn').addEventListener('click',()=>{if(state.selected===null){setMessage('先选择一张卡片，我再提示它属于哪一类。');return}const item=state.round.items.find(x=>x.id===state.selected);setMessage(`提示：请放进“${item[state.round.rule].name}”分类盒。`,'ok')});
+$('modeGroup').addEventListener('click',e=>{if(!e.target.dataset.mode)return;state.mode=e.target.dataset.mode;setSelected('modeGroup','mode',state.mode);startRound(true)});$('levelGroup').addEventListener('click',e=>{if(!e.target.dataset.level)return;state.level=e.target.dataset.level;setSelected('levelGroup','level',state.level);startRound(true)});
+startRound(true);
+})();
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+const root=new URL('../',import.meta.url);
+const source=fs.readFileSync(new URL('hpx-ability-check.js',root),'utf8');
+const page=fs.readFileSync(new URL('ability-check.html',root),'utf8');
+const dailyPage=fs.readFileSync(new URL('daily-camp.html',root),'utf8');
+const dailySource=fs.readFileSync(new URL('hpx-daily-camp.js',root),'utf8');
+const progressSource=fs.readFileSync(new URL('hpx-game-progress.js',root),'utf8');
+const roadmap=fs.readFileSync(new URL('ROADMAP.md',root),'utf8');
+const sources=fs.readFileSync(new URL('CONTENT_SOURCES.md',root),'utf8');
+const storage=new Map();
+const context={globalThis:{localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)}},Date};
+vm.runInContext(source,vm.createContext(context),{filename:'hpx-ability-check.js'});
+const api=context.globalThis.HpxAbilityCheck;
+assert.ok(api,'能力小测API没有初始化');
+assert.equal(api.ABILITIES.length,6,'能力小测没有覆盖6个方向');
+assert.equal(new Set(Array.from(api.ABILITIES,item=>item.gameId)).size,6,'能力小测复用了重复游戏');
+assert.equal(api.levelForGrade('k'),'easy','幼儿园难度映射错误');
+assert.equal(api.levelForGrade('3-4'),'medium','三四年级难度映射错误');
+assert.equal(api.levelForGrade('5-6'),'hard','五六年级难度映射错误');
+
+const progress={games:{}};
+for(const ability of api.ABILITIES)progress.games[ability.gameId]={completed:2,mistakes:1,hints:0,totalMs:1000};
+let state=api.start('3-4',progress,100);
+assert.equal(state.status,'in_progress','小测没有进入进行中状态');
+assert.equal(state.items[0].baseline.completed,2,'小测没有保存开始前基线');
+state.items.forEach((item,index)=>{progress.games[item.gameId].completed++;progress.games[item.gameId].mistakes+=index;progress.games[item.gameId].hints+=index===5?1:0;progress.games[item.gameId].totalMs+=30000});
+state=api.sync(state,progress,200);
+assert.equal(state.status,'complete','6项完成后没有生成结果');
+assert.equal(Object.keys(state.result.abilities).length,6,'结果没有覆盖6个能力方向');
+assert.equal(state.result.focus[0],'observe','没有把误选和提示最多的方向列为重点');
+assert.equal(api.label(100),'表现突出','高段反馈文案错误');
+assert.equal(api.label(75),'稳定发展','中段反馈文案错误');
+assert.equal(api.label(50),'可以加强','低段反馈文案错误');
+
+assert.ok(page.includes('不是专业测评或诊断'),'页面缺少非诊断说明');
+assert.ok(page.includes('不提供儿童排名')||page.includes('不给孩子排名'),'页面缺少无排名说明');
+assert.ok(page.includes('from=ability-check&level='),'任务链接没有携带返回来源和难度');
+assert.ok(dailyPage.includes('id="abilityGate"'),'每日训练营缺少首次小测引导');
+assert.ok(dailyPage.includes('暂时跳过'),'每日训练营缺少跳过入口');
+assert.ok(dailySource.includes("hpxAbilityCheckV1"),'每日推荐没有读取小测结果');
+assert.ok(progressSource.includes("source==='ability-check'"),'游戏页缺少返回小测通道');
+assert.ok(progressSource.includes("params.get('level')"),'游戏页没有应用年级对应难度');
+assert.ok(roadmap.includes('**首次能力小测（第一版）**'),'路线图没有标记首次能力小测完成');
+assert.ok(sources.includes('`hpx-ability-check.js` / `ability-check.html` 首次能力小测'),'内容来源没有登记首次能力小测');
+console.log('首次能力小测检查通过：六能力、年级难度、完成汇总、三级反馈、训练推荐联动和本地隐私完整。');

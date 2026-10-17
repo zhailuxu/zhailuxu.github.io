@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语启蒙阅读 1A — 原创故事与练习</title>
+<meta name="description" content="8个原创英语启蒙故事，支持逐句跟读、整篇朗读、核心词学习和随机闯关练习。">
+<style>
+:root{--ink:#183153;--muted:#62748a;--blue:#2878d0;--blue2:#e8f3ff;--yellow:#ffd76a;--green:#2ca66f;--red:#dc4f64;--paper:#fff;--line:#d7e5f4;--bg:#f5faff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:linear-gradient(155deg,#f9fcff,#edf7ff 55%,#fff9e6);font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif}.wrap{width:min(980px,calc(100% - 24px));margin:auto;padding:22px 0 54px}.top{text-align:center;margin-bottom:18px}.top h1{margin:0;color:#175b9e;font:800 clamp(1.7rem,5vw,2.5rem)/1.15 Georgia,serif}.top p{margin:8px 0 0;color:var(--muted);font-size:.9rem}.nav,.tools,.mode-bar,.actions{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.nav{margin:18px 0}.tab,.btn,.lesson-btn,.mode-btn,.answer{font:700 .9rem/1.2 inherit;cursor:pointer}.tab,.btn,.mode-btn{border:2px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:9px 16px}.tab.active,.mode-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}.btn:focus-visible,.tab:focus-visible,.lesson-btn:focus-visible,.mode-btn:focus-visible,.answer:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}.panel{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 34px rgba(34,85,130,.1);padding:18px}.hidden{display:none!important}.lesson-list{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}.lesson-btn{min-height:66px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:8px}.lesson-btn span{display:block;font-size:1.35rem;margin-bottom:3px}.lesson-btn small{display:block;color:var(--muted);font-weight:600}.lesson-btn.active{border-color:var(--blue);background:var(--blue2)}.lesson-btn.done::after{content:" ✓";color:var(--green)}.story-head{text-align:center;padding:4px 0 13px}.story-icon{font-size:3.4rem}.story-head h2{font:800 1.65rem/1.2 Georgia,serif;margin:5px 0}.story-head p{color:var(--muted);margin:0}.tools{margin:0 0 14px}.sentences{display:grid;gap:9px}.sentence{position:relative;border:2px solid var(--line);border-radius:14px;padding:13px 48px 13px 14px;background:#fff;cursor:pointer}.sentence:hover,.sentence.playing{border-color:var(--blue);background:var(--blue2)}.sentence .en{font:700 1.08rem/1.45 Georgia,serif}.sentence .cn{margin-top:4px;color:var(--muted);font-size:.84rem}.sentence .speaker{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:1.2rem}.word-title{font-size:1rem;margin:20px 0 9px}.words{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.word{border:1px solid var(--line);border-radius:12px;text-align:center;padding:10px 5px;background:#fbfdff;cursor:pointer}.word strong{display:block;color:var(--blue);font-family:Georgia,serif}.word small{color:var(--muted)}.learn-foot{text-align:center;margin-top:18px}.mode-bar{margin-bottom:18px}.quiz-card{max-width:690px;margin:auto;text-align:center}.quiz-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;font-weight:700}.progress{height:7px;background:var(--blue2);border-radius:20px;overflow:hidden;margin:10px 0 24px}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .25s}.question-kind{color:var(--blue);font-size:.82rem;font-weight:800;letter-spacing:.08em}.question{min-height:75px;display:grid;place-items:center;margin:8px 0 16px;font:800 clamp(1.2rem,4vw,1.65rem)/1.45 Georgia,serif}.listen-button{font-size:1.05rem;padding:13px 22px}.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.answer{min-height:55px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:10px}.answer:hover{border-color:var(--blue);background:var(--blue2)}.answer.correct{border-color:var(--green);background:#e8f8ef;color:#17633f}.answer.wrong{border-color:var(--red);background:#fff0f2;color:#8d2334}.feedback{min-height:52px;margin:14px 0 2px;font-weight:800;line-height:1.5}.feedback.ok{color:var(--green)}.feedback.bad{color:var(--red)}.result{padding:22px 8px}.result .big{font-size:3.8rem}.result h2{font:800 1.7rem Georgia,serif}.note{margin:16px auto 0;max-width:760px;text-align:center;color:var(--muted);font-size:.78rem;line-height:1.6}.home-link{display:block;text-align:center;margin-top:18px;color:var(--blue);font-weight:700;text-decoration:none}@media(max-width:680px){.lesson-list{grid-template-columns:repeat(2,1fr)}.words{grid-template-columns:repeat(2,1fr)}.answers{grid-template-columns:1fr}.panel{padding:13px}.sentence .en{font-size:1rem}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <h1>English Reading 1A</h1>
+    <p>原创英语启蒙阅读 · 每天一课，先听、再读、最后练习</p>
+  </header>
+
+  <nav class="nav" aria-label="学习区域">
+    <button class="tab active" data-tab="learn" aria-selected="true" onclick="showTab('learn')">📖 故事学习</button>
+    <button class="tab" data-tab="practice" aria-selected="false" onclick="showTab('practice')">🎯 随机练习</button>
+    <button class="btn" id="speakToggle" aria-pressed="true" onclick="speech.toggle()">🔊 声音解说 开</button>
+  </nav>
+
+  <section class="panel" id="tab-learn">
+    <div class="lesson-list" id="lessonList"></div>
+    <article id="story"></article>
+  </section>
+
+  <section class="panel hidden" id="tab-practice">
+    <div class="mode-bar" aria-label="练习类型">
+      <button class="mode-btn active" data-mode="mix" onclick="setMode('mix')">混合练习</button>
+      <button class="mode-btn" data-mode="listen" onclick="setMode('listen')">听音选句</button>
+      <button class="mode-btn" data-mode="meaning" onclick="setMode('meaning')">单词意思</button>
+      <button class="mode-btn" data-mode="missing" onclick="setMode('missing')">句子补词</button>
+    </div>
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-meta"><span id="quizStep">准备开始</span><span id="quizScore">⭐ 0</span></div>
+      <div class="progress"><i id="quizProgress"></i></div>
+      <div id="questionArea">
+        <div class="question-kind">10 题小挑战</div>
+        <div class="question">题目来自本页的 8 个原创故事</div>
+        <button class="btn primary" onclick="startQuiz()">开始练习</button>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <button class="btn primary hidden" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+    </div>
+  </section>
+
+  <p class="note">本页故事、中文释义和练习均为本站原创，不对应或复刻任何指定教材。声音由当前浏览器即时合成。</p>
+  <a class="home-link" href="index.html">← 返回慧陪学</a>
+</main>
+
+<script src="hpx-core.js"></script>
+<script>
+// 2026-09-04：本站独立创作的初级英语故事、译文和练习数据。
+const LESSONS=[
+  {id:1,icon:'🌤️',title:'Morning Hello',theme:'早晨问候',sentences:[
+    ['Good morning, Sun!','太阳，早上好！'],
+    ['I see a red bird.','我看见一只红色的小鸟。'],
+    ['The bird sits by my window.','小鸟停在我的窗边。'],
+    ['We start the day together.','我们一起开始新的一天。']
+  ],words:[['morning','早晨'],['sun','太阳'],['bird','小鸟'],['window','窗户']]},
+  {id:2,icon:'🎒',title:'My Blue Bag',theme:'我的书包',sentences:[
+    ['This is my blue bag.','这是我的蓝色书包。'],
+    ['I put in one book.','我放进去一本书。'],
+    ['I put in two pens.','我放进去两支笔。'],
+    ['My bag is ready for school.','我的书包准备好去学校了。']
+  ],words:[['blue','蓝色的'],['bag','书包'],['book','书'],['pens','钢笔']]},
+  {id:3,icon:'🌱',title:'A Tiny Seed',theme:'小种子',sentences:[
+    ['I find a tiny seed.','我发现一颗小种子。'],
+    ['I put it in the soft ground.','我把它放进松软的土里。'],
+    ['Rain falls and the sun shines.','雨落下来，阳光照耀着。'],
+    ['A green leaf pops up.','一片绿叶冒了出来。']
+  ],words:[['tiny','很小的'],['seed','种子'],['rain','雨'],['leaf','叶子']]},
+  {id:4,icon:'🍎',title:'Snack for Two',theme:'分享点心',sentences:[
+    ['I have one round apple.','我有一个圆圆的苹果。'],
+    ['My friend has no snack.','我的朋友没有点心。'],
+    ['I cut the apple in two.','我把苹果切成两份。'],
+    ['We smile and eat together.','我们笑着一起吃。']
+  ],words:[['round','圆的'],['apple','苹果'],['friend','朋友'],['smile','微笑']]},
+  {id:5,icon:'🐈',title:'Where Is Dot?',theme:'寻找小猫',sentences:[
+    ['My cat Dot hides at home.','我的猫点点藏在家里。'],
+    ['Is she under the chair?','她在椅子下面吗？'],
+    ['No. Is she in the box?','不在。她在盒子里吗？'],
+    ['Yes! Two bright eyes look at me.','在！两只明亮的眼睛看着我。']
+  ],words:[['cat','猫'],['under','在下面'],['chair','椅子'],['box','盒子']]},
+  {id:6,icon:'🌧️',title:'Rain Boots',theme:'雨天散步',sentences:[
+    ['Rain taps on the door.','雨点轻敲着门。'],
+    ['I pull on my yellow boots.','我穿上黄色雨靴。'],
+    ['I jump over a little puddle.','我跳过一个小水洼。'],
+    ['Then I walk home very slowly.','然后我慢慢地走回家。']
+  ],words:[['rain','雨'],['yellow','黄色的'],['boots','靴子'],['slowly','慢慢地']]},
+  {id:7,icon:'🌙',title:'The Sleepy Moon',theme:'睡前时光',sentences:[
+    ['The moon looks into my room.','月亮望进我的房间。'],
+    ['I show it my paper star.','我给它看我的纸星星。'],
+    ['Good night, little moon.','晚安，小月亮。'],
+    ['My eyes close before its eyes do.','我比它先闭上眼睛。']
+  ],words:[['moon','月亮'],['room','房间'],['star','星星'],['night','夜晚']]},
+  {id:8,icon:'🥣',title:'We Make Soup',theme:'一起做汤',sentences:[
+    ['We wash one red tomato.','我们洗了一个红番茄。'],
+    ['We add peas and a small carrot.','我们加入豌豆和一根小胡萝卜。'],
+    ['Dad stirs the warm soup.','爸爸搅拌着热汤。'],
+    ['Four bowls wait on the table.','桌上摆着四只碗。']
+  ],words:[['wash','清洗'],['tomato','番茄'],['soup','汤'],['bowls','碗']]}
+];
+
+const speech=Hpx.speech.create({buttonId:'speakToggle',lang:'en-US',rate:.78,pitch:1.05,enabledMessage:'English reading is ready.'});
+let currentLesson=0;
+let mode='mix';
+let quiz=[];
+let quizIndex=0;
+let score=0;
+let answered=false;
+const completed=new Set(JSON.parse(localStorage.getItem('hpx_reader_1a_done')||'[]'));
+
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+function shuffled(items){return Hpx.random.shuffled(items);}
+
+function showTab(name){
+  ['learn','practice'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==name));
+  document.querySelectorAll('[data-tab]').forEach(button=>{const active=button.dataset.tab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
+  speech.stop();
+}
+
+function buildLessonList(){
+  document.getElementById('lessonList').innerHTML=LESSONS.map((lesson,index)=>`<button class="lesson-btn ${index===currentLesson?'active':''} ${completed.has(lesson.id)?'done':''}" onclick="openLesson(${index})"><span>${lesson.icon}</span>Lesson ${lesson.id}<small>${escapeHtml(lesson.title)}</small></button>`).join('');
+}
+
+function openLesson(index){currentLesson=index;speech.stop();buildLessonList();renderStory();}
+
+function renderStory(){
+  const lesson=LESSONS[currentLesson];
+  document.getElementById('story').innerHTML=`
+    <div class="story-head"><div class="story-icon">${lesson.icon}</div><h2>${escapeHtml(lesson.title)}</h2><p>Lesson ${lesson.id} · ${escapeHtml(lesson.theme)}</p></div>
+    <div class="tools"><button class="btn primary" onclick="readStory()">▶ 整篇朗读</button><button class="btn" onclick="speech.stop();clearPlaying()">■ 停止</button></div>
+    <div class="sentences">${lesson.sentences.map((item,index)=>`<div class="sentence" role="button" tabindex="0" onclick="readSentence(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();readSentence(${index})}"><div class="en">${escapeHtml(item[0])}</div><div class="cn">${escapeHtml(item[1])}</div><span class="speaker" aria-hidden="true">🔊</span></div>`).join('')}</div>
+    <h3 class="word-title">Core Words · 核心词</h3>
+    <div class="words">${lesson.words.map(item=>`<div class="word" role="button" tabindex="0" onclick="speech.speak('${escapeHtml(item[0])}')" onkeydown="if(event.key==='Enter'){speech.speak('${escapeHtml(item[0])}')}"><strong>${escapeHtml(item[0])}</strong><small>${escapeHtml(item[1])}</small></div>`).join('')}</div>
+    <div class="learn-foot"><button class="btn primary" onclick="finishLesson()">完成本课，去练习 ✓</button></div>`;
+}
+
+function clearPlaying(){document.querySelectorAll('.sentence.playing').forEach(el=>el.classList.remove('playing'));}
+async function readSentence(index){
+  clearPlaying();const elements=document.querySelectorAll('.sentence');if(elements[index])elements[index].classList.add('playing');
+  await speech.speak(LESSONS[currentLesson].sentences[index][0]);clearPlaying();
+}
+async function readStory(){
+  const items=LESSONS[currentLesson].sentences.map((item,index)=>({text:item[0],gapMs:300,index}));
+  await speech.sequence(items,{onItem:item=>{clearPlaying();const el=document.querySelectorAll('.sentence')[item.index];if(el)el.classList.add('playing');}});clearPlaying();
+}
+function finishLesson(){completed.add(LESSONS[currentLesson].id);localStorage.setItem('hpx_reader_1a_done',JSON.stringify([...completed]));buildLessonList();showTab('practice');startQuiz();}
+
+function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(button=>button.classList.toggle('active',button.dataset.mode===next));startQuiz();}
+function allSentences(){return LESSONS.flatMap(lesson=>lesson.sentences.map(item=>({en:item[0],cn:item[1],lesson:lesson.id})));}
+function allWords(){return LESSONS.flatMap(lesson=>lesson.words.map(item=>({word:item[0],cn:item[1],lesson:lesson.id})));}
+function alternatives(pool,answer,key){return shuffled([answer,...shuffled(pool.filter(item=>item[key]!==answer[key])).slice(0,3)]);}
+
+function makeQuestion(type){
+  const sentences=allSentences(),words=allWords();
+  if(type==='listen'){
+    const answer=shuffled(sentences)[0];return{type,prompt:'点击按钮听句子',speak:answer.en,answer:answer.en,choices:alternatives(sentences,answer,'en').map(item=>item.en)};
+  }
+  if(type==='meaning'){
+    const answer=shuffled(words)[0];return{type,prompt:`“${answer.word}” 是什么意思？`,speak:answer.word,answer:answer.cn,choices:alternatives(words,answer,'cn').map(item=>item.cn)};
+  }
+  const answer=shuffled(words)[0];
+  const source=sentences.find(item=>new RegExp(`\\b${answer.word.replace(/s$/,'')}s?\\b`,'i').test(item.en))||shuffled(sentences)[0];
+  const match=source.en.match(new RegExp(`\\b${answer.word.replace(/s$/,'')}s?\\b`,'i'));
+  const missing=match?match[0]:source.en.split(/\s+/).find(part=>part.replace(/[^a-z]/gi,'').length>3)||source.en.split(' ')[0];
+  const clean=missing.replace(/[^a-z]/gi,'').toLowerCase();
+  const candidates=words.filter(item=>item.word.toLowerCase()!==clean);
+  return{type,prompt:source.en.replace(new RegExp(`\\b${missing.replace(/[^a-z]/gi,'')}\\b`,'i'),'_____'),speak:source.en,answer:clean,choices:shuffled([clean,...shuffled(candidates).slice(0,3).map(item=>item.word)])};
+}
+
+function startQuiz(){
+  speech.stop();quizIndex=0;score=0;answered=false;
+  const types=mode==='mix'?['listen','meaning','missing']:Array(10).fill(mode);
+  quiz=Array.from({length:10},(_,index)=>makeQuestion(types[index%types.length]));
+  renderQuestion();
+}
+function kindName(type){return{listen:'听音选句',meaning:'单词意思',missing:'句子补词'}[type];}
+function renderQuestion(){
+  answered=false;const question=quiz[quizIndex];
+  document.getElementById('quizStep').textContent=`第 ${quizIndex+1} / ${quiz.length} 题`;
+  document.getElementById('quizScore').textContent=`⭐ ${score}`;
+  document.getElementById('quizProgress').style.width=`${quizIndex/quiz.length*100}%`;
+  document.getElementById('feedback').textContent='';document.getElementById('feedback').className='feedback';document.getElementById('nextBtn').classList.add('hidden');
+  const prompt=question.type==='listen'?`<button class="btn primary listen-button" onclick="speech.speak(quiz[quizIndex].speak)">🔊 听一听</button>`:escapeHtml(question.prompt);
+  document.getElementById('questionArea').innerHTML=`<div class="question-kind">${kindName(question.type)}</div><div class="question">${prompt}</div>`;
+  document.getElementById('answers').innerHTML=question.choices.map(choice=>`<button class="answer" onclick="checkAnswer(this,'${escapeHtml(choice)}')">${escapeHtml(choice)}</button>`).join('');
+  if(question.type==='listen')setTimeout(()=>speech.speak(question.speak),180);
+}
+function checkAnswer(button,choice){
+  if(answered)return;answered=true;const question=quiz[quizIndex],ok=choice===question.answer;
+  if(ok){score++;button.classList.add('correct');document.getElementById('feedback').textContent='答对了！Great job!';document.getElementById('feedback').classList.add('ok');speech.speak('Great job!');}
+  else{button.classList.add('wrong');document.querySelectorAll('.answer').forEach(el=>{if(el.textContent===question.answer)el.classList.add('correct');});document.getElementById('feedback').textContent=`再听一遍，正确答案是：${question.answer}`;document.getElementById('feedback').classList.add('bad');speech.speak(question.speak);}
+  document.getElementById('quizScore').textContent=`⭐ ${score}`;document.getElementById('nextBtn').classList.remove('hidden');
+}
+function nextQuestion(){quizIndex++;if(quizIndex>=quiz.length)return showResult();renderQuestion();}
+function showResult(){
+  document.getElementById('quizProgress').style.width='100%';document.getElementById('answers').innerHTML='';document.getElementById('feedback').textContent='';document.getElementById('nextBtn').classList.add('hidden');
+  const message=score>=9?'Amazing! 太棒了！':score>=7?'Great work! 做得很好！':'Good try! 再读一课试试看！';
+  document.getElementById('questionArea').innerHTML=`<div class="result"><div class="big">${score>=7?'🏆':'🌱'}</div><h2>${message}</h2><p>本次得分：${score} / ${quiz.length}</p><button class="btn primary" onclick="startQuiz()">再练一次</button> <button class="btn" onclick="showTab('learn')">返回故事</button></div>`;
+  speech.speak(message);
+}
+
+buildLessonList();renderStory();
+try {
+  const params=new URLSearchParams(window.location.search);
+  const requestedLesson=Number(params.get('lesson'));
+  if(Number.isInteger(requestedLesson)&&requestedLesson>=1&&requestedLesson<=LESSONS.length)openLesson(requestedLesson-1);
+  if(params.get('tab')==='practice'){
+    showTab('practice');
+    const requestedMode=params.get('mode');
+    if(['mix','listen','meaning','missing'].includes(requestedMode))mode=requestedMode;
+    setMode(mode);
+  }
+} catch(error) {}
+</script>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>因数与倍数</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#eceff1 0%,#e8eaf6 50%,#e0f7fa 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.9rem;color:#263238;letter-spacing:2px;text-shadow:2px 3px 0 #b0bec5;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.88rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.ctrl-row{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.ctrl-row label{font-size:.9rem;color:#555;font-weight:bold;}
+.num-input{font-size:1.1rem;width:80px;border:2px solid #b0bec5;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.num-input:focus{border-color:#455a64;}
+.mode-btn{padding:7px 16px;border:2px solid #b0bec5;border-radius:14px;background:#fff;color:#455a64;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.mode-btn.on{background:#455a64;color:#fff;border-color:#455a64;}
+.grid100{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:400px;margin:0 auto 14px;}
+.gcell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:bold;border-radius:5px;background:#f5f5f5;color:#bbb;transition:all .25s;}
+.gcell.hl-a{background:#bbdefb;color:#0d47a1;}
+.gcell.hl-b{background:#ffcdd2;color:#b71c1c;}
+.gcell.hl-both{background:#ce93d8;color:#4a148c;}
+.gcell.hl-single{background:#a5d6a7;color:#1b5e20;}
+.gcell.prime{background:#a5d6a7;color:#1b5e20;}
+.gcell.composite{background:#eceff1;color:#b0bec5;text-decoration:line-through;}
+.gcell.current{background:#ffe082;color:#e65100;box-shadow:0 0 0 2px #fb8c00;}
+.result-box{background:#eceff1;border-radius:12px;padding:12px 16px;text-align:center;font-size:.95rem;color:#455a64;line-height:1.8;}
+.result-box b{color:#c62828;}
+.legend-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:.78rem;color:#777;margin-bottom:10px;}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+.sieve-btn{display:block;margin:0 auto 14px;padding:9px 24px;border:none;border-radius:14px;background:#455a64;color:#fff;font-size:.95rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#eceff1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#455a64;}
+.quiz-q{font-size:1.15rem;color:#333;margin-bottom:12px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:100px;border:2px solid #b0bec5;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#455a64;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#455a64;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;margin:0 auto;}
+.choice-btn{padding:12px 10px;border:2px solid #b0bec5;border-radius:12px;background:#fff;color:#455a64;font-size:1.05rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#eceff1;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#455a64;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#455a64">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🔍</div>
+    <h1>因数与倍数</h1>
+    <p>点亮数字格子，看看因数、倍数和质数长什么样</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('single')">🔢 因数与倍数</button>
+    <button class="tab-btn" onclick="switchTab('common')">🤝 公因数与公倍数</button>
+    <button class="tab-btn" onclick="switchTab('sieve')">🧹 质数筛</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 因数与倍数 -->
+  <div id="tab-single">
+    <div class="card">
+      <div class="ctrl-row">
+        <label>数字 N：</label><input type="number" id="singleN" class="num-input" value="12" min="1" max="100" oninput="renderSingle()">
+        <button class="mode-btn on" id="modeFactorBtn" onclick="setSingleMode('factor')">找因数</button>
+        <button class="mode-btn" id="modeMultipleBtn" onclick="setSingleMode('multiple')">找倍数</button>
+      </div>
+      <div class="grid100" id="singleGrid"></div>
+      <div class="result-box" id="singleResult"></div>
+    </div>
+  </div>
+
+  <!-- 公因数与公倍数 -->
+  <div id="tab-common" style="display:none;">
+    <div class="card">
+      <div class="ctrl-row">
+        <label>A：</label><input type="number" id="commonA" class="num-input" value="12" min="1" max="100" oninput="renderCommon()">
+        <label>B：</label><input type="number" id="commonB" class="num-input" value="18" min="1" max="100" oninput="renderCommon()">
+      </div>
+      <div class="ctrl-row">
+        <button class="mode-btn on" id="cModeFactorBtn" onclick="setCommonMode('factor')">公因数</button>
+        <button class="mode-btn" id="cModeMultipleBtn" onclick="setCommonMode('multiple')">公倍数</button>
+      </div>
+      <div class="legend-row">
+        <span><span class="legend-dot" style="background:#bbdefb;"></span>只属于A</span>
+        <span><span class="legend-dot" style="background:#ffcdd2;"></span>只属于B</span>
+        <span><span class="legend-dot" style="background:#ce93d8;"></span>A和B共有</span>
+      </div>
+      <div class="grid100" id="commonGrid"></div>
+      <div class="result-box" id="commonResult"></div>
+    </div>
+  </div>
+
+  <!-- 质数筛 -->
+  <div id="tab-sieve" style="display:none;">
+    <div class="card">
+      <div class="legend-row">
+        <span><span class="legend-dot" style="background:#ffe082;"></span>正在筛选</span>
+        <span><span class="legend-dot" style="background:#eceff1;"></span>合数（被划掉）</span>
+        <span><span class="legend-dot" style="background:#a5d6a7;"></span>质数</span>
+      </div>
+      <button class="sieve-btn" onclick="startSieve()">▶ 开始筛选（埃拉托斯特尼筛法）</button>
+      <div class="grid100" id="sieveGrid"></div>
+      <div class="result-box" id="sieveResult">1～100 之间，哪些是质数？点击上面的按钮开始筛选吧！</div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
+function lcm(a,b){return a*b/gcd(a,b);}
+function isPrime(n){if(n<2)return false;for(let i=2;i*i<=n;i++){if(n%i===0)return false;}return true;}
+function divisors(n){const r=[];for(let i=1;i<=n;i++) if(n%i===0) r.push(i);return r;}
+
+function buildGridCells(containerId){
+  const el=document.getElementById(containerId);
+  el.innerHTML='';
+  for(let n=1;n<=100;n++){
+    const c=document.createElement('div');
+    c.className='gcell'; c.id=containerId+'-'+n; c.textContent=n;
+    el.appendChild(c);
+  }
+}
+buildGridCells('singleGrid'); buildGridCells('commonGrid'); buildGridCells('sieveGrid');
+
+// ── 因数与倍数 ──
+let singleMode='factor';
+function setSingleMode(m){
+  singleMode=m;
+  document.getElementById('modeFactorBtn').classList.toggle('on',m==='factor');
+  document.getElementById('modeMultipleBtn').classList.toggle('on',m==='multiple');
+  renderSingle();
+}
+function renderSingle(){
+  const N=Math.max(1,Math.min(100,parseInt(document.getElementById('singleN').value)||1));
+  for(let n=1;n<=100;n++){
+    const c=document.getElementById('singleGrid-'+n);
+    c.className='gcell';
+    const hit = singleMode==='factor' ? (N%n===0) : (n%N===0);
+    if(hit) c.classList.add('hl-single');
+  }
+  if(singleMode==='factor'){
+    const list=divisors(N);
+    document.getElementById('singleResult').innerHTML=`${N} 的因数有 ${list.length} 个：<b>${list.join('、')}</b>`;
+    speak(N+'的因数一共有'+list.length+'个。');
+  } else {
+    const list=[]; for(let m=N;m<=100;m+=N) list.push(m);
+    document.getElementById('singleResult').innerHTML=`${N} 的倍数（100以内）有：<b>${list.join('、')}</b>（倍数的个数是无限的哦）`;
+    speak(N+'的倍数有无限多个，这里只列出100以内的。');
+  }
+}
+
+// ── 公因数与公倍数 ──
+let commonMode='factor';
+function setCommonMode(m){
+  commonMode=m;
+  document.getElementById('cModeFactorBtn').classList.toggle('on',m==='factor');
+  document.getElementById('cModeMultipleBtn').classList.toggle('on',m==='multiple');
+  renderCommon();
+}
+function renderCommon(){
+  const A=Math.max(1,Math.min(100,parseInt(document.getElementById('commonA').value)||1));
+  const B=Math.max(1,Math.min(100,parseInt(document.getElementById('commonB').value)||1));
+  for(let n=1;n<=100;n++){
+    const c=document.getElementById('commonGrid-'+n);
+    c.className='gcell';
+    const inA = commonMode==='factor' ? (A%n===0) : (n%A===0 && n>0);
+    const inB = commonMode==='factor' ? (B%n===0) : (n%B===0 && n>0);
+    if(inA&&inB) c.classList.add('hl-both');
+    else if(inA) c.classList.add('hl-a');
+    else if(inB) c.classList.add('hl-b');
+  }
+  if(commonMode==='factor'){
+    const g=gcd(A,B);
+    document.getElementById('commonResult').innerHTML=`${A} 和 ${B} 的最大公因数（紫色格子中最大的数）是 <b>${g}</b>`;
+    speak(A+'和'+B+'的最大公因数是'+g+'。');
+  } else {
+    const l=lcm(A,B);
+    const note = l<=100 ? `最小公倍数（紫色格子中最小的数）是 <b>${l}</b>` : `最小公倍数是 <b>${l}</b>（超过100，格子里看不到啦）`;
+    document.getElementById('commonResult').innerHTML=`${A} 和 ${B} 的${note}`;
+    speak(A+'和'+B+'的最小公倍数是'+l+'。');
+  }
+}
+
+// ── 质数筛 ──
+let sieveTimer=null;
+function renderSieveGrid(marked,curP,done){
+  const c1=document.getElementById('sieveGrid-1'); c1.className='gcell'; c1.style.background='#e0e0e0'; c1.style.color='#999';
+  for(let n=2;n<=100;n++){
+    const c=document.getElementById('sieveGrid-'+n);
+    c.className='gcell';
+    if(marked[n]) c.classList.add('composite');
+    else if(n===curP) c.classList.add('current');
+    else if(done) c.classList.add('prime');
+  }
+}
+function startSieve(){
+  if(sieveTimer) clearInterval(sieveTimer);
+  const marked=new Array(101).fill(false);
+  renderSieveGrid(marked,null,false);
+  document.getElementById('sieveResult').textContent='开始筛选……';
+  let p=2;
+  sieveTimer=setInterval(()=>{
+    if(p>10){
+      clearInterval(sieveTimer);
+      renderSieveGrid(marked,null,true);
+      const primes=[]; for(let n=2;n<=100;n++) if(!marked[n]) primes.push(n);
+      document.getElementById('sieveResult').innerHTML=`✅ 筛选完成！1～100 之间共有 <b>${primes.length}</b> 个质数：${primes.join('、')}`;
+      speak('筛选完成！剩下的绿色数字都是质数。');
+      return;
+    }
+    if(!marked[p]){
+      renderSieveGrid(marked,p,false);
+      document.getElementById('sieveResult').innerHTML=`👉 <b>${p}</b> 没有被划掉，它是质数！现在划掉它的所有倍数……`;
+      speak(p+'是质数，划掉它的倍数。');
+      for(let m=p*2;m<=100;m+=p) marked[m]=true;
+    }
+    p++;
+  },900);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=null, qType='', qDone=false;
+function attachNumAutoCheck(){
+  const inp=document.getElementById('quizInput');
+  inp.addEventListener('input',()=>{ if(inp.value.length>0 && inp.value.length>=String(qAns).length) checkNum(); });
+  inp.addEventListener('blur',()=>{ if(inp.value.length>0) checkNum(); });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkNum(); });
+}
+function nextQ(){
+  qDone=false;
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const types=['count','gcd','lcm','prime'];
+  qType=types[randInt(0,3)];
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  if(qType==='count'){
+    const N=randInt(6,60);
+    qAns=divisors(N).length;
+    document.getElementById('quizQ').textContent=`${N} 的因数一共有多少个？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck();
+    speak(N+'的因数一共有多少个？');
+  } else if(qType==='gcd'){
+    const A=randInt(4,60), B=randInt(4,60);
+    qAns=gcd(A,B);
+    document.getElementById('quizQ').textContent=`${A} 和 ${B} 的最大公因数是多少？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck();
+    speak(A+'和'+B+'的最大公因数是多少？');
+  } else if(qType==='lcm'){
+    const A=randInt(2,20), B=randInt(2,20);
+    qAns=lcm(A,B);
+    document.getElementById('quizQ').textContent=`${A} 和 ${B} 的最小公倍数是多少？`;
+    area.innerHTML=`<input type="number" id="quizInput" class="quiz-input" placeholder="?">`;
+    attachNumAutoCheck();
+    speak(A+'和'+B+'的最小公倍数是多少？');
+  } else {
+    const prime=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97][randInt(0,24)];
+    const composites=new Set();
+    while(composites.size<3){const c=randInt(4,99); if(!isPrime(c)) composites.add(c);}
+    const opts=shuffleArr([prime,...composites]);
+    qAns=prime;
+    document.getElementById('quizQ').textContent='下面哪个数是质数？';
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkChoice(b,o);
+      area.appendChild(b);
+    });
+    speak('下面哪个数是质数？');
+  }
+}
+function shuffleArr(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function checkNum(){
+  if(qDone) return;
+  const v=parseInt(document.getElementById('quizInput').value);
+  if(isNaN(v)) return;
+  qDone=true;
+  document.getElementById('quizInput').disabled=true;
+  markResult(v===qAns, qAns);
+}
+function checkChoice(btn,val){
+  if(qDone) return;
+  qDone=true;
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(parseInt(b.textContent)===qAns) b.classList.add('correct');});
+  if(val!==qAns) btn.classList.add('wrong');
+  markResult(val===qAns, qAns);
+}
+function markResult(correct,ans){
+  if(correct){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+ans;
+    speak('答案是'+ans+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['single','common','sieve','quiz']);
+  if(t==='single'){renderSingle();speak('因数与倍数：输入一个数字，看看它的因数或倍数在哪里。');}
+  if(t==='common'){renderCommon();speak('公因数与公倍数：输入两个数，看看它们共同的因数或倍数。');}
+  if(t==='sieve') speak('质数筛：点击开始，看看质数是怎么被筛选出来的。');
+  if(t==='quiz') nextQ();
+}
+renderSingle();
+speak('欢迎来到因数与倍数！点亮数字格子，探索数字之间的秘密。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

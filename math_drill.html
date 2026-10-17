@@ -396,7 +396,16 @@
   .ineq-item { background: #ede7f6 !important; flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
   .ineq-expr { color: #6a1b9a; font-size: 1.1rem; font-weight: 700; white-space: nowrap; }
   .ineq-ask  { color: #555; font-size: 0.95rem; }
+  /* 数的组成 */
+  .comp-item { background: #fff8e1 !important; }
+  .comp-unit { color: #555; font-size: 0.9rem; margin: 0 2px; white-space: nowrap; }
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4a148c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
 
@@ -591,6 +600,51 @@
   <div class="calc-grid" id="ineq-grid"></div>
 </div>
 
+<!-- 第十二关 -->
+<div class="section">
+  <div class="section-title">🔢 第十二关 · 数的组成</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-comp" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6" selected>6题</option>
+      <option value="8">8题</option>
+      <option value="10">10题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="comp-grid"></div>
+</div>
+
+<!-- 第十三关 -->
+<div class="section">
+  <div class="section-title">🔗 第十三关 · 连加连减</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-cons" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6" selected>6题</option>
+      <option value="8">8题</option>
+      <option value="10">10题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="cons-grid"></div>
+</div>
+
+<!-- 第十四关 -->
+<div class="section">
+  <div class="section-title">🔀 第十四关 · 加减混合</div>
+  <div class="count-row">
+    出题数量：
+    <select id="sel-mix" class="count-select" onchange="generate()">
+      <option value="4">4题</option>
+      <option value="6" selected>6题</option>
+      <option value="8">8题</option>
+      <option value="10">10题</option>
+    </select>
+  </div>
+  <div class="calc-grid" id="mix-grid"></div>
+</div>
+
 <!-- 结果弹窗 -->
 <div class="result-overlay" id="result-overlay" onclick="this.classList.remove('show')">
   <div class="result-box" onclick="event.stopPropagation()">
@@ -635,6 +689,7 @@ let clockProblems = [];
 let rmbProblems = [];
 let decompProblems = [];
 let ineqProblems = [];
+let compProblems = [], consProblems = [], mixProblems = [];
 
 // 看图题场景库
 const picScenes = [
@@ -731,6 +786,7 @@ function generate() {
   rmbProblems = [];
   decompProblems = [];
   ineqProblems = [];
+  compProblems = []; consProblems = []; mixProblems = [];
   document.getElementById('score-bar').textContent = '';
 
   // 清除所有输入框和运算符下拉框的状态
@@ -859,10 +915,12 @@ function generate() {
   genRmb();
   genDecomp();
   genIneq();
+  genComp(); genCons(); genMix();
   renderClock();
   renderRmb();
   renderDecomp();
   renderIneq();
+  renderComp(); renderCons(); renderMix();
   resetTimer();
 }
 
@@ -1261,6 +1319,140 @@ function renderIneq() {
   });
 }
 
+// ─── 第十二关：数的组成 ───────────────────────────────────
+function genComp() {
+  compProblems = [];
+  const n = parseInt(document.getElementById('sel-comp').value);
+  const seen = new Set();
+  let attempts = 0;
+  while (compProblems.length < n && attempts < n * 100) {
+    attempts++;
+    const tens = rand(1, 9);
+    const ones = rand(0, 9);
+    const num = tens * 10 + ones;
+    if (num < 11 || seen.has(num)) continue;
+    seen.add(num);
+    compProblems.push({ id: `comp_${compProblems.length}`, num, tens, ones, points: 2 });
+  }
+}
+
+function renderComp() {
+  const grid = document.getElementById('comp-grid');
+  grid.innerHTML = '';
+  compProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item comp-item';
+    div.innerHTML = `
+      <span class="num">${p.num}</span>
+      <span style="color:#9e9e9e">＝</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}_shi" placeholder="□" data-maxlen="1" style="width:42px">
+      <span class="comp-unit">个十</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}_ge" placeholder="□" data-maxlen="1" style="width:42px">
+      <span class="comp-unit">个一</span>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ─── 第十三关：连加连减 ───────────────────────────────────
+function genCons() {
+  consProblems = [];
+  const n = parseInt(document.getElementById('sel-cons').value);
+  const half = Math.floor(n / 2);
+  const targets = [...Array(half).fill('add'), ...Array(n - half).fill('sub')];
+  shuffle(targets);
+  const seen = new Set();
+  for (let i = 0; i < targets.length; i++) {
+    const type = targets[i];
+    for (let t = 0; t < 300; t++) {
+      let a, b, c, ans;
+      if (type === 'add') {
+        a = rand(1, 8); b = rand(1, 8); c = rand(1, 8);
+        ans = a + b + c;
+        if (ans > 20) continue;
+      } else {
+        a = rand(10, 20); b = rand(1, 5); c = rand(1, 5);
+        ans = a - b - c;
+        if (ans < 1) continue;
+      }
+      const key = `${a}${type}${b}${type}${c}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const op = type === 'add' ? '＋' : '－';
+      consProblems.push({ id: `cons_${consProblems.length}`, a, b, c, op, ans, points: 3 });
+      break;
+    }
+  }
+}
+
+function renderCons() {
+  const grid = document.getElementById('cons-grid');
+  grid.innerHTML = '';
+  consProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    div.innerHTML = `
+      <span class="num">${p.a}</span><span class="op">${p.op}</span>
+      <span class="num">${p.b}</span><span class="op">${p.op}</span>
+      <span class="num">${p.c}</span><span class="op">＝</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}" placeholder="?" data-maxlen="${digitLen(p.ans)}">
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ─── 第十四关：加减混合 ───────────────────────────────────
+function genMix() {
+  mixProblems = [];
+  const n = parseInt(document.getElementById('sel-mix').value);
+  const half = Math.floor(n / 2);
+  const targets = [...Array(half).fill('add_sub'), ...Array(n - half).fill('sub_add')];
+  shuffle(targets);
+  const seen = new Set();
+  for (let i = 0; i < targets.length; i++) {
+    const type = targets[i];
+    for (let t = 0; t < 300; t++) {
+      let a, b, c, ans;
+      if (type === 'add_sub') {
+        a = rand(2, 12); b = rand(2, 10); c = rand(1, a + b - 1);
+        ans = a + b - c;
+        if (ans < 1 || ans > 20) continue;
+      } else {
+        a = rand(8, 18); b = rand(2, 8); c = rand(1, 8);
+        ans = a - b + c;
+        if (ans < 1 || ans > 20 || a - b < 1) continue;
+      }
+      const key = type === 'add_sub' ? `${a}+${b}-${c}` : `${a}-${b}+${c}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const op1 = type === 'add_sub' ? '＋' : '－';
+      const op2 = type === 'add_sub' ? '－' : '＋';
+      mixProblems.push({ id: `mix_${mixProblems.length}`, a, b, c, op1, op2, ans, points: 3 });
+      break;
+    }
+  }
+}
+
+function renderMix() {
+  const grid = document.getElementById('mix-grid');
+  grid.innerHTML = '';
+  mixProblems.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'calc-item';
+    div.innerHTML = `
+      <span class="num">${p.a}</span><span class="op">${p.op1}</span>
+      <span class="num">${p.b}</span><span class="op">${p.op2}</span>
+      <span class="num">${p.c}</span><span class="op">＝</span>
+      <input class="answer-input" type="number" inputmode="numeric"
+             id="inp_${p.id}" placeholder="?" data-maxlen="${digitLen(p.ans)}">
+    `;
+    grid.appendChild(div);
+  });
+}
+
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1542,13 +1734,46 @@ function checkAll() {
     }
   });
 
+  // 数的组成（十位 + 个位 两格都对得分）
+  compProblems.forEach(p => {
+    total += p.points;
+    const shiInp = document.getElementById(`inp_${p.id}_shi`);
+    const geInp  = document.getElementById(`inp_${p.id}_ge`);
+    if (!shiInp || !geInp) return;
+    [shiInp, geInp].forEach(el => el.classList.remove('correct', 'wrong'));
+    const vShi = parseInt(shiInp.value), vGe = parseInt(geInp.value);
+    if (!isNaN(vShi) && !isNaN(vGe) && vShi === p.tens && vGe === p.ones) {
+      shiInp.classList.add('correct'); geInp.classList.add('correct'); got += p.points;
+    } else if (shiInp.value !== '' && geInp.value !== '') {
+      shiInp.classList.add('wrong'); geInp.classList.add('wrong');
+    }
+  });
+
+  // 连加连减 + 加减混合
+  [...consProblems, ...mixProblems].forEach(p => {
+    total += p.points;
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.classList.remove('correct', 'wrong');
+    const val = parseInt(inp.value);
+    if (!isNaN(val) && val === p.ans) {
+      inp.classList.add('correct'); got += p.points;
+    } else if (inp.value !== '') {
+      inp.classList.add('wrong');
+    }
+  });
+
   // 计算已答题数（以答案框是否填写为准）
-  const allForCount = [...problems, ...picProblems, ...wordProblems, ...blankProblems, ...cmpProblems, ...seqProblems, ...clockProblems, ...rmbProblems, ...decompProblems, ...ineqProblems];
+  const allForCount = [...problems, ...picProblems, ...wordProblems, ...blankProblems, ...cmpProblems, ...seqProblems, ...clockProblems, ...rmbProblems, ...decompProblems, ...ineqProblems, ...consProblems, ...mixProblems];
+  const compFilled = compProblems.filter(p => {
+    const el = document.getElementById(`inp_${p.id}_shi`);
+    return el && el.value !== '';
+  }).length;
   const filled = allForCount.filter(p => {
     const inp = document.getElementById(`inp_${p.id}`);
     return inp && inp.value !== '';
-  }).length;
-  const totalCount = problems.length + picProblems.length + wordProblems.length + blankProblems.length + cmpProblems.length + seqProblems.length + clockProblems.length + rmbProblems.length + decompProblems.length + ineqProblems.length;
+  }).length + compFilled;
+  const totalCount = problems.length + picProblems.length + wordProblems.length + blankProblems.length + cmpProblems.length + seqProblems.length + clockProblems.length + rmbProblems.length + decompProblems.length + ineqProblems.length + compProblems.length + consProblems.length + mixProblems.length;
 
   const pct = Math.round(got / total * 100);
   document.getElementById('score-bar').innerHTML =
@@ -1671,6 +1896,26 @@ function showAnswers() {
     inp.classList.add('correct');
     inp.disabled = true;
   });
+  // 数的组成
+  compProblems.forEach(p => {
+    [{ id: `inp_${p.id}_shi`, val: p.tens }, { id: `inp_${p.id}_ge`, val: p.ones }].forEach(({ id, val }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = val;
+      el.classList.remove('correct','wrong');
+      el.classList.add('correct');
+      el.disabled = true;
+    });
+  });
+  // 连加连减 + 加减混合
+  [...consProblems, ...mixProblems].forEach(p => {
+    const inp = document.getElementById(`inp_${p.id}`);
+    if (!inp) return;
+    inp.value = p.ans;
+    inp.classList.remove('correct','wrong');
+    inp.classList.add('correct');
+    inp.disabled = true;
+  });
   document.getElementById('score-bar').innerHTML = '已显示答案，点「换一套题」重新练习！';
 }
 
@@ -1757,5 +2002,16 @@ document.addEventListener('keydown', e => {
 // ─── 初始化 ───────────────────────────────────────────
 generate();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
 </body>
 </html>

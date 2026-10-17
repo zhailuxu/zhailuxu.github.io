@@ -1,0 +1,14 @@
+(function(global){
+  'use strict';
+  var DENOMS=[{fen:1,label:'1分',kind:'coin'},{fen:5,label:'5分',kind:'coin'},{fen:10,label:'1角',kind:'coin'},{fen:50,label:'5角',kind:'coin'},{fen:100,label:'1元',kind:'coin'},{fen:500,label:'5元',kind:'note'},{fen:1000,label:'10元',kind:'note'},{fen:2000,label:'20元',kind:'note'},{fen:5000,label:'50元',kind:'note'}];
+  var ITEMS=[{name:'铅笔',icon:'✏️'},{name:'练习本',icon:'📒'},{name:'橡皮',icon:'▰'},{name:'尺子',icon:'📏'},{name:'彩纸',icon:'🟨'},{name:'收纳袋',icon:'👝'},{name:'书签',icon:'🔖'},{name:'小卡片',icon:'▣'}];
+  function randomInt(min,max,rng){rng=rng||Math.random;return min+Math.floor(rng()*(max-min+1))}
+  function shuffled(list,rng){rng=rng||Math.random;var out=list.slice();for(var i=out.length-1;i>0;i--){var j=Math.floor(rng()*(i+1)),temp=out[i];out[i]=out[j];out[j]=temp}return out}
+  function format(fen){fen=Math.round(Number(fen)||0);var yuan=Math.floor(fen/100),jiao=Math.floor(fen%100/10),cent=fen%10,parts=[];if(yuan)parts.push(yuan+'元');if(jiao)parts.push(jiao+'角');if(cent)parts.push(cent+'分');return parts.join('')||'0元'}
+  function decompose(fen){var result=[];DENOMS.slice().reverse().forEach(function(denom){while(fen>=denom.fen){result.push(denom);fen-=denom.fen}});return result}
+  function easy(rng){var pool=DENOMS.slice(0,5),pieces=[],count=randomInt(2,4,rng);for(var i=0;i<count;i++)pieces.push(pool[randomInt(0,pool.length-1,rng)]);var goal=pieces.reduce(function(sum,item){return sum+item.fen},0);return{level:'easy',type:'exact',goal:goal,title:'按金额付款',question:'请用练习币凑出 '+format(goal)+'。',items:[],example:pieces.map(function(item){return item.label}).join(' + ')}}
+  function medium(rng){var selected=shuffled(ITEMS,rng).slice(0,randomInt(2,3,rng)),items=selected.map(function(item){return{name:item.name,icon:item.icon,price:randomInt(2,24,rng)*50}}),goal=items.reduce(function(sum,item){return sum+item.price},0);return{level:'medium',type:'total',goal:goal,title:'计算购物篮总价',question:'先算总价，再用练习币付出刚好的金额。',items:items,example:decompose(goal).map(function(item){return item.label}).join(' + ')}}
+  function hard(rng){var item=shuffled(ITEMS,rng)[0],price=randomInt(3,78,rng)*50,candidates=[1000,2000,5000,10000].filter(function(value){return value>price}),paid=candidates[randomInt(0,candidates.length-1,rng)],goal=paid-price;return{level:'hard',type:'change',goal:goal,title:'计算并找零',question:'商品 '+format(price)+'，顾客付 '+format(paid)+'。请用练习币找回正确金额。',items:[{name:item.name,icon:item.icon,price:price}],price:price,paid:paid,example:decompose(goal).map(function(item){return item.label}).join(' + ')}}
+  function generate(level,rng){return level==='hard'?hard(rng):level==='medium'?medium(rng):easy(rng)}
+  global.HpxMoneyShop={DENOMS:DENOMS,ITEMS:ITEMS,format:format,decompose:decompose,generate:generate,randomInt:randomInt,shuffled:shuffled};
+})(typeof window!=='undefined'?window:globalThis);

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读理解策略训练</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8f5e9 0%,#e3f2fd 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.7rem;color:#1b5e20;letter-spacing:1px;text-shadow:2px 3px 0 #c8e6c9;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 16px;font-size:.86rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.strategy-box{background:#e8f5e9;border-radius:12px;padding:12px 18px;margin-bottom:14px;font-size:.95rem;color:#1b5e20;line-height:1.8;}
+.passage-box{background:#fff8e1;border-radius:14px;padding:14px 18px;margin-bottom:14px;font-size:1rem;color:#333;line-height:1.9;}
+.passage-title{font-weight:bold;color:#e65100;margin-bottom:6px;}
+.quiz-q{font-size:1.02rem;color:#333;margin-bottom:12px;line-height:1.8;font-weight:bold;}
+.choice-col{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.choice-btn{padding:10px 16px;border:2px solid #a5d6a7;border-radius:12px;background:#fff;color:#333;font-size:.95rem;font-weight:normal;cursor:pointer;font-family:inherit;text-align:left;}
+.choice-btn:hover{background:#f1f8e9;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;font-weight:bold;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.02rem;font-weight:bold;min-height:26px;margin-top:8px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#43a047;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#1b5e20;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8f5e9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#1b5e20;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#1b5e20">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📖</div>
+    <h1>阅读理解策略训练</h1>
+    <p>提取信息 · 概括中心思想 · 预测与提问 —— 高年级阅读三大策略</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('extract')">🔍 提取信息</button>
+    <button class="tab-btn" onclick="switchTab('summary')">💡 概括中心思想</button>
+    <button class="tab-btn" onclick="switchTab('predict')">🔮 预测与提问</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
+  </div>
+
+  <!-- 提取信息 -->
+  <div id="tab-extract">
+    <div class="card">
+      <div class="strategy-box">🔍 <b>提取信息</b>：从文章里直接找到写明的内容，比如谁、在哪里、做了什么事、有什么特点。答案往往就藏在原文的某一句话里。</div>
+      <div class="passage-box"><div class="passage-title" id="extractTitle"></div><div id="extractText"></div></div>
+      <div class="quiz-q" id="extractQ"></div>
+      <div class="choice-col" id="extractChoices"></div>
+      <div class="result-msg" id="extractMsg"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextExtract()">下一篇 →</button></div>
+    </div>
+  </div>
+
+  <!-- 概括中心思想 -->
+  <div id="tab-summary" style="display:none;">
+    <div class="card">
+      <div class="strategy-box">💡 <b>概括中心思想</b>：读完整篇文章后，用一句话说出文章主要讲了什么、想告诉我们什么道理，而不是复述细节。</div>
+      <div class="passage-box"><div class="passage-title" id="summaryTitle"></div><div id="summaryText"></div></div>
+      <div class="quiz-q" id="summaryQ"></div>
+      <div class="choice-col" id="summaryChoices"></div>
+      <div class="result-msg" id="summaryMsg"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextSummary()">下一篇 →</button></div>
+    </div>
+  </div>
+
+  <!-- 预测与提问 -->
+  <div id="tab-predict" style="display:none;">
+    <div class="card">
+      <div class="strategy-box">🔮 <b>预测与提问</b>：根据文章里的因果关系，合理推测接下来可能发生什么，或者对文章内容提出有价值的问题。</div>
+      <div class="passage-box"><div class="passage-title" id="predictTitle"></div><div id="predictText"></div></div>
+      <div class="quiz-q" id="predictQ"></div>
+      <div class="choice-col" id="predictChoices"></div>
+      <div class="result-msg" id="predictMsg"></div>
+      <div style="text-align:center;"><button class="gen-btn" onclick="nextPredict()">下一篇 →</button></div>
+    </div>
+  </div>
+
+  <!-- 综合练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="passage-box" style="text-align:left;"><div class="passage-title" id="quizTitle"></div><div id="quizText"></div></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-col" id="quizChoices"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// ── 短文语料库 ──
+// 以下短文及配套题目由本项目于 2026-08-09 重新编写，不取自教材或第三方题库。
+const PASSAGES=[
+  {
+    title:'树洞里的秋日仓库',
+    text:'第一阵凉风吹过树林时，松鼠豆豆就开始准备过冬。它每天沿着三条不同的小路寻找松果，把饱满的放进树洞，把破损的留在林地。几天以后，树洞的一角堆起了整齐的“小山”。寒冷的日子到来后，豆豆不用冒雪远行，也能按计划取出食物。',
+    extract:{ q:'豆豆怎样整理找到的松果？', options:['把饱满的放进树洞，把破损的留在林地','全部埋到河边','只把最小的带回家','送给飞往南方的鸟'], correct:0 },
+    summary:{ q:'这篇短文主要说明了什么？', options:['树林里有三条小路','提前选择并储备食物能帮助松鼠过冬','破损的松果最好吃','冬天不需要准备食物'], correct:1 },
+    predict:{ q:'如果豆豆没有提前储存食物，降雪后最可能遇到什么困难？', options:['树洞会自动长出松果','需要冒着风雪寻找食物','马上学会飞行','天气会立刻变暖'], correct:1 }
+  },
+  {
+    title:'骆驼的沙地装备',
+    text:'在松软的沙地上，骆驼宽大的脚掌像两块软垫，能分散身体的重量。风沙变强时，它可以缩小鼻孔，长睫毛也能遮挡飞沙。驼峰储存的是脂肪，食物不足时可为身体提供能量。不同部位互相配合，使骆驼更适合在干燥、多沙的环境中行走。',
+    extract:{ q:'宽大的脚掌怎样帮助骆驼行走？', options:['让身体变得更高','分散重量，减少陷入沙中的可能','帮助它在水下呼吸','用来抓住树枝'], correct:1 },
+    summary:{ q:'这篇短文主要介绍了什么？', options:['沙地为什么会移动','骆驼多种身体特点如何帮助它适应沙漠','骆驼每天走多远','沙漠里有哪些植物'], correct:1 },
+    predict:{ q:'风沙突然变强时，骆驼最可能利用哪些特点保护自己？', options:['缩小鼻孔并用长睫毛挡沙','把脚掌缩得很小','躲进驼峰里面','立刻跳进水中'], correct:0 }
+  },
+  {
+    title:'书包里少了一本书',
+    text:'还书那天，晨晨整理书包时发现借来的科普书不见了。他先沿着放学路线寻找，又询问了值日同学，仍然没有找到。晨晨把经过如实告诉图书管理员，并提出用零花钱补偿。管理员和他一起登记了遗失情况，还提醒他以后给借书袋贴上姓名卡。',
+    extract:{ q:'晨晨发现书不见后，先做了哪些事？', options:['沿路寻找并询问同学','买了一本故事书','把别人的书拿来归还','假装忘记了还书日期'], correct:0 },
+    summary:{ q:'晨晨的做法表现了什么品质？', options:['遇到问题如实说明并愿意承担责任','只要道歉就不用解决问题','借书越多越好','零花钱应该全部买书'], correct:0 },
+    predict:{ q:'使用贴有姓名卡的借书袋，最可能带来什么帮助？', options:['书会自动回到图书馆','丢失时更容易确认书的主人','所有书都会变成新书','可以不登记借阅'], correct:1 }
+  },
+  {
+    title:'蜂巢里的不同岗位',
+    text:'一座蜂巢像一座忙碌的小城。蜂王的主要任务是产卵；许多工蜂轮流清理蜂房、照顾幼虫、修筑蜂巢，还要外出采集花蜜和花粉；雄蜂也承担繁殖相关的任务。每一类蜜蜂的工作不同，却共同维持着蜂群的生活。',
+    extract:{ q:'文中列举了工蜂的哪些工作？', options:['清理蜂房、照顾幼虫、筑巢和采集食物','只负责产卵','只在蜂巢里休息','负责给花朵浇水'], correct:0 },
+    summary:{ q:'这篇短文主要讲了什么？', options:['蜂巢的颜色很多','蜂群成员分工不同并共同维持生活','所有蜜蜂都做完全相同的工作','蜂王每天外出采蜜'], correct:1 },
+    predict:{ q:'如果大量工蜂无法工作，蜂群最可能受到什么影响？', options:['食物采集和幼虫照顾都会受影响','蜂巢会立刻变成鸟巢','蜂王会变成蝴蝶','花粉会自动进入蜂巢'], correct:0 }
+  }
+];
+
+function renderChoices(containerId, options, correctIdx, msgId, onDone){
+  const col=document.getElementById(containerId);
+  col.innerHTML=options.map((o,i)=>`<button class="choice-btn" onclick="handleChoice(this,${i},${correctIdx},'${msgId}')">${o}</button>`).join('');
+  document.getElementById(msgId).textContent='';
+  col.dataset.done='0';
+  if(onDone) col.dataset.onDone=onDone;
+}
+function handleChoice(btn,idx,correctIdx,msgId){
+  const col=btn.parentElement;
+  if(col.dataset.done==='1') return;
+  col.dataset.done='1';
+  col.querySelectorAll('.choice-btn').forEach((b,i)=>{ b.disabled=true; if(i===correctIdx) b.classList.add('correct'); });
+  if(idx!==correctIdx) btn.classList.add('wrong');
+  const msg=document.getElementById(msgId);
+  if(idx===correctIdx){
+    msg.className='result-msg ok'; msg.textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    msg.className='result-msg no'; msg.textContent='❌ 再想想，正确答案已标绿。';
+    speak('再想想，正确答案已经标出来了。');
+  }
+  if(col.dataset.onDone==='quiz') markQuizResult(idx===correctIdx);
+}
+
+// ── 提取信息 ──
+let extractIdx=0;
+function nextExtract(){
+  extractIdx=(extractIdx+1)%PASSAGES.length;
+  renderExtract();
+}
+function renderExtract(){
+  const p=PASSAGES[extractIdx];
+  document.getElementById('extractTitle').textContent=p.title;
+  document.getElementById('extractText').textContent=p.text;
+  document.getElementById('extractQ').textContent=p.extract.q;
+  renderChoices('extractChoices', p.extract.options, p.extract.correct, 'extractMsg');
+  speak(p.text+' '+p.extract.q);
+}
+
+// ── 概括中心思想 ──
+let summaryIdx=0;
+function nextSummary(){
+  summaryIdx=(summaryIdx+1)%PASSAGES.length;
+  renderSummary();
+}
+function renderSummary(){
+  const p=PASSAGES[summaryIdx];
+  document.getElementById('summaryTitle').textContent=p.title;
+  document.getElementById('summaryText').textContent=p.text;
+  document.getElementById('summaryQ').textContent=p.summary.q;
+  renderChoices('summaryChoices', p.summary.options, p.summary.correct, 'summaryMsg');
+  speak(p.text+' '+p.summary.q);
+}
+
+// ── 预测与提问 ──
+let predictIdx=0;
+function nextPredict(){
+  predictIdx=(predictIdx+1)%PASSAGES.length;
+  renderPredict();
+}
+function renderPredict(){
+  const p=PASSAGES[predictIdx];
+  document.getElementById('predictTitle').textContent=p.title;
+  document.getElementById('predictText').textContent=p.text;
+  document.getElementById('predictQ').textContent=p.predict.q;
+  renderChoices('predictChoices', p.predict.options, p.predict.correct, 'predictMsg');
+  speak(p.text+' '+p.predict.q);
+}
+
+// ── 综合练习 ──
+let qScore={c:0,w:0};
+function nextQ(){
+  document.getElementById('nextBtn').style.display='none';
+  const pIdx=randInt(0,PASSAGES.length-1);
+  const p=PASSAGES[pIdx];
+  const skills=['extract','summary','predict'];
+  const skill=skills[randInt(0,2)];
+  const item=p[skill];
+  document.getElementById('quizTitle').textContent=p.title;
+  document.getElementById('quizText').textContent=p.text;
+  document.getElementById('quizQ').textContent=item.q;
+  renderChoices('quizChoices', item.options, item.correct, 'quizMsg', 'quiz');
+  speak(p.text+' '+item.q);
+}
+function markQuizResult(correct){
+  if(correct) qScore.c++; else qScore.w++;
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['extract','summary','predict','quiz']);
+  if(t==='extract') speak('提取信息：从文章里直接找到写明的内容。');
+  if(t==='summary') speak('概括中心思想：用一句话说出文章主要讲了什么。');
+  if(t==='predict') speak('预测与提问：根据文章内容，合理推测接下来会发生什么。');
+  if(t==='quiz') nextQ();
+}
+renderExtract();
+renderSummary();
+renderPredict();
+speak('欢迎来到阅读理解策略训练！我们来学提取信息、概括中心思想，还有预测与提问三种阅读策略。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

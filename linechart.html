@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>折线统计图</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e8eaf6 0%,#e0f7fa 50%,#fff3e0 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:740px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.95rem;color:#1a237e;letter-spacing:2px;text-shadow:2px 3px 0 #9fa8da;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.preset-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.preset-btn{padding:7px 14px;border:2px solid #9fa8da;border-radius:14px;background:#fff;color:#283593;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.preset-btn.on{background:#283593;color:#fff;border-color:#283593;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;}
+canvas{border-radius:10px;background:#fff;}
+.legend-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:.85rem;margin-bottom:6px;}
+.legend-item{display:flex;align-items:center;gap:5px;}
+.legend-dot{width:12px;height:12px;border-radius:50%;}
+.trend-box{background:#e8eaf6;border-radius:12px;padding:10px 16px;text-align:center;font-size:.9rem;color:#283593;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e8eaf6;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#283593;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto;}
+.choice-btn{padding:12px 10px;border:2px solid #9fa8da;border-radius:12px;background:#fff;color:#283593;font-size:.92rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.choice-btn:hover{background:#e8eaf6;}
+.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:12px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#283593;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#283593">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">📈</div>
+    <h1>折线统计图</h1>
+    <p>看懂趋势变化，单式与复式对比</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('single')">📖 单式折线统计图</button>
+    <button class="tab-btn" onclick="switchTab('double')">📊 复式折线统计图</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 单式 -->
+  <div id="tab-single">
+    <div class="card">
+      <div style="text-align:center;font-size:.9rem;color:#777;margin-bottom:10px;">某地一周气温变化</div>
+      <div class="canvas-wrap"><canvas id="singleCanvas" width="340" height="220"></canvas></div>
+      <div class="trend-box" id="singleTrend"></div>
+    </div>
+  </div>
+
+  <!-- 复式 -->
+  <div id="tab-double" style="display:none;">
+    <div class="card">
+      <div class="preset-row" id="doubleRow"></div>
+      <div class="legend-row" id="doubleLegend"></div>
+      <div class="canvas-wrap"><canvas id="doubleCanvas" width="340" height="220"></canvas></div>
+      <div class="trend-box" id="doubleTrend"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="quizCanvas" width="300" height="180"></canvas></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="choice-grid" id="quizArea"></div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+const LABELS7=['周一','周二','周三','周四','周五','周六','周日'];
+
+function drawLineChart(canvas, datasets, labels, unit){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,pad=34;
+  ctx.clearRect(0,0,W,H);
+  const allVals=datasets.flatMap(d=>d.values);
+  const maxV=Math.max(...allVals)+3, minV=Math.min(...allVals)-3;
+  const n=labels.length;
+  const xStep=n>1?(W-pad*2)/(n-1):0;
+  const yScale=(H-pad*2)/(maxV-minV);
+  function toXY(i,v){ return [pad+i*xStep, H-pad-(v-minV)*yScale]; }
+  // axes
+  ctx.strokeStyle='#ccc';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,pad-10);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad+10,H-pad);ctx.stroke();
+  // gridlines + y labels
+  ctx.fillStyle='#999';ctx.font='10px sans-serif';ctx.textAlign='right';
+  const ySteps=4;
+  for(let i=0;i<=ySteps;i++){
+    const v=minV+(maxV-minV)*i/ySteps;
+    const y=H-pad-(v-minV)*yScale;
+    ctx.strokeStyle='#f0f0f0';ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad+10,y);ctx.stroke();
+    ctx.fillText(Math.round(v),pad-6,y+3);
+  }
+  // x labels
+  ctx.textAlign='center';ctx.fillStyle='#777';
+  labels.forEach((l,i)=>{ const [x]=toXY(i,minV); ctx.fillText(l,x,H-pad+16); });
+  // lines
+  datasets.forEach(d=>{
+    ctx.strokeStyle=d.color;ctx.lineWidth=2.5;
+    ctx.beginPath();
+    d.values.forEach((v,i)=>{ const [x,y]=toXY(i,v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.stroke();
+    d.values.forEach((v,i)=>{
+      const [x,y]=toXY(i,v);
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=d.color;ctx.fill();
+      ctx.fillStyle='#333';ctx.font='bold 10px sans-serif';ctx.fillText(v,x,y-8);
+    });
+  });
+}
+
+// ── 单式 ──
+const SINGLE_DATA=[18,20,19,23,25,24,21];
+function renderSingle(){
+  drawLineChart(document.getElementById('singleCanvas'),[{color:'#3949ab',values:SINGLE_DATA}],LABELS7,'℃');
+  const maxI=SINGLE_DATA.indexOf(Math.max(...SINGLE_DATA)), minI=SINGLE_DATA.indexOf(Math.min(...SINGLE_DATA));
+  document.getElementById('singleTrend').innerHTML=
+    `最高温出现在 <b>${LABELS7[maxI]}</b>（${SINGLE_DATA[maxI]}℃），最低温出现在 <b>${LABELS7[minI]}</b>（${SINGLE_DATA[minI]}℃）。<br>周一到${LABELS7[maxI]}总体呈<b>上升</b>趋势，${LABELS7[maxI]}到周日总体呈<b>下降</b>趋势。`;
+  speak('这是某地一周的气温变化，看看温度是怎么升高又降低的。');
+}
+
+// ── 复式 ──
+const DOUBLE_PRESETS=[
+  {title:'两城市气温对比',labelA:'A城市',labelB:'B城市',dataA:[18,20,19,23,25,24,21],dataB:[22,23,25,24,26,27,25]},
+  {title:'男生女生平均身高对比（cm）',labelA:'男生',labelB:'女生',dataA:[135,140,146,152,158,163],dataB:[133,139,145,150,153,155]}
+];
+let curDouble=0;
+function buildDoubleRow(){
+  const row=document.getElementById('doubleRow');
+  row.innerHTML='';
+  DOUBLE_PRESETS.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='preset-btn'+(i===curDouble?' on':'');
+    b.textContent=p.title;
+    b.onclick=()=>{curDouble=i;buildDoubleRow();renderDouble();};
+    row.appendChild(b);
+  });
+}
+function renderDouble(){
+  const p=DOUBLE_PRESETS[curDouble];
+  const labels = p.dataA.length===7?LABELS7:p.dataA.map((_,i)=>(i+1)+'年级');
+  drawLineChart(document.getElementById('doubleCanvas'),[{color:'#3949ab',values:p.dataA},{color:'#e64a19',values:p.dataB}],labels);
+  document.getElementById('doubleLegend').innerHTML=
+    `<div class="legend-item"><span class="legend-dot" style="background:#3949ab;"></span>${p.labelA}</div><div class="legend-item"><span class="legend-dot" style="background:#e64a19;"></span>${p.labelB}</div>`;
+  const diff=p.dataA[p.dataA.length-1]-p.dataB[p.dataB.length-1];
+  document.getElementById('doubleTrend').innerHTML=
+    `两条折线都呈上升趋势。最后一组数据，${p.labelA}是${p.dataA[p.dataA.length-1]}，${p.labelB}是${p.dataB[p.dataB.length-1]}，相差 <b>${Math.abs(diff)}</b>。`;
+  speak(p.title+'，比较两条折线，看看它们的变化趋势。');
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=null;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  const area=document.getElementById('quizArea'); area.innerHTML='';
+  const type=randInt(0,2);
+  drawLineChart(document.getElementById('quizCanvas'),[{color:'#3949ab',values:SINGLE_DATA}],LABELS7);
+  if(type===0){
+    const maxI=SINGLE_DATA.indexOf(Math.max(...SINGLE_DATA));
+    qAns=LABELS7[maxI];
+    document.getElementById('quizQ').textContent='上面这周，哪一天的气温最高？';
+    const opts=shuffle([LABELS7[maxI],...shuffleList(LABELS7.filter(l=>l!==LABELS7[maxI])).slice(0,3)]);
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o); area.appendChild(b);
+    });
+    speak('哪一天的气温最高？');
+  } else if(type===1){
+    const i=randInt(0,6);
+    qAns=String(SINGLE_DATA[i]);
+    document.getElementById('quizQ').textContent=`${LABELS7[i]}的气温是多少摄氏度？`;
+    const wrongs=new Set(); while(wrongs.size<3){ const w=SINGLE_DATA[i]+randInt(-4,4); if(w!==SINGLE_DATA[i]&&w>0) wrongs.add(String(w)); }
+    const opts=shuffle([qAns,...wrongs]);
+    opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o+'℃';
+      b.onclick=()=>checkQ(b,o); area.appendChild(b);
+    });
+    speak(LABELS7[i]+'的气温是多少摄氏度？');
+  } else {
+    const i1=randInt(0,4), i2=i1+2;
+    const rising=SINGLE_DATA[i2]>SINGLE_DATA[i1];
+    qAns=rising?'上升':'下降';
+    document.getElementById('quizQ').textContent=`从${LABELS7[i1]}到${LABELS7[i2]}，气温总体是上升还是下降？`;
+    ['上升','下降'].forEach(o=>{
+      const b=document.createElement('button'); b.className='choice-btn'; b.textContent=o;
+      b.onclick=()=>checkQ(b,o); area.appendChild(b);
+    });
+    speak(`从${LABELS7[i1]}到${LABELS7[i2]}，气温总体是上升还是下降？`);
+  }
+}
+function shuffleList(a){return shuffle(a);}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function checkQ(btn,val){
+  document.querySelectorAll('#quizArea .choice-btn').forEach(b=>{b.disabled=true; if(b.textContent.replace('℃','')===qAns) b.classList.add('correct');});
+  if(val!==qAns) btn.classList.add('wrong');
+  if(val===qAns){
+    qScore.c++;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+  } else {
+    qScore.w++;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 正确答案是：'+qAns;
+    speak('答案是'+qAns+'，再想想！');
+  }
+  document.getElementById('qC').textContent=qScore.c;
+  document.getElementById('qW').textContent=qScore.w;
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['single','double','quiz']);
+  if(t==='single') renderSingle();
+  if(t==='double') renderDouble();
+  if(t==='quiz') nextQ();
+}
+renderSingle();
+buildDoubleRow(); renderDouble();
+speak('欢迎来到折线统计图！看懂数据是怎么随时间变化的。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

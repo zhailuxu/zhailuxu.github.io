@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圆柱与圆锥</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#e8eaf6 50%,#fce4ec 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:1.9rem;color:#00695c;letter-spacing:2px;text-shadow:2px 3px 0 #80cbc4;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 18px;font-size:.9rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.canvas-wrap{display:flex;justify-content:center;margin:10px 0;flex-wrap:wrap;gap:14px;}
+canvas{border-radius:10px;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:110px;accent-color:#00695c;}
+.sl-val{font-weight:bold;font-size:1rem;color:#00695c;}
+.formula-box{background:#e0f2f1;border-radius:12px;padding:12px 18px;text-align:center;font-size:1rem;color:#00695c;line-height:1.9;}
+.unroll-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:6px;}
+.compare-box{background:#fffde7;border-radius:12px;padding:14px 18px;text-align:center;font-size:.95rem;color:#5d4037;line-height:1.9;}
+.pour-btn{display:block;margin:10px auto 0;padding:8px 22px;border:none;border-radius:14px;background:#00695c;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.fill-bar-wrap{width:60px;height:100px;border:3px solid #37474f;border-radius:0 0 8px 8px;margin:10px auto;position:relative;overflow:hidden;background:#fafafa;}
+.fill-bar{position:absolute;bottom:0;left:0;right:0;background:#4db6ac;transition:height .4s;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#e0f2f1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#00695c;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.quiz-input{font-size:1.3rem;width:110px;border:2px solid #80cbc4;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#00695c;}
+.check-btn{margin-left:10px;padding:8px 22px;border:none;border-radius:10px;background:#00695c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#00695c;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#00695c">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🥫</div>
+    <h1>圆柱与圆锥</h1>
+    <p>侧面展开推导表面积，等底等高体积是3倍关系</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('cyl')">🥫 圆柱</button>
+    <button class="tab-btn" onclick="switchTab('cone')">🍦 圆锥</button>
+    <button class="tab-btn" onclick="switchTab('compare')">⚖️ 体积关系</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 圆柱 -->
+  <div id="tab-cyl">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group"><label>底面半径 r</label><input type="range" id="cylR" min="2" max="8" value="3" oninput="updateCyl()"><span class="sl-val" id="cylRVal">3</span></div>
+        <div class="sl-group"><label>高 h</label><input type="range" id="cylH" min="2" max="10" value="6" oninput="updateCyl()"><span class="sl-val" id="cylHVal">6</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="cylCanvas" width="140" height="220"></canvas><canvas id="cylUnrollCanvas" width="160" height="220"></canvas></div>
+      <div class="unroll-desc">右图：侧面展开是一个长方形，长 = 底面周长(2πr)，宽 = 高(h)</div>
+      <div class="formula-box" id="cylFormula"></div>
+    </div>
+  </div>
+
+  <!-- 圆锥 -->
+  <div id="tab-cone" style="display:none;">
+    <div class="card">
+      <div class="slider-row">
+        <div class="sl-group"><label>底面半径 r</label><input type="range" id="coneR" min="2" max="8" value="3" oninput="updateCone()"><span class="sl-val" id="coneRVal">3</span></div>
+        <div class="sl-group"><label>高 h</label><input type="range" id="coneH" min="2" max="10" value="6" oninput="updateCone()"><span class="sl-val" id="coneHVal">6</span></div>
+      </div>
+      <div class="canvas-wrap"><canvas id="coneCanvas" width="180" height="220"></canvas></div>
+      <div class="formula-box" id="coneFormula"></div>
+    </div>
+  </div>
+
+  <!-- 体积关系 -->
+  <div id="tab-compare" style="display:none;">
+    <div class="card">
+      <div class="unroll-desc">等底等高的圆柱和圆锥，圆锥体积正好是圆柱的 1/3</div>
+      <div class="canvas-wrap">
+        <div style="text-align:center;">
+          <canvas id="cmpCylCanvas" width="120" height="180"></canvas>
+          <div class="fill-bar-wrap"><div class="fill-bar" id="fillBar" style="height:0%;"></div></div>
+        </div>
+        <canvas id="cmpConeCanvas" width="120" height="180"></canvas>
+      </div>
+      <button class="pour-btn" onclick="pourOnce()">🥤 倒入一锥（点3次正好装满）</button>
+      <div class="compare-box" id="compareResult"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div>
+        <input type="number" id="quizInput" class="quiz-input" placeholder="?" step="0.01">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+const PI=3.14;
+
+function drawCylinder3D(canvas, r, h, PX){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const rx=r*PX, ry=r*PX*0.38;
+  const cx=canvas.width/2, botY=canvas.height-30, topY=botY-h*PX;
+  ctx.beginPath();ctx.ellipse(cx,botY,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#4db6ac';ctx.fill();ctx.strokeStyle='#00695c';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#80cbc4';ctx.fillRect(cx-rx,topY,rx*2,botY-topY);
+  ctx.strokeStyle='#00695c';
+  ctx.beginPath();ctx.moveTo(cx-rx,topY);ctx.lineTo(cx-rx,botY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+rx,topY);ctx.lineTo(cx+rx,botY);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,botY,rx,ry,0,0,Math.PI);ctx.fillStyle='#80cbc4';ctx.fill();ctx.strokeStyle='#00695c';ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,topY,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#b2dfdb';ctx.fill();ctx.strokeStyle='#00695c';ctx.stroke();
+  ctx.fillStyle='#37474f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('r='+r, cx, topY-10);
+  ctx.save();ctx.translate(cx+rx+14,(topY+botY)/2);ctx.fillText('h='+h,0,0);ctx.restore();
+  return {cx,topY,botY,rx,ry};
+}
+function drawCone3D(canvas, r, h, PX){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const rx=r*PX, ry=r*PX*0.38;
+  const cx=canvas.width/2, botY=canvas.height-30, apexY=botY-h*PX;
+  ctx.beginPath();ctx.ellipse(cx,botY,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#ffab91';ctx.fill();ctx.strokeStyle='#bf360c';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,apexY);ctx.lineTo(cx-rx,botY);ctx.lineTo(cx+rx,botY);ctx.closePath();
+  ctx.fillStyle='#ffccbc';ctx.fill();
+  ctx.strokeStyle='#bf360c';
+  ctx.beginPath();ctx.moveTo(cx,apexY);ctx.lineTo(cx-rx,botY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,apexY);ctx.lineTo(cx+rx,botY);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,botY,rx,ry,0,0,Math.PI);ctx.fillStyle='#ffccbc';ctx.fill();ctx.strokeStyle='#bf360c';ctx.stroke();
+  ctx.fillStyle='#37474f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('r='+r, cx, botY+18);
+  ctx.save();ctx.translate(cx+rx*0.5+16,(apexY+botY)/2);ctx.fillText('h='+h,0,0);ctx.restore();
+  return {cx,apexY,botY,rx,ry};
+}
+function drawUnrollRect(canvas, r, h, PX){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const circ=2*PI*r;
+  const scale=Math.min((canvas.width-30)/circ, (canvas.height-30)/h, PX*1.3);
+  const rw=circ*scale, rh=h*scale;
+  const ox=(canvas.width-rw)/2, oy=(canvas.height-rh)/2;
+  ctx.fillStyle='#80cbc4';ctx.fillRect(ox,oy,rw,rh);
+  ctx.strokeStyle='#00695c';ctx.lineWidth=1.5;ctx.strokeRect(ox,oy,rw,rh);
+  ctx.fillStyle='#37474f';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+  ctx.fillText('长 = 2πr = '+circ.toFixed(1), ox+rw/2, oy-8);
+  ctx.save();ctx.translate(ox-14,oy+rh/2);ctx.rotate(-Math.PI/2);ctx.fillText('宽=h='+h,0,0);ctx.restore();
+}
+
+// ── 圆柱 ──
+function updateCyl(){
+  const r=+document.getElementById('cylR').value, h=+document.getElementById('cylH').value;
+  document.getElementById('cylRVal').textContent=r; document.getElementById('cylHVal').textContent=h;
+  drawCylinder3D(document.getElementById('cylCanvas'), r, h, 14);
+  drawUnrollRect(document.getElementById('cylUnrollCanvas'), r, h, 14);
+  const sideArea=2*PI*r*h, baseArea=PI*r*r, S=sideArea+2*baseArea, V=baseArea*h;
+  document.getElementById('cylFormula').innerHTML=
+    `侧面积 = 2πr×h = 2×3.14×${r}×${h} = <b>${sideArea.toFixed(2)}</b><br>表面积 = 侧面积+2个底面积 = ${sideArea.toFixed(2)}+2×${baseArea.toFixed(2)} = <b>${S.toFixed(2)}</b><br>体积 = 底面积×高 = ${baseArea.toFixed(2)}×${h} = <b>${V.toFixed(2)}</b>`;
+  speak(`圆柱的底面半径是${r}，高是${h}，体积是${V.toFixed(2)}。`);
+}
+
+// ── 圆锥 ──
+function updateCone(){
+  const r=+document.getElementById('coneR').value, h=+document.getElementById('coneH').value;
+  document.getElementById('coneRVal').textContent=r; document.getElementById('coneHVal').textContent=h;
+  drawCone3D(document.getElementById('coneCanvas'), r, h, 14);
+  const V=(1/3)*PI*r*r*h;
+  document.getElementById('coneFormula').innerHTML=
+    `体积 = 1/3 × 底面积 × 高 = 1/3 × 3.14×${r}² × ${h} = <b>${V.toFixed(2)}</b><br>（和它等底等高的圆柱体积是 <b>${(V*3).toFixed(2)}</b>，正好是圆锥的3倍）`;
+  speak(`圆锥的底面半径是${r}，高是${h}，体积是${V.toFixed(2)}。`);
+}
+
+// ── 体积关系（倒水动画）──
+let pourCount=0;
+function initCompare(){
+  const r=4,h=6;
+  drawCylinder3D(document.getElementById('cmpCylCanvas'), r, h, 12);
+  drawCone3D(document.getElementById('cmpConeCanvas'), r, h, 12);
+  pourCount=0;
+  document.getElementById('fillBar').style.height='0%';
+  document.getElementById('compareResult').innerHTML=`等底(r=${r})等高(h=${h})：圆柱体积=${(PI*r*r*h).toFixed(2)}，圆锥体积=${((1/3)*PI*r*r*h).toFixed(2)}<br>点击按钮，看看倒几次圆锥的水能装满圆柱`;
+}
+function pourOnce(){
+  if(pourCount>=3){ pourCount=0; document.getElementById('fillBar').style.height='0%'; speak('重新开始倒水。'); return; }
+  pourCount++;
+  document.getElementById('fillBar').style.height=(pourCount/3*100)+'%';
+  if(pourCount<3){ speak('倒了'+pourCount+'次，还没装满。'); document.getElementById('compareResult').innerHTML=`已经倒了 <b>${pourCount}</b> 次圆锥的水，圆柱还没装满，继续倒！`; }
+  else { speak('倒了3次，正好装满！圆柱体积是圆锥的3倍。'); document.getElementById('compareResult').innerHTML=`🎉 倒了 <b>3</b> 次正好装满！这说明：圆柱体积 = 3 × 圆锥体积（等底等高时）`; }
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qAns=0;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizInput').value='';
+  document.getElementById('quizInput').disabled=false;
+  const type=randInt(0,2);
+  if(type===0){
+    const r=randInt(2,10), h=randInt(2,15);
+    qAns=Math.round(PI*r*r*h*100)/100;
+    document.getElementById('quizQ').textContent=`圆柱的底面半径是${r}cm，高是${h}cm，体积是多少立方厘米？（π取3.14）`;
+    speak(`圆柱的底面半径是${r}厘米，高是${h}厘米，体积是多少？`);
+  } else if(type===1){
+    const r=randInt(2,10), h=randInt(2,15);
+    qAns=Math.round((PI*r*r*h+2*PI*r*h)*100)/100;
+    document.getElementById('quizQ').textContent=`圆柱的底面半径是${r}cm，高是${h}cm，表面积是多少平方厘米？（π取3.14）`;
+    speak(`圆柱的底面半径是${r}厘米，高是${h}厘米，表面积是多少？`);
+  } else {
+    const r=randInt(2,10), h=randInt(2,15);
+    qAns=Math.round((1/3)*PI*r*r*h*100)/100;
+    document.getElementById('quizQ').textContent=`圆锥的底面半径是${r}cm，高是${h}cm，体积是多少立方厘米？（π取3.14）`;
+    speak(`圆锥的底面半径是${r}厘米，高是${h}厘米，体积是多少？`);
+  }
+}
+function checkQ(){
+  const inp=document.getElementById('quizInput');
+  if(inp.disabled) return;
+  const v=parseFloat(inp.value);
+  if(isNaN(v)) return;
+  inp.disabled=true;
+  if(Math.abs(v-qAns)<0.05){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent='❌ 答案是 '+qAns;
+    speak('答案是'+qAns+'，再想想！');
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+document.getElementById('quizInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkQ();});
+document.getElementById('quizInput').addEventListener('blur',()=>{
+  if(document.getElementById('quizInput').value.length>0) checkQ();
+});
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['cyl','cone','compare','quiz']);
+  if(t==='cyl') speak('圆柱：侧面展开是一个长方形，长是底面周长，宽是高。');
+  if(t==='cone') speak('圆锥：体积是等底等高圆柱的三分之一。');
+  if(t==='compare') initCompare();
+  if(t==='quiz') nextQ();
+}
+updateCyl(); updateCone();
+speak('欢迎来到圆柱与圆锥！探索侧面展开的秘密，还有体积三倍关系。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>

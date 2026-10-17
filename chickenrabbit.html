@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鸡兔同笼</title>
+<link rel="stylesheet" href="hpx-common.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#f1f8e9 0%,#fffde7 50%,#efebe9 100%);min-height:100vh;padding:16px 12px;}
+.container{max-width:720px;margin:0 auto;}
+.header{text-align:center;margin-bottom:20px;}
+.header h1{font-size:2rem;color:#33691e;letter-spacing:3px;text-shadow:2px 3px 0 #aed581;}
+.header p{font-size:.85rem;color:#999;margin-top:4px;}
+.tab-btn{padding:8px 20px;font-size:.92rem;}
+.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
+.story-box{background:#fffde7;border-radius:14px;padding:14px 18px;font-size:.95rem;color:#5d4037;line-height:1.9;margin-bottom:14px;}
+.animals-wrap{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0;min-height:70px;align-content:flex-start;}
+.animal-icon{font-size:1.8rem;transition:transform .3s;}
+.animal-icon.flip{animation:flip .5s ease;}
+@keyframes flip{0%{transform:scale(1);}50%{transform:scale(1.4) rotate(15deg);}100%{transform:scale(1);}}
+.step-box{background:#e8f5e9;border-radius:12px;padding:12px 16px;font-size:.92rem;color:#33691e;line-height:1.8;text-align:center;min-height:50px;}
+.play-btn{display:block;margin:12px auto 0;padding:10px 26px;border:none;border-radius:16px;background:#558b2f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.formula-box{background:#fff3e0;border-radius:12px;padding:12px 18px;font-size:.92rem;color:#5d4037;text-align:center;line-height:1.9;margin-top:12px;}
+.theme-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.theme-btn{padding:7px 16px;border:2px solid #aed581;border-radius:14px;background:#fff;color:#558b2f;font-size:.86rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.theme-btn.on{background:#558b2f;color:#fff;border-color:#558b2f;}
+.slider-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.sl-group{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sl-group label{font-size:.82rem;color:#777;}
+input[type=range]{width:130px;accent-color:#558b2f;}
+.sl-val{font-weight:bold;font-size:1.05rem;color:#558b2f;}
+.result-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.result-tag{background:#e8f5e9;border-radius:10px;padding:8px 18px;font-size:1rem;font-weight:bold;color:#33691e;}
+.result-tag span{font-size:1.3rem;color:#bf360c;}
+/* quiz */
+.quiz-box{text-align:center;}
+.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
+.score-item{background:#f1f8e9;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#558b2f;}
+.quiz-q{font-size:1.05rem;color:#333;margin-bottom:14px;line-height:1.8;}
+.dual-input{display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+.dual-input label{font-size:.95rem;color:#555;font-weight:bold;}
+.quiz-input{font-size:1.2rem;width:80px;border:2px solid #aed581;border-radius:10px;padding:6px 10px;text-align:center;outline:none;font-family:inherit;}
+.quiz-input:focus{border-color:#558b2f;}
+.check-btn{margin-top:6px;padding:8px 22px;border:none;border-radius:10px;background:#558b2f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;}
+.result-msg.ok{color:#2e7d32;}
+.result-msg.no{color:#c62828;}
+.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#558b2f;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body data-hpx-page style="--hpx-accent:#558b2f">
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.4rem;">🐔🐇</div>
+    <h1>鸡兔同笼</h1>
+    <p>数学广角：用假设法解决经典问题</p>
+  </div>
+  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
+  <div class="tabs">
+    <button class="tab-btn on" onclick="switchTab('learn')">📖 认识问题</button>
+    <button class="tab-btn" onclick="switchTab('play')">🖱️ 互动求解</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 练习</button>
+  </div>
+
+  <!-- 认识问题 -->
+  <div id="tab-learn">
+    <div class="card">
+      <div class="story-box">📜 《孙子算经》里的经典题：<br>"今有雉兔同笼，上有三十五头，下有九十四足，问雉兔各几何？"<br>意思是：笼子里鸡和兔一共 <b>35</b> 个头，一共 <b>94</b> 只脚，鸡和兔各有多少只？</div>
+      <div class="animals-wrap" id="learnAnimals"></div>
+      <div class="step-box" id="learnStep">点击"播放"，看看假设法是怎么解决这个问题的</div>
+      <button class="play-btn" onclick="playLearnAnim()">▶ 播放假设法动画</button>
+      <div class="formula-box">
+        假设全部是鸡：35只×2脚 = 70只脚，比94只少 24只脚<br>
+        每把1只鸡换成兔，就多2只脚：24÷2 = <b style="color:#bf360c">12</b>（兔的数量）<br>
+        鸡的数量 = 35 − 12 = <b style="color:#bf360c">23</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- 互动求解 -->
+  <div id="tab-play" style="display:none;">
+    <div class="card">
+      <div class="theme-row">
+        <button class="theme-btn on" data-t="0" onclick="setTheme(0)">🐔🐇 鸡兔同笼</button>
+        <button class="theme-btn" data-t="1" onclick="setTheme(1)">🚲🛺 自行车三轮车</button>
+      </div>
+      <div class="slider-row">
+        <div class="sl-group"><label id="headLabel">总头数</label><input type="range" id="headSlider" min="5" max="50" value="35" oninput="updatePlay()"><span class="sl-val" id="headVal">35</span></div>
+        <div class="sl-group"><label id="legLabel">总脚数</label><input type="range" id="legSlider" min="10" max="200" value="94" step="1" oninput="updatePlay()"><span class="sl-val" id="legVal">94</span></div>
+      </div>
+      <div class="animals-wrap" id="playAnimals"></div>
+      <button class="play-btn" onclick="animatePlay()">▶ 播放换脚动画</button>
+      <div class="result-row" id="playResult"></div>
+      <div class="formula-box" id="playFormula"></div>
+    </div>
+  </div>
+
+  <!-- 练习 -->
+  <div id="tab-quiz" style="display:none;">
+    <div class="card quiz-box">
+      <div class="score-row">
+        <div class="score-item">✅ <span id="qC">0</span></div>
+        <div class="score-item">❌ <span id="qW">0</span></div>
+      </div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="dual-input">
+        <label id="qLabelA">🐔 鸡：</label><input type="number" id="ansA" class="quiz-input">
+        <label id="qLabelB">🐇 兔：</label><input type="number" id="ansB" class="quiz-input">
+      </div>
+      <div class="result-msg" id="quizMsg"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">← 返回慧陪学</a>
+</div>
+<script src="hpx-core.js"></script>
+<script>
+Hpx.speech.install({rate:0.9});
+const randInt=Hpx.random.int;
+
+// 通用解法：assume-all-typeA (legsA), 换成 typeB (legsB, legsB>legsA)
+function solve(heads,legs,legsA,legsB){
+  const assumeLegs = heads*legsA;
+  const diff = legs - assumeLegs;
+  const countB = diff/(legsB-legsA);
+  const countA = heads-countB;
+  return {countA, countB, assumeLegs, diff};
+}
+
+// ── 认识问题：动画 ──
+let learnTimer=null;
+function playLearnAnim(){
+  if(learnTimer) clearInterval(learnTimer);
+  const heads=35, legs=94, legsA=2, legsB=4;
+  const wrap=document.getElementById('learnAnimals');
+  wrap.innerHTML='';
+  const icons=[];
+  for(let i=0;i<heads;i++){
+    const s=document.createElement('span'); s.className='animal-icon'; s.textContent='🐔';
+    wrap.appendChild(s); icons.push(s);
+  }
+  const {countB}=solve(heads,legs,legsA,legsB);
+  document.getElementById('learnStep').textContent=`假设 ${heads} 只全部是鸡，一共有 ${heads}×2 = ${heads*legsA} 只脚，比实际 ${legs} 只少了 ${legs-heads*legsA} 只`;
+  speak(`假设三十五只全部是鸡，一共有七十只脚，比实际九十四只少了二十四只。`);
+  let flipped=0;
+  learnTimer=setInterval(()=>{
+    if(flipped>=countB){
+      clearInterval(learnTimer);
+      document.getElementById('learnStep').innerHTML=`每换一只鸡变兔子就多2只脚，换了 <b style="color:#bf360c">${countB}</b> 次刚好补齐差的脚数！<br>所以兔有 <b style="color:#bf360c">${countB}</b> 只，鸡有 <b style="color:#bf360c">${heads-countB}</b> 只`;
+      speak(`每换一只鸡变兔子就多两只脚，换了十二次刚好补齐。所以兔有十二只，鸡有二十三只。`);
+      return;
+    }
+    icons[flipped].textContent='🐇';
+    icons[flipped].classList.add('flip');
+    flipped++;
+  },350);
+}
+
+// ── 互动求解 ──
+const THEMES=[
+  {name:'鸡兔同笼', iconA:'🐔', iconB:'🐇', legsA:2, legsB:4, nameA:'鸡', nameB:'兔', headMax:60, legMaxMult:4},
+  {name:'自行车三轮车', iconA:'🚲', iconB:'🛺', legsA:2, legsB:3, nameA:'自行车', nameB:'三轮车', headMax:40, legMaxMult:3}
+];
+let curTheme=0, playTimer=null;
+function setTheme(i){
+  curTheme=i;
+  document.querySelectorAll('.theme-btn').forEach((b,idx)=>b.classList.toggle('on',idx===i));
+  const th=THEMES[i];
+  document.getElementById('headLabel').textContent='总'+(i===0?'头':'车')+'数';
+  document.getElementById('legLabel').textContent='总'+(i===0?'脚':'轮子')+'数';
+  const hs=document.getElementById('headSlider'), ls=document.getElementById('legSlider');
+  hs.max=th.headMax; ls.max=th.headMax*th.legMaxMult;
+  hs.value=Math.min(hs.value, th.headMax);
+  updatePlay();
+}
+function updatePlay(){
+  const th=THEMES[curTheme];
+  let heads=parseInt(document.getElementById('headSlider').value);
+  let legs=parseInt(document.getElementById('legSlider').value);
+  // 修正腿数使其可解（合法范围 heads*legsA <= legs <= heads*legsB，且差值能被(legsB-legsA)整除）
+  const minLegs=heads*th.legsA, maxLegs=heads*th.legsB;
+  legs=Math.max(minLegs,Math.min(maxLegs,legs));
+  const diff=legs-minLegs, rem=diff%(th.legsB-th.legsA);
+  if(rem!==0) legs-=rem;
+  document.getElementById('legSlider').value=legs;
+  document.getElementById('headVal').textContent=heads;
+  document.getElementById('legVal').textContent=legs;
+  const {countA,countB}=solve(heads,legs,th.legsA,th.legsB);
+  const wrap=document.getElementById('playAnimals');
+  wrap.innerHTML='';
+  for(let i=0;i<heads;i++){
+    const s=document.createElement('span'); s.className='animal-icon';
+    s.textContent = i<countA ? th.iconA : th.iconB;
+    wrap.appendChild(s);
+  }
+  document.getElementById('playResult').innerHTML=`<div class="result-tag">${th.iconA}${th.nameA} <span>${countA}</span> 个</div><div class="result-tag">${th.iconB}${th.nameB} <span>${countB}</span> 个</div>`;
+  document.getElementById('playFormula').innerHTML=`假设全部是${th.nameA}：${heads}×${th.legsA}=${heads*th.legsA}（${th.legsA===2?'只':'个'}${i18nUnit(th)}），比${legs}少 ${legs-heads*th.legsA}<br>${legs-heads*th.legsA}÷(${th.legsB}-${th.legsA}) = <b style="color:#bf360c">${countB}</b>（${th.nameB}数）`;
+}
+function i18nUnit(th){return th.legsA===2&&th.legsB===4?'脚':'轮';}
+function animatePlay(){
+  if(playTimer) clearInterval(playTimer);
+  const th=THEMES[curTheme];
+  const heads=parseInt(document.getElementById('headSlider').value);
+  const legs=parseInt(document.getElementById('legSlider').value);
+  const {countA,countB}=solve(heads,legs,th.legsA,th.legsB);
+  const wrap=document.getElementById('playAnimals');
+  wrap.innerHTML='';
+  const icons=[];
+  for(let i=0;i<heads;i++){const s=document.createElement('span');s.className='animal-icon';s.textContent=th.iconA;wrap.appendChild(s);icons.push(s);}
+  speak(`假设全部是${th.nameA}，一共${heads*th.legsA}${i18nUnit(th)}，比实际少了${legs-heads*th.legsA}。`);
+  let flipped=0;
+  playTimer=setInterval(()=>{
+    if(flipped>=countB){clearInterval(playTimer);speak(`换了${countB}次，${th.nameB}有${countB}个，${th.nameA}有${countA}个。`);return;}
+    icons[flipped].textContent=th.iconB;
+    icons[flipped].classList.add('flip');
+    flipped++;
+  },300);
+}
+
+// ── 练习 ──
+let qScore={c:0,w:0}, qData={}, qDone=false;
+function nextQ(){
+  document.getElementById('quizMsg').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('ansA').value='';
+  document.getElementById('ansB').value='';
+  document.getElementById('ansA').disabled=false;
+  document.getElementById('ansB').disabled=false;
+  qDone=false;
+  const th=THEMES[randInt(0,THEMES.length-1)];
+  const countA=randInt(3,25), countB=randInt(3,25);
+  const heads=countA+countB, legs=countA*th.legsA+countB*th.legsB;
+  qData={th,countA,countB,heads,legs};
+  document.getElementById('qLabelA').textContent=th.iconA+' '+th.nameA+'：';
+  document.getElementById('qLabelB').textContent=th.iconB+' '+th.nameB+'：';
+  document.getElementById('quizQ').textContent=`${th.name}问题：一共有 ${heads} 个头，${legs} 个${i18nUnit(th)}，${th.nameA}和${th.nameB}各有多少个？`;
+  speak(`一共有${heads}个头，${legs}个${i18nUnit(th)}，${th.nameA}和${th.nameB}各有多少个？`);
+  const aInp=document.getElementById('ansA'), bInp=document.getElementById('ansB');
+  const maybeCheck=()=>{
+    if(aInp.value.length>=String(qData.countA).length && bInp.value.length>=String(qData.countB).length) checkQ();
+  };
+  aInp.addEventListener('input',maybeCheck);
+  bInp.addEventListener('input',maybeCheck);
+  bInp.addEventListener('blur',()=>{ if(aInp.value.length>0 && bInp.value.length>0) checkQ(); });
+}
+function checkQ(){
+  if(qDone) return;
+  const a=parseInt(document.getElementById('ansA').value);
+  const b=parseInt(document.getElementById('ansB').value);
+  if(isNaN(a)||isNaN(b)) return;
+  qDone=true;
+  document.getElementById('ansA').disabled=true;
+  document.getElementById('ansB').disabled=true;
+  const ok = a===qData.countA && b===qData.countB;
+  if(ok){
+    qScore.c++;document.getElementById('qC').textContent=qScore.c;
+    document.getElementById('quizMsg').className='result-msg ok';
+    document.getElementById('quizMsg').textContent='✅ 正确！';
+    speak('正确！真棒！');
+    setTimeout(nextQ,1200);
+  } else {
+    qScore.w++;document.getElementById('qW').textContent=qScore.w;
+    document.getElementById('quizMsg').className='result-msg no';
+    document.getElementById('quizMsg').textContent=`❌ 正确答案：${qData.th.nameA} ${qData.countA} 个，${qData.th.nameB} ${qData.countB} 个`;
+    speak(`答案是${qData.th.nameA}${qData.countA}个，${qData.th.nameB}${qData.countB}个，再想想！`);
+    document.getElementById('nextBtn').style.display='inline-block';
+  }
+}
+
+function switchTab(t){
+  Hpx.tabs.activate(t, ['learn','play','quiz']);
+  if(t==='learn') speak('认识问题：点击播放，看看假设法是怎么解决鸡兔同笼问题的。');
+  if(t==='play'){updatePlay();speak('拖动滑块设置总头数和总脚数，看看鸡和兔各有多少只。');}
+  if(t==='quiz') nextQ();
+}
+setTheme(0);
+speak('欢迎来到鸡兔同笼！一起用假设法解决这个千年古老的数学问题吧。');
+</script>
+
+<script src="feedback.js?v=20260906-2"></script>
+<script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="hpx-speech-compat.js"></script>
+<script src="hpx-footer-actions.js"></script>
+</body>
+</html>
