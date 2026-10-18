@@ -160,6 +160,9 @@ body {
 }
 .btn-learned:active { transform:scale(.96); }
 .btn-learned.done { background:#c8e6c9; color:#388e3c; box-shadow:none; }
+.btn-write-one { padding:11px 14px; border:none; border-radius:14px; font-size:.9rem; font-weight:bold;
+  cursor:pointer; background:linear-gradient(135deg,#9575cd,#5e35b1); color:#fff; box-shadow:0 3px 10px rgba(94,53,177,.25); }
+.btn-write-one:disabled { cursor:not-allowed; opacity:.52; box-shadow:none; }
 .btn-nav {
   padding:11px 18px; border:none; border-radius:14px;
   font-size:.9rem; font-weight:bold; cursor:pointer;
@@ -322,15 +325,21 @@ body {
 .component-link{display:inline-flex;align-items:center;text-decoration:none;margin-top:16px;padding:9px 16px;border-radius:16px;background:#ede7f6;color:#5e35b1;font-size:.85rem;font-weight:bold;}
 @media(max-width:620px){.radical-card{grid-template-columns:1fr}.radical-main{padding:12px}.radical-big{font-size:4.3rem}.radical-grid{grid-template-columns:repeat(3,1fr)}}
 @media(prefers-reduced-motion:reduce){.combine-equation.animate .combine-part{animation:none!important}}
-.stroke-wrap{max-width:340px;margin:0 auto;padding:0 12px;}
-.stroke-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
-.stroke-btn{padding:8px 14px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
+.stroke-wrap{max-width:880px;margin:0 auto;padding:0 12px;}
+.stroke-layout{display:grid;grid-template-columns:minmax(230px,300px) minmax(300px,1fr);gap:18px;align-items:start;}
+.stroke-panel{background:rgba(255,255,255,.78);border:1.5px solid #ead8f0;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(106,27,154,.08);}
+.stroke-panel h2{font-size:1rem;color:#6a1b9a;margin-bottom:12px;}
+.stroke-picker-note{font-size:.8rem;color:#888;line-height:1.55;margin:-5px 0 12px;}
+.stroke-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;margin-bottom:16px;}
+.stroke-btn{padding:7px 12px;border:2px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;font-size:.94rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .15s;}
 .stroke-btn.on{background:#6a1b9a;color:#fff;border-color:#6a1b9a;}
-.stroke-name{text-align:center;font-size:2.2rem;font-weight:bold;color:#4a148c;margin-bottom:2px;}
-.stroke-py{text-align:center;font-size:1rem;color:#e91e63;font-weight:bold;margin-bottom:2px;}
-.stroke-desc{text-align:center;font-size:.85rem;color:#888;margin-bottom:10px;}
+.stroke-name{text-align:left;font-size:2.2rem;font-weight:bold;color:#4a148c;margin-bottom:2px;}
+.stroke-py{text-align:left;font-size:1rem;color:#e91e63;font-weight:bold;margin-bottom:2px;}
+.stroke-desc{text-align:left;font-size:.85rem;color:#888;line-height:1.55;margin-bottom:0;}
+.stroke-practice-title{font-size:1.15rem;color:#4a148c;text-align:center;margin:0 0 5px;}
 #sGuideCanvas{display:block;width:100%;height:auto;}
 #sTraceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
+@media(max-width:620px){.stroke-layout{grid-template-columns:1fr;gap:12px}.stroke-panel{padding:14px}.stroke-btns{margin-bottom:12px}.stroke-name,.stroke-py,.stroke-desc{text-align:center}.stroke-btns{justify-content:center}}
 </style>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#4a148c">
@@ -502,6 +511,7 @@ body {
     <div class="ai-hz-box" id="aiHzBox"></div>
     <div class="modal-btns">
       <button class="btn-nav" onclick="modalStep(-1)">◀ 上一个</button>
+      <button class="btn-write-one" id="mWriteBtn" onclick="startWriteForModalChar()">✍️ 练习手写</button>
       <button class="btn-learned" id="mLearnBtn" onclick="toggleLearned()">✓ 学会了</button>
       <button class="btn-nav" onclick="modalStep(1)">下一个 ▶</button>
     </div>
@@ -536,10 +546,12 @@ body {
         <div id="hwHintStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:none;pointer-events:none;"></div>
       </div>
       <div class="write-hint">用手指或鼠标在田字格里书写</div>
+      <div class="write-hint" id="strictOrderStatus"></div>
       <div class="write-result" id="wResult"></div>
       <div class="write-btns">
         <button class="btn btn-gray" onclick="writeNav(-1)">◀ 上一个</button>
         <button class="btn-guide-toggle on" id="guideToggle" onclick="toggleGuide()">👁 显示参考</button>
+        <button class="btn-guide-toggle on" id="strictOrderToggle" onclick="toggleStrictStrokeOrder()">✍️ 严格笔顺：开</button>
         <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showWriteHint()">💡 笔顺提示</button>
         <button class="btn-guide-toggle" id="stepToggle" onclick="toggleStepPanel()">✏️ 逐笔练习</button>
         <button class="btn" style="background:#e91e63;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="clearWrite()">🗑 清除</button>
@@ -557,20 +569,31 @@ body {
     <p>练好基本笔画，写字更漂亮</p>
   </div>
   <div class="stroke-wrap">
-    <div class="stroke-btns" id="strokeBtns"></div>
-    <div class="stroke-name" id="strokeName">横</div>
-    <div class="stroke-py"   id="strokePy">héng</div>
-    <div class="stroke-desc" id="strokeDesc"></div>
-    <div class="write-canvas-wrap">
-      <canvas id="sGuideCanvas" width="280" height="280"></canvas>
-      <canvas id="sTraceCanvas" width="280" height="280"></canvas>
-    </div>
-    <div class="write-hint">沿着粉色笔画描写</div>
-    <div class="write-result" id="sResult"></div>
-    <div class="write-btns">
-      <button class="btn btn-gray"  onclick="clearStroke()">🗑 清除</button>
-      <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showStrokeHint()">💡 提示</button>
-      <button class="btn btn-purple" onclick="speak(STROKE_DATA[curStroke].name)">🔊 读</button>
+    <div class="stroke-layout">
+      <section class="stroke-panel" aria-label="笔画选择">
+        <h2>① 选择笔画</h2>
+        <p class="stroke-picker-note">点选一个笔画，先看清它的方向和要领。</p>
+        <div class="stroke-btns" id="strokeBtns"></div>
+        <div class="stroke-name" id="strokeName">横</div>
+        <div class="stroke-py"   id="strokePy">héng</div>
+        <div class="stroke-desc" id="strokeDesc"></div>
+      </section>
+      <section class="stroke-panel" aria-label="笔画书写">
+        <h2 class="stroke-practice-title">② 在这里写一写</h2>
+        <div class="write-canvas-wrap">
+          <canvas id="sGuideCanvas" width="280" height="280"></canvas>
+          <canvas id="sTraceCanvas" width="280" height="280"></canvas>
+        </div>
+        <div class="write-hint">沿着粉色笔画描写</div>
+        <div class="write-hint" id="strictDirectionStatus"></div>
+        <div class="write-result" id="sResult"></div>
+        <div class="write-btns">
+          <button class="btn btn-gray"  onclick="clearStroke()">🗑 清除</button>
+          <button class="btn-guide-toggle on" id="strictDirectionToggle" onclick="toggleStrictStrokeDirection()">✍️ 严格方向：开</button>
+          <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="showStrokeHint()">💡 提示</button>
+          <button class="btn btn-purple" onclick="speak(STROKE_DATA[curStroke].name)">🔊 读</button>
+        </div>
+      </section>
     </div>
   </div>
 </div>
@@ -1274,6 +1297,12 @@ function showModalChar() {
   btn.textContent = isLearned ? '✓ 已学会' : '✓ 学会了';
   btn.className   = 'btn-learned' + (isLearned ? ' done' : '');
 
+  const writeBtn=document.getElementById('mWriteBtn');
+  const canWrite=Boolean(window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[ch[0]]);
+  writeBtn.disabled=false;
+  writeBtn.textContent=canWrite?'✍️ 练习手写':'✍️ 自由描写';
+  writeBtn.title=canWrite?'练习这个字的笔顺和手写':'笔顺数据正在补充，仍可进入田字格自由描写';
+
   // 切换到新字时，清空上一个字残留的 AI 讲解内容
   const aiBox=document.getElementById('aiHzBox');
   if(aiBox){ aiBox.classList.remove('show'); aiBox.innerHTML=''; }
@@ -1514,6 +1543,7 @@ function showQuizDone() {
 // ─────────────────────────────────────────────────
 let wList=[], wIdx=0, wGuideOn=true;
 let _hintTimer=null, _writeInited=false;
+let strictStrokeOrder=true, strictStrokeIndex=0;
 
 function startWrite(){
   const strokeData=window.HANZI_STROKE_DATA||{};
@@ -1531,6 +1561,19 @@ function startWrite(){
   if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
 }
 
+function startWriteForModalChar(){
+  const ch=curChars[modalIdx];
+  const strokeData=window.HANZI_STROKE_DATA||{};
+  if(!ch) return;
+  wList=[ch];
+  wIdx=0;
+  closeModal();
+  renderWrite();
+  show('pgWrite');
+  if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
+  if(!strokeData[ch[0]]) showToast('这个字的笔顺数据正在补充，可以先在田字格里自由描写。');
+}
+
 function renderWrite(){
   const ch=wList[wIdx];
   document.getElementById('wProg').textContent=(wIdx+1)+' / '+wList.length+' · '+ch[2]+'画';
@@ -1538,6 +1581,7 @@ function renderWrite(){
   document.getElementById('wSub').textContent=ch[3]+(ch[4]?'  ·  例：'+ch[4]:'');
   document.getElementById('wResult').textContent='';
   document.getElementById('wResult').className='write-result';
+  updateStrictOrderControl();
   drawGuide(ch[0]);
   clearWrite();
   initStepChar(ch[0]);
@@ -1599,6 +1643,8 @@ function clearWrite(){
   clearTimeout(_hintTimer);
   const canvas=document.getElementById('writeCanvas');
   canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  strictStrokeIndex=0;
+  updateStrictOrderStatus();
   document.getElementById('wResult').textContent='';
   document.getElementById('wResult').className='write-result';
   const stage=document.getElementById('hwHintStage');
@@ -1611,6 +1657,40 @@ function toggleGuide(){
   btn.classList.toggle('on',wGuideOn);
   btn.textContent=wGuideOn?'👁 显示参考':'👁 隐藏参考';
   if(wList.length) drawGuide(wList[wIdx][0]);
+}
+
+function toggleStrictStrokeOrder(){
+  const char=wList[wIdx]&&wList[wIdx][0];
+  if(!char || !(window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char])){
+    showToast('这个字的笔顺数据正在补充，暂不能开启严格笔顺。');
+    return;
+  }
+  strictStrokeOrder=!strictStrokeOrder;
+  updateStrictOrderControl();
+  clearWrite();
+  showToast(strictStrokeOrder?'已开启严格笔顺：请按一笔一笔的顺序写。':'已关闭严格笔顺：只计算整体笔画覆盖。');
+}
+
+function updateStrictOrderControl(){
+  const btn=document.getElementById('strictOrderToggle');
+  if(!btn) return;
+  const char=wList[wIdx]&&wList[wIdx][0];
+  const canStrict=Boolean(char&&window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char]);
+  btn.disabled=!canStrict;
+  btn.classList.toggle('on',canStrict&&strictStrokeOrder);
+  btn.textContent=canStrict?`✍️ 严格笔顺：${strictStrokeOrder?'开':'关'}`:'✍️ 笔顺待补充';
+}
+
+function updateStrictOrderStatus(){
+  const el=document.getElementById('strictOrderStatus');
+  if(!el) return;
+  if(!strictStrokeOrder){ el.textContent=''; return; }
+  const char=wList[wIdx]&&wList[wIdx][0];
+  const data=char&&window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  const total=data&&data.medians?data.medians.length:0;
+  el.textContent=total
+    ? `严格笔顺已开启：请写第 ${Math.min(strictStrokeIndex+1,total)} 笔 / 共 ${total} 笔`
+    : '笔顺数据正在补充：可以自由描写';
 }
 
 function writeNav(dir){
@@ -1743,49 +1823,141 @@ function toggleStepPanel(){
   if(stepPanelOn&&stepChar) initStepChar(stepChar);
 }
 
-// 书写匹配度检测（像素比对，pointerup 后调用）
+// 用与 Hanzi Writer 参考字完全相同的 SVG 笔画路径绘制判定遮罩。
+// Hanzi Writer 的坐标范围为 x: 0~1024、y: -124~900，定位公式与 HW_BOX 一致。
+function drawHanziStrokeMask(ctx,char,withHalo=false){
+  const data=window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  if(!data || !data.strokes || typeof Path2D==='undefined') return false;
+  const S=280, padding=HW_BOX.padding, scale=(S-padding*2)/1024;
+  const yOffset=padding+124*scale;
+  ctx.save();
+  if(withHalo){ ctx.shadowColor='#000'; ctx.shadowBlur=10; }
+  ctx.translate(padding,S-yOffset);
+  ctx.scale(scale,-scale);
+  data.strokes.forEach(path=>ctx.fill(new Path2D(path)));
+  ctx.restore();
+  return true;
+}
+
+// 书写匹配度检测（以目标字形的笔画像素为基准，pointerup 后调用）
 function checkMatch(){
-  const S=280, GRID=14, STEP=S/GRID;
+  const S=280;
+  const char=wList[wIdx]&&wList[wIdx][0];
+  if(!char) return;
   const tCtx=document.getElementById('writeCanvas').getContext('2d');
-  // 离屏 canvas 只画纯字（透明背景），排除田字格背景对 alpha 的干扰
-  const off=document.createElement('canvas');
-  off.width=S; off.height=S;
-  const gCtx=off.getContext('2d');
-  if(wList[wIdx]){
-    const ch=wList[wIdx];
-    gCtx.font=`bold ${Math.round(S*.74)}px "楷体","STKaiti","KaiTi","华文楷体",serif`;
-    gCtx.textAlign='center'; gCtx.textBaseline='middle';
-    gCtx.fillStyle='#000';
-    gCtx.fillText(ch,S/2,S/2+4);
+  const strokeData=window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  if(!strokeData){
+    const pixels=tCtx.getImageData(0,0,S,S).data;
+    if(pixels.some((value,index)=>index%4===3&&value>20)){
+      const el=document.getElementById('wResult');
+      el.textContent='✍️ 自由描写完成！笔顺评分正在补充。';
+      el.className='write-result so';
+    }
+    return;
   }
+  // 离屏 canvas 只画真实笔画路径，目标笔画而非田字格作为覆盖率分母。
+  const target=document.createElement('canvas');
+  target.width=S; target.height=S;
+  const gCtx=target.getContext('2d');
+  if(!drawHanziStrokeMask(gCtx,char)){
+    showToast('当前浏览器无法加载笔画判定，请使用较新的浏览器。');
+    return;
+  }
+  // 允许少量书写偏差：真实笔画外沿扩展 10px，用来判断用户笔迹是否落在笔画附近。
+  const targetHalo=document.createElement('canvas');
+  targetHalo.width=S; targetHalo.height=S;
+  const hCtx=targetHalo.getContext('2d');
+  drawHanziStrokeMask(hCtx,char,true);
+  drawHanziStrokeMask(hCtx,char);
+
+  // 将用户笔迹稍微扩展，用于计算“目标笔画有没有被写到”；
+  // 不扩展的原始笔迹仍用于计算是否明显写到字形外。
+  const userHalo=document.createElement('canvas');
+  userHalo.width=S; userHalo.height=S;
+  const uCtx=userHalo.getContext('2d');
+  uCtx.shadowColor='#000'; uCtx.shadowBlur=10;
+  uCtx.drawImage(document.getElementById('writeCanvas'),0,0);
+  uCtx.drawImage(document.getElementById('writeCanvas'),0,0);
+
   const tPx=tCtx.getImageData(0,0,S,S).data;
   const gPx=gCtx.getImageData(0,0,S,S).data;
-  let tCells=0,gCells=0,both=0;
-  for(let row=0;row<GRID;row++){
-    for(let col=0;col<GRID;col++){
-      let tSum=0,gSum=0;
-      for(let dy=0;dy<STEP;dy++) for(let dx=0;dx<STEP;dx++){
-        const i=((Math.floor(row*STEP+dy))*S+Math.floor(col*STEP+dx))*4;
-        tSum+=tPx[i+3]; gSum+=gPx[i+3];
-      }
-      const area=STEP*STEP;
-      const tOn=(tSum/area)>20, gOn=(gSum/area)>15;
-      if(tOn) tCells++;
-      if(gOn) gCells++;
-      if(tOn&&gOn) both++;
+  const hPx=hCtx.getImageData(0,0,S,S).data;
+  const uPx=uCtx.getImageData(0,0,S,S).data;
+  let targetPixels=0, coveredPixels=0, userPixels=0, onCharacterPixels=0;
+  for(let i=3;i<tPx.length;i+=4){
+    const targetOn=gPx[i]>80;
+    const userOn=tPx[i]>20;
+    if(targetOn){
+      targetPixels++;
+      if(uPx[i]>20) coveredPixels++;
+    }
+    if(userOn){
+      userPixels++;
+      if(hPx[i]>20) onCharacterPixels++;
     }
   }
-  if(tCells<3) return;
-  const pct=gCells>0?Math.round(both/gCells*100):0;
+  if(userPixels<80 || !targetPixels) return;
+  const coverage=Math.round(coveredPixels/targetPixels*100);
+  const precision=Math.round(onCharacterPixels/userPixels*100);
   const el=document.getElementById('wResult');
-  if(pct>=70){el.textContent='写得棒！覆盖 '+pct+'%';el.className='write-result ok';tone(660,.25);}
-  else{el.textContent='继续练！覆盖 '+pct+'%，再描一遍';el.className='write-result so';}
+  if(coverage>=70 && precision>=45){
+    el.textContent=`写得棒！笔画覆盖 ${coverage}%`;
+    el.className='write-result ok';tone(660,.25);
+  } else {
+    el.textContent=`继续练！笔画覆盖 ${coverage}%${precision<45?'，注意别写到字外':''}`;
+    el.className='write-result so';
+  }
+}
+
+function pointToSegmentDistance(point,start,end){
+  const dx=end[0]-start[0], dy=end[1]-start[1];
+  const lengthSq=dx*dx+dy*dy;
+  if(!lengthSq) return Math.hypot(point[0]-start[0],point[1]-start[1]);
+  const t=Math.max(0,Math.min(1,((point[0]-start[0])*dx+(point[1]-start[1])*dy)/lengthSq));
+  return Math.hypot(point[0]-(start[0]+t*dx),point[1]-(start[1]+t*dy));
+}
+
+function pointToPathDistance(point,path){
+  let distance=Infinity;
+  for(let i=1;i<path.length;i++) distance=Math.min(distance,pointToSegmentDistance(point,path[i-1],path[i]));
+  return distance;
+}
+
+function averagePathDistance(fromPath,toPath){
+  return fromPath.reduce((sum,point)=>sum+pointToPathDistance(point,toPath),0)/fromPath.length;
+}
+
+function expectedStrokePoints(char,index){
+  const data=window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  if(!data || !data.medians || !data.medians[index]) return null;
+  const S=280, padding=HW_BOX.padding, scale=(S-padding*2)/1024;
+  const yOffset=padding+124*scale;
+  return data.medians[index].map(([x,y])=>[padding+x*scale,S-(yOffset+y*scale)]);
+}
+
+// 严格笔顺只检查当前这一笔是否符合下一笔的方向和位置；
+// 每笔通过后才允许进入下一笔，避免把整字涂满仍拿到高分。
+function verifyStrictStroke(points){
+  const char=wList[wIdx]&&wList[wIdx][0];
+  const data=char&&window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char];
+  if(!data || !data.medians) return {ok:false,message:'这个字的严格笔顺数据正在补充'};
+  if(strictStrokeIndex>=data.medians.length) return {ok:false,message:'这个字已经写完，请查看覆盖结果'};
+  if(points.length<2) return {ok:false,message:'请把这一笔完整写出来'};
+  const expected=expectedStrokePoints(char,strictStrokeIndex);
+  const startDistance=Math.hypot(points[0][0]-expected[0][0],points[0][1]-expected[0][1]);
+  const endDistance=Math.hypot(points[points.length-1][0]-expected[expected.length-1][0],points[points.length-1][1]-expected[expected.length-1][1]);
+  const pathDistance=(averagePathDistance(points,expected)+averagePathDistance(expected,points))/2;
+  const correct=startDistance<=42 && endDistance<=52 && pathDistance<=29;
+  if(!correct) return {ok:false,message:`第 ${strictStrokeIndex+1} 笔顺序或方向不对，请按提示重写`};
+  strictStrokeIndex++;
+  updateStrictOrderStatus();
+  return {ok:true};
 }
 
 function initWriteCanvas(){
   const canvas=document.getElementById('writeCanvas');
   if(!canvas) return;
-  let isWriting=false, lastX=0, lastY=0;
+  let isWriting=false, activeStroke=[], beforeStroke=null;
   function xy(e){
     const r=canvas.getBoundingClientRect();
     const scaleX=canvas.width/r.width, scaleY=canvas.height/r.height;
@@ -1796,8 +1968,9 @@ function initWriteCanvas(){
     isWriting=true;
     try{canvas.setPointerCapture(e.pointerId);}catch(err){}
     const [x,y]=xy(e);
-    lastX=x; lastY=y;
     const ctx=canvas.getContext('2d');
+    activeStroke=[[x,y]];
+    beforeStroke=strictStrokeOrder?ctx.getImageData(0,0,canvas.width,canvas.height):null;
     ctx.strokeStyle='#1a237e';ctx.lineWidth=18;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.beginPath();ctx.moveTo(x,y);
   });
@@ -1809,14 +1982,33 @@ function initWriteCanvas(){
     ctx.strokeStyle='#1a237e';ctx.lineWidth=18;ctx.lineCap='round';ctx.lineJoin='round';
     ctx.lineTo(x,y);ctx.stroke();
     ctx.beginPath();ctx.moveTo(x,y);
-    lastX=x; lastY=y;
+    activeStroke.push([x,y]);
   });
   canvas.addEventListener('pointerup',e=>{
     e.preventDefault();
     isWriting=false;
+    const [x,y]=xy(e);
+    const last=activeStroke[activeStroke.length-1];
+    if(!last || Math.hypot(x-last[0],y-last[1])>1) activeStroke.push([x,y]);
+    const char=wList[wIdx]&&wList[wIdx][0];
+    const canStrict=Boolean(char&&window.HANZI_STROKE_DATA&&window.HANZI_STROKE_DATA[char]);
+    if(strictStrokeOrder&&canStrict){
+      const verdict=verifyStrictStroke(activeStroke);
+      if(!verdict.ok){
+        if(beforeStroke) canvas.getContext('2d').putImageData(beforeStroke,0,0);
+        const result=document.getElementById('wResult');
+        result.textContent=`❌ ${verdict.message}`;
+        result.className='write-result'; result.style.color='#e53935';
+        tone(200,.18,'sawtooth');
+        return;
+      }
+    }
     try{checkMatch();}catch(err){}
   });
-  canvas.addEventListener('pointercancel',()=>{isWriting=false;});
+  canvas.addEventListener('pointercancel',()=>{
+    isWriting=false;
+    if(strictStrokeOrder&&beforeStroke) canvas.getContext('2d').putImageData(beforeStroke,0,0);
+  });
 }
 
 // ─────────────────────────────────────────────────
@@ -2038,6 +2230,7 @@ const STROKE_DATA = [
 ];
 
 let curStroke=0, _sHintTimer=null, _sInited=false;
+let strictStrokeDirection=true, strictStrokeCompleted=false;
 
 function startStroke(){
   show('pgStroke');
@@ -2064,6 +2257,23 @@ function selectStroke(idx){
   drawStrokeGuide(s.pts);
   clearStroke();
   speak(s.name);
+}
+
+function toggleStrictStrokeDirection(){
+  strictStrokeDirection=!strictStrokeDirection;
+  const btn=document.getElementById('strictDirectionToggle');
+  btn.classList.toggle('on',strictStrokeDirection);
+  btn.textContent=`✍️ 严格方向：${strictStrokeDirection?'开':'关'}`;
+  clearStroke();
+  showToast(strictStrokeDirection?'已开启严格方向：请从绿点“起”开始，一笔写完。':'已关闭严格方向：只计算整体笔画匹配。');
+}
+
+function updateStrictDirectionStatus(){
+  const el=document.getElementById('strictDirectionStatus');
+  if(!el) return;
+  el.textContent=strictStrokeDirection
+    ? (strictStrokeCompleted?'严格方向正确 ✓':'严格方向已开启：从绿点“起”开始，一笔写完')
+    : '';
 }
 
 function drawStrokeGuide(pts){
@@ -2093,6 +2303,8 @@ function drawStrokeGuide(pts){
 function clearStroke(){
   clearTimeout(_sHintTimer);
   document.getElementById('sTraceCanvas').getContext('2d').clearRect(0,0,280,280);
+  strictStrokeCompleted=false;
+  updateStrictDirectionStatus();
   const r=document.getElementById('sResult');
   r.textContent=''; r.className='write-result'; r.style.color='';
 }
@@ -2161,13 +2373,32 @@ function checkStrokeMatch(){
   }
 }
 
+// 单笔练习没有“第几笔”的问题；严格模式只校验是否从正确起笔点，
+// 沿正确方向完整写出当前笔画。通过后不能再额外补画。
+function verifyStrictStrokeDirection(points){
+  if(strictStrokeCompleted) return {ok:false,message:'这一笔已经写完，请清除后再练'};
+  if(points.length<2) return {ok:false,message:'请把这一笔完整写出来'};
+  const expected=STROKE_DATA[curStroke].pts.map(([x,y])=>[x*280,y*280]);
+  const startDistance=Math.hypot(points[0][0]-expected[0][0],points[0][1]-expected[0][1]);
+  const endDistance=Math.hypot(points[points.length-1][0]-expected[expected.length-1][0],points[points.length-1][1]-expected[expected.length-1][1]);
+  const pathDistance=(averagePathDistance(points,expected)+averagePathDistance(expected,points))/2;
+  if(startDistance>38 || endDistance>48 || pathDistance>25){
+    return {ok:false,message:'起笔、方向或路径不对，请从绿点“起”开始重写'};
+  }
+  strictStrokeCompleted=true;
+  updateStrictDirectionStatus();
+  return {ok:true};
+}
+
 function initStrokeCanvas(){
   const cv=document.getElementById('sTraceCanvas');
-  let drawing=false;
+  let drawing=false, activeStroke=[], beforeStroke=null;
   function xy(e){ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*280/r.width,(e.clientY-r.top)*280/r.height]; }
   cv.addEventListener('pointerdown',e=>{
     e.preventDefault(); drawing=true; try{cv.setPointerCapture(e.pointerId);}catch(err){}
     const [x,y]=xy(e), ctx=cv.getContext('2d');
+    activeStroke=[[x,y]];
+    beforeStroke=strictStrokeDirection?ctx.getImageData(0,0,cv.width,cv.height):null;
     ctx.strokeStyle='#1a237e'; ctx.lineWidth=18; ctx.lineCap='round'; ctx.lineJoin='round';
     ctx.beginPath(); ctx.moveTo(x,y);
   });
@@ -2175,9 +2406,29 @@ function initStrokeCanvas(){
     e.preventDefault(); if(!drawing) return;
     const [x,y]=xy(e), ctx=cv.getContext('2d');
     ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+    activeStroke.push([x,y]);
   });
-  cv.addEventListener('pointerup',e=>{ e.preventDefault(); drawing=false; try{checkStrokeMatch();}catch(err){} });
-  cv.addEventListener('pointercancel',()=>{ drawing=false; });
+  cv.addEventListener('pointerup',e=>{
+    e.preventDefault(); drawing=false;
+    const [x,y]=xy(e), last=activeStroke[activeStroke.length-1];
+    if(!last || Math.hypot(x-last[0],y-last[1])>1) activeStroke.push([x,y]);
+    if(strictStrokeDirection){
+      const verdict=verifyStrictStrokeDirection(activeStroke);
+      if(!verdict.ok){
+        if(beforeStroke) cv.getContext('2d').putImageData(beforeStroke,0,0);
+        const result=document.getElementById('sResult');
+        result.textContent=`❌ ${verdict.message}`;
+        result.className='write-result'; result.style.color='#e53935';
+        tone(200,.18,'sawtooth');
+        return;
+      }
+    }
+    try{checkStrokeMatch();}catch(err){}
+  });
+  cv.addEventListener('pointercancel',()=>{
+    drawing=false;
+    if(strictStrokeDirection&&beforeStroke) cv.getContext('2d').putImageData(beforeStroke,0,0);
+  });
 }
 
 // ─────────────────────────────────────────────────
