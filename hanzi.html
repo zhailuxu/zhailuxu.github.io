@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>趣味汉字 — 3000常用字</title>
-<meta name="description" content="从简单到复杂，趣味学习3000常用汉字，含拼音、笔画、偏旁、例词与部件组合">
+<meta name="description" content="按一至六年级由基础到拓展，趣味学习3000常用汉字，含拼音、笔画、偏旁、例词与部件组合">
 <style>
 * { box-sizing:border-box; margin:0; padding:0; }
 body {
@@ -261,7 +261,7 @@ body {
 .write-prog{text-align:center;font-size:.9rem;color:#888;margin-bottom:6px;}
 .write-title{text-align:center;font-size:1.6rem;font-weight:bold;color:#4a148c;margin-bottom:2px;letter-spacing:8px;}
 .write-sub{text-align:center;font-size:.88rem;color:#888;margin-bottom:10px;}
-/* 手写练习：左侧「自己写」+ 右侧「一笔笔跟着练」两栏并排，窄屏自动堆叠 */
+/* 手写练习：左侧「一笔笔跟着练」+ 右侧「自己写」两栏并排，窄屏自动堆叠 */
 .write-panels{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:640px;margin:0 auto;padding:0 12px 20px;}
 .write-panel-col{width:280px;}
 .step-panel{display:none;}
@@ -346,7 +346,7 @@ body {
   <div class="hdr">
     <div style="font-size:3rem">📖</div>
     <h1>趣味汉字</h1>
-    <p>从简单到复杂，认识3000个常用汉字</p>
+    <p>按一至六年级，由基础字逐步认识3000个常用汉字</p>
   </div>
   <div class="stroke-entry">
     <button class="stroke-entry-btn" onclick="startStroke()">✏️ 笔画练习</button>
@@ -485,7 +485,7 @@ body {
     <div class="modal-py"   id="mPy"></div>
     <div class="modal-meta">
       <span class="meta-tag" id="mStrokeTag" style="background:#7e57c2">0画</span>
-      <span class="meta-tag" id="mLvlTag"    style="background:#e91e63">第1关</span>
+      <span class="meta-tag" id="mLvlTag"    style="background:#e91e63">一年级</span>
     </div>
     <div class="modal-meaning">
       <div class="meaning-label">字义</div>
@@ -517,6 +517,17 @@ body {
     <div class="write-sub" id="wSub"></div>
   </div>
   <div class="write-panels">
+    <div class="write-panel-col step-panel">
+      <div class="write-canvas-wrap">
+        <canvas id="stepGuideCanvas" width="280" height="280"></canvas>
+        <div id="hwStepStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
+      </div>
+      <div class="write-hint" id="stepLabel">点击"下一笔"开始</div>
+      <div class="write-btns">
+        <button class="btn btn-gray" onclick="stepReset()">↺ 重来</button>
+        <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:9px 20px;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="stepNext()">下一笔 ▶</button>
+      </div>
+    </div>
     <div class="write-panel-col">
       <div class="write-canvas-wrap">
         <canvas id="guideCanvas" width="280" height="280"></canvas>
@@ -533,17 +544,6 @@ body {
         <button class="btn-guide-toggle" id="stepToggle" onclick="toggleStepPanel()">✏️ 逐笔练习</button>
         <button class="btn" style="background:#e91e63;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="clearWrite()">🗑 清除</button>
         <button class="btn btn-gray" onclick="writeNav(1)">下一个 ▶</button>
-      </div>
-    </div>
-    <div class="write-panel-col step-panel">
-      <div class="write-canvas-wrap">
-        <canvas id="stepGuideCanvas" width="280" height="280"></canvas>
-        <div id="hwStepStage" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
-      </div>
-      <div class="write-hint" id="stepLabel">点击"下一笔"开始</div>
-      <div class="write-btns">
-        <button class="btn btn-gray" onclick="stepReset()">↺ 重来</button>
-        <button class="btn" style="background:#7b1fa2;color:#fff;border:none;border-radius:18px;padding:9px 20px;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;" onclick="stepNext()">下一笔 ▶</button>
       </div>
     </div>
   </div>
@@ -579,13 +579,15 @@ body {
 
 <script src="lib/hanzi-writer.min.js"></script>
 <script src="hanzi-data.js"></script>
+<script src="hanzi-frequency-3000.js"></script>
 <script src="hpx-core.js?v=20260906-3"></script>
 <script>
 // ─────────────────────────────────────────────────
 //  Character Data
 //  Format: [char, pinyin, strokes, meaning, example_word, word_meaning, level]
+//  BASE_CHARS keeps the project's original child-friendly explanations.
 // ─────────────────────────────────────────────────
-const CHARS = [
+const BASE_CHARS = [
 
 // ══════ Level 1 · 入门 · 独体字（1-5画）══════
 ['一','yī',1,'数字一，最小的正整数','一起','大家一起去',1],
@@ -932,18 +934,74 @@ const CHARS = [
 ['望','wàng',11,'希望，看望','希望','有期望',6],
 ['希','xī',7,'希望','希望','有期望',6],
 
-]; // end CHARS
+]; // end BASE_CHARS
+
+// The 3,000-character learning index is sorted by frequency. Original entries
+// above retain their project-written explanations; the remaining entries keep
+// only licensed factual metadata (pinyin, stroke count, frequency rank).
+const frequencyChars = window.HANZI_FREQUENCY_3000;
+if (!Array.isArray(frequencyChars) || frequencyChars.length !== 3000) {
+  throw new Error('3000 汉字学习数据加载失败');
+}
+const baseCharMap = new Map();
+BASE_CHARS.forEach(item => {
+  if (!baseCharMap.has(item[0])) baseCharMap.set(item[0], item);
+});
+// 一年级先按儿童容易理解的成组概念连续学习，再接高频、低笔画字。
+// 这是站内学习分层，并非对应某一套教材的官方识字表。
+const FOUNDATION_GROUPS = [
+  '一二三四五六七八九十',
+  '日月水火土',
+  '天地人',
+  '上中下左右',
+  '你我他她',
+  '大小多少长短高低',
+  '口耳目手足',
+  '山石田木林',
+  '云雨风雪',
+];
+const foundationRank = new Map();
+let foundationIndex = 0;
+FOUNDATION_GROUPS.forEach(group => {
+  [...group].forEach(char => {
+    if (!foundationRank.has(char)) foundationRank.set(char, foundationIndex++);
+  });
+});
+const learningOrder = [...frequencyChars].sort((left, right) => {
+  const leftFoundationRank = foundationRank.get(left[0]);
+  const rightFoundationRank = foundationRank.get(right[0]);
+  if (leftFoundationRank !== undefined || rightFoundationRank !== undefined) {
+    return (leftFoundationRank ?? Infinity) - (rightFoundationRank ?? Infinity);
+  }
+  const learningScore = ([, , strokes, rank]) => rank + Math.max(0, strokes - 4) * 120;
+  return learningScore(left) - learningScore(right) || left[3] - right[3];
+});
+
+const CHARS = learningOrder.map(([char, pinyin, strokes, rank], index) => {
+  const original = baseCharMap.get(char);
+  const level = Math.min(6, Math.floor(index / 500) + 1);
+  return [
+    char,
+    original ? original[1] : pinyin,
+    original ? original[2] : strokes,
+    original ? original[3] : '高频常用学习汉字',
+    original ? original[4] : char,
+    original ? original[5] : `常用字频率第 ${rank} 位`,
+    level,
+    rank,
+  ];
+});
 
 // ─────────────────────────────────────────────────
 //  Level configuration
 // ─────────────────────────────────────────────────
 const LEVELS = [
-  { id:1, icon:'🌱', name:'入门', sub:'独体字 · 1-5画', color:'#4caf50', grad:'linear-gradient(135deg,#81c784,#2e7d32)' },
-  { id:2, icon:'🌿', name:'初级', sub:'常见字 · 6-7画', color:'#00897b', grad:'linear-gradient(135deg,#4db6ac,#00695c)' },
-  { id:3, icon:'🌸', name:'中级', sub:'常用词汇 · 8画+', color:'#e91e63', grad:'linear-gradient(135deg,#f48fb1,#880e4f)' },
-  { id:4, icon:'🏮', name:'进阶', sub:'词汇扩展', color:'#f57c00', grad:'linear-gradient(135deg,#ffb74d,#e65100)' },
-  { id:5, icon:'🎯', name:'高级', sub:'词汇深化', color:'#7b1fa2', grad:'linear-gradient(135deg,#ce93d8,#4a148c)' },
-  { id:6, icon:'🏆', name:'拓展', sub:'进阶常用字', color:'#1565c0', grad:'linear-gradient(135deg,#64b5f6,#0d47a1)' },
+  { id:1, icon:'🌱', name:'一年级', sub:'高频基础字 · 优先低笔画', color:'#4caf50', grad:'linear-gradient(135deg,#81c784,#2e7d32)' },
+  { id:2, icon:'🌿', name:'二年级', sub:'常用基础字', color:'#00897b', grad:'linear-gradient(135deg,#4db6ac,#00695c)' },
+  { id:3, icon:'🌸', name:'三年级', sub:'常用进阶字', color:'#e91e63', grad:'linear-gradient(135deg,#f48fb1,#880e4f)' },
+  { id:4, icon:'🏮', name:'四年级', sub:'阅读常用字', color:'#f57c00', grad:'linear-gradient(135deg,#ffb74d,#e65100)' },
+  { id:5, icon:'🎯', name:'五年级', sub:'扩展常用字', color:'#7b1fa2', grad:'linear-gradient(135deg,#ce93d8,#4a148c)' },
+  { id:6, icon:'🏆', name:'六年级', sub:'综合常用字', color:'#1565c0', grad:'linear-gradient(135deg,#64b5f6,#0d47a1)' },
 ];
 
 // 常见偏旁学习数据。名称、位置、例字和组合均按通用汉字知识独立整理。
@@ -1205,7 +1263,7 @@ function showModalChar() {
   document.getElementById('mPy').textContent      = ch[1];
   document.getElementById('mStrokeTag').textContent = ch[2] + '画';
   document.getElementById('mStrokeTag').style.background = lv.color;
-  document.getElementById('mLvlTag').textContent  = '第'+ch[6]+'关';
+  document.getElementById('mLvlTag').textContent  = lv.name;
   document.getElementById('mLvlTag').style.background = lv.color;
   document.getElementById('mMeaning').textContent = ch[3];
   document.getElementById('mWord').textContent    = ch[4];
@@ -1458,7 +1516,15 @@ let wList=[], wIdx=0, wGuideOn=true;
 let _hintTimer=null, _writeInited=false;
 
 function startWrite(){
-  wList=[...curChars];
+  const strokeData=window.HANZI_STROKE_DATA||{};
+  wList=curChars.filter(ch=>strokeData[ch[0]]);
+  if(!wList.length){
+    showToast('这一关的笔顺动画数据正在补充，请先用字卡或测验学习。');
+    return;
+  }
+  if(wList.length<curChars.length){
+    showToast(`本关有 ${wList.length} 个字支持笔顺动画，其余字可先用字卡学习。`);
+  }
   wIdx=0;
   renderWrite();
   show('pgWrite');
@@ -1646,7 +1712,7 @@ function initStepChar(char){
 function updateStepLabel(){
   const el=document.getElementById('stepLabel');
   if(!el) return;
-  if(!stepTotal) el.textContent='点击"下一笔"开始';
+  if(!stepTotal) el.textContent='这个字的逐笔动画正在补充';
   else if(stepIdx>=stepTotal) el.textContent=`✓ 全部 ${stepTotal} 笔完成啦`;
   else el.textContent=`第 ${stepIdx+1} 笔 / 共 ${stepTotal} 笔`;
 }
