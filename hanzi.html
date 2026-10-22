@@ -1911,13 +1911,19 @@ function checkMatch(){
   const coverage=Math.round(coveredPixels/targetPixels*100);
   const precision=Math.round(onCharacterPixels/userPixels*100);
   const el=document.getElementById('wResult');
+  let speechText='';
   if(coverage>=70 && precision>=45){
     el.textContent=`写得棒！笔画覆盖 ${coverage}%`;
     el.className='write-result ok';tone(660,.25);
+    speechText=`写得棒！笔画覆盖百分之${coverage}`;
   } else {
     el.textContent=`继续练！笔画覆盖 ${coverage}%${precision<45?'，注意别写到字外':''}`;
     el.className='write-result so';
+    speechText=`继续练！笔画覆盖百分之${coverage}`;
   }
+  // 严格笔顺下每笔都会触发匹配计算，只在全部笔画完成后才朗读最终分数。
+  const totalStrokes=strokeData.medians?strokeData.medians.length:0;
+  if(speechText&&(!strictStrokeOrder||strictStrokeIndex>=totalStrokes)) speak(speechText);
 }
 
 function pointToSegmentDistance(point,start,end){
@@ -2373,16 +2379,17 @@ function checkStrokeMatch(){
   const el=document.getElementById('sResult');
   el.style.color='';
   if(f1>=65){
-    el.textContent=f1>=80?`🌟 写得棒！匹配 ${f1}%`:`✅ 不错！匹配 ${f1}%`;
+    el.textContent=f1>=80?`🌟 写得棒！匹配 ${f1}% · ${f1}分`:`✅ 不错！匹配 ${f1}% · ${f1}分`;
     el.className='write-result ok'; if(f1>=80) tone(660,.25);
   } else if(f1>=40){
-    el.textContent=`⚠️ 接近了，匹配 ${f1}%，再试试`;
+    el.textContent=`⚠️ 接近了，匹配 ${f1}% · ${f1}分，再试试`;
     el.className='write-result so';
   } else {
-    el.textContent=`❌ 匹配 ${f1}%，点💡看提示再描一遍`;
+    el.textContent=`❌ 匹配 ${f1}% · ${f1}分，点💡看提示再描一遍`;
     el.className='write-result'; el.style.color='#e53935';
     tone(200,.18,'sawtooth');
   }
+  speak(`匹配度百分之${f1}，${f1}分`);
 }
 
 // 单笔练习没有“第几笔”的问题；严格模式只校验是否从正确起笔点，
