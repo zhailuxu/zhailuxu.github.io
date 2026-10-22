@@ -202,6 +202,7 @@ body {
   font-size: .95rem; font-weight: 800; color: #E07000;
   background: #FFF3E0; border-radius: 10px; padding: 4px 14px;
 }
+.quiz-reset-btn { padding: 6px 11px; font-size: .8rem; }
 .quiz-progress-bar { background: #E8ECF0; border-radius: var(--radius-pill); height: 7px; margin-bottom: 22px; overflow: hidden; }
 .quiz-progress-fill {
   height: 100%; border-radius: var(--radius-pill);
@@ -261,6 +262,34 @@ body {
 .wr-correct { color: var(--success); font-weight: 900; }
 
 /* ══════════════════════════════════════
+   TAB 4 — 除法方格填写
+══════════════════════════════════════ */
+.div-grid-intro { text-align:center; color:var(--text-muted); font-size:.88rem; line-height:1.7; margin-bottom:12px; }
+.div-grid-toolbar { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.div-grid-size-label { display:inline-flex; align-items:center; gap:6px; color:var(--accent-dark); font-size:.9rem; font-weight:700; }
+.div-grid-size-select { border:2px solid #FBCB99; border-radius:10px; padding:6px 10px; background:#fff; color:var(--accent-dark); font:inherit; font-size:.9rem; font-weight:700; cursor:pointer; }
+.div-grid-progress { color:var(--accent-dark); font-weight:800; font-size:.95rem; }
+.div-grid-toggle { border:2px solid #9ED2F0; border-radius:12px; padding:7px 12px; background:#EAF6FF; color:#155B86; font:inherit; font-size:.84rem; font-weight:700; cursor:pointer; }
+.div-grid-toggle.on { background:var(--blue); color:#fff; box-shadow:0 2px 8px rgba(30,136,199,.28); }
+.div-grid-current { min-height:36px; width:max-content; min-width:210px; max-width:100%; margin:0 auto 10px; padding:6px 16px; border-radius:12px; background:#FFF8EE; color:#76502D; text-align:center; font-size:1rem; font-weight:700; }
+.div-grid-current strong { color:var(--accent-dark); font-size:1.15rem; font-family:'Courier New',monospace; }
+.div-grid-scroll { overflow-x:auto; padding:3px 2px 8px; }
+.div-fill-grid { border-collapse:separate; border-spacing:5px; margin:0 auto; }
+.div-fill-grid th { width:42px; min-width:42px; height:42px; border-radius:10px; background:#FFF0DF; color:var(--accent-dark); font-size:.95rem; font-weight:800; transition:background .15s,color .15s,box-shadow .15s,transform .15s; }
+.div-fill-grid .grid-corner { background:var(--accent-dark); color:#fff; font-size:1.05rem; }
+.div-fill-grid th.guide-active { background:#FFCA72; color:#5C3500; box-shadow:0 0 0 3px rgba(242,123,34,.28); transform:scale(1.08); }
+.div-fill-grid td { position:relative; width:52px; min-width:52px; height:64px; text-align:center; vertical-align:top; }
+.div-grid-input { width:52px; height:44px; border:2px solid #FBCB99; border-radius:10px; background:#fff; color:var(--text); text-align:center; font:700 1.05rem 'Courier New',monospace; outline:none; -moz-appearance:textfield; transition:border-color .15s,background .15s,box-shadow .15s; }
+.div-grid-input::-webkit-inner-spin-button,.div-grid-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+.div-grid-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(242,123,34,.16); }
+.div-grid-input.correct { border-color:var(--success); background:#EDFAF3; color:var(--success); }
+.div-grid-input.wrong { border-color:var(--danger); background:#FFF0EE; color:var(--danger); }
+.div-grid-feedback { display:block; min-height:16px; margin-top:2px; color:var(--danger); font-size:.63rem; font-weight:700; line-height:1.15; }
+.div-grid-live { min-height:24px; margin-top:8px; text-align:center; color:var(--text-muted); font-weight:700; }
+.div-grid-live.ok { color:var(--success); }
+.div-grid-live.fail { color:var(--danger); }
+
+/* ══════════════════════════════════════
    TAB 4 — 错题本
 ══════════════════════════════════════ */
 .wr-book-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
@@ -299,6 +328,10 @@ body {
   .q-equation { font-size: 2rem; letter-spacing: 3px; }
   .memo-card { width: 108px; height: 88px; }
   .q-input { width: 78px; height: 52px; font-size: 1.6rem; }
+  .div-fill-grid { border-spacing:3px; }
+  .div-fill-grid th { width:36px; min-width:36px; height:40px; }
+  .div-fill-grid td { width:48px; min-width:48px; }
+  .div-grid-input { width:48px; }
 }
 
 /* ── focus visible ── */
@@ -306,6 +339,7 @@ body {
 .memo-row-btn:focus-visible, .q-input:focus-visible {
   outline: 3px solid var(--accent); outline-offset: 2px;
 }
+.div-grid-size-select:focus-visible, .div-grid-toggle:focus-visible, .div-grid-input:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
 @media (prefers-reduced-motion: reduce) {
   .memo-card-inner { transition: none; }
   .formula-cell { transition: none; }
@@ -360,6 +394,7 @@ body {
   <button class="tab-btn active" onclick="switchTab('table')">📊 除法口诀表</button>
   <button class="tab-btn" onclick="switchTab('memo')">📖 背诵</button>
   <button class="tab-btn" onclick="switchTab('quiz')">✏️ 测验</button>
+  <button class="tab-btn" onclick="switchTab('grid')">🔢 方格填写</button>
   <button class="tab-btn" onclick="switchTab('wrongbook')">📕 错题本</button>
 </div>
 
@@ -420,6 +455,13 @@ body {
             <option value="15">每题 15 秒</option>
           </select>
         </div>
+        <div class="setup-group">
+          <label>答错后</label>
+          <select id="quizWrongAction">
+            <option value="retry" selected>继续作答（默认）</option>
+            <option value="skip">显示答案后跳过</option>
+          </select>
+        </div>
         <button class="btn btn-primary" onclick="startQuiz()" style="align-self:flex-end">🚀 开始测验</button>
       </div>
     </div>
@@ -430,6 +472,7 @@ body {
         <span class="quiz-score" id="quizScore">✅ 0 &nbsp; ❌ 0</span>
         <span class="quiz-score" id="quizQNum">第 1 / 10 题</span>
         <span class="quiz-timer-display" id="quizTimerDisp" style="display:none">⏱ 8s</span>
+        <button type="button" class="btn btn-gray quiz-reset-btn" onclick="resetQuiz()">↺ 重置测验</button>
       </div>
       <div class="quiz-progress-bar">
         <div class="quiz-progress-fill" id="quizProgFill" style="width:0%"></div>
@@ -461,7 +504,37 @@ body {
   </div>
 </div>
 
-<!-- ══ TAB 4: 错题本 ══ -->
+<!-- ══ TAB 4: 除法方格填写 ══ -->
+<div id="tab-grid" class="hidden">
+  <div class="card-panel">
+    <p class="div-grid-intro">上方是除数，左边是商。在方格里填写被除数：例如商是 3、除数是 4，就填 12，因为 12 ÷ 4 = 3。</p>
+    <div class="div-grid-toolbar">
+      <label class="div-grid-size-label" for="divGridSizeSelect">练习范围
+        <select class="div-grid-size-select" id="divGridSizeSelect" onchange="setDivGridSize(this.value)">
+          <option value="2">2 以内</option>
+          <option value="3">3 以内</option>
+          <option value="4">4 以内</option>
+          <option value="5">5 以内</option>
+          <option value="6">6 以内</option>
+          <option value="7">7 以内</option>
+          <option value="8">8 以内</option>
+          <option value="9" selected>9 以内</option>
+        </select>
+      </label>
+      <span class="div-grid-progress" id="divGridProgress">已完成 0 / 81</span>
+      <button class="div-grid-toggle on" id="divGridGuideToggle" type="button" onclick="toggleDivGridGuide()" aria-pressed="true">🔦 行列提示 开</button>
+      <button class="div-grid-toggle on" id="divGridAutoToggle" type="button" onclick="toggleDivGridAutoAdvance()" aria-pressed="true">➡️ 自动跳格 开</button>
+      <button class="btn btn-gray" type="button" onclick="resetDivGrid()">↻ 清空重填</button>
+    </div>
+    <div class="div-grid-current" id="divGridCurrent" aria-live="polite">点一个方格，查看当前除法</div>
+    <div class="div-grid-scroll">
+      <table class="div-fill-grid" id="divFillGrid" aria-label="9 以内除法方格填写"></table>
+    </div>
+    <div class="div-grid-live" id="divGridLive" role="status" aria-live="polite">从任意一格开始填写吧！</div>
+  </div>
+</div>
+
+<!-- ══ TAB 5: 错题本 ══ -->
 <div id="tab-wrongbook" class="hidden">
   <div class="card-panel">
     <div class="wr-book-empty" id="wrongBookEmpty">还没有错题，加油保持哦！🎉</div>
@@ -566,8 +639,9 @@ function speakGroup(q) {
 //  Tab 切换
 // ══════════════════════════════════════
 function switchTab(name) {
-  Hpx.tabs.activate(name,['table','memo','quiz','wrongbook'],{activeClass:'active',hiddenClass:'hidden'});
+  Hpx.tabs.activate(name,['table','memo','quiz','grid','wrongbook'],{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'memo' && !memoInited) initMemo();
+  if (name === 'grid' && !divGridInited) initDivGrid();
   if (name === 'wrongbook') renderWrongBook();
 }
 
@@ -717,6 +791,7 @@ function updateProgress(g) {
 let quizList = [], quizIdx = 0, quizCorrect = 0, quizWrong = [];
 let quizTimerInterval = null, quizTimerLeft = 0, quizTimerSec = 0;
 let quizAnswered = false;
+let quizAllowSkipOnWrong = false, quizCurrentHadError = false;
 
 function buildQuizList() {
   const range = parseInt(document.getElementById('quizRange').value);
@@ -741,6 +816,7 @@ function getQ(item) {
 
 function startQuiz() {
   quizTimerSec = parseInt(document.getElementById('quizTimer').value);
+  quizAllowSkipOnWrong = document.getElementById('quizWrongAction').value === 'skip';
   runQuiz(buildQuizList());
 }
 
@@ -752,6 +828,7 @@ function startWrongQuiz() {
   }));
   if (!items.length) return;
   quizTimerSec = 0;
+  quizAllowSkipOnWrong = false;
   switchTab('quiz');
   runQuiz([...items].sort(() => Math.random() - .5));
 }
@@ -777,6 +854,7 @@ function autoCheck(inp) {
 function showQuestion() {
   if (quizIdx >= quizList.length) { endQuiz(); return; }
   quizAnswered = false;
+  quizCurrentHadError = false;
   const item  = quizList[quizIdx];
   const q     = getQ(item);
   const total = quizList.length;
@@ -790,8 +868,7 @@ function showQuestion() {
   inp.value = ''; inp.className = 'q-input'; inp.disabled = false;
   setTimeout(() => inp.focus(), 60);
 
-  document.getElementById('quizScore').textContent =
-    `✅ ${quizCorrect}  ❌ ${quizList.slice(0, quizIdx).length - quizCorrect}`;
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizWrong.length}`;
   document.getElementById('quizQNum').textContent = `第 ${quizIdx + 1} / ${total} 题`;
   document.getElementById('quizProgFill').style.width = (quizIdx / total * 100) + '%';
 
@@ -816,16 +893,23 @@ function renderTimer() {
 
 function timeOut() {
   if (quizAnswered) return;
-  quizAnswered = true;
   const item = quizList[quizIdx];
   const q    = getQ(item);
   const inp  = document.getElementById('qInput');
-  inp.disabled = true; inp.classList.add('wrong');
   const fb = document.getElementById('qFeedback');
+  markQuizMistake(item);
+  inp.classList.add('wrong');
+  if (!quizAllowSkipOnWrong) {
+    fb.textContent = '⏰ 时间到了，继续算一算，答对才能进入下一题。';
+    fb.className = 'q-feedback show-fail';
+    inp.select(); inp.focus();
+    playFail();
+    return;
+  }
+  quizAnswered = true;
+  inp.disabled = true;
   fb.textContent = `⏰ 超时！答案是 ${q.answer}（${item.dividend} ÷ ${item.divisor} = ${item.quotient}）`;
   fb.className = 'q-feedback show-fail';
-  quizWrong.push(item);
-  recordWrong(item);
   speakItem(item);
   showDivToast(item);
   setTimeout(nextQ, 1700);
@@ -853,16 +937,31 @@ function checkAnswer() {
     playOk();
   } else {
     inp.classList.add('wrong');
-    fb.textContent = `❌ 答案是 ${q.answer}（${item.dividend} ÷ ${item.divisor} = ${item.quotient}）`;
+    markQuizMistake(item);
+    fb.textContent = quizAllowSkipOnWrong
+      ? `❌ 答案是 ${q.answer}（${item.dividend} ÷ ${item.divisor} = ${item.quotient}）`
+      : '❌ 不对，再算一算，答对才能进入下一题。';
     fb.className   = 'q-feedback show-fail';
-    quizWrong.push(item);
-    recordWrong(item);
     playFail();
   }
-  inp.disabled = true;
-  speakItem(item);
-  showDivToast(item);
-  setTimeout(nextQ, ok ? 900 : 1700);
+  if (ok || quizAllowSkipOnWrong) {
+    inp.disabled = true;
+    speakItem(item);
+    // 答对后直接进入下一题，不弹出口诀解说；选择跳过时才展示答案说明。
+    if (!ok) showDivToast(item);
+    setTimeout(nextQ, ok ? 900 : 1700);
+  } else {
+    quizAnswered = false;
+    inp.select(); inp.focus();
+  }
+}
+
+function markQuizMistake(item) {
+  if (quizCurrentHadError) return;
+  quizCurrentHadError = true;
+  quizWrong.push(item);
+  recordWrong(item);
+  document.getElementById('quizScore').textContent = `✅ ${quizCorrect}  ❌ ${quizWrong.length}`;
 }
 
 function nextQ() { quizIdx++; showQuestion(); }
@@ -909,13 +1008,263 @@ function endQuiz() {
 
 function resetQuiz() {
   clearInterval(quizTimerInterval);
+  quizTimerInterval = null;
+  quizList = [];
+  quizIdx = 0;
+  quizCorrect = 0;
+  quizWrong = [];
+  quizAnswered = false;
+  quizCurrentHadError = false;
+  quizTimerLeft = 0;
   document.getElementById('quizSetupArea').style.display = '';
   document.getElementById('quizBoard').classList.remove('active');
   document.getElementById('quizResult').classList.remove('show');
+  document.getElementById('qInput').value = '';
+  document.getElementById('qInput').disabled = false;
+  document.getElementById('qInput').className = 'q-input';
+  document.getElementById('qFeedback').textContent = '';
+  document.getElementById('qFeedback').className = 'q-feedback';
+  document.getElementById('quizProgFill').style.width = '0%';
+  document.getElementById('quizScore').textContent = '✅ 0  ❌ 0';
+  document.getElementById('quizQNum').textContent = '第 1 / 10 题';
+  document.getElementById('quizTimerDisp').style.display = 'none';
 }
 
 // ══════════════════════════════════════
-//  TAB 4 — 错题本（自动收集测验答错的题，持久化）
+//  TAB 4 — 除法方格填写
+//  行是商、列是除数，填写被除数：□ ÷ 除数 = 商
+// ══════════════════════════════════════
+let divGridInited = false;
+let divGridCompleted = false;
+let divGridSize = 9;
+let divGridGuideEnabled = true;
+let divGridAutoAdvanceEnabled = true;
+let divGridActiveInput = null;
+
+function initDivGrid(){
+  divGridInited = true;
+  buildDivGrid();
+}
+
+function setDivGridSize(value){
+  divGridSize = Math.min(9,Math.max(2,Number(value) || 9));
+  const select=document.getElementById('divGridSizeSelect');
+  if(select) select.value=String(divGridSize);
+  if(divGridInited) buildDivGrid();
+}
+
+function buildDivGrid(){
+  const table=document.getElementById('divFillGrid');
+  table.innerHTML='';
+  table.setAttribute('aria-label',`${divGridSize} 以内除法方格填写`);
+  divGridCompleted=false;
+  divGridActiveInput=null;
+
+  const head=document.createElement('thead');
+  const headRow=document.createElement('tr');
+  const corner=document.createElement('th');
+  corner.className='grid-corner';
+  corner.scope='col';
+  corner.textContent='÷';
+  headRow.appendChild(corner);
+  for(let divisor=1;divisor<=divGridSize;divisor++){
+    const th=document.createElement('th');
+    th.scope='col';
+    th.dataset.divGridCol=divisor;
+    th.textContent=divisor;
+    headRow.appendChild(th);
+  }
+  head.appendChild(headRow);
+  table.appendChild(head);
+
+  const body=document.createElement('tbody');
+  for(let quotient=1;quotient<=divGridSize;quotient++){
+    const row=document.createElement('tr');
+    const th=document.createElement('th');
+    th.scope='row';
+    th.dataset.divGridRow=quotient;
+    th.textContent=quotient;
+    row.appendChild(th);
+    for(let divisor=1;divisor<=divGridSize;divisor++){
+      const cell=document.createElement('td');
+      const input=document.createElement('input');
+      const feedback=document.createElement('span');
+      const feedbackId=`div-grid-feedback-${quotient}-${divisor}`;
+      input.className='div-grid-input';
+      input.type='text';
+      input.inputMode='numeric';
+      input.maxLength=2;
+      input.autocomplete='off';
+      input.dataset.divisor=divisor;
+      input.dataset.quotient=quotient;
+      input.setAttribute('aria-label',`除数 ${divisor}，商 ${quotient} 的被除数`);
+      input.setAttribute('aria-describedby',feedbackId);
+      input.addEventListener('focus',()=>showDivGridGuide(input));
+      input.addEventListener('input',()=>handleDivGridInput(input));
+      input.addEventListener('blur',()=>checkDivGridCell(input,true));
+      input.addEventListener('keydown',event=>handleDivGridKeydown(event,input));
+      feedback.className='div-grid-feedback';
+      feedback.id=feedbackId;
+      feedback.setAttribute('aria-live','polite');
+      cell.append(input,feedback);
+      row.appendChild(cell);
+    }
+    body.appendChild(row);
+  }
+  table.appendChild(body);
+  document.getElementById('divGridCurrent').textContent=divGridGuideEnabled
+    ? '点一个方格，查看当前除法'
+    : '行列提示已关闭';
+  const live=document.getElementById('divGridLive');
+  live.textContent=`已生成 ${divGridSize} 以内除法方格，从任意一格开始填写吧！`;
+  live.className='div-grid-live';
+  updateDivGridProgress();
+}
+
+function getDivGridValues(input){
+  const divisor=Number(input.dataset.divisor);
+  const quotient=Number(input.dataset.quotient);
+  return {divisor,quotient,dividend:divisor*quotient};
+}
+
+function showDivGridGuide(input){
+  divGridActiveInput=input;
+  clearDivGridGuide();
+  const current=document.getElementById('divGridCurrent');
+  const {divisor,quotient}=getDivGridValues(input);
+  if(!divGridGuideEnabled){
+    current.textContent='行列提示已关闭';
+    return;
+  }
+  const rowHeader=document.querySelector(`#divFillGrid th[data-div-grid-row="${quotient}"]`);
+  const colHeader=document.querySelector(`#divFillGrid th[data-div-grid-col="${divisor}"]`);
+  [rowHeader,colHeader].forEach(header=>{
+    if(!header) return;
+    header.classList.add('guide-active');
+    header.setAttribute('aria-current','true');
+  });
+  current.innerHTML=`当前：<strong>□ ÷ ${divisor} = ${quotient}</strong>`;
+}
+
+function clearDivGridGuide(){
+  document.querySelectorAll('#divFillGrid th.guide-active').forEach(header=>{
+    header.classList.remove('guide-active');
+    header.removeAttribute('aria-current');
+  });
+}
+
+function toggleDivGridGuide(){
+  divGridGuideEnabled=!divGridGuideEnabled;
+  const button=document.getElementById('divGridGuideToggle');
+  button.classList.toggle('on',divGridGuideEnabled);
+  button.setAttribute('aria-pressed',String(divGridGuideEnabled));
+  button.textContent=divGridGuideEnabled?'🔦 行列提示 开':'🔦 行列提示 关';
+  if(divGridGuideEnabled && divGridActiveInput) showDivGridGuide(divGridActiveInput);
+  else {
+    clearDivGridGuide();
+    document.getElementById('divGridCurrent').textContent=divGridGuideEnabled
+      ? '点一个方格，查看当前除法'
+      : '行列提示已关闭';
+  }
+}
+
+function toggleDivGridAutoAdvance(){
+  divGridAutoAdvanceEnabled=!divGridAutoAdvanceEnabled;
+  const button=document.getElementById('divGridAutoToggle');
+  button.classList.toggle('on',divGridAutoAdvanceEnabled);
+  button.setAttribute('aria-pressed',String(divGridAutoAdvanceEnabled));
+  button.textContent=divGridAutoAdvanceEnabled?'➡️ 自动跳格 开':'⏸️ 自动跳格 关';
+}
+
+function handleDivGridInput(input){
+  input.value=input.value.replace(/\D/g,'').slice(0,2);
+  input.classList.remove('correct','wrong');
+  input.removeAttribute('aria-invalid');
+  input.nextElementSibling.textContent='';
+  const {dividend}=getDivGridValues(input);
+  if(input.value.length>=String(dividend).length){
+    if(checkDivGridCell(input,false) && divGridAutoAdvanceEnabled) focusNextDivGridInput(input);
+  }else updateDivGridProgress();
+}
+
+function checkDivGridCell(input,fromBlur){
+  const value=input.value.trim();
+  if(!value){
+    input.classList.remove('correct','wrong');
+    input.removeAttribute('aria-invalid');
+    input.nextElementSibling.textContent='';
+    updateDivGridProgress();
+    return false;
+  }
+  const {divisor,quotient,dividend}=getDivGridValues(input);
+  const correct=Number(value)===dividend;
+  input.classList.toggle('correct',correct);
+  input.classList.toggle('wrong',!correct);
+  input.setAttribute('aria-invalid',String(!correct));
+  input.nextElementSibling.textContent=correct?'':'再想想';
+  const live=document.getElementById('divGridLive');
+  if(correct){
+    live.textContent=`${dividend} ÷ ${divisor} = ${quotient}，正确！`;
+    live.className='div-grid-live ok';
+    if(!fromBlur) playOk();
+  }else{
+    live.textContent=`□ ÷ ${divisor} = ${quotient}，再想一想。`;
+    live.className='div-grid-live fail';
+    if(!fromBlur) playFail();
+  }
+  updateDivGridProgress();
+  return correct;
+}
+
+function handleDivGridKeydown(event,input){
+  if(event.key!=='Enter') return;
+  event.preventDefault();
+  if(checkDivGridCell(input,false)) focusNextDivGridInput(input);
+}
+
+function focusNextDivGridInput(input){
+  const inputs=[...document.querySelectorAll('#divFillGrid .div-grid-input')];
+  const next=inputs[inputs.indexOf(input)+1];
+  if(next) next.focus();
+  return next || null;
+}
+
+function updateDivGridProgress(){
+  const inputs=[...document.querySelectorAll('#divFillGrid .div-grid-input')];
+  const total=inputs.length;
+  const correct=inputs.filter(input=>input.classList.contains('correct')).length;
+  document.getElementById('divGridProgress').textContent=`已完成 ${correct} / ${total}`;
+  if(total>0 && correct===total && !divGridCompleted){
+    divGridCompleted=true;
+    const live=document.getElementById('divGridLive');
+    live.textContent=`🎉 ${divGridSize} 以内的 ${total} 个除法方格全部填写正确！`;
+    live.className='div-grid-live ok';
+    playOk();
+    divisionSpeech.speak(`太棒了，${divGridSize}以内除法方格全部填写正确！`);
+    launchConfetti();
+  }else if(correct<total){
+    divGridCompleted=false;
+  }
+}
+
+function resetDivGrid(){
+  if(!divGridInited) return;
+  document.querySelectorAll('#divFillGrid .div-grid-input').forEach(input=>{
+    input.value='';
+    input.className='div-grid-input';
+    input.removeAttribute('aria-invalid');
+    input.nextElementSibling.textContent='';
+  });
+  divGridCompleted=false;
+  document.getElementById('divGridLive').textContent='已清空，从任意一格重新开始吧！';
+  document.getElementById('divGridLive').className='div-grid-live';
+  updateDivGridProgress();
+  const first=document.querySelector('#divFillGrid .div-grid-input');
+  if(first) first.focus();
+}
+
+// ══════════════════════════════════════
+//  TAB 5 — 错题本（自动收集测验答错的题，持久化）
 // ══════════════════════════════════════
 const WRONG_KEY = 'divWrongBook_v1';
 let wrongBook = {}; // key = "dividend÷divisor", value = {dividend,divisor,quotient,count,lastAt}
