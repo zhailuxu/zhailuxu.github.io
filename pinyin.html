@@ -3,652 +3,1628 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>汉语拼音入门</title>
-<link rel="stylesheet" href="hpx-common.css">
+<title>数字乐园 1-100</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;background:linear-gradient(135deg,#fff3e0 0%,#fce4ec 50%,#e1f5fe 100%);min-height:100vh;padding:16px 12px;}
-.container{max-width:760px;margin:0 auto;}
-.header{text-align:center;margin-bottom:20px;}
-.header h1{font-size:1.75rem;color:#e65100;letter-spacing:1px;text-shadow:2px 3px 0 #ffe0b2;}
-.header p{font-size:.85rem;color:#999;margin-top:4px;}
-.tab-btn{padding:8px 14px;font-size:.82rem;}
-.card{background:rgba(255,255,255,.92);border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px;}
-.net-desc{text-align:center;font-size:.85rem;color:#999;margin-bottom:10px;}
-.read-mode{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin:0 auto 14px;padding:8px 10px;background:#fff8e1;border-radius:12px;}
-.read-mode-label{font-size:.82rem;font-weight:bold;color:#795548;margin-right:2px;}
-.read-mode-btn{padding:7px 12px;border:2px solid #ffcc80;border-radius:999px;background:#fff;color:#795548;font:inherit;font-size:.8rem;font-weight:bold;cursor:pointer;}
-.read-mode-btn:hover{background:#fff3e0;}
-.read-mode-btn.on{border-color:#e65100;background:#e65100;color:#fff;}
-.read-mode-btn:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
-.group-title{font-size:.95rem;font-weight:bold;color:#e65100;margin:12px 0 8px;}
-.py-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;margin-bottom:8px;}
-.py-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;transition:transform .12s;}
-.py-chip:hover{transform:translateY(-2px);background:#ffe0b2;}
-.py-chip .letter{font-size:1.3rem;font-weight:bold;color:#e65100;}
-.py-chip .syllable{font-size:.8rem;font-weight:bold;color:#ef6c00;margin-top:2px;}
-.py-chip .word{font-size:.78rem;color:#795548;margin-top:4px;}
-.tone-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
-.tone-chip{background:#fff8e1;border:2px solid #ffcc80;border-radius:14px;padding:14px 16px;text-align:center;cursor:pointer;min-width:90px;}
-.tone-chip .letter{font-size:1.6rem;font-weight:bold;color:#e65100;}
-.tone-chip .shape{font-size:.75rem;color:#999;margin-top:4px;}
-.tone-chip .char{font-size:1rem;color:#795548;margin-top:4px;}
-.blend-box{background:#fff8e1;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px;}
-.blend-expr{font-size:1.6rem;font-weight:bold;color:#e65100;margin-bottom:14px;}
-.choice-col{display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;}
-.choice-btn{padding:10px 16px;border:2px solid #ffcc80;border-radius:12px;background:#fff;color:#333;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
-.choice-btn:hover{background:#fff3e0;}
-.choice-btn.correct{background:#c8e6c9;border-color:#2e7d32;}
-.choice-btn.wrong{background:#ffcdd2;border-color:#c62828;}
-.result-msg{font-size:1.05rem;font-weight:bold;min-height:26px;margin-top:10px;text-align:center;}
-.result-msg.ok{color:#2e7d32;}
-.result-msg.no{color:#c62828;}
-.gen-btn{padding:8px 20px;border:none;border-radius:14px;background:#fb8c00;color:#fff;font-size:.9rem;font-weight:bold;cursor:pointer;font-family:inherit;margin:4px;}
-.next-btn{margin-top:12px;padding:10px 32px;border:none;border-radius:20px;background:#e65100;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;}
-.quiz-box{text-align:center;}
-.score-row{display:flex;gap:16px;justify-content:center;margin-bottom:12px;}
-.score-item{background:#fff8e1;border-radius:10px;padding:6px 18px;font-size:.9rem;font-weight:bold;color:#e65100;}
-.quiz-q{font-size:1.15rem;color:#333;margin-bottom:14px;line-height:1.8;font-weight:bold;}
-.study-kind-nav{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
-.study-kind-btn{padding:7px 11px;border:2px solid #ffcc80;border-radius:999px;background:#fff;color:#795548;font:inherit;font-size:.78rem;font-weight:bold;cursor:pointer;}
-.study-kind-btn:hover{background:#fff3e0;}
-.study-kind-btn.on{border-color:#e65100;background:#e65100;color:#fff;}
-.study-kind-btn:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
-.study-progress-row{display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto 12px;color:#795548;font-size:.78rem;font-weight:bold;}
-.study-meter{height:8px;flex:1;overflow:hidden;background:#ffe0b2;border-radius:999px;}
-.study-meter span{display:block;width:0;height:100%;background:linear-gradient(90deg,#fb8c00,#e65100);border-radius:inherit;transition:width .2s;}
-.study-stage{max-width:520px;margin:0 auto 14px;padding:20px;background:linear-gradient(145deg,#fffaf0,#fff3e0);border:2px solid #ffcc80;border-radius:18px;text-align:center;}
-.study-kind{display:inline-block;margin-bottom:8px;padding:3px 10px;background:#ffe0b2;border-radius:999px;color:#bf4b00;font-size:.75rem;font-weight:bold;}
-.study-path{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-height:62px;}
-.study-symbol{font-size:2rem;font-weight:bold;color:#e65100;}
-.study-arrow{color:#bcaaa4;font-weight:bold;}
-.study-example{font-size:1.65rem;font-weight:bold;color:#ef6c00;}
-.study-word{font-size:1.2rem;font-weight:bold;color:#5d4037;}
-.study-tip{min-height:42px;margin-top:12px;color:#8d6e63;font-size:.82rem;line-height:1.55;}
-.study-actions{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;max-width:520px;margin:0 auto;}
-.study-action{min-height:42px;padding:8px 10px;border:2px solid #ffcc80;border-radius:13px;background:#fff;color:#6d4c41;font:inherit;font-size:.82rem;font-weight:bold;cursor:pointer;}
-.study-action.primary{border-color:#e65100;background:#e65100;color:#fff;}
-.study-action:disabled{cursor:not-allowed;opacity:.42;}
-.alphabet-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 auto 14px;}
-.alphabet-action{border:2px solid #ffcc80;border-radius:13px;padding:8px 14px;background:#fff;color:#6d4c41;font:inherit;font-size:.84rem;font-weight:bold;cursor:pointer;}
-.alphabet-action.primary{border-color:#e65100;background:#e65100;color:#fff;}
-.alphabet-group{margin:0 0 14px;}
-.alphabet-group-title{font-size:.9rem;font-weight:bold;color:#bf4b00;margin:0 0 7px;}
-.alphabet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px;}
-.alphabet-chip{min-height:52px;border:2px solid #ffcc80;border-radius:12px;background:#fff8e1;color:#e65100;font:inherit;font-weight:bold;cursor:pointer;line-height:1.15;padding:5px 3px;}
-.alphabet-chip:hover{background:#ffe0b2;transform:translateY(-1px);}
-.alphabet-chip small{display:block;margin-top:3px;font-size:.72rem;color:#795548;font-weight:normal;}
-.alphabet-action:focus-visible,.alphabet-chip:focus-visible{outline:3px solid rgba(230,81,0,.28);outline-offset:2px;}
-@media(max-width:430px){.study-actions{grid-template-columns:1fr 1fr}.study-action.primary{grid-column:1/-1;grid-row:1}.study-path{gap:7px}.study-symbol{font-size:1.7rem}.study-example{font-size:1.45rem}}
-@media(prefers-reduced-motion:reduce){.study-meter span{transition:none;}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Comic Sans MS","华文圆体","微软雅黑",sans-serif;
+  background: linear-gradient(135deg,#fff9e6 0%,#ffe8f7 55%,#e8f4ff 100%);
+  min-height: 100vh; padding: 14px 10px;
+}
+.container { max-width: 720px; margin: 0 auto; }
+
+.header { text-align:center; margin-bottom:16px; }
+.header h1 {
+  font-size:2.2rem; color:#e91e63; letter-spacing:4px;
+  text-shadow:2px 3px 0 #f8bbd0, 4px 6px 0 rgba(0,0,0,.06);
+}
+.header p { font-size:.84rem; color:#aaa; margin-top:4px; }
+
+/* ── Tabs ── */
+.tabs { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.tab-btn {
+  padding:9px 18px; border:none; border-radius:22px;
+  font-size:.95rem; font-weight:bold; cursor:pointer;
+  background:rgba(255,255,255,.75); color:#777;
+  box-shadow:0 2px 8px rgba(0,0,0,.1); transition:all .2s;
+}
+.tab-btn.on { background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff; box-shadow:0 4px 14px rgba(233,30,99,.4); }
+.tab-progress{display:inline-block;margin-left:3px;font-size:.67rem;opacity:.84;white-space:nowrap;}
+.numbers-record{background:rgba(255,255,255,.9);border:1.5px solid #f8bbd0;border-radius:17px;padding:12px 14px;margin:0 0 14px;box-shadow:0 3px 12px rgba(233,30,99,.08);}
+.numbers-record-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.numbers-record-title{font-size:.92rem;font-weight:bold;color:#c2185b;}.numbers-record-note{font-size:.74rem;color:#8d6e63;line-height:1.55;margin-top:4px;}
+.numbers-record-clear{border:1.5px solid #f48fb1;border-radius:13px;background:#fff;color:#c2185b;padding:5px 9px;font:700 .75rem inherit;cursor:pointer;}.numbers-record-clear:hover{background:#fff0f5;}
+
+/* ── Card ── */
+.card {
+  background:rgba(255,255,255,.92); border-radius:22px;
+  padding:18px 16px; box-shadow:0 4px 20px rgba(0,0,0,.1);
+  margin-bottom:14px;
+}
+
+/* ── Number Grid ── */
+.num-grid {
+  display:grid; grid-template-columns:repeat(10,1fr);
+  gap:4px;
+}
+.ng-cell {
+  aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+  border-radius:9px; font-size:1.05rem; font-weight:bold;
+  cursor:pointer; user-select:none; color:#fff;
+  box-shadow:0 2px 5px rgba(0,0,0,.13);
+  transition:transform .15s, box-shadow .15s;
+}
+.ng-cell:hover  { transform:scale(1.15); box-shadow:0 4px 12px rgba(0,0,0,.22); z-index:1; }
+.ng-cell.picked { transform:scale(1.22); box-shadow:0 0 0 3px #fff,0 0 0 6px #e91e63; z-index:2; }
+.ng-cell.unrevealed { visibility:hidden; pointer-events:none; }
+.ng-cell.just-revealed { animation:revealPop .4s ease-out; }
+/* decade gradients */
+.d1 { background:linear-gradient(135deg,#ef9a9a,#e53935); }
+.d2 { background:linear-gradient(135deg,#ffcc80,#e65100); }
+.d3 { background:linear-gradient(135deg,#fff176,#f9a825); color:#555!important; }
+.d4 { background:linear-gradient(135deg,#a5d6a7,#2e7d32); }
+.d5 { background:linear-gradient(135deg,#80cbc4,#00796b); }
+.d6 { background:linear-gradient(135deg,#81d4fa,#0277bd); }
+.d7 { background:linear-gradient(135deg,#9fa8da,#283593); }
+.d8 { background:linear-gradient(135deg,#ce93d8,#6a1b9a); }
+.d9 { background:linear-gradient(135deg,#f48fb1,#880e4f); }
+.d10{ background:linear-gradient(135deg,#b0bec5,#37474f); }
+
+/* ── Reveal Progress (Tab 1) ── */
+.rv-bar-wrap { background:#ffe0eb; border-radius:8px; height:10px; overflow:hidden; margin-bottom:10px; }
+.rv-bar { height:100%; background:linear-gradient(90deg,#ff80ab,#e91e63); border-radius:8px; transition:width .3s; }
+.rv-status { text-align:center; font-size:.85rem; color:#aaa; margin-bottom:10px; }
+.rv-status b { color:#e91e63; }
+
+/* ── Zoom Panel ── */
+.zoom-panel {
+  background:linear-gradient(135deg,#fff9e6,#ffe8f7);
+  border-radius:20px; padding:20px 16px; margin-bottom:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+  display:none; animation:zoomIn .3s ease-out;
+}
+.zoom-panel.show { display:block; }
+.zoom-big  { font-size:5.5rem; font-weight:bold; color:#e91e63; line-height:1; text-align:center; }
+.zoom-cn   { font-size:2rem; color:#555; text-align:center; margin:6px 0 14px; }
+.zoom-blocks { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-bottom:14px; }
+.blk-ten { width:26px; height:26px; background:#e53935; border-radius:5px; display:inline-block; }
+.blk-one { width:19px; height:19px; background:#ff9800; border-radius:4px; display:inline-block; }
+.blk-label { width:100%; text-align:center; font-size:.8rem; color:#aaa; margin-top:4px; }
+.zoom-nav { display:flex; gap:10px; justify-content:center; }
+.znav { padding:9px 22px; border:none; border-radius:18px; font-size:1rem; font-weight:bold;
+  cursor:pointer; background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff;
+  box-shadow:0 3px 10px rgba(233,30,99,.3); transition:transform .1s; }
+.znav:active { transform:scale(.94); }
+
+/* ── Counting Game ── */
+.lv-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.lv-btn {
+  padding:7px 16px; border:2.5px solid #f48fb1; border-radius:16px;
+  background:#fff; color:#e91e63; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.lv-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
+
+.obj-area {
+  min-height:110px; display:grid; grid-template-columns:repeat(5,1fr);
+  gap:8px 12px; justify-items:center; align-items:center;
+  background:#fff9e6; border-radius:14px; padding:14px 10px;
+  margin:0 auto 14px; font-size:1.7rem; line-height:1.3;
+  max-width:260px;
+}
+.obj-area span { display:inline-block; animation:popIn .2s ease-out; }
+
+.choices4 {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; margin-bottom:10px;
+}
+.choice-btn {
+  padding:16px 10px; border:none; border-radius:16px;
+  font-size:2.2rem; font-weight:bold; cursor:pointer;
+  background:linear-gradient(135deg,#e8f5e9,#c8e6c9); color:#2e7d32;
+  box-shadow:0 3px 10px rgba(0,0,0,.1); transition:all .15s;
+}
+.choice-btn:hover { transform:scale(1.05); }
+.choice-btn.ok   { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; animation:celebrate .4s ease; }
+.choice-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
+
+/* ── Find Number Game ── */
+.fl-btn {
+  padding:7px 16px; border:2.5px solid #9fa8da; border-radius:16px;
+  background:#fff; color:#3f51b5; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.fl-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
+.fm-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.fm-btn {
+  padding:6px 14px; border:2px solid #9fa8da; border-radius:14px;
+  background:#fff; color:#3f51b5; font-size:.86rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.fm-btn.on { background:#3f51b5; color:#fff; border-color:#3f51b5; }
+
+.find-q  { text-align:center; font-size:1.4rem; color:#555; margin-bottom:6px; min-height:38px; }
+.find-t  { text-align:center; font-size:4rem; font-weight:bold; color:#e91e63;
+  text-shadow:2px 3px 0 #f8bbd0; margin-bottom:14px; line-height:1.15; }
+
+.find-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:10px; margin-bottom:12px;
+}
+.find-btn {
+  padding:16px 8px; border:none; border-radius:16px;
+  font-size:1.5rem; font-weight:bold; cursor:pointer;
+  background:linear-gradient(135deg,#e3f2fd,#bbdefb); color:#1565c0;
+  box-shadow:0 3px 10px rgba(0,0,0,.1); transition:all .15s;
+}
+.find-btn:hover { transform:scale(1.06); }
+.find-btn.ok   { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; animation:celebrate .4s ease; }
+.find-btn.fail { background:linear-gradient(135deg,#ef9a9a,#e53935); color:#fff; animation:shake .35s ease; }
+
+/* ── Cross-ten practice ── */
+.cross-rule { text-align:center; color:#6a4c93; font-size:1rem; line-height:1.65; margin:0 0 14px; }
+.cross-q { text-align:center; font-size:1.05rem; color:#777; margin-bottom:4px; }
+.cross-equation { display:flex; align-items:center; justify-content:center; gap:12px; margin:8px 0 16px; }
+.cross-num { min-width:90px; padding:8px 12px; border-radius:18px; font-size:3.7rem; font-weight:bold; line-height:1.1; color:#e91e63; background:#fff0f5; box-shadow:0 3px 10px rgba(233,30,99,.14); }
+.cross-arrow { font-size:2.1rem; font-weight:bold; color:#ff9800; }
+.cross-answer { min-width:90px; padding:8px 12px; border-radius:18px; font-size:3.7rem; font-weight:bold; line-height:1.1; color:#fff; background:linear-gradient(135deg,#9575cd,#5e35b1); box-shadow:0 3px 10px rgba(94,53,177,.22); }
+.cross-place { display:flex; gap:10px; justify-content:center; margin:0 auto 16px; max-width:390px; }
+.place-card { flex:1; min-width:0; padding:10px 8px; border-radius:16px; text-align:center; background:#f3e5f5; }
+.place-card.ones { background:#fff3e0; }
+.place-label { font-size:.84rem; color:#777; margin-bottom:4px; }
+.place-change { display:flex; align-items:center; justify-content:center; gap:7px; font-size:1.9rem; font-weight:bold; }
+.place-before { color:#777; text-decoration:line-through; text-decoration-thickness:2px; }
+.place-turn { color:#ff9800; font-size:1.2rem; }
+.place-after { color:#5e35b1; }
+.cross-tip { min-height:28px; text-align:center; color:#6a4c93; font-weight:bold; font-size:.95rem; }
+
+/* ── Auto Play ── */
+.auto-num {
+  font-size:7rem; font-weight:bold; text-align:center; line-height:1;
+  margin:10px 0 6px; transition:transform .18s, color .18s;
+  color:#e91e63; text-shadow:3px 4px 0 #f8bbd0, 6px 8px 0 rgba(0,0,0,.07);
+}
+.auto-cn { font-size:2.2rem; color:#888; text-align:center; margin-bottom:14px; }
+.auto-bar-wrap { background:#ffe0eb; border-radius:8px; height:12px; overflow:hidden; margin-bottom:14px; }
+.auto-bar { height:100%; background:linear-gradient(90deg,#ff80ab,#e91e63); border-radius:8px; transition:width .3s; }
+
+/* ── Buttons ── */
+.btn {
+  border:none; border-radius:14px; padding:10px 22px;
+  font-size:1rem; font-weight:bold; cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,.12); transition:transform .1s;
+}
+.btn:active { transform:scale(.94); }
+.btn-pink   { background:linear-gradient(135deg,#f48fb1,#e91e63); color:#fff; }
+.btn-green  { background:linear-gradient(135deg,#81c784,#2e7d32); color:#fff; }
+.btn-blue   { background:linear-gradient(135deg,#64b5f6,#1565c0); color:#fff; }
+.btn-orange { background:linear-gradient(135deg,#ffb74d,#e65100); color:#fff; }
+.btn-gray   { background:#e0e0e0; color:#555; }
+.sp-btn {
+  padding:3px 12px; border:1.5px solid #ccc; border-radius:10px;
+  background:#fff; color:#555; font-size:.8rem; cursor:pointer; margin-left:4px;
+}
+.sp-btn.on { background:#e91e63; color:#fff; border-color:#e91e63; }
+
+/* ── Sort game ── */
+.sr-btn {
+  padding:7px 16px; border:2.5px solid #64b5f6; border-radius:16px;
+  background:#fff; color:#1565c0; font-size:.9rem; font-weight:bold;
+  cursor:pointer; transition:all .18s;
+}
+.sr-btn.on { background:#1565c0; color:#fff; border-color:#1565c0; }
+.sort-q { text-align:center; font-size:.95rem; color:#777; margin-bottom:10px; }
+.sort-slots, .sort-pool {
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  margin:6px 0 16px; min-height:70px; align-items:center;
+}
+.sort-slot {
+  width:58px; height:58px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; font-weight:bold; color:#bbb;
+  border:2.5px dashed #ccc; background:#fafafa;
+  transition:all .15s;
+}
+.sort-slot.hover-target { border-color:#1565c0; background:#e3f2fd; }
+.sort-slot.filled { border-style:solid; border-color:#2e7d32; color:#fff; background:linear-gradient(135deg,#81c784,#2e7d32); }
+.sort-tile {
+  width:58px; height:58px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; font-weight:bold; color:#fff;
+  background:linear-gradient(135deg,#64b5f6,#1565c0);
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+  cursor:grab; user-select:none; touch-action:none;
+  transition:box-shadow .15s;
+  position:relative; z-index:1;
+}
+.sort-tile.dragging { cursor:grabbing; z-index:10; box-shadow:0 8px 20px rgba(0,0,0,.3); }
+
+/* ── Shared feedback ── */
+.fb { text-align:center; font-size:1.15rem; font-weight:bold; min-height:34px; margin-bottom:8px; }
+.fb.ok   { color:#2e7d32; }
+.fb.fail { color:#e53935; }
+.score   { text-align:center; color:#aaa; font-size:.88rem; }
+
+.row-ctrl { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.hidden { display:none !important; }
+
+@keyframes zoomIn    { from{opacity:0;transform:scale(.82)} to{opacity:1;transform:scale(1)} }
+@keyframes popIn     { from{opacity:0;transform:scale(.5)}  to{opacity:1;transform:scale(1)} }
+@keyframes celebrate { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 75%{transform:scale(.94)} 100%{transform:scale(1)} }
+@keyframes shake     { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px)} 75%{transform:translateX(9px)} }
+@keyframes numPop    { 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
+@keyframes revealPop { 0%{opacity:0;transform:scale(.3) rotate(-8deg)} 60%{opacity:1;transform:scale(1.25) rotate(4deg)} 100%{transform:scale(1) rotate(0)} }
+
+@media(max-width:400px){
+  .ng-cell { font-size:.82rem; border-radius:7px; }
+  .auto-num { font-size:5.5rem; }
+  .choice-btn { font-size:1.8rem; }
+}
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#e91e63">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="慧陪学">
+  <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
-<body data-hpx-page style="--hpx-accent:#e65100">
+<body>
 <div class="container">
-  <div class="header">
-    <div style="font-size:2.4rem;">🀄</div>
-    <h1>汉语拼音入门</h1>
-    <p>声母 · 韵母 · 声调 · 整体认读音节 · 拼读 —— 一年级语文地基</p>
-  </div>
-  <div class="speak-bar"><button class="speak-toggle on" id="speakToggle" onclick="toggleSpeak()">🔊 声音解说 开</button></div>
-  <div class="tabs">
-    <button class="tab-btn on" onclick="switchTab('initial')">🅱️ 声母</button>
-    <button class="tab-btn" onclick="switchTab('final')">🅰️ 韵母</button>
-    <button class="tab-btn" onclick="switchTab('tone')">🎵 声调</button>
-    <button class="tab-btn" onclick="switchTab('whole')">🔤 整体认读音节</button>
-    <button class="tab-btn" onclick="switchTab('alphabet')">🎵 字母歌</button>
-    <button class="tab-btn" onclick="switchTab('study')">🪜 拼读学习</button>
-    <button class="tab-btn" onclick="switchTab('blend')">🧩 拼读练习</button>
-    <button class="tab-btn" onclick="switchTab('quiz')">✏️ 综合练习</button>
-  </div>
 
-  <!-- 声母 -->
-  <div id="tab-initial">
-    <div class="card">
-      <div class="net-desc">一共23个声母，示例连读会接着读拼成的音节和例词，例如：p（坡）→ ping（苹）→ 苹果</div>
-      <div class="read-mode" aria-label="声母朗读模式">
-        <span class="read-mode-label">朗读模式</span>
-        <button type="button" class="read-mode-btn" data-read-kind="initial" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('initial','single')">只读声母</button>
-        <button type="button" class="read-mode-btn on" data-read-kind="initial" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('initial','full')">示例连读</button>
-      </div>
-      <div class="py-grid" id="initialGrid"></div>
+<div class="header">
+  <h1>🔢 数字乐园</h1>
+  <p>认识 1 到 100，快来玩吧！</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" id="tab1" onclick="switchTab(1)">🔢 认数字 <span class="tab-progress" id="numberRecordTab1">0/100</span></button>
+  <button class="tab-btn"    id="tab2" onclick="switchTab(2)">🍎 数一数 <span class="tab-progress" id="numberRecordTab2">0/0</span></button>
+  <button class="tab-btn"    id="tab3" onclick="switchTab(3)">🎯 找数字 <span class="tab-progress" id="numberRecordTab3">0/0</span></button>
+  <button class="tab-btn"    id="tab4" onclick="switchTab(4)">🎵 跟我数 <span class="tab-progress" id="numberRecordTab4">0/100</span></button>
+  <button class="tab-btn"    id="tab5" onclick="switchTab(5)">✍️ 写数字 <span class="tab-progress" id="numberRecordTab5">0/0</span></button>
+  <button class="tab-btn"    id="tab6" onclick="switchTab(6)">⚖️ 比大小 <span class="tab-progress" id="numberRecordTab6">0/0</span></button>
+  <button class="tab-btn"    id="tab7" onclick="switchTab(7)">🔗 数字接龙 <span class="tab-progress" id="numberRecordTab7">0/0</span></button>
+  <button class="tab-btn"    id="tab8" onclick="switchTab(8)">🔀 排序 <span class="tab-progress" id="numberRecordTab8">0/0</span></button>
+  <button class="tab-btn"    id="tab9" onclick="switchTab(9)">🚀 过十闯关 <span class="tab-progress" id="numberRecordTab9">0/0</span></button>
+</div>
+<section class="numbers-record" aria-labelledby="numbersRecordTitle">
+  <div class="numbers-record-head">
+    <div class="numbers-record-title" id="numbersRecordTitle">📋 数字学习记录</div>
+    <button type="button" class="numbers-record-clear" onclick="clearNumberLearningRecords()">🧹 清除记录</button>
+  </div>
+  <p class="numbers-record-note" id="numbersRecordSummary" aria-live="polite"></p>
+</section>
+
+<!-- ══ Tab 1 ══ -->
+<div id="p1">
+  <div class="zoom-panel" id="zoomPanel">
+    <div class="zoom-big"  id="zN">7</div>
+    <div class="zoom-cn"   id="zCN">七</div>
+    <div class="zoom-blocks" id="zBlk"></div>
+    <div class="zoom-nav">
+      <button class="znav" onclick="zoomMove(-1)">◀ 上一个</button>
+      <button class="znav" id="zNextBtn" onclick="zoomOrRevealNext()">下一个 ▶</button>
     </div>
   </div>
+  <div class="card">
+    <div class="rv-status" id="rvStatus">已认识 <b>1</b> 个数字，共 100 个</div>
+    <div class="rv-bar-wrap"><div class="rv-bar" id="rvBar" style="width:1%"></div></div>
+    <div class="row-ctrl">
+      <button class="btn btn-gray"   onclick="revealReset()">↺ 从头开始</button>
+    </div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue" id="rvAutoBtn" onclick="toggleRevealAuto()">▶ 自动揭晓</button>
+    </div>
+    <div style="text-align:center;color:#aaa;font-size:.82rem;margin-bottom:10px">
+      速度：
+      <button class="sp-btn on" data-rvsp="1300" onclick="setRevealSp(1300,this)">慢</button>
+      <button class="sp-btn"    data-rvsp="750"  onclick="setRevealSp(750,this)">正常</button>
+      <button class="sp-btn"    data-rvsp="380"  onclick="setRevealSp(380,this)">快</button>
+    </div>
+    <div class="num-grid" id="numGrid"></div>
+  </div>
+</div>
 
-  <!-- 韵母 -->
-  <div id="tab-final" style="display:none;">
-    <div class="card">
-      <div class="net-desc">一共24个韵母，点一下依次听“韵母 → 拼成的字音 → 例词”，例如：a → ā → 阿姨</div>
-      <div class="read-mode" aria-label="韵母朗读模式">
-        <span class="read-mode-label">朗读模式</span>
-        <button type="button" class="read-mode-btn" data-read-kind="final" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('final','single')">只读韵母</button>
-        <button type="button" class="read-mode-btn on" data-read-kind="final" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('final','full')">示例连读</button>
-      </div>
-      <div id="finalGroups"></div>
+<!-- ══ Tab 2 ══ -->
+<div id="p2" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="lv-btn on" data-lv="10" onclick="setLv(10,this)">1-10（简单）</button>
+      <button class="lv-btn"    data-lv="20" onclick="setLv(20,this)">1-20（中等）</button>
+      <button class="lv-btn"    data-lv="30" onclick="setLv(30,this)">1-30（挑战）</button>
+    </div>
+    <div class="obj-area" id="objArea"></div>
+    <div class="choices4" id="cntChoices"></div>
+    <div class="fb" id="cntFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCount()">换一题 🔄</button>
+    </div>
+    <div class="score" id="cntScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 3 ══ -->
+<div id="p3" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="fl-btn" data-fl="10"  onclick="setFindLv(10,this)">10以内</button>
+      <button class="fl-btn" data-fl="20"  onclick="setFindLv(20,this)">20以内</button>
+      <button class="fl-btn" data-fl="50"  onclick="setFindLv(50,this)">50以内</button>
+      <button class="fl-btn on" data-fl="100" onclick="setFindLv(100,this)">100以内</button>
+    </div>
+    <div class="fm-row">
+      <button class="fm-btn on" data-m="num2cn" onclick="setFM('num2cn',this)">数字 → 名字</button>
+      <button class="fm-btn"    data-m="cn2num" onclick="setFM('cn2num',this)">名字 → 数字</button>
+      <button class="fm-btn"    data-m="next"   onclick="setFM('next',this)">下一个是几？</button>
+      <button class="fm-btn"    data-m="prev"   onclick="setFM('prev',this)">上一个是几？</button>
+    </div>
+    <div class="find-q" id="findQ"></div>
+    <div class="find-t" id="findT"></div>
+    <div class="find-grid" id="findGrid"></div>
+    <div class="fb" id="findFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue" onclick="genFind()">换一题 🔄</button>
+    </div>
+    <div class="score" id="findScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 4 ══ -->
+<div id="p4" class="hidden">
+  <div class="card">
+    <div class="auto-num" id="autoNum">1</div>
+    <div class="auto-cn"  id="autoCN">一</div>
+    <div class="auto-bar-wrap"><div class="auto-bar" id="autoBar" style="width:1%"></div></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink"   id="autoBtn" onclick="toggleAuto()">▶ 开始数数</button>
+      <button class="btn btn-gray"   onclick="autoReset()">↺ 从 1 开始</button>
+    </div>
+    <div class="row-ctrl">
+      <button class="btn btn-orange" onclick="autoStep(-1)">◀ 上一个</button>
+      <button class="btn btn-blue"   onclick="autoStep(1)">下一个 ▶</button>
+    </div>
+    <div style="text-align:center;color:#aaa;font-size:.82rem;margin-bottom:6px">
+      速度：
+      <button class="sp-btn on" data-sp="1300" onclick="setAutoSp(1300,this)">慢</button>
+      <button class="sp-btn"    data-sp="750"  onclick="setAutoSp(750,this)">正常</button>
+      <button class="sp-btn"    data-sp="380"  onclick="setAutoSp(380,this)">快</button>
     </div>
   </div>
+</div>
 
-  <!-- 声调 -->
-  <div id="tab-tone" style="display:none;">
-    <div class="card">
-      <div class="net-desc">同一个音，声调不同意思完全不同；点卡片依次听“声调 → 单字 → 例词”</div>
-      <div class="tone-row" id="toneRow"></div>
-      <div class="quiz-q" id="toneQ" style="margin-top:16px;"></div>
-      <div class="choice-col" id="toneChoices"></div>
-      <div class="result-msg" id="toneMsg"></div>
-      <div style="text-align:center;"><button class="gen-btn" onclick="nextTonePractice()">下一题 →</button></div>
+
+<style>
+/* ── 写数字 ── */
+.dig-btn{width:48px;height:48px;border:2px solid #ddd;border-radius:12px;
+  font-size:1.4rem;font-weight:bold;cursor:pointer;background:#f8f8ff;color:#555;transition:all .15s;}
+.dig-btn.on{background:linear-gradient(135deg,#f48fb1,#e91e63);color:#fff;border-color:#e91e63;}
+.pen-btn{width:34px;height:34px;border-radius:50%;border:3px solid transparent;
+  cursor:pointer;transition:transform .15s;display:inline-block;}
+.pen-btn.on{border-color:#222;transform:scale(1.25);}
+.trace-wrap{position:relative;width:min(280px,100%);margin:0 auto 14px;aspect-ratio:1;
+  border-radius:14px;background:#fff9e6;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+#guideCanvas,#traceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:14px;}
+#traceCanvas{touch-action:none;cursor:crosshair;}
+/* ── 比大小 ── */
+.cmp-display{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px;}
+.cmp-n{font-size:4.2rem;font-weight:bold;transition:font-size .3s,color .3s;}
+.cmp-sign{font-size:3rem;color:#aaa;min-width:48px;text-align:center;transition:color .3s;}
+.cmp-btn{width:68px;height:68px;border:none;border-radius:16px;font-size:2.2rem;
+  font-weight:bold;cursor:pointer;
+  background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:#1565c0;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);transition:all .15s;}
+.cmp-btn:hover{transform:scale(1.08);}
+.cmp-btn:active{transform:scale(.93);}
+/* ── 数字接龙 ── */
+.seq-row{display:flex;gap:6px;justify-content:center;align-items:center;
+  flex-wrap:wrap;margin-bottom:16px;}
+.seq-n{width:50px;height:50px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:bold;background:#e3f2fd;border-radius:10px;color:#1565c0;}
+.seq-blank{width:50px;height:50px;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:bold;background:#fff9c4;border-radius:10px;color:#f57c00;
+  border:2.5px dashed #ff9800;}
+.seq-blank.ok{background:#c8e6c9;color:#2e7d32;border:2.5px solid #2e7d32;}
+.seq-sep{font-size:1.2rem;color:#bbb;}
+/* ── 解题 Toast ── */
+#seqToast{
+  position:fixed;bottom:-220px;left:50%;transform:translateX(-50%);
+  background:#fff;border-radius:20px;padding:18px 20px 16px;
+  box-shadow:0 10px 36px rgba(0,0,0,.18);
+  max-width:360px;width:calc(100% - 32px);
+  text-align:center;z-index:9999;
+  border:2px solid #ffcdd2;
+  transition:bottom .38s cubic-bezier(.34,1.46,.64,1);
+}
+#seqToast.show{bottom:24px;}
+.toast-seq{display:flex;align-items:center;justify-content:center;
+  gap:5px;flex-wrap:wrap;margin:10px 0;}
+.toast-sn{min-width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  font-size:1.35rem;font-weight:bold;border-radius:10px;
+  background:#e3f2fd;color:#1565c0;}
+.toast-sn.ans{background:#2e7d32;color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.4);}
+.toast-arrow{color:#bbb;font-size:1rem;}
+.toast-rule{font-size:.92rem;color:#555;margin-top:8px;line-height:1.7;}
+.toast-rule b{color:#e91e63;}
+.toast-calc{font-size:.85rem;color:#888;margin-top:4px;}
+
+/* ── 数字圆点 Toast ── */
+#numToast{
+  position:fixed;bottom:-320px;left:50%;transform:translateX(-50%);
+  background:#fff;border-radius:20px;padding:18px 20px 16px;
+  box-shadow:0 10px 36px rgba(0,0,0,.18);
+  max-width:400px;width:calc(100% - 32px);
+  text-align:center;z-index:9999;
+  border:2px solid #f8bbd0;
+  transition:bottom .38s cubic-bezier(.34,1.46,.64,1);
+}
+#numToast.show{bottom:24px;}
+.nt-num{font-size:2.2rem;font-weight:bold;color:#e91e63;margin-bottom:10px;line-height:1;}
+.nt-dots{display:grid;grid-template-columns:repeat(10,26px);gap:8px;justify-content:center;}
+.nt-dot{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#e91e63);
+  box-shadow:0 2px 4px rgba(0,0,0,.18);}
+</style>
+
+<!-- ══ Tab 5: 写数字 ══ -->
+<div id="p5" class="hidden">
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center" id="digBtns">
+      <!-- built by JS -->
     </div>
   </div>
-
-  <!-- 整体认读音节 -->
-  <div id="tab-whole" style="display:none;">
-    <div class="card">
-      <div class="net-desc">这16个音节不要拆开拼；点卡片听音节，示例连读时会接着读例词</div>
-      <div class="read-mode" aria-label="整体认读音节朗读模式">
-        <span class="read-mode-label">朗读模式</span>
-        <button type="button" class="read-mode-btn" data-read-kind="whole" data-read-mode="single" aria-pressed="false" onclick="setReadingMode('whole','single')">只读整体认读音节</button>
-        <button type="button" class="read-mode-btn on" data-read-kind="whole" data-read-mode="full" aria-pressed="true" onclick="setReadingMode('whole','full')">示例连读</button>
-      </div>
-      <div class="py-grid" id="wholeGrid"></div>
+  <div class="card">
+    <div class="trace-wrap">
+      <canvas id="guideCanvas" width="280" height="280"></canvas>
+      <canvas id="traceCanvas" width="280" height="280"></canvas>
     </div>
-  </div>
-
-  <!-- 拼音字母歌 -->
-  <div id="tab-alphabet" style="display:none;">
-    <div class="card">
-      <div class="net-desc">所有拼音字母排成一队：从 a、o、e、i、u、ü 开始，读到 y、w 后，再接复韵母和鼻韵母。</div>
-      <div class="alphabet-actions">
-        <button type="button" class="alphabet-action primary" onclick="speakAlphabetSong()">▶ 从头跟读</button>
-        <button type="button" class="alphabet-action" onclick="pySpeech.stop()">⏹ 停止</button>
-      </div>
-      <div id="alphabetGroups"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+      <button class="pen-btn on" data-c="#e91e63" style="background:#e91e63" onclick="setPen('#e91e63',this)"></button>
+      <button class="pen-btn"    data-c="#1565c0" style="background:#1565c0" onclick="setPen('#1565c0',this)"></button>
+      <button class="pen-btn"    data-c="#2e7d32" style="background:#2e7d32" onclick="setPen('#2e7d32',this)"></button>
+      <button class="pen-btn"    data-c="#e65100" style="background:#e65100" onclick="setPen('#e65100',this)"></button>
+      <button class="pen-btn"    data-c="#222"    style="background:#222"    onclick="setPen('#222',this)"></button>
     </div>
+    <div class="row-ctrl">
+      <button class="btn btn-blue"   onclick="showHint()">💡 笔顺提示</button>
+      <button class="btn btn-gray"   onclick="clearTrace()">🗑️ 清除</button>
+      <button class="btn btn-pink"   onclick="speak(numCN(traceDigit))">🔊 读数字</button>
+    </div>
+    <div id="traceResult" style="text-align:center;font-size:1.1rem;font-weight:bold;min-height:36px;margin-top:10px;transition:color .25s;letter-spacing:.5px;"></div>
   </div>
+</div>
 
-  <!-- 拼读学习 -->
-  <div id="tab-study" style="display:none;">
-    <div class="card">
-      <div class="net-desc">按顺序学完23个声母、24个韵母和16个整体认读音节，共63项</div>
-      <div class="study-kind-nav" aria-label="拼读学习范围">
-        <button type="button" class="study-kind-btn on" data-study-kind="all" aria-pressed="true" onclick="setStudyKind('all')">全部 63</button>
-        <button type="button" class="study-kind-btn" data-study-kind="initial" aria-pressed="false" onclick="setStudyKind('initial')">声母 23</button>
-        <button type="button" class="study-kind-btn" data-study-kind="final" aria-pressed="false" onclick="setStudyKind('final')">韵母 24</button>
-        <button type="button" class="study-kind-btn" data-study-kind="whole" aria-pressed="false" onclick="setStudyKind('whole')">整体认读 16</button>
+<!-- ══ Tab 6: 比大小 ══ -->
+<div id="p6" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="lv-btn on" data-cl="1" onclick="setCmpLv(1,this)">1-10（简单）</button>
+      <button class="lv-btn"    data-cl="2" onclick="setCmpLv(2,this)">1-50（中等）</button>
+      <button class="lv-btn"    data-cl="3" onclick="setCmpLv(3,this)">1-100（挑战）</button>
+    </div>
+    <div class="cmp-display">
+      <div class="cmp-n" id="cmpA" style="color:#e91e63">?</div>
+      <div class="cmp-sign" id="cmpSign">?</div>
+      <div class="cmp-n" id="cmpB" style="color:#1565c0">?</div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:14px">
+      <button class="cmp-btn" onclick="checkCmp('&lt;')">&lt;</button>
+      <button class="cmp-btn" onclick="checkCmp('=')">=</button>
+      <button class="cmp-btn" onclick="checkCmp('&gt;')">&gt;</button>
+    </div>
+    <div class="fb" id="cmpFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCmp()">换一题 🔄</button>
+    </div>
+    <div class="score" id="cmpScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 7: 数字接龙 ══ -->
+<div id="p7" class="hidden">
+  <div class="card">
+    <div class="lv-row" id="seqStepBtns">
+      <button class="lv-btn on" data-s="1"  onclick="setSeqStep(1,this)">按 1 数</button>
+      <button class="lv-btn"    data-s="2"  onclick="setSeqStep(2,this)">按 2 数</button>
+      <button class="lv-btn"    data-s="5"  onclick="setSeqStep(5,this)">按 5 数</button>
+      <button class="lv-btn"    data-s="10" onclick="setSeqStep(10,this)">按 10 数</button>
+    </div>
+    <div class="seq-row" id="seqRow"></div>
+    <div class="choices4" id="seqChoices"></div>
+    <div class="fb" id="seqFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genSeq()">换一题 🔄</button>
+    </div>
+    <div class="score" id="seqScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 8: 排序 ══ -->
+<div id="p8" class="hidden">
+  <div class="card">
+    <div class="lv-row">
+      <button class="sr-btn" data-sr="10" onclick="setSortLv(10,this)">10以内</button>
+      <button class="sr-btn" data-sr="20" onclick="setSortLv(20,this)">20以内</button>
+      <button class="sr-btn" data-sr="50" onclick="setSortLv(50,this)">50以内</button>
+      <button class="sr-btn on" data-sr="100" onclick="setSortLv(100,this)">100以内</button>
+    </div>
+    <div class="sort-q">👉 把下面的数字一个个拖到上面的格子里，从小到大放好</div>
+    <div class="sort-slots" id="sortSlots"></div>
+    <div class="sort-pool" id="sortPool"></div>
+    <div class="fb" id="sortFb"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genSort()">换一题 🔄</button>
+    </div>
+    <div class="score" id="sortScore">✅ 0 &nbsp; ❌ 0</div>
+  </div>
+</div>
+
+<!-- ══ Tab 9: 过十闯关 ══ -->
+<div id="p9" class="hidden">
+  <div class="card">
+    <p class="cross-rule">看到个位是 <b>9</b>，再数 1 个：<br>个位回到 <b>0</b>，十位就加 <b>1</b>！</p>
+    <div class="cross-q" id="crossQ">19 后面是几？</div>
+    <div class="cross-equation">
+      <div class="cross-num" id="crossStart">19</div>
+      <div class="cross-arrow">＋1 →</div>
+      <div class="cross-answer" id="crossAnswer">？</div>
+    </div>
+    <div class="cross-place" aria-label="十位和个位的变化">
+      <div class="place-card">
+        <div class="place-label">十位</div>
+        <div class="place-change"><span class="place-before" id="crossTensBefore">1</span><span class="place-turn">→</span><span class="place-after" id="crossTensAfter">2</span></div>
       </div>
-      <div class="study-progress-row">
-        <span id="studyProgressText">第 1 / 63 项</span>
-        <div class="study-meter" id="studyMeter" role="progressbar" aria-label="拼读学习进度" aria-valuemin="1" aria-valuemax="63" aria-valuenow="1"><span id="studyMeterBar"></span></div>
-      </div>
-      <div class="study-stage" aria-live="polite">
-        <span class="study-kind" id="studyKindText">声母</span>
-        <div class="study-path">
-          <span class="study-symbol" id="studySymbol">b</span>
-          <span class="study-arrow" aria-hidden="true">→</span>
-          <span class="study-example" id="studyExample">bā</span>
-          <span class="study-arrow" aria-hidden="true">→</span>
-          <span class="study-word" id="studyWord">爸爸</span>
-        </div>
-        <p class="study-tip" id="studyTip"></p>
-      </div>
-      <div class="study-actions">
-        <button type="button" class="study-action" id="studyPrev" onclick="moveStudy(-1)">← 上一项</button>
-        <button type="button" class="study-action primary" onclick="speakCurrentStudy()">🔊 朗读本项</button>
-        <button type="button" class="study-action" id="studyNext" onclick="moveStudy(1)">下一项 →</button>
+      <div class="place-card ones">
+        <div class="place-label">个位</div>
+        <div class="place-change"><span class="place-before">9</span><span class="place-turn">→</span><span class="place-after">0</span></div>
       </div>
     </div>
-  </div>
-
-  <!-- 拼读练习 -->
-  <div id="tab-blend" style="display:none;">
-    <div class="card">
-      <div class="net-desc">先听声母和韵母，答题后完整回放“声母 → 韵母 → 字音 → 例词”</div>
-      <div class="blend-box">
-        <div class="blend-expr" id="blendExpr"></div>
-        <div class="choice-col" id="blendChoices"></div>
-        <div class="result-msg" id="blendMsg"></div>
-      </div>
-      <div style="text-align:center;"><button class="gen-btn" onclick="nextBlend()">下一题 →</button></div>
+    <div class="choices4" id="crossChoices"></div>
+    <div class="cross-tip" id="crossTip"></div>
+    <div class="row-ctrl">
+      <button class="btn btn-pink" onclick="genCrossTen()">换一关 🔄</button>
     </div>
+    <div class="score" id="crossScore">✅ 0 &nbsp; ❌ 0</div>
   </div>
-
-  <!-- 综合练习 -->
-  <div id="tab-quiz" style="display:none;">
-    <div class="card quiz-box">
-      <div class="score-row">
-        <div class="score-item">✅ <span id="qC">0</span></div>
-        <div class="score-item">❌ <span id="qW">0</span></div>
-      </div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="choice-col" id="quizChoices"></div>
-      <div class="result-msg" id="quizMsg"></div>
-      <button class="next-btn" id="nextBtn" onclick="nextQ()" style="display:none;">下一题 →</button>
-    </div>
-  </div>
+</div>
 
 </div>
 <script src="hpx-core.js"></script>
 <script>
-const pySpeech=Hpx.speech.install({rate:0.85});
-const randInt=Hpx.random.int;
-function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=randInt(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+// ─── Utils ───
+const EMOJIS = ['🍎','🐱','⭐','🦋','🍭','🌸','🐠','🎈','🍓','🐸',
+                '🐣','🦊','🍊','🌈','🐧','🍇','🦄','🐞','🍕','🎀'];
 
-const READING_MODES={initial:'full',final:'full',whole:'full'};
-function setReadingMode(kind,mode){
-  READING_MODES[kind]=mode;
-  document.querySelectorAll(`[data-read-kind="${kind}"]`).forEach(btn=>{
-    const selected=btn.dataset.readMode===mode;
-    btn.classList.toggle('on',selected);
-    btn.setAttribute('aria-pressed',String(selected));
-  });
-  const label={initial:'声母',final:'韵母',whole:'整体认读音节'}[kind]||'';
-  speak(mode==='single'?`已切换为只读${label}`:`已切换为${label}示例连读`);
+function numCN(n) {
+  const d = ['','一','二','三','四','五','六','七','八','九','十'];
+  if (n === 100) return '一百';
+  if (n <= 10) return d[n];
+  if (n < 20)  return '十' + (n > 10 ? d[n % 10] : '');
+  const t = Math.floor(n/10), r = n%10;
+  return d[t] + '十' + (r ? d[r] : '');
 }
 
-// ── 声母（23个）──
-const INITIALS=[
-  {py:'b',read:'玻',syllable:'爸',syllablePy:'bā',word:'爸爸'},{py:'p',read:'坡',syllable:'苹',syllablePy:'píng',word:'苹果'},
-  {py:'m',read:'摸',syllable:'妈',syllablePy:'mā',word:'妈妈'},{py:'f',read:'佛',syllable:'飞',syllablePy:'fēi',word:'飞机'},
-  {py:'d',read:'得',syllable:'大',syllablePy:'dà',word:'大象'},{py:'t',read:'特',syllable:'兔',syllablePy:'tù',word:'兔子'},
-  {py:'n',read:'讷',syllable:'牛',syllablePy:'niú',word:'牛奶'},{py:'l',read:'勒',syllable:'老',syllablePy:'lǎo',word:'老虎'},
-  {py:'g',read:'哥',syllable:'哥',syllablePy:'gē',word:'哥哥'},{py:'k',read:'科',syllable:'开',syllablePy:'kāi',word:'开心'},
-  {py:'h',read:'喝',syllable:'河',syllablePy:'hé',word:'河流'},{py:'j',read:'基',syllable:'鸡',syllablePy:'jī',word:'鸡蛋'},
-  {py:'q',read:'欺',syllable:'铅',syllablePy:'qiān',word:'铅笔'},{py:'x',read:'希',syllable:'西',syllablePy:'xī',word:'西瓜'},
-  {py:'zh',read:'知',syllable:'桌',syllablePy:'zhuō',word:'桌子'},{py:'ch',read:'吃',syllable:'吃',syllablePy:'chī',word:'吃饭'},
-  {py:'sh',read:'诗',syllable:'书',syllablePy:'shū',word:'书本'},{py:'r',read:'日',syllable:'热',syllablePy:'rè',word:'热闹'},
-  {py:'z',read:'资',syllable:'字',syllablePy:'zì',word:'字典'},{py:'c',read:'雌',syllable:'草',syllablePy:'cǎo',word:'草地'},
-  {py:'s',read:'思',syllable:'三',syllablePy:'sān',word:'数字三'},{py:'y',read:'衣',syllable:'月',syllablePy:'yuè',word:'月亮'},
-  {py:'w',read:'乌',syllable:'乌',syllablePy:'wū',word:'乌龟'},
-];
-function speakInitial(py,read,syllablePy,syllable,word){
-  if(READING_MODES.initial==='single'){
-    speak(read);
-    return;
+const ri=Hpx.random.int;
+
+function shuffle(a) {
+  for (let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];
   }
-  pySpeech.sequence([
-    {text:read,gapMs:360},
-    {text:`${syllablePy}，${syllable}`,gapMs:320},
-    {text:word}
-  ],{rate:0.78});
-}
-function renderInitials(){
-  document.getElementById('initialGrid').innerHTML=INITIALS.map(it=>
-    `<div class="py-chip" onclick="speakInitial('${it.py}','${it.read}','${it.syllablePy}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
+  return a;
 }
 
-// ── 韵母（24个，分组）──
-const FINAL_GROUPS=[
-  { name:'单韵母（6个）', items:[
-    {py:'a',read:'啊',syllable:'阿',syllablePy:'ā',word:'阿姨'},{py:'o',read:'喔',syllable:'喔',syllablePy:'ō',word:'公鸡喔喔叫'},
-    {py:'e',read:'鹅',syllable:'鹅',syllablePy:'é',word:'白鹅'},{py:'i',read:'衣',syllable:'衣',syllablePy:'yī',word:'衣服'},
-    {py:'u',read:'乌',syllable:'乌',syllablePy:'wū',word:'乌鸦'},{py:'ü',read:'迂',syllable:'鱼',syllablePy:'yú',word:'小鱼'},
-  ]},
-  { name:'复韵母（8个）', items:[
-    {py:'ai',read:'哀',syllable:'爱',syllablePy:'ài',word:'爱心'},{py:'ei',read:'诶',syllable:'黑',syllablePy:'hēi',word:'黑色'},
-    {py:'ui',read:'威',syllable:'队',syllablePy:'duì',word:'排队'},{py:'ao',read:'凹',syllable:'猫',syllablePy:'māo',word:'小猫'},
-    {py:'ou',read:'欧',syllable:'猴',syllablePy:'hóu',word:'猴子'},{py:'iu',read:'优',syllable:'牛',syllablePy:'niú',word:'小牛'},
-    {py:'ie',read:'耶',syllable:'姐',syllablePy:'jiě',word:'姐姐'},{py:'üe',read:'约',syllable:'月',syllablePy:'yuè',word:'月亮'},
-  ]},
-  { name:'前鼻韵母（5个）', items:[
-    {py:'an',read:'安',syllable:'伞',syllablePy:'sǎn',word:'雨伞'},{py:'en',read:'恩',syllable:'门',syllablePy:'mén',word:'大门'},
-    {py:'in',read:'因',syllable:'音',syllablePy:'yīn',word:'声音'},{py:'un',read:'温',syllable:'温',syllablePy:'wēn',word:'温暖'},
-    {py:'ün',read:'晕',syllable:'云',syllablePy:'yún',word:'白云'},
-  ]},
-  { name:'后鼻韵母（4个）', items:[
-    {py:'ang',read:'肮',syllable:'羊',syllablePy:'yáng',word:'山羊'},{py:'eng',read:'鞥',syllable:'灯',syllablePy:'dēng',word:'台灯'},
-    {py:'ing',read:'英',syllable:'星',syllablePy:'xīng',word:'星星'},{py:'ong',read:'嗡',syllable:'红',syllablePy:'hóng',word:'红色'},
-  ]},
-  { name:'特殊韵母（1个）', items:[
-    {py:'er',read:'儿',syllable:'耳',syllablePy:'ěr',word:'耳朵'},
-  ]},
-];
-function speakFinal(read,syllable,word){
-  if(READING_MODES.final==='single'){
-    speak(read);
-    return;
+function genChoices(correct, lo, hi, n) {
+  const s = new Set([correct]);
+  for (let t=0; s.size<n && t<600; t++) s.add(ri(lo,hi));
+  return shuffle([...s]).slice(0,n);
+}
+
+// 记录只保存在当前浏览器，用于显示各标签的个人练习进度，不上传或同步。
+const NUMBER_RECORD_STORAGE_KEY='hpx-number-learning-record-v1';
+const numberLearningRecords=loadNumberLearningRecords();
+function newNumberLearningRecords(){
+  return {learned:{recognition:[],countAlong:[]},practice:{count:{correct:0,attempts:0},find:{correct:0,attempts:0},write:{correct:0,attempts:0},compare:{correct:0,attempts:0},sequence:{correct:0,attempts:0},sort:{correct:0,attempts:0},cross:{correct:0,attempts:0}}};
+}
+function loadNumberLearningRecords(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(NUMBER_RECORD_STORAGE_KEY)||'null');
+    const records=newNumberLearningRecords();
+    if(!saved||typeof saved!=='object') return records;
+    Object.keys(records.learned).forEach(kind=>{
+      if(Array.isArray(saved.learned&&saved.learned[kind])) records.learned[kind]=[...new Set(saved.learned[kind].filter(n=>Number.isInteger(n)&&n>=1&&n<=100))];
+    });
+    Object.keys(records.practice).forEach(kind=>{
+      const item=saved.practice&&saved.practice[kind];
+      if(item&&Number.isFinite(item.correct)&&Number.isFinite(item.attempts)) records.practice[kind]={correct:Math.max(0,Math.floor(item.correct)),attempts:Math.max(0,Math.floor(item.attempts))};
+    });
+    return records;
+  }catch(err){return newNumberLearningRecords();}
+}
+function saveNumberLearningRecords(){try{localStorage.setItem(NUMBER_RECORD_STORAGE_KEY,JSON.stringify(numberLearningRecords));}catch(err){}}
+function markNumberLearned(kind,n){
+  const list=numberLearningRecords.learned[kind];
+  if(!list||list.includes(n)) return;
+  list.push(n);saveNumberLearningRecords();renderNumberLearningRecords();
+}
+function recordNumberPractice(kind,correct){
+  const record=numberLearningRecords.practice[kind];
+  if(!record) return;
+  record.attempts++;if(correct) record.correct++;
+  saveNumberLearningRecords();renderNumberLearningRecords();
+}
+function setNumberRecordText(id,text){const el=document.getElementById(id);if(el)el.textContent=text;}
+function renderNumberLearningRecords(){
+  const learned=numberLearningRecords.learned,practice=numberLearningRecords.practice;
+  setNumberRecordText('numberRecordTab1',`${learned.recognition.length}/100`);
+  setNumberRecordText('numberRecordTab4',`${learned.countAlong.length}/100`);
+  [['2','count'],['3','find'],['5','write'],['6','compare'],['7','sequence'],['8','sort'],['9','cross']].forEach(([tab,kind])=>setNumberRecordText(`numberRecordTab${tab}`,`${practice[kind].correct}/${practice[kind].attempts}`));
+  const summary=document.getElementById('numbersRecordSummary');
+  if(summary) summary.textContent=`已学习：认数字 ${learned.recognition.length}/100，跟我数 ${learned.countAlong.length}/100；答题：数一数 ${practice.count.correct}/${practice.count.attempts}，找数字 ${practice.find.correct}/${practice.find.attempts}，写数字 ${practice.write.correct}/${practice.write.attempts}，比大小 ${practice.compare.correct}/${practice.compare.attempts}，接龙 ${practice.sequence.correct}/${practice.sequence.attempts}，排序 ${practice.sort.correct}/${practice.sort.attempts}，过十 ${practice.cross.correct}/${practice.cross.attempts}。记录保存在本浏览器。`;
+}
+function clearNumberLearningRecords(){
+  const empty=newNumberLearningRecords();Object.assign(numberLearningRecords,empty);
+  try{localStorage.removeItem(NUMBER_RECORD_STORAGE_KEY);}catch(err){}
+  renderNumberLearningRecords();speak('已清除数字学习记录');
+}
+
+// ─── Tab 1 — Grid ───
+let zNum = 1;
+let revealed = 1; // 已经"揭晓"到的数字个数：1 表示只显示数字 1
+let numToastTimer = null;
+
+function decCls(n){
+  if(n<=10) return 'd1';
+  if(n<=20) return 'd2';
+  if(n<=30) return 'd3';
+  if(n<=40) return 'd4';
+  if(n<=50) return 'd5';
+  if(n<=60) return 'd6';
+  if(n<=70) return 'd7';
+  if(n<=80) return 'd8';
+  if(n<=90) return 'd9';
+  return 'd10';
+}
+
+function buildGrid() {
+  let h='';
+  for(let i=1;i<=100;i++)
+    h+=`<div class="ng-cell ${decCls(i)} unrevealed" id="ngc-${i}" onclick="zoomTo(${i})">${i}</div>`;
+  document.getElementById('numGrid').innerHTML=h;
+  applyReveal(false);
+}
+
+// 把 1..revealed 的格子显示出来，其余保持隐藏
+function applyReveal(animateLast){
+  for(let i=1;i<=100;i++){
+    const cell=document.getElementById(`ngc-${i}`);
+    if(!cell) continue;
+    cell.classList.toggle('unrevealed', i>revealed);
+    cell.classList.remove('just-revealed');
   }
-  pySpeech.sequence([
-    {text:read,gapMs:260},
-    {text:syllable,gapMs:300},
-    {text:word}
-  ],{rate:0.78});
-}
-function renderFinals(){
-  document.getElementById('finalGroups').innerHTML=FINAL_GROUPS.map(g=>
-    `<div class="group-title">${g.name}</div><div class="py-grid">${g.items.map(it=>
-      `<div class="py-chip" onclick="speakFinal('${it.read}','${it.syllable}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('')}</div>`
-  ).join('');
-}
-
-// ── 声调 ──
-const TONE_DEMO=[
-  {py:'mā',char:'妈',word:'妈妈',tone:1,shape:'高而平 ——'},
-  {py:'má',char:'麻',word:'麻绳',tone:2,shape:'往上扬 ↗'},
-  {py:'mǎ',char:'马',word:'小马',tone:3,shape:'先降后升 ∨'},
-  {py:'mà',char:'骂',word:'骂人',tone:4,shape:'往下降 ↘'},
-  {py:'ma',char:'吗',word:'好吗',tone:0,shape:'又轻又短'},
-];
-const TONE_BANK=[
-  {py:'mā',char:'妈',tone:1},{py:'tiān',char:'天',tone:1},{py:'shū',char:'书',tone:1},{py:'huā',char:'花',tone:1},{py:'fēi',char:'飞',tone:1},
-  {py:'má',char:'麻',tone:2},{py:'lái',char:'来',tone:2},{py:'rén',char:'人',tone:2},{py:'huí',char:'回',tone:2},{py:'tóng',char:'同',tone:2},
-  {py:'mǎ',char:'马',tone:3},{py:'hǎo',char:'好',tone:3},{py:'shǒu',char:'手',tone:3},{py:'lǎo',char:'老',tone:3},{py:'wǒ',char:'我',tone:3},
-  {py:'mà',char:'骂',tone:4},{py:'qù',char:'去',tone:4},{py:'dà',char:'大',tone:4},{py:'zài',char:'再',tone:4},{py:'rè',char:'热',tone:4},
-];
-function renderTones(){
-  document.getElementById('toneRow').innerHTML=TONE_DEMO.map(t=>
-    `<div class="tone-chip" onclick="speakTone('${t.char}',${t.tone},'${t.word}')">
-      <div class="letter">${t.py}</div>
-      <div class="shape">${t.tone===0?'轻声':'第'+t.tone+'声'}：${t.shape}</div>
-      <div class="char">${t.char} · ${t.word}</div>
-    </div>`).join('');
-}
-function speakTone(char,tone,word){
-  pySpeech.sequence([
-    {text:tone===0?'轻声':'第'+tone+'声',gapMs:220},
-    {text:char,gapMs:260},
-    {text:word}
-  ],{rate:0.82});
-}
-let toneState=null;
-function nextTonePractice(){
-  const item=TONE_BANK[randInt(0,TONE_BANK.length-1)];
-  toneState=item;
-  document.getElementById('toneQ').textContent=`${item.py}（${item.char}）是第几声？`;
-  const opts=shuffle([1,2,3,4]);
-  document.getElementById('toneChoices').innerHTML=opts.map(o=>
-    `<button class="choice-btn" onclick="checkTone(this,${o})">第${o}声</button>`).join('');
-  document.getElementById('toneMsg').textContent='';
-  speak(item.char);
-}
-function checkTone(btn,choice){
-  const correct=toneState.tone;
-  document.querySelectorAll('#toneChoices .choice-btn').forEach(b=>{
-    b.disabled=true;
-    if(parseInt(b.textContent.replace('第','').replace('声',''))===correct) b.classList.add('correct');
-  });
-  if(choice!==correct) btn.classList.add('wrong');
-  const msg=document.getElementById('toneMsg');
-  const ok=choice===correct;
-  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是第'+correct+'声'; }
-  pySpeech.sequence([
-    {text:ok?'答对了':'正确答案',gapMs:160},
-    {text:'第'+correct+'声',gapMs:220},
-    {text:toneState.char}
-  ],{rate:0.82});
-}
-
-// ── 整体认读音节（16个）──
-const WHOLE_SYLLABLES=[
-  {py:'zhi',read:'知',syllablePy:'zhī',word:'知识'},{py:'chi',read:'吃',syllablePy:'chī',word:'吃饭'},
-  {py:'shi',read:'十',syllablePy:'shí',word:'十个'},{py:'ri',read:'日',syllablePy:'rì',word:'日出'},
-  {py:'zi',read:'字',syllablePy:'zì',word:'字典'},{py:'ci',read:'词',syllablePy:'cí',word:'词语'},
-  {py:'si',read:'四',syllablePy:'sì',word:'数字四'},{py:'yi',read:'一',syllablePy:'yī',word:'数字一'},
-  {py:'wu',read:'五',syllablePy:'wǔ',word:'数字五'},{py:'yu',read:'鱼',syllablePy:'yú',word:'小鱼'},
-  {py:'ye',read:'叶',syllablePy:'yè',word:'叶子'},{py:'yue',read:'月',syllablePy:'yuè',word:'月亮'},
-  {py:'yuan',read:'圆',syllablePy:'yuán',word:'圆形'},{py:'yin',read:'音',syllablePy:'yīn',word:'音乐'},
-  {py:'yun',read:'云',syllablePy:'yún',word:'云朵'},{py:'ying',read:'英',syllablePy:'yīng',word:'英雄'},
-];
-function speakWhole(read,word){
-  if(READING_MODES.whole==='single'){
-    speak(read);
-    return;
+  if(animateLast){
+    const last=document.getElementById(`ngc-${revealed}`);
+    if(last){ void last.offsetWidth; last.classList.add('just-revealed'); }
   }
-  pySpeech.sequence([
-    {text:read,gapMs:280},
-    {text:word}
-  ],{rate:0.8});
-}
-function renderWhole(){
-  document.getElementById('wholeGrid').innerHTML=WHOLE_SYLLABLES.map(it=>
-    `<div class="py-chip" onclick="speakWhole('${it.read}','${it.word}')"><div class="letter">${it.py}</div><div class="syllable">${it.syllablePy}</div><div class="word">${it.word}</div></div>`).join('');
-}
-
-// ── 拼音字母歌：按一条连续的拼音字母顺序跟读 ──
-const ALPHABET_SONG_ORDER=['a','o','e','i','u','ü','b','p','m','f','d','t','n','l','g','k','h','j','q','x','zh','ch','sh','r','z','c','s','y','w','ai','ei','ui','ao','ou','iu','ie','üe','er','an','en','in','un','ün','ang','eng','ing','ong'];
-function getAlphabetSongItems(){
-  const byPy=new Map([
-    ...INITIALS,
-    ...FINAL_GROUPS.flatMap(group=>group.items)
-  ].map(item=>[item.py,item]));
-  return ALPHABET_SONG_ORDER.map(py=>byPy.get(py)).filter(Boolean);
-}
-function renderAlphabetSong(){
-  const wrap=document.getElementById('alphabetGroups');
-  wrap.innerHTML='';
-  const grid=document.createElement('div');
-  grid.className='alphabet-grid';
-  grid.setAttribute('aria-label','拼音字母歌顺序');
-  getAlphabetSongItems().forEach(item=>{
-    const chip=document.createElement('button');
-    chip.type='button';
-    chip.className='alphabet-chip';
-    chip.innerHTML=`${item.py}<small>${item.read}</small>`;
-    chip.setAttribute('aria-label',`${item.py}，读${item.read}`);
-    chip.addEventListener('click',()=>pySpeech.speak(item.read,{rate:.78}));
-    grid.appendChild(chip);
-  });
-  wrap.appendChild(grid);
-}
-function speakAlphabetSong(){
-  const items=getAlphabetSongItems();
-  pySpeech.sequence(items.map(item=>({text:item.read,gapMs:180})),{rate:.76});
+  document.getElementById('rvBar').style.width = revealed+'%';
+  document.getElementById('rvStatus').innerHTML =
+    revealed>=100
+      ? `🎉 恭喜！已经认识全部 <b>100</b> 个数字啦！`
+      : `已认识 <b>${revealed}</b> 个数字，共 100 个`;
+  const zBtn=document.getElementById('zNextBtn');
+  if(zBtn){
+    zBtn.disabled = revealed>=100 && zNum>=100;
+    zBtn.style.opacity = (revealed>=100 && zNum>=100) ? .5 : 1;
+  }
 }
 
-// ── 拼读学习：覆盖全部声母、韵母和整体认读音节 ──
-const STUDY_TIPS={
-  initial:'先听声母读音，再听完整拼音和例字，最后读例词。',
-  final:'先听韵母读音，再听完整拼音和例字，最后读例词。',
-  whole:'整体认读音节直接读，不拆成声母和韵母。'
-};
-let studyKind='all',studyIndex=0;
-function getAllStudyItems(){
-  const initials=INITIALS.map(item=>({...item,kind:'initial',kindName:'声母',symbol:item.py,example:item.syllablePy}));
-  const finals=FINAL_GROUPS.flatMap(group=>group.items.map(item=>({...item,kind:'final',kindName:'韵母',symbol:item.py,example:item.syllablePy})));
-  const wholes=WHOLE_SYLLABLES.map(item=>({...item,kind:'whole',kindName:'整体认读音节',symbol:item.py,example:item.syllablePy}));
-  return [...initials,...finals,...wholes];
-}
-function getStudyItems(){
-  const items=getAllStudyItems();
-  return studyKind==='all'?items:items.filter(item=>item.kind===studyKind);
-}
-function setStudyKind(kind){
-  studyKind=kind;
-  studyIndex=0;
-  document.querySelectorAll('[data-study-kind]').forEach(btn=>{
-    const selected=btn.dataset.studyKind===kind;
-    btn.classList.toggle('on',selected);
-    btn.setAttribute('aria-pressed',String(selected));
-  });
-  renderStudy(true);
-}
-function renderStudy(readAloud=false){
-  const items=getStudyItems();
-  studyIndex=Math.max(0,Math.min(studyIndex,items.length-1));
-  const item=items[studyIndex];
-  document.getElementById('studyKindText').textContent=item.kindName;
-  document.getElementById('studySymbol').textContent=item.symbol;
-  document.getElementById('studyExample').textContent=item.example;
-  document.getElementById('studyWord').textContent=item.word;
-  document.getElementById('studyTip').textContent=STUDY_TIPS[item.kind];
-  document.getElementById('studyProgressText').textContent=`第 ${studyIndex+1} / ${items.length} 项`;
-  const meter=document.getElementById('studyMeter');
-  meter.setAttribute('aria-valuemax',String(items.length));
-  meter.setAttribute('aria-valuenow',String(studyIndex+1));
-  document.getElementById('studyMeterBar').style.width=`${(studyIndex+1)/items.length*100}%`;
-  document.getElementById('studyPrev').disabled=studyIndex===0;
-  document.getElementById('studyNext').disabled=studyIndex===items.length-1;
-  if(readAloud) speakStudyItem(item);
-}
-function speakStudyItem(item){
-  const parts=item.kind==='whole'
-    ? [{text:item.read,gapMs:280},{text:item.word}]
-    : [{text:item.read,gapMs:250},{text:`${item.example}，${item.syllable}`,gapMs:280},{text:item.word}];
-  pySpeech.sequence(parts,{rate:0.78});
-}
-function speakCurrentStudy(){speakStudyItem(getStudyItems()[studyIndex]);}
-function moveStudy(step){studyIndex+=step;renderStudy(true);}
-
-// ── 拼读练习 ──
-const BLEND_COMBOS=[
-  {i:'b',f:'a',syl:'ba',char:'爸',word:'爸爸'},
-  {i:'m',f:'a',syl:'ma',char:'妈',word:'妈妈'},
-  {i:'d',f:'a',syl:'da',char:'大',word:'大象'},
-  {i:'t',f:'u',syl:'tu',char:'兔',word:'兔子'},
-  {i:'n',f:'i',syl:'ni',char:'你',word:'你好'},
-  {i:'l',f:'ao',syl:'lao',char:'老',word:'老虎'},
-  {i:'g',f:'e',syl:'ge',char:'哥',word:'哥哥'},
-  {i:'k',f:'ai',syl:'kai',char:'开',word:'开心'},
-  {i:'h',f:'e',syl:'he',char:'河',word:'河流'},
-  {i:'x',f:'i',syl:'xi',char:'西',word:'西瓜'},
-  {i:'sh',f:'u',syl:'shu',char:'书',word:'书本'},
-  {i:'h',f:'ong',syl:'hong',char:'红',word:'红色'},
-  {i:'sh',f:'an',syl:'shan',char:'山',word:'大山'},
-  {i:'n',f:'iu',syl:'niu',char:'牛',word:'牛奶'},
-  {i:'h',f:'ai',syl:'hai',char:'海',word:'大海'},
-  {i:'f',f:'ei',syl:'fei',char:'飞',word:'飞机'},
-  {i:'j',f:'i',syl:'ji',char:'鸡',word:'鸡蛋'},
-  {i:'c',f:'ao',syl:'cao',char:'草',word:'草地'},
-  {i:'p',f:'ing',syl:'ping',char:'苹',word:'苹果'},
-  {i:'d',f:'eng',syl:'deng',char:'灯',word:'灯笼'},
-];
-let blendState=null;
-function nextBlend(){
-  const item=BLEND_COMBOS[randInt(0,BLEND_COMBOS.length-1)];
-  blendState=item;
-  document.getElementById('blendExpr').textContent=`${item.i} + ${item.f} = ?`;
-  const distractors=shuffle(BLEND_COMBOS.filter(b=>b.syl!==item.syl)).slice(0,3);
-  const opts=shuffle([item, ...distractors]);
-  document.getElementById('blendChoices').innerHTML=opts.map(o=>
-    `<button class="choice-btn" onclick="checkBlend(this,'${o.syl}')">${o.syl}（${o.char}）</button>`).join('');
-  document.getElementById('blendMsg').textContent='';
-  const initialRead=INITIALS.find(x=>x.py===item.i).read;
-  const finalRead=FINAL_GROUPS.flatMap(g=>g.items).find(x=>x.py===item.f).read;
-  pySpeech.sequence([
-    {text:'声母'+initialRead,gapMs:120},
-    {text:'韵母'+finalRead,gapMs:160},
-    {text:'拼在一起，读什么？'}
-  ],{rate:0.84});
-}
-function speakBlendAnswer(item,correct){
-  const initialRead=INITIALS.find(x=>x.py===item.i).read;
-  const finalRead=FINAL_GROUPS.flatMap(g=>g.items).find(x=>x.py===item.f).read;
-  pySpeech.sequence([
-    {text:correct?'答对了':'正确答案',gapMs:180},
-    {text:initialRead,gapMs:220},
-    {text:finalRead,gapMs:260},
-    {text:item.char,gapMs:280},
-    {text:item.word}
-  ],{rate:0.8});
-}
-function checkBlend(btn,choice){
-  const correct=blendState.syl;
-  document.querySelectorAll('#blendChoices .choice-btn').forEach(b=>{
-    b.disabled=true;
-    if(b.textContent.startsWith(correct)) b.classList.add('correct');
-  });
-  if(choice!==correct) btn.classList.add('wrong');
-  const msg=document.getElementById('blendMsg');
-  if(choice===correct){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'+blendState.i+'+'+blendState.f+'='+blendState.syl+'（'+blendState.char+'）'; }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是 '+correct+'（'+blendState.char+'）'; }
-  speakBlendAnswer(blendState,choice===correct);
+function revealNext(fromAuto){
+  if(revealed>=100) return;
+  if(!fromAuto) stopRevealAuto();
+  revealed++;
+  applyReveal(true);
+  zoomTo(revealed);
 }
 
-// ── 综合练习 ──
-let qScore={c:0,w:0};
-let quizState=null;
-function nextQ(){
-  document.getElementById('quizMsg').textContent='';
-  document.getElementById('nextBtn').style.display='none';
-  const type=randInt(0,3);
-  if(type===0){
-    const item=INITIALS[randInt(0,INITIALS.length-1)];
-    quizState={type:'initial',item};
-    document.getElementById('quizQ').textContent=`声母 "${item.py}" 对应下面哪个词？`;
-    const distractors=shuffle(INITIALS.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
-    const opts=shuffle([item.word, ...distractors]);
-    document.getElementById('quizChoices').innerHTML=opts.map(o=>
-      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
-    speak(`声母${item.read}对应哪个词？`);
-  } else if(type===1){
-    const flat=FINAL_GROUPS.flatMap(g=>g.items);
-    const item=flat[randInt(0,flat.length-1)];
-    quizState={type:'final',item};
-    document.getElementById('quizQ').textContent=`韵母 "${item.py}" 对应下面哪个词？`;
-    const distractors=shuffle(flat.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
-    const opts=shuffle([item.word, ...distractors]);
-    document.getElementById('quizChoices').innerHTML=opts.map(o=>
-      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
-    speak(`韵母${item.read}对应哪个词？`);
-  } else if(type===2){
-    const item=TONE_BANK[randInt(0,TONE_BANK.length-1)];
-    quizState={type:'tone',item};
-    document.getElementById('quizQ').textContent=`"${item.py}"（${item.char}）是第几声？`;
-    const opts=shuffle([1,2,3,4]).map(o=>'第'+o+'声');
-    document.getElementById('quizChoices').innerHTML=opts.map(o=>
-      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','第${item.tone}声')">${o}</button>`).join('');
-    speak(item.char+'是第几声？');
+// 合并后的"下一个"按钮：如果当前看的数字还没到揭晓上限，先在已揭晓范围内移动；
+// 如果已经在最新揭晓的数字上，就揭晓一个新数字并跳过去
+function zoomOrRevealNext(){
+  stopRevealAuto();
+  if(zNum<revealed){
+    zoomTo(zNum+1);
   } else {
-    const item=WHOLE_SYLLABLES[randInt(0,WHOLE_SYLLABLES.length-1)];
-    quizState={type:'whole',item};
-    document.getElementById('quizQ').textContent=`整体认读音节 "${item.py}" 对应下面哪个词？`;
-    const distractors=shuffle(WHOLE_SYLLABLES.filter(x=>x.word!==item.word)).slice(0,3).map(x=>x.word);
-    const opts=shuffle([item.word, ...distractors]);
-    document.getElementById('quizChoices').innerHTML=opts.map(o=>
-      `<button class="choice-btn" onclick="checkQuizChoice(this,'${o}','${item.word}')">${o}</button>`).join('');
-    speak(`整体认读音节${item.read}对应哪个词？`);
+    revealNext(true); // 传 true 避免重复调用 stopRevealAuto
   }
-}
-function speakQuizAnswer(correct){
-  if(!quizState) return;
-  const lead=correct?'答对了':'正确答案';
-  const item=quizState.item;
-  if(quizState.type==='initial'){
-    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:220},{text:item.syllable,gapMs:260},{text:item.word}],{rate:0.8});
-  }else if(quizState.type==='final'){
-    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:220},{text:item.syllable,gapMs:260},{text:item.word}],{rate:0.8});
-  }else if(quizState.type==='whole'){
-    pySpeech.sequence([{text:lead,gapMs:160},{text:item.read,gapMs:260},{text:item.word}],{rate:0.8});
-  }else{
-    pySpeech.sequence([{text:lead,gapMs:160},{text:'第'+item.tone+'声',gapMs:220},{text:item.char}],{rate:0.82});
-  }
-}
-function checkQuizChoice(btn,choice,correct){
-  document.querySelectorAll('#quizChoices .choice-btn').forEach(b=>{
-    b.disabled=true;
-    if(b.textContent===correct) b.classList.add('correct');
-  });
-  if(choice!==correct) btn.classList.add('wrong');
-  const ok=choice===correct;
-  if(ok) qScore.c++; else qScore.w++;
-  document.getElementById('qC').textContent=qScore.c;
-  document.getElementById('qW').textContent=qScore.w;
-  const msg=document.getElementById('quizMsg');
-  if(ok){ msg.className='result-msg ok'; msg.textContent='✅ 正确！'; }
-  else { msg.className='result-msg no'; msg.textContent='❌ 正确答案是：'+correct; }
-  speakQuizAnswer(ok);
-  document.getElementById('nextBtn').style.display='inline-block';
 }
 
-function switchTab(t){
-  Hpx.tabs.activate(t, ['initial','final','tone','whole','alphabet','study','blend','quiz']);
-  if(t==='initial') speak('声母：点一下听读音，认熟23个声母。');
-  if(t==='final') speak('韵母：一共24个，分成单韵母、复韵母、前鼻韵母和后鼻韵母。');
-  if(t==='tone') { speak('声调：同一个音，声调不同意思完全不同。'); nextTonePractice(); }
-  if(t==='whole') speak('整体认读音节：这16个要整体记住读音。');
-  if(t==='alphabet') speak('拼音字母歌：点卡片单独听，或者从头跟读。');
-  if(t==='study') renderStudy(true);
-  if(t==='blend') nextBlend();
-  if(t==='quiz') nextQ();
+function revealReset(){
+  stopRevealAuto();
+  revealed=1;
+  applyReveal(false);
+  zoomTo(1);
+  document.getElementById('numGrid').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-renderInitials();
-renderFinals();
-renderTones();
-renderWhole();
-renderAlphabetSong();
-renderStudy();
-speak('欢迎来到汉语拼音入门！我们先认声母和韵母，再学声调，最后学拼读。');
+
+// ─── 自动连续揭晓 ───
+let rvAutoPlaying=false, rvAutoTimer=null, rvAutoSp=1300;
+
+function toggleRevealAuto(){
+  if(rvAutoPlaying){
+    stopRevealAuto();
+  } else {
+    if(revealed>=100) revealReset();
+    rvAutoPlaying=true;
+    document.getElementById('rvAutoBtn').textContent='⏸ 暂停';
+    rvAutoStep();
+  }
+}
+
+function rvAutoStep(){
+  if(!rvAutoPlaying) return;
+  if(revealed>=100){ stopRevealAuto(); return; }
+  revealNext(true);
+  if(revealed>=100){ stopRevealAuto(); return; }
+  rvAutoTimer=setTimeout(rvAutoStep, rvAutoSp);
+}
+
+function stopRevealAuto(){
+  rvAutoPlaying=false;
+  clearTimeout(rvAutoTimer);
+  const btn=document.getElementById('rvAutoBtn');
+  if(btn) btn.textContent='▶ 自动揭晓';
+}
+
+function setRevealSp(sp,btn){
+  rvAutoSp=sp;
+  document.querySelectorAll('[data-rvsp]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function zoomTo(n,shouldRecord=true) {
+  if(n>revealed) return; // 还没揭晓的数字不能点
+  zNum=n;
+  document.querySelectorAll('.ng-cell').forEach(c=>c.classList.remove('picked'));
+  document.getElementById(`ngc-${n}`).classList.add('picked');
+
+  document.getElementById('zN').textContent=n;
+  document.getElementById('zCN').textContent=numCN(n);
+
+  const tens=Math.floor(n/10), ones=n%10;
+  let blk='';
+  if(tens) blk+=`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">`;
+  for(let i=0;i<tens;i++) blk+='<span class="blk-ten"></span>';
+  if(tens) blk+='</div>';
+  if(ones) {
+    blk+=`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:${tens?6:0}px">`;
+    for(let i=0;i<ones;i++) blk+='<span class="blk-one"></span>';
+    blk+='</div>';
+  }
+  if(tens&&ones) blk+=`<div class="blk-label">红色=十，橙色=个</div>`;
+  document.getElementById('zBlk').innerHTML=blk||'<span style="color:#ccc;font-size:.85rem">零（没有单独的块）</span>';
+
+  const panel=document.getElementById('zoomPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  speak(numCN(n));
+  tone(280+n*1.2,.14);
+  showNumDotToast(n);
+  if(shouldRecord) markNumberLearned('recognition',n);
+}
+
+function zoomMove(d){ zoomTo(Math.max(1,Math.min(revealed,zNum+d))); }
+
+function showNumDotToast(n){
+  const old=document.getElementById('numToast');
+  if(old) old.remove();
+  clearTimeout(numToastTimer);
+
+  let dotsHtml='';
+  for(let i=0;i<n;i++) dotsHtml+='<div class="nt-dot"></div>';
+
+  const toast=document.createElement('div');
+  toast.id='numToast';
+  toast.innerHTML=`
+    <div class="nt-num">${n}</div>
+    <div class="nt-dots">${dotsHtml}</div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+
+  numToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },2200);
+}
+
+// ─── Tab 2 — Count ───
+let cntLv=10, cntAns=0, cntOk=0, cntBad=0, cntDone=false;
+
+function setLv(lv,btn){
+  cntLv=lv;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genCount();
+}
+
+function genCount(){
+  cntDone=false;
+  cntAns=ri(1,cntLv);
+  const em=EMOJIS[ri(0,EMOJIS.length-1)];
+  let h='';
+  for(let i=0;i<cntAns;i++) h+=`<span style="animation-delay:${i*25}ms">${em}</span>`;
+  document.getElementById('objArea').innerHTML=h;
+
+  const ch=genChoices(cntAns,1,cntLv,4);
+  const g=document.getElementById('cntChoices');
+  g.innerHTML='';
+  ch.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='choice-btn'; b.textContent=c;
+    b.onclick=()=>checkCount(c,b);
+    g.appendChild(b);
+  });
+  setFb('cntFb','','');
+}
+
+function checkCount(val,btn){
+  if(cntDone)return; cntDone=true;
+  recordNumberPractice('count',val===cntAns);
+  if(val===cntAns){
+    cntOk++; btn.classList.add('ok');
+    setFb('cntFb','ok',`✅ 真棒！是 ${cntAns} 个！`);
+    speak(`${numCN(cntAns)}，真棒`); chime(); setTimeout(genCount,1600);
+  } else {
+    cntBad++; btn.classList.add('fail');
+    setFb('cntFb','fail','🔢 再数数看！');
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>{ btn.classList.remove('fail'); cntDone=false; setFb('cntFb','',''); },900);
+  }
+  document.getElementById('cntScore').textContent=`✅ ${cntOk}  ❌ ${cntBad}`;
+}
+
+// ─── Tab 3 — Find ───
+let fm='num2cn', findOk=0, findBad=0, findDone=false, findMax=100;
+
+function setFM(m,btn){
+  fm=m;
+  document.querySelectorAll('.fm-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genFind();
+}
+
+function setFindLv(max,btn){
+  findMax=max;
+  document.querySelectorAll('.fl-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genFind();
+}
+
+// 保证候选数量足够（哪怕范围很小，比如"10以内"），从理想区间往两边扩到 [hardMin,hardMax] 为止
+// 注意：判断"够不够"要用裁剪到硬边界之后的宽度，否则区间一端越界会误判为"已经够宽"
+function safeChoices(correct, idealLo, idealHi, want, hardMin, hardMax){
+  let lo=idealLo, hi=idealHi;
+  while((Math.min(hardMax,hi)-Math.max(hardMin,lo)+1)<want && (lo>hardMin || hi<hardMax)){
+    if(lo>hardMin) lo--;
+    if(hi<hardMax) hi++;
+  }
+  return genChoices(correct, Math.max(hardMin,lo), Math.min(hardMax,hi), want);
+}
+
+function genFind(){
+  findDone=false;
+  setFb('findFb','','');
+
+  if(fm==='num2cn'){
+    const n=ri(1,findMax);
+    document.getElementById('findQ').textContent='这个数字叫什么名字？';
+    document.getElementById('findT').textContent=n;
+    const ch=genChoices(n,1,findMax,6);
+    buildFindGrid(ch, v=>v===n, v=>numCN(v));
+    setTimeout(()=>speak(numCN(n)),300);
+  } else if(fm==='cn2num'){
+    const n=ri(1,findMax);
+    document.getElementById('findQ').textContent='找到这个数字！';
+    document.getElementById('findT').textContent=numCN(n);
+    const ch=genChoices(n,1,findMax,6);
+    buildFindGrid(ch, v=>v===n, v=>v);
+    setTimeout(()=>speak(numCN(n)),300);
+  } else if(fm==='next'){
+    const n=ri(1,findMax-1);
+    const ans=n+1;
+    document.getElementById('findQ').textContent=`${n} 的下一个是几？`;
+    document.getElementById('findT').textContent=n;
+    const ch=safeChoices(ans,n-3,n+5,6,1,findMax);
+    buildFindGrid(ch, v=>v===ans, v=>v);
+    setTimeout(()=>speak(`${numCN(n)}，下一个是几？`),300);
+  } else {
+    const n=ri(2,findMax);
+    const ans=n-1;
+    document.getElementById('findQ').textContent=`${n} 的上一个是几？`;
+    document.getElementById('findT').textContent=n;
+    const ch=safeChoices(ans,n-5,n+3,6,1,findMax);
+    buildFindGrid(ch, v=>v===ans, v=>v);
+    setTimeout(()=>speak(`${numCN(n)}，上一个是几？`),300);
+  }
+}
+
+function buildFindGrid(choices, isOk, display){
+  const g=document.getElementById('findGrid');
+  g.innerHTML='';
+  choices.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='find-btn'; b.textContent=display(c);
+    b.onclick=()=>checkFind(isOk(c),b);
+    g.appendChild(b);
+  });
+}
+
+function checkFind(ok,btn){
+  if(findDone)return; findDone=true;
+  recordNumberPractice('find',ok);
+  if(ok){
+    findOk++; btn.classList.add('ok');
+    setFb('findFb','ok','✅ 答对啦！太棒了！');
+    speak('答对了，太棒了'); chime(); setTimeout(genFind,1500);
+  } else {
+    findBad++; btn.classList.add('fail');
+    setFb('findFb','fail','❌ 再想想看！');
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>{ btn.classList.remove('fail'); findDone=false; setFb('findFb','',''); },900);
+  }
+  document.getElementById('findScore').textContent=`✅ ${findOk}  ❌ ${findBad}`;
+}
+
+// ─── Tab 4 — Auto ───
+let autoN=1, autoPlaying=false, autoTimer=null, autoSp=1300;
+
+function showAutoN(n,shouldRecord=true){
+  const el=document.getElementById('autoNum');
+  el.textContent=n;
+  el.style.animation='none';
+  // Force reflow
+  void el.offsetWidth;
+  el.style.animation='numPop .3s ease-out';
+  el.style.color=`hsl(${n*3.6},75%,50%)`;
+  document.getElementById('autoCN').textContent=numCN(n);
+  document.getElementById('autoBar').style.width=`${n}%`;
+  if(shouldRecord) markNumberLearned('countAlong',n);
+}
+
+function toggleAuto(){
+  if(autoPlaying){
+    autoPlaying=false; clearTimeout(autoTimer);
+    document.getElementById('autoBtn').textContent='▶ 继续';
+  } else {
+    if(autoN>=100) autoReset();
+    autoPlaying=true;
+    document.getElementById('autoBtn').textContent='⏸ 暂停';
+    autoNext();
+  }
+}
+
+function autoNext(){
+  if(!autoPlaying)return;
+  showAutoN(autoN);
+  speak(numCN(autoN), autoSp<500 ? 1.3 : 0.88);
+  tone(262+autoN*1.15,.12);
+  if(autoN>=100){ autoPlaying=false; document.getElementById('autoBtn').textContent='▶ 开始数数'; return; }
+  autoN++;
+  autoTimer=setTimeout(autoNext,autoSp);
+}
+
+function autoReset(){
+  autoPlaying=false; clearTimeout(autoTimer); autoN=1;
+  document.getElementById('autoBtn').textContent='▶ 开始数数';
+  showAutoN(1);
+}
+
+function autoStep(d){
+  clearTimeout(autoTimer); autoPlaying=false;
+  document.getElementById('autoBtn').textContent='▶ 继续';
+  autoN=Math.max(1,Math.min(100,autoN+d));
+  showAutoN(autoN); speak(numCN(autoN)); tone(262+autoN*1.15,.12);
+}
+
+function setAutoSp(sp,btn){
+  autoSp=sp;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ─── Tab 5: 写数字 ───
+let traceDigit=1, penColor='#e91e63', traceInited=false, isDrawing=false;
+let hintTimer=null;
+
+function mkArc(cx,cy,rx,ry,a0,a1,n=20){
+  return Array.from({length:n+1},(_,i)=>{
+    const a=a0+(a1-a0)*i/n;
+    return [cx+rx*Math.cos(a),cy+ry*Math.sin(a)];
+  });
+}
+const _P=Math.PI;
+const DSTROKES={
+  // 0: 椭圆
+  0:[mkArc(.5,.5,.36,.44,-_P/2,_P*1.5,48)],
+  // 1: 撇 + 竖
+  1:[[[.34,.22],[.5,.10]],[[.5,.10],[.5,.90]]],
+  // 2: 弧 → 斜下 → 底横
+  2:[[
+    [.18,.30],[.20,.15],[.40,.07],[.62,.10],[.78,.24],
+    [.78,.40],[.62,.54],[.40,.68],[.20,.90],[.80,.90]
+  ]],
+  // 3: 上弧 + 下弧，开口向右
+  3:[[
+    [.22,.18],[.38,.08],[.62,.08],[.78,.20],
+    [.82,.34],[.74,.46],[.54,.50],
+    [.74,.54],[.84,.68],[.80,.82],
+    [.62,.92],[.38,.94],[.20,.84]
+  ]],
+  // 4: 斜线 + 横线 + 竖线
+  4:[[[.64,.08],[.08,.68]],[[.06,.68],[.92,.68]],[[.64,.08],[.64,.92]]],
+  // 5: 横 + 竖 + 右弧
+  5:[
+    [[.76,.10],[.20,.10]],
+    [[.20,.10],[.20,.50]],
+    [[.20,.50],[.22,.44],[.45,.40],[.68,.46],
+     [.82,.60],[.80,.76],[.62,.90],[.40,.93],[.18,.84]]
+  ],
+  // 6: 从右上大弯下来，底部闭合圆
+  6:[[
+    [.68,.12],[.50,.06],[.26,.12],[.12,.30],
+    [.08,.52],[.14,.70],[.28,.84],[.50,.92],
+    [.74,.88],[.86,.70],[.84,.54],[.70,.42],
+    [.48,.40],[.26,.50],[.20,.66]
+  ]],
+  // 7: 横 + 斜
+  7:[[[.12,.10],[.88,.10]],[[.88,.10],[.35,.90]]],
+  // 8: 上椭圆 + 下椭圆
+  8:[
+    [[.50,.08],[.72,.12],[.84,.26],[.82,.42],[.68,.50],
+     [.50,.52],[.32,.50],[.18,.42],[.16,.26],[.28,.12],[.50,.08]],
+    [[.50,.52],[.72,.56],[.86,.70],[.84,.84],[.68,.92],
+     [.50,.94],[.32,.92],[.16,.84],[.14,.70],[.28,.56],[.50,.52]]
+  ],
+  // 9: 先画圆（从右侧起），再画尾
+  9:[[
+    [.78,.34],[.80,.20],[.68,.08],[.50,.06],
+    [.28,.10],[.16,.26],[.16,.44],[.28,.58],
+    [.48,.64],[.68,.60],[.80,.46],[.80,.34],
+    [.80,.55],[.76,.72],[.62,.88],[.42,.94]
+  ]]
+};
+
+function initTraceTab(){
+  if(traceInited)return; traceInited=true;
+  // Build digit picker buttons
+  const wrap=document.getElementById('digBtns');
+  for(let d=0;d<=9;d++){
+    const b=document.createElement('button');
+    b.className='dig-btn'; b.textContent=d; b.dataset.d=d;
+    b.onclick=()=>selectDigit(d); wrap.appendChild(b);
+  }
+  const tc=document.getElementById('traceCanvas');
+  let lastX=0,lastY=0;
+  function xy(e){
+    const r=tc.getBoundingClientRect();
+    return [(e.clientX-r.left)*280/r.width,(e.clientY-r.top)*280/r.height];
+  }
+  tc.addEventListener('pointerdown',e=>{
+    isDrawing=true; tc.setPointerCapture(e.pointerId);
+    [lastX,lastY]=xy(e);
+    const ctx=tc.getContext('2d');
+    ctx.beginPath(); ctx.moveTo(lastX,lastY);
+  });
+  tc.addEventListener('pointermove',e=>{
+    if(!isDrawing)return;
+    const [x,y]=xy(e);
+    const ctx=tc.getContext('2d');
+    ctx.strokeStyle=penColor; ctx.lineWidth=18; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+    lastX=x; lastY=y;
+  });
+  tc.addEventListener('pointerup',()=>{ isDrawing=false; checkMatch(); });
+  tc.addEventListener('pointercancel',()=>{ isDrawing=false; checkMatch(); });
+  selectDigit(1);
+}
+
+function selectDigit(d){
+  traceDigit=d;
+  document.querySelectorAll('.dig-btn').forEach(b=>b.classList.toggle('on',+b.dataset.d===d));
+  drawGuide(); clearTrace(); speak(numCN(d));
+}
+
+function drawGuide(){
+  const S=280,gc=document.getElementById('guideCanvas');
+  const ctx=gc.getContext('2d');
+  ctx.clearRect(0,0,S,S);
+  ctx.strokeStyle='rgba(255,155,185,0.5)'; ctx.lineWidth=30;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  DSTROKES[traceDigit].forEach(sk=>{
+    if(sk.length<2)return;
+    ctx.beginPath(); ctx.moveTo(sk[0][0]*S,sk[0][1]*S);
+    for(let i=1;i<sk.length;i++) ctx.lineTo(sk[i][0]*S,sk[i][1]*S);
+    ctx.stroke();
+  });
+}
+
+function clearTrace(){
+  clearTimeout(hintTimer);
+  document.getElementById('traceCanvas').getContext('2d').clearRect(0,0,280,280);
+  const r=document.getElementById('traceResult');
+  if(r) r.textContent='';
+}
+
+function setPen(c,btn){
+  penColor=c;
+  document.querySelectorAll('.pen-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function showHint(){
+  clearTrace();
+  const S=280,tc=document.getElementById('traceCanvas'),ctx=tc.getContext('2d');
+  const allPts=[];
+  DSTROKES[traceDigit].forEach(sk=>sk.forEach((pt,i)=>allPts.push({pt,ns:i===0})));
+  let idx=0;
+  ctx.strokeStyle='#1565c0'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.lineJoin='round';
+  function step(){
+    if(idx>=allPts.length)return;
+    const{pt,ns}=allPts[idx];
+    const px=pt[0]*S,py=pt[1]*S;
+    if(ns){ctx.beginPath();ctx.moveTo(px,py);}
+    else{ctx.lineTo(px,py);ctx.stroke();ctx.beginPath();ctx.moveTo(px,py);}
+    ctx.save();ctx.fillStyle='rgba(255,23,68,.85)';
+    ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();ctx.restore();
+    idx++; hintTimer=setTimeout(step,150);
+  }
+  step();
+}
+
+// ─── 手写匹配度检测 ───
+function checkMatch(){
+  const S=280, GRID=28, STEP=S/GRID;
+  const tCtx=document.getElementById('traceCanvas').getContext('2d');
+  const gCtx=document.getElementById('guideCanvas').getContext('2d');
+  const tPx=tCtx.getImageData(0,0,S,S).data;
+  const gPx=gCtx.getImageData(0,0,S,S).data;
+
+  let tCells=0, gCells=0, both=0;
+  for(let row=0;row<GRID;row++){
+    for(let col=0;col<GRID;col++){
+      let tSum=0, gSum=0;
+      for(let dy=0;dy<STEP;dy++){
+        for(let dx=0;dx<STEP;dx++){
+          const px=Math.floor(col*STEP+dx), py=Math.floor(row*STEP+dy);
+          const i=(py*S+px)*4;
+          tSum+=tPx[i+3]; gSum+=gPx[i+3];
+        }
+      }
+      const area=STEP*STEP;
+      const tOn=(tSum/area)>25;
+      const gOn=(gSum/area)>12; // guide是半透明 alpha≈128，阈值低一些
+      if(tOn) tCells++;
+      if(gOn) gCells++;
+      if(tOn&&gOn) both++;
+    }
+  }
+
+  if(tCells<3){ showMatchResult(-1); return; } // 几乎没写
+  if(gCells===0) return;
+
+  const recall=both/gCells;           // 覆盖了多少参考区域
+  const prec=both/tCells;             // 有多少笔迹在参考区域内
+  const f1=(recall+prec>0)?2*recall*prec/(recall+prec):0;
+  showMatchResult(Math.round(f1*100));
+}
+
+function showMatchResult(pct){
+  const el=document.getElementById('traceResult');
+  if(!el) return;
+  if(pct<0){
+    el.style.color='#aaa';
+    el.textContent='✍️ 在格子里写写看！';
+    return;
+  }
+  recordNumberPractice('write',pct>=60);
+  if(pct>=60){
+    el.style.color='#2e7d32';
+    if(pct>=75){
+      el.textContent=`🌟 棒极了！匹配度 ${pct}%，自动进入下一个…`;
+      chime();
+      setTimeout(()=>selectDigit((traceDigit+1)%10), 1200);
+    } else {
+      el.textContent=`✅ 不错哦！匹配度 ${pct}%`;
+    }
+  } else if(pct>=40){
+    el.style.color='#f57c00';
+    el.textContent=`⚠️ 接近了！匹配度 ${pct}%，再仔细一点！`;
+  } else {
+    el.style.color='#e53935';
+    el.textContent=`❌ 写得不像哦，匹配度 ${pct}%，看看笔顺提示再试试！`;
+    tone(200,.18,'sawtooth');
+  }
+}
+
+// ─── Tab 6: 比大小 ───
+let cmpLv=1, cmpOk=0, cmpBad=0, cmpDone=false, cmpA=0, cmpB=0;
+
+function setCmpLv(lv,btn){
+  cmpLv=lv;
+  document.querySelectorAll('[data-cl]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); genCmp();
+}
+
+function genCmp(){
+  cmpDone=false;
+  const max=cmpLv===1?10:cmpLv===2?50:100;
+  cmpA=ri(1,max);
+  cmpB=Math.random()<0.15?cmpA:ri(1,max);
+  document.getElementById('cmpA').textContent=cmpA;
+  document.getElementById('cmpB').textContent=cmpB;
+  document.getElementById('cmpSign').textContent='?';
+  document.getElementById('cmpSign').style.color='#aaa';
+  document.getElementById('cmpA').style.fontSize='4.2rem';
+  document.getElementById('cmpB').style.fontSize='4.2rem';
+  document.getElementById('cmpA').style.color='#e91e63';
+  document.getElementById('cmpB').style.color='#1565c0';
+  setFb('cmpFb','','');
+  setTimeout(()=>speak(`${numCN(cmpA)}和${numCN(cmpB)}，哪个大？`),200);
+}
+
+function checkCmp(sign){
+  if(cmpDone)return; cmpDone=true;
+  const correct=cmpA<cmpB?'<':cmpA>cmpB?'>':'=';
+  const ok=sign===correct;
+  recordNumberPractice('compare',ok);
+  const se=document.getElementById('cmpSign');
+  se.textContent=sign; se.style.color=ok?'#2e7d32':'#e53935';
+  if(ok){
+    cmpOk++;
+    if(cmpA>cmpB){document.getElementById('cmpA').style.fontSize='5.5rem';}
+    else if(cmpB>cmpA){document.getElementById('cmpB').style.fontSize='5.5rem';}
+    setFb('cmpFb','ok','✅ 答对啦！');
+    speak('答对了，真棒'); chime(); setTimeout(genCmp,1600);
+  } else {
+    cmpBad++;
+    setFb('cmpFb','fail',`❌ 正确是 ${cmpA} ${correct} ${cmpB}`);
+    speak(`不对，正确答案是${numCN(cmpA)}${correct==='>'?'大于':'小于等于'}${numCN(cmpB)}`);
+    tone(200,.2,'sawtooth'); setTimeout(()=>{cmpDone=false;genCmp();},2000);
+  }
+  document.getElementById('cmpScore').textContent=`✅ ${cmpOk}  ❌ ${cmpBad}`;
+}
+
+// ─── Tab 7: 数字接龙 ───
+let seqStep=1, seqOk=0, seqBad=0, seqDone=false, seqAns=0;
+let seqArr=[], seqBlankIdx=0;
+let seqToastTimer = null;
+const SEQ_CFG={1:{max:20},2:{max:40},5:{max:50},10:{max:100}};
+
+function setSeqStep(s,btn){
+  seqStep=s;
+  document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); genSeq();
+}
+
+function genSeq(){
+  seqDone=false;
+  clearTimeout(seqToastTimer);
+  const old=document.getElementById('seqToast');
+  if(old){old.classList.remove('show');setTimeout(()=>old.remove(),400);}
+  const cfg=SEQ_CFG[seqStep]||{max:20};
+  const maxStart=Math.max(1, cfg.max - seqStep*4);
+  const start=ri(1,maxStart);
+  seqArr=Array.from({length:5},(_,i)=>start+i*seqStep);
+  seqBlankIdx=ri(0,4);
+  seqAns=seqArr[seqBlankIdx];
+
+  const row=document.getElementById('seqRow');
+  let seqHtml='';
+  seqArr.forEach((n,i)=>{
+    if(i>0) seqHtml+=`<div class="seq-sep">→</div>`;
+    if(i===seqBlankIdx) seqHtml+=`<div class="seq-blank" id="seqBlank">?</div>`;
+    else seqHtml+=`<div class="seq-n">${n}</div>`;
+  });
+  row.innerHTML=seqHtml;
+
+  const lo=Math.max(1,seqAns-seqStep*2), hi=Math.min(cfg.max+seqStep*2,seqAns+seqStep*2);
+  const choices=genChoices(seqAns,lo,hi,4);
+  const g=document.getElementById('seqChoices');
+  g.innerHTML='';
+  choices.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='choice-btn'; b.textContent=c;
+    b.onclick=()=>checkSeq(c,b); g.appendChild(b);
+  });
+  setFb('seqFb','','');
+  const txt=seqArr.map((n,i)=>i===seqBlankIdx?'空':numCN(n)).join('，');
+  setTimeout(()=>speak(txt),300);
+}
+
+function checkSeq(val,btn){
+  if(seqDone)return; seqDone=true;
+  recordNumberPractice('sequence',val===seqAns);
+  const blank=document.getElementById('seqBlank');
+  if(val===seqAns){
+    seqOk++; btn.classList.add('ok');
+    if(blank){blank.textContent=val;blank.classList.add('ok');}
+    setFb('seqFb','ok',`✅ 正确！是 ${numCN(seqAns)}！`);
+    speak(`${numCN(seqAns)}，真棒`); chime(); setTimeout(genSeq,1600);
+  } else {
+    seqBad++; btn.classList.add('fail');
+    setFb('seqFb','fail',`❌ 答错了！答案是 ${seqAns}`);
+    tone(200,.2,'sawtooth');
+    setTimeout(()=>btn.classList.remove('fail'), 600);
+    showSeqToast();
+  }
+  document.getElementById('seqScore').textContent=`✅ ${seqOk}  ❌ ${seqBad}`;
+}
+
+function showSeqToast(){
+  clearTimeout(seqToastTimer);
+  const old=document.getElementById('seqToast');
+  if(old){old.classList.remove('show');old.remove();}
+
+  // 序列展示（空格填正确答案，绿色高亮）
+  const seqHtml=seqArr.map((n,i)=>{
+    const cls=i===seqBlankIdx?'toast-sn ans':'toast-sn';
+    return `<div class="${cls}">${n}</div>${i<4?'<div class="toast-arrow">→</div>':''}`;
+  }).join('');
+
+  // 解题步骤
+  const bi=seqBlankIdx;
+  let calcHtml='';
+  if(bi>0){
+    calcHtml=`${seqArr[bi-1]} + ${seqStep} = <b style="color:#2e7d32">${seqAns}</b>`;
+  } else {
+    calcHtml=`<b style="color:#2e7d32">${seqAns}</b> + ${seqStep} = ${seqArr[1]}`;
+  }
+
+  const toast=document.createElement('div');
+  toast.id='seqToast';
+  toast.innerHTML=`
+    <div style="font-size:.9rem;font-weight:bold;color:#e53935;margin-bottom:2px">❌ 解题思路</div>
+    <div class="toast-seq">${seqHtml}</div>
+    <div class="toast-rule">规律：每次 <b>＋${seqStep}</b>，所以空格是</div>
+    <div class="toast-calc">${calcHtml}</div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+  seqToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(),400);
+  },5000);
+}
+
+// ─── Tab 9: 过十闯关 ───
+// 只选 9 到 89：让孩子先把“个位 9 变 0、十位加 1”这一条规律练熟。
+let crossStart=19, crossAns=20, crossOk=0, crossBad=0, crossDone=false;
+
+function genCrossTen(){
+  crossDone=false;
+  crossStart=ri(1,9)*10-1;
+  crossAns=crossStart+1;
+  const tensBefore=Math.floor(crossStart/10);
+  const tensAfter=Math.floor(crossAns/10);
+
+  document.getElementById('crossQ').textContent=`${crossStart} 后面是几？`;
+  document.getElementById('crossStart').textContent=crossStart;
+  document.getElementById('crossAnswer').textContent='？';
+  document.getElementById('crossTensBefore').textContent=tensBefore;
+  document.getElementById('crossTensAfter').textContent=tensAfter;
+  document.getElementById('crossTip').textContent='';
+
+  const choices=genChoices(crossAns,Math.max(1,crossStart-2),Math.min(100,crossStart+3),4);
+  const grid=document.getElementById('crossChoices');
+  grid.innerHTML='';
+  choices.forEach(choice=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=choice;
+    btn.onclick=()=>checkCrossTen(choice,btn);
+    grid.appendChild(btn);
+  });
+  setTimeout(()=>speak(`${crossStart} 后面是几`),250);
+}
+
+async function checkCrossTen(value,btn){
+  if(crossDone) return;
+  crossDone=true;
+  recordNumberPractice('cross',value===crossAns);
+  const answer=document.getElementById('crossAnswer');
+  answer.textContent=crossAns;
+  if(value===crossAns){
+    crossOk++;
+    btn.classList.add('ok');
+    document.getElementById('crossTip').textContent=`✅ 个位 9 变 0，十位 ${Math.floor(crossStart/10)} 变 ${Math.floor(crossAns/10)}，所以是 ${crossAns}！`;
+    chime();
+    await speak(`答对了。个位九变零，十位加一，${crossAns}`);
+    // 讲解读完后再出下一题，避免固定倒计时截断较长语音。
+    setTimeout(genCrossTen,600);
+  } else {
+    crossBad++;
+    btn.classList.add('fail');
+    document.getElementById('crossTip').textContent=`💡 看个位：9 加 1 变 0；十位 ${Math.floor(crossStart/10)} 加 1 变 ${Math.floor(crossAns/10)}。答案是 ${crossAns}。`;
+    speak(`再看一看。个位九加一变零，十位加一，所以是${crossAns}`);
+    tone(200,.2,'sawtooth');
+  }
+  document.getElementById('crossScore').textContent=`✅ ${crossOk}  ❌ ${crossBad}`;
+}
+
+// ─── Tab 8: 排序（拖到格子里，错了马上提示重试）───
+let sortRange=100, sortSorted=[], sortFilled=[], sortPoolVals=[];
+let sortOk=0, sortBad=0, sortDragEl=null, sortDragValue=null, sortStartX=0, sortStartY=0;
+
+function setSortLv(max,btn){
+  sortRange=max;
+  document.querySelectorAll('.sr-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  genSort();
+}
+
+function genSort(){
+  const N=Math.min(6,sortRange);
+  const set=new Set();
+  while(set.size<N) set.add(ri(1,sortRange));
+  sortPoolVals=shuffle([...set]);
+  sortSorted=[...sortPoolVals].sort((a,b)=>a-b);
+  sortFilled=new Array(N).fill(null);
+  renderSortSlots();
+  renderSortPool();
+  setFb('sortFb','','');
+  setTimeout(()=>speak('把这些数字从小到大拖到格子里'),200);
+}
+
+function renderSortSlots(){
+  const wrap=document.getElementById('sortSlots');
+  wrap.innerHTML='';
+  sortFilled.forEach((v,idx)=>{
+    const d=document.createElement('div');
+    d.className='sort-slot'+(v!==null?' filled':'');
+    d.textContent = v!==null ? v : '';
+    d.dataset.idx=idx;
+    wrap.appendChild(d);
+  });
+}
+
+function renderSortPool(){
+  const wrap=document.getElementById('sortPool');
+  wrap.innerHTML='';
+  sortPoolVals.forEach(v=>{
+    if(sortFilled.includes(v)) return; // 已经放对的数字不再出现在数字池里
+    const d=document.createElement('div');
+    d.className='sort-tile';
+    d.textContent=v;
+    d.dataset.value=v;
+    attachSortDrag(d);
+    wrap.appendChild(d);
+  });
+}
+
+function attachSortDrag(el){
+  el.addEventListener('pointerdown', e=>{
+    sortDragEl=el; sortDragValue=+el.dataset.value;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+    sortStartX=e.clientX; sortStartY=e.clientY;
+  });
+  el.addEventListener('pointermove', e=>{
+    if(sortDragEl!==el) return;
+    const dx=e.clientX-sortStartX, dy=e.clientY-sortStartY;
+    el.style.transform=`translate(${dx}px,${dy}px)`;
+    el.style.pointerEvents='none';
+    const hover=document.elementFromPoint(e.clientX,e.clientY);
+    el.style.pointerEvents='';
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('hover-target'));
+    const slot = hover ? hover.closest('.sort-slot') : null;
+    if(slot && !slot.classList.contains('filled')) slot.classList.add('hover-target');
+  });
+  el.addEventListener('pointerup', e=>{
+    if(sortDragEl!==el) return;
+    sortDragEl=null;
+    el.classList.remove('dragging');
+    el.style.transform='';
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('hover-target'));
+    el.style.pointerEvents='none';
+    const target=document.elementFromPoint(e.clientX,e.clientY);
+    el.style.pointerEvents='';
+    const slot = target ? target.closest('.sort-slot') : null;
+    if(!slot || slot.classList.contains('filled')) return; // 放到格子外或已占用的格子：悄悄弹回去，不算错
+
+    const slotIdx=+slot.dataset.idx;
+    const correctVal=sortSorted[slotIdx];
+    if(sortDragValue===correctVal){
+      sortOk++;
+      recordNumberPractice('sort',true);
+      sortFilled[slotIdx]=sortDragValue;
+      renderSortSlots();
+      renderSortPool();
+      setFb('sortFb','ok','✅ 放对了！');
+      speak('放对了'); tone(523,.1);
+      if(sortFilled.every(v=>v!==null)){
+        setFb('sortFb','ok','🎉 全部排好啦！从小到大完全正确！');
+        speak('全部排好了，真棒'); chime();
+        setTimeout(genSort,1600);
+      }
+    } else {
+      sortBad++;
+      recordNumberPractice('sort',false);
+      setFb('sortFb','fail','❌ 这个位置不对，再试试！');
+      speak('不对，再想想'); tone(200,.2,'sawtooth');
+    }
+    document.getElementById('sortScore').textContent=`✅ ${sortOk}  ❌ ${sortBad}`;
+  });
+  el.addEventListener('pointercancel', ()=>{
+    if(sortDragEl===el){ sortDragEl=null; el.classList.remove('dragging'); el.style.transform=''; }
+  });
+}
+
+// ─── Tab switch ───
+function pauseAll(){
+  // 停自动揭晓数字（Tab 1）
+  if(rvAutoPlaying) stopRevealAuto();
+  // 停自动数数
+  if(autoPlaying){ autoPlaying=false; clearTimeout(autoTimer); document.getElementById('autoBtn').textContent='▶ 继续'; }
+  // 停笔顺动画
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  // 停语音
+  numbersSpeech.stop();
+}
+
+function switchTab(n){
+  pauseAll();
+  Hpx.tabs.activate(n,[1,2,3,4,5,6,7,8,9],{hiddenClass:'hidden',panelId:id=>`p${id}`});
+  if(n===2) genCount();
+  if(n===3) genFind();
+  if(n===4) showAutoN(autoN,false);
+  if(n===5) initTraceTab();
+  if(n===6) genCmp();
+  if(n===7) genSeq();
+  if(n===8) genSort();
+  if(n===9) genCrossTen();
+}
+
+// ─── Helpers ───
+function setFb(id,cls,txt){
+  const el=document.getElementById(id);
+  el.className='fb'+(cls?' '+cls:'');
+  el.textContent=txt;
+}
+
+// ─── Audio ───
+let _ac=null;
+function tone(f,d,t='sine',v=.2){
+  try{
+    if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+    if(_ac.state==='suspended')_ac.resume();
+    const o=_ac.createOscillator(),g=_ac.createGain();
+    o.connect(g);g.connect(_ac.destination);
+    o.type=t;o.frequency.setValueAtTime(f,_ac.currentTime);
+    g.gain.setValueAtTime(v,_ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,_ac.currentTime+d);
+    o.start();o.stop(_ac.currentTime+d);
+  }catch(e){}
+}
+function chime(){
+  tone(523,.1); setTimeout(()=>tone(659,.12),110); setTimeout(()=>tone(784,.18),240);
+}
+
+// ─── Speech ───
+const numbersSpeech=Hpx.speech.create({rate:0.88,pitch:1.1});
+function speak(text,rate){return numbersSpeech.speak(text,{rate:rate||0.88});}
+
+// ─── Init ───
+buildGrid();
+genCount();
+genFind();
+showAutoN(1,false);
+zoomTo(1,false);
+genCrossTen();
+renderNumberLearningRecords();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
 </script>
 
+<a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
 <script src="feedback.js?v=20260906-2"></script>
 <script data-goatcounter="https://zhailuxu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script src="hpx-speech-compat.js"></script>

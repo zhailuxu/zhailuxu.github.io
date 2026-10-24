@@ -267,6 +267,20 @@ body {
 /* 手写练习：左侧「一笔笔跟着练」+ 右侧「自己写」两栏并排，窄屏自动堆叠 */
 .write-panels{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:640px;margin:0 auto;padding:0 12px 20px;}
 .write-panel-col{width:280px;}
+.handwrite-record{max-width:640px;margin:0 auto 20px;padding:16px;border:1.5px solid #ead8f0;border-radius:20px;background:rgba(255,255,255,.84);box-shadow:0 4px 14px rgba(106,27,154,.08);}
+.handwrite-record-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;}
+.handwrite-record h2{font-size:1rem;color:#6a1b9a;}
+.handwrite-record-summary{font-size:.82rem;line-height:1.6;color:#666;}
+.handwrite-record-summary b{color:#4a148c;}
+.handwrite-record-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;max-height:260px;overflow:auto;padding-right:2px;}
+.handwrite-record-empty{width:100%;padding:12px;border-radius:12px;background:#faf5fc;color:#8b7194;text-align:center;font-size:.85rem;}
+.handwrite-record-item{min-width:114px;flex:1 1 114px;padding:9px 10px;border:1px solid #e5c9ed;border-radius:13px;background:#fffafc;}
+.handwrite-record-char{font-weight:bold;color:#4a148c;font-size:1.25rem;line-height:1;}
+.handwrite-record-meta{margin-top:5px;color:#777;font-size:.75rem;line-height:1.45;}
+.handwrite-record-state{font-size:.76rem;font-weight:bold;margin-top:3px;}
+.handwrite-record-state.done{color:#2e7d32;}.handwrite-record-state.trying{color:#e07000;}
+.handwrite-record-clear{border:1.5px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;padding:6px 10px;font:700 .78rem inherit;cursor:pointer;}
+.handwrite-record-clear:hover{background:#f7ecfb;}
 .step-panel{display:none;}
 /* guideCanvas / stepGuideCanvas 在正常流中撑起容器高度，其余层绝对定位叠在上方 */
 .write-canvas-wrap{position:relative;margin:0 auto;max-width:280px;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.13);}
@@ -339,6 +353,20 @@ body {
 .stroke-practice-title{font-size:1.15rem;color:#4a148c;text-align:center;margin:0 0 5px;}
 #sGuideCanvas{display:block;width:100%;height:auto;}
 #sTraceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
+.stroke-record{margin-top:18px;background:rgba(255,255,255,.84);border:1.5px solid #ead8f0;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(106,27,154,.08);}
+.stroke-record-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;}
+.stroke-record h2{font-size:1rem;color:#6a1b9a;}
+.stroke-record-summary{font-size:.82rem;line-height:1.6;color:#666;}
+.stroke-record-summary b{color:#4a148c;}
+.stroke-record-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
+.stroke-record-empty{width:100%;padding:12px;border-radius:12px;background:#faf5fc;color:#8b7194;text-align:center;font-size:.85rem;}
+.stroke-record-item{min-width:122px;flex:1 1 122px;padding:9px 10px;border:1px solid #e5c9ed;border-radius:13px;background:#fffafc;}
+.stroke-record-name{font-weight:bold;color:#4a148c;font-size:.92rem;}
+.stroke-record-meta{margin-top:3px;color:#777;font-size:.75rem;line-height:1.45;}
+.stroke-record-state{font-size:.76rem;font-weight:bold;margin-top:3px;}
+.stroke-record-state.done{color:#2e7d32;}.stroke-record-state.trying{color:#e07000;}
+.stroke-record-clear{border:1.5px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;padding:6px 10px;font:700 .78rem inherit;cursor:pointer;}
+.stroke-record-clear:hover{background:#f7ecfb;}
 @media(max-width:620px){.stroke-layout{grid-template-columns:1fr;gap:12px}.stroke-panel{padding:14px}.stroke-btns{margin-bottom:12px}.stroke-name,.stroke-py,.stroke-desc{text-align:center}.stroke-btns{justify-content:center}}
 </style>
   <link rel="manifest" href="/manifest.json">
@@ -559,6 +587,14 @@ body {
       </div>
     </div>
   </div>
+  <section class="handwrite-record" aria-labelledby="handwriteRecordTitle">
+    <div class="handwrite-record-head">
+      <h2 id="handwriteRecordTitle">📋 手写练习记录</h2>
+      <button type="button" class="handwrite-record-clear" onclick="clearHandwritePracticeRecords()">🧹 清除记录</button>
+    </div>
+    <p class="handwrite-record-summary" id="handwriteRecordSummary" aria-live="polite"></p>
+    <div class="handwrite-record-list" id="handwriteRecordList"></div>
+  </section>
 </div>
 
 <!-- ══ Page: Stroke Practice ══ -->
@@ -595,6 +631,14 @@ body {
         </div>
       </section>
     </div>
+    <section class="stroke-record" aria-labelledby="strokeRecordTitle">
+      <div class="stroke-record-head">
+        <h2 id="strokeRecordTitle">📋 笔画练习记录</h2>
+        <button type="button" class="stroke-record-clear" onclick="clearStrokePracticeRecords()">🧹 清除记录</button>
+      </div>
+      <p class="stroke-record-summary" id="strokeRecordSummary" aria-live="polite"></p>
+      <div class="stroke-record-list" id="strokeRecordList"></div>
+    </section>
   </div>
 </div>
 
@@ -1555,6 +1599,76 @@ function showQuizDone() {
 let wList=[], wIdx=0, wGuideOn=true;
 let _hintTimer=null, _writeInited=false;
 let strictStrokeOrder=true, strictStrokeIndex=0;
+// 手写记录仅保存于当前浏览器，不上传，也不与其他设备同步。
+const HANDWRITE_RECORD_STORAGE_KEY='hpx-hanzi-handwrite-practice-v1';
+const handwritePracticeRecords=loadHandwritePracticeRecords();
+
+function loadHandwritePracticeRecords(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(HANDWRITE_RECORD_STORAGE_KEY)||'[]');
+    if(!Array.isArray(saved)) return new Map();
+    return new Map(saved.filter(([char,record])=>
+      typeof char==='string'&&char.length===1&&record&&
+      Number.isFinite(record.attempts)&&Number.isFinite(record.passes)&&Number.isFinite(record.bestScore)
+    ).map(([char,record])=>[char,{
+      attempts:Math.max(0,Math.floor(record.attempts)),
+      passes:Math.max(0,Math.floor(record.passes)),
+      bestScore:Math.max(0,Math.min(100,Math.floor(record.bestScore))),
+      completed:Boolean(record.completed),
+      updatedAt:Number.isFinite(record.updatedAt)?record.updatedAt:0
+    }]));
+  }catch(err){ return new Map(); }
+}
+
+function saveHandwritePracticeRecords(){
+  try{ localStorage.setItem(HANDWRITE_RECORD_STORAGE_KEY,JSON.stringify([...handwritePracticeRecords])); }catch(err){}
+}
+
+function renderHandwritePracticeRecords(){
+  const summary=document.getElementById('handwriteRecordSummary');
+  const list=document.getElementById('handwriteRecordList');
+  if(!summary||!list) return;
+  const records=[...handwritePracticeRecords.entries()];
+  const practiced=records.length;
+  const completed=records.filter(([,record])=>record.completed).length;
+  const completion=practiced?Math.round(completed/practiced*100):0;
+  summary.innerHTML=`累计已练 <b>${practiced}</b> 个字，已完成 <b>${completed}</b> 个，练过字完成度 <b>${completion}%</b>。记录保存在本浏览器。`;
+  list.replaceChildren();
+  if(!practiced){
+    const empty=document.createElement('div');
+    empty.className='handwrite-record-empty';
+    empty.textContent='还没有记录，完成一个字的手写练习后会显示在这里。';
+    list.appendChild(empty);
+    return;
+  }
+  records.sort(([,a],[,b])=>b.updatedAt-a.updatedAt).forEach(([char,record])=>{
+    const item=document.createElement('div'); item.className='handwrite-record-item';
+    const title=document.createElement('div'); title.className='handwrite-record-char'; title.textContent=char;
+    const meta=document.createElement('div'); meta.className='handwrite-record-meta'; meta.textContent=`练习 ${record.attempts} 次 · 最佳 ${record.bestScore}%`;
+    const state=document.createElement('div');
+    state.className=`handwrite-record-state ${record.completed?'done':'trying'}`;
+    state.textContent=record.completed?`✓ 已完成（达标 ${record.passes} 次）`:'继续练习，争取完成';
+    item.append(title,meta,state); list.appendChild(item);
+  });
+}
+
+function recordHandwritePractice(char,score,completed){
+  const record=handwritePracticeRecords.get(char)||{attempts:0,passes:0,bestScore:0,completed:false,updatedAt:0};
+  record.attempts++;
+  record.bestScore=Math.max(record.bestScore,score);
+  if(completed){ record.passes++; record.completed=true; }
+  record.updatedAt=Date.now();
+  handwritePracticeRecords.set(char,record);
+  saveHandwritePracticeRecords();
+  renderHandwritePracticeRecords();
+}
+
+function clearHandwritePracticeRecords(){
+  handwritePracticeRecords.clear();
+  try{ localStorage.removeItem(HANDWRITE_RECORD_STORAGE_KEY); }catch(err){}
+  renderHandwritePracticeRecords();
+  showToast('已清除浏览器中的手写练习记录');
+}
 
 function startWrite(){
   const strokeData=window.HANZI_STROKE_DATA||{};
@@ -1570,6 +1684,7 @@ function startWrite(){
   renderWrite();
   show('pgWrite');
   if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
+  renderHandwritePracticeRecords();
 }
 
 function startWriteForModalChar(){
@@ -1582,6 +1697,7 @@ function startWriteForModalChar(){
   renderWrite();
   show('pgWrite');
   if(!_writeInited){ _writeInited=true; initWriteCanvas(); }
+  renderHandwritePracticeRecords();
   if(!strokeData[ch[0]]) showToast('这个字的笔顺数据正在补充，可以先在田字格里自由描写。');
 }
 
@@ -1923,6 +2039,9 @@ function checkMatch(){
   }
   // 严格笔顺下每笔都会触发匹配计算，只在全部笔画完成后才朗读最终分数。
   const totalStrokes=strokeData.medians?strokeData.medians.length:0;
+  if(!strictStrokeOrder||strictStrokeIndex>=totalStrokes){
+    recordHandwritePractice(char,coverage,coverage>=70&&precision>=45);
+  }
   if(speechText&&(!strictStrokeOrder||strictStrokeIndex>=totalStrokes)) speak(speechText);
 }
 
@@ -2249,6 +2368,75 @@ const STROKE_DATA = [
 
 let curStroke=0, _sHintTimer=null, _sInited=false;
 let strictStrokeDirection=true, strictStrokeCompleted=false;
+// 仅保存在当前浏览器 localStorage，不上传；清除按钮会一并删除。
+const STROKE_RECORD_STORAGE_KEY='hpx-hanzi-stroke-practice-v1';
+const strokePracticeRecords=loadStrokePracticeRecords();
+
+function loadStrokePracticeRecords(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STROKE_RECORD_STORAGE_KEY)||'[]');
+    if(!Array.isArray(saved)) return new Map();
+    return new Map(saved.filter(([idx,record])=>
+      Number.isInteger(idx)&&idx>=0&&idx<STROKE_DATA.length&&record&&
+      Number.isFinite(record.attempts)&&Number.isFinite(record.passes)&&Number.isFinite(record.bestScore)
+    ).map(([idx,record])=>[idx,{
+      attempts:Math.max(0,Math.floor(record.attempts)),
+      passes:Math.max(0,Math.floor(record.passes)),
+      bestScore:Math.max(0,Math.min(100,Math.floor(record.bestScore))),
+      completed:Boolean(record.completed)
+    }]));
+  }catch(err){ return new Map(); }
+}
+
+function saveStrokePracticeRecords(){
+  try{ localStorage.setItem(STROKE_RECORD_STORAGE_KEY,JSON.stringify([...strokePracticeRecords])); }catch(err){}
+}
+
+function renderStrokePracticeRecords(){
+  const summary=document.getElementById('strokeRecordSummary');
+  const list=document.getElementById('strokeRecordList');
+  if(!summary||!list) return;
+  const records=[...strokePracticeRecords.entries()];
+  const practiced=records.length;
+  const completed=records.filter(([,record])=>record.completed).length;
+  const total=STROKE_DATA.length;
+  const completion=Math.round(completed/total*100);
+  summary.innerHTML=`累计已练 <b>${practiced}</b> 种，已完成 <b>${completed}</b> / ${total} 种，总完成度 <b>${completion}%</b>。记录保存在本浏览器；完成一笔：至少一次达到 65 分。`;
+  list.replaceChildren();
+  if(!practiced){
+    const empty=document.createElement('div');
+    empty.className='stroke-record-empty';
+    empty.textContent='还没有记录，选一个笔画开始描写吧。';
+    list.appendChild(empty);
+    return;
+  }
+  records.sort(([a],[b])=>a-b).forEach(([idx,record])=>{
+    const item=document.createElement('div'); item.className='stroke-record-item';
+    const name=document.createElement('div'); name.className='stroke-record-name'; name.textContent=STROKE_DATA[idx].name;
+    const meta=document.createElement('div'); meta.className='stroke-record-meta'; meta.textContent=`练习 ${record.attempts} 次 · 最佳 ${record.bestScore} 分`;
+    const state=document.createElement('div');
+    state.className=`stroke-record-state ${record.completed?'done':'trying'}`;
+    state.textContent=record.completed?`✓ 已完成（达标 ${record.passes} 次）`:'继续练习，争取达到 65 分';
+    item.append(name,meta,state); list.appendChild(item);
+  });
+}
+
+function recordStrokePractice(score,completed){
+  const record=strokePracticeRecords.get(curStroke)||{attempts:0,passes:0,bestScore:0,completed:false};
+  record.attempts++;
+  record.bestScore=Math.max(record.bestScore,score);
+  if(completed){ record.passes++; record.completed=true; }
+  strokePracticeRecords.set(curStroke,record);
+  saveStrokePracticeRecords();
+  renderStrokePracticeRecords();
+}
+
+function clearStrokePracticeRecords(){
+  strokePracticeRecords.clear();
+  try{ localStorage.removeItem(STROKE_RECORD_STORAGE_KEY); }catch(err){}
+  renderStrokePracticeRecords();
+  showToast('已清除浏览器中的笔画练习记录');
+}
 
 function startStroke(){
   show('pgStroke');
@@ -2263,6 +2451,7 @@ function startStroke(){
     wrap.appendChild(b);
   });
   selectStroke(0);
+  renderStrokePracticeRecords();
 }
 
 function selectStroke(idx){
@@ -2389,6 +2578,7 @@ function checkStrokeMatch(){
     el.className='write-result'; el.style.color='#e53935';
     tone(200,.18,'sawtooth');
   }
+  recordStrokePractice(f1,f1>=65);
   speak(`匹配度百分之${f1}，${f1}分`);
 }
 
@@ -2439,6 +2629,7 @@ function initStrokeCanvas(){
         result.textContent=`❌ ${verdict.message}`;
         result.className='write-result'; result.style.color='#e53935';
         tone(200,.18,'sawtooth');
+        recordStrokePractice(0,false);
         return;
       }
     }
