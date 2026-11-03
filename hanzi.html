@@ -316,6 +316,8 @@ body {
 .radical-title{font-size:1.15rem;font-weight:bold;color:#4a148c;margin-top:6px;}
 .radical-py{font-size:.82rem;color:#e91e63;margin-top:2px;}
 .radical-position{display:inline-block;margin-top:9px;padding:3px 10px;border-radius:12px;background:#fff;color:#00695c;font-size:.76rem;font-weight:bold;}
+.radical-write-entry{display:block;width:100%;margin-top:12px;border:1.5px solid #80cbc4;border-radius:14px;background:#fff;color:#00695c;padding:8px 7px;font:700 .8rem inherit;cursor:pointer;}
+.radical-write-entry:hover{background:#e0f2f1;}
 .radical-detail h3{font-size:1rem;color:#00695c;margin-bottom:6px;}
 #radicalMeaningSection{scroll-margin-top:12px;}
 .radical-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;}
@@ -337,6 +339,17 @@ body {
 .combine-caption{color:#607d8b;font-size:.84rem;margin:7px 0 10px;}
 .radical-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
 .component-link{display:inline-flex;align-items:center;text-decoration:none;margin-top:16px;padding:9px 16px;border-radius:16px;background:#ede7f6;color:#5e35b1;font-size:.85rem;font-weight:bold;}
+.radical-write-panel{margin-top:16px;padding:18px;background:rgba(255,255,255,.9);border:1.5px solid #b2dfdb;border-radius:20px;box-shadow:0 4px 16px rgba(0,105,92,.1);}
+.radical-write-panel[hidden]{display:none;}.radical-write-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.radical-write-head h2{font-size:1.06rem;color:#00695c;}.radical-write-note{font-size:.8rem;line-height:1.55;color:#607d8b;margin-bottom:12px;}
+.radical-write-layout{display:grid;grid-template-columns:minmax(220px,280px) 1fr;gap:18px;align-items:start;justify-content:center;}
+.radical-write-canvas-wrap{position:relative;width:min(280px,100%);margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+#radicalGuideCanvas{display:block;width:100%;height:auto;}#radicalTraceCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;}
+.radical-write-side{padding:6px 2px;text-align:center;}.radical-write-glyph{font-size:3.6rem;line-height:1;color:#00695c;font-weight:bold;}.radical-write-name{margin-top:5px;color:#4a148c;font-size:1rem;font-weight:bold;}
+.radical-write-result{min-height:28px;margin:10px 0;color:#00695c;font-weight:bold;font-size:.9rem;}.radical-write-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.radical-step-panel{margin-top:14px;padding:14px;border-radius:16px;background:#f5fffe;border:1px dashed #80cbc4;text-align:center;}.radical-step-panel[hidden]{display:none;}.radical-step-canvas{display:block;width:min(280px,100%);height:auto;margin:0 auto;border-radius:14px;box-shadow:0 3px 12px rgba(0,105,92,.12);}.radical-step-label{min-height:24px;margin:7px 0;color:#00695c;font-size:.85rem;font-weight:bold;}
+.radical-write-record{margin-top:15px;padding-top:13px;border-top:1px dashed #b2dfdb;}.radical-write-record-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;}.radical-write-record h3{font-size:.9rem;color:#00695c;}.radical-write-summary{font-size:.78rem;color:#607d8b;margin-top:5px;line-height:1.5;}.radical-write-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;max-height:184px;overflow:auto;}.radical-write-empty{width:100%;padding:10px;text-align:center;background:#f5fffe;border-radius:12px;color:#78909c;font-size:.8rem;}.radical-write-item{padding:7px 9px;border:1px solid #b2dfdb;border-radius:12px;background:#fff;min-width:88px;color:#00695c;}.radical-write-item b{font-size:1.15rem;}.radical-write-item span{display:block;margin-top:2px;font-size:.72rem;color:#607d8b;}
+@media(max-width:620px){.radical-write-layout{grid-template-columns:1fr}.radical-write-side{padding-top:0}}
 @media(max-width:620px){.radical-card{grid-template-columns:1fr}.radical-main{padding:12px}.radical-big{font-size:4.3rem}.radical-grid{grid-template-columns:repeat(3,1fr)}}
 @media(prefers-reduced-motion:reduce){.combine-equation.animate .combine-part{animation:none!important}}
 .stroke-wrap{max-width:880px;margin:0 auto;padding:0 12px;}
@@ -364,7 +377,8 @@ body {
 .stroke-record-name{font-weight:bold;color:#4a148c;font-size:.92rem;}
 .stroke-record-meta{margin-top:3px;color:#777;font-size:.75rem;line-height:1.45;}
 .stroke-record-state{font-size:.76rem;font-weight:bold;margin-top:3px;}
-.stroke-record-state.done{color:#2e7d32;}.stroke-record-state.trying{color:#e07000;}
+.stroke-record-state.done{color:#2e7d32;}.stroke-record-state.trying{color:#e07000;}.stroke-record-state.unwritten{color:#8b7194;}
+.stroke-record-item.unwritten{background:#faf5fc;border-style:dashed;}
 .stroke-record-clear{border:1.5px solid #ce93d8;border-radius:14px;background:#fff;color:#6a1b9a;padding:6px 10px;font:700 .78rem inherit;cursor:pointer;}
 .stroke-record-clear:hover{background:#f7ecfb;}
 @media(max-width:620px){.stroke-layout{grid-template-columns:1fr;gap:12px}.stroke-panel{padding:14px}.stroke-btns{margin-bottom:12px}.stroke-name,.stroke-py,.stroke-desc{text-align:center}.stroke-btns{justify-content:center}}
@@ -415,6 +429,7 @@ body {
         <div class="radical-title" id="radicalTitle"></div>
         <div class="radical-py" id="radicalPy"></div>
         <span class="radical-position" id="radicalPosition"></span>
+        <button type="button" class="radical-write-entry" id="radicalWriteToggleBtn" onclick="toggleRadicalWriting()">✍️ 写一写这个偏旁</button>
       </div>
       <div class="radical-detail" id="radicalMeaningSection">
         <h3>它常表示什么？</h3>
@@ -431,6 +446,44 @@ body {
           </div>
         </div>
         <a class="component-link" href="hanzi-components.html">继续玩“汉字部件拼装” →</a>
+      </div>
+    </section>
+    <section class="radical-write-panel" id="radicalWritePanel" aria-labelledby="radicalWriteTitle" hidden>
+      <div class="radical-write-head">
+        <h2 id="radicalWriteTitle">✍️ 描写偏旁</h2>
+        <button type="button" class="read-examples-btn" onclick="toggleRadicalWriting()">收起</button>
+      </div>
+      <p class="radical-write-note">沿着粉色参考描写当前偏旁。偏旁常有字形变化，本区提供描写练习与完成记录，不用字体轮廓做不可靠的笔顺评分。</p>
+      <div class="radical-write-layout">
+        <div class="radical-write-canvas-wrap">
+          <canvas id="radicalGuideCanvas" width="280" height="280"></canvas>
+          <canvas id="radicalTraceCanvas" width="280" height="280"></canvas>
+        </div>
+        <div class="radical-write-side">
+          <div class="radical-write-glyph" id="radicalWriteGlyph"></div>
+          <div class="radical-write-name" id="radicalWriteName"></div>
+          <div class="radical-write-result" id="radicalWriteResult" aria-live="polite"></div>
+          <div class="radical-write-actions">
+            <button type="button" class="btn btn-gray" onclick="clearRadicalWriting()">🗑 清除</button>
+            <button type="button" class="btn btn-blue" onclick="speak(RADICALS[radicalIdx].glyph)">🔊 读一读</button>
+            <button type="button" class="btn btn-gray" id="radicalStepToggleBtn" onclick="toggleRadicalStepPractice()">✏️ 逐笔练习</button>
+            <button type="button" class="btn btn-purple" onclick="completeRadicalWriting()">✓ 写好了</button>
+          </div>
+        </div>
+      </div>
+      <div class="radical-step-panel" id="radicalStepPanel" hidden>
+        <h3 style="font-size:.95rem;color:#00695c;margin-bottom:5px">① 一笔一笔跟着看</h3>
+        <canvas class="radical-step-canvas" id="radicalStepCanvas" width="280" height="280"></canvas>
+        <div class="radical-step-label" id="radicalStepLabel"></div>
+        <div class="radical-write-actions">
+          <button type="button" class="btn btn-gray" onclick="resetRadicalStepPractice()">↺ 重来</button>
+          <button type="button" class="btn btn-blue" id="radicalStepNextBtn" onclick="nextRadicalStepPractice()">下一笔 ▶</button>
+        </div>
+      </div>
+      <div class="radical-write-record">
+        <div class="radical-write-record-head"><h3>📋 偏旁描写记录</h3><button type="button" class="read-examples-btn" onclick="clearRadicalWritingRecords()">🧹 清除记录</button></div>
+        <p class="radical-write-summary" id="radicalWriteSummary"></p>
+        <div class="radical-write-list" id="radicalWriteList"></div>
       </div>
     </section>
   </div>
@@ -1096,6 +1149,22 @@ const RADICALS = [
   {glyph:'阝',name:'右耳旁',pinyin:'yòu ěr páng',position:'在右边',meaning:'右耳旁由“邑”变化而来，常见于与地区、城镇或地点有关的字。',examples:['郊','都','部','邻','邮','那'],builds:[['交','阝','郊'],['由','阝','邮']]},
 ];
 
+// 常用偏旁的项目原创逐笔引导路径，坐标为 0~1 的田字格相对位置。
+// 仅用于展示基础书写方向，不替代完整字帖或自动笔顺评分。
+const RADICAL_STEP_GUIDES = {
+  0:[[[.62,.17],[.54,.31],[.45,.46],[.34,.62]],[[.56,.28],[.56,.50],[.56,.72],[.56,.86]]],
+  1:[[[.38,.22],[.32,.31]],[[.45,.43],[.37,.53]],[[.49,.66],[.41,.78]]],
+  2:[[[.24,.30],[.48,.30],[.76,.30]],[[.49,.16],[.49,.40],[.49,.65]],[[.49,.65],[.61,.58],[.72,.50]]],
+  3:[[[.18,.30],[.50,.30],[.82,.30]],[[.50,.16],[.50,.46],[.50,.84]],[[.49,.46],[.30,.68]],[[.51,.46],[.72,.70]]],
+  4:[[[.33,.20],[.33,.72]],[[.33,.20],[.68,.20],[.68,.72]],[[.33,.72],[.68,.72]]],
+  5:[[[.37,.20],[.55,.43]],[[.70,.22],[.54,.47],[.31,.68]],[[.25,.75],[.50,.75],[.76,.75]]],
+  6:[[[.35,.25],[.30,.38]],[[.62,.22],[.68,.35]],[[.52,.18],[.52,.47],[.52,.80]]],
+  7:[[[.36,.22],[.43,.32]],[[.46,.46],[.68,.46],[.68,.64],[.51,.80]]],
+  8:[[[.25,.26],[.75,.26]],[[.38,.18],[.38,.44]],[[.62,.18],[.62,.44]]],
+  9:[[[.50,.20],[.43,.31]],[[.68,.29],[.75,.38]],[[.25,.53],[.50,.53],[.75,.53],[.75,.72]]],
+  10:[[[.34,.22],[.41,.31]],[[.44,.30],[.61,.30],[.53,.44],[.43,.56]],[[.26,.70],[.42,.64],[.60,.70],[.74,.82]]]
+};
+
 // ─────────────────────────────────────────────────
 //  State
 // ─────────────────────────────────────────────────
@@ -1105,6 +1174,15 @@ let curChars = [];
 let modalIdx = 0;
 let radicalIdx = 0;
 let radicalBuildIdx = 0;
+let radicalWritingOpen = false;
+let radicalWritingInited = false;
+let radicalWritingHasInk = false;
+let radicalStepOpen = false;
+let radicalStepIndex = 0;
+let radicalStepAnimating = false;
+let radicalStepTimer = null;
+const RADICAL_WRITE_RECORD_KEY = 'hpx-hanzi-radical-writing-v1';
+const radicalWritingRecords = loadRadicalWritingRecords();
 
 // Flashcard state
 let fcQueue = [], fcIdx = 0, fcFlipped = false;
@@ -1117,6 +1195,19 @@ let quizList = [], qIdx = 0, qOk = 0, qBad = 0, qAnswered = false;
 // ─────────────────────────────────────────────────
 function saveLearned() {
   localStorage.setItem('hz_learned', JSON.stringify([...learned]));
+}
+
+function loadRadicalWritingRecords() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(RADICAL_WRITE_RECORD_KEY) || '[]');
+    if (!Array.isArray(saved)) return new Map();
+    return new Map(saved.filter(([index, record]) => Number.isInteger(index) && index >= 0 && index < RADICALS.length && record && Number.isFinite(record.completed))
+      .map(([index, record]) => [index, {completed: Math.max(0, Math.floor(record.completed))}]));
+  } catch (error) { return new Map(); }
+}
+
+function saveRadicalWritingRecords() {
+  try { localStorage.setItem(RADICAL_WRITE_RECORD_KEY, JSON.stringify([...radicalWritingRecords])); } catch (error) {}
 }
 
 // ─────────────────────────────────────────────────
@@ -1147,6 +1238,7 @@ function startRadicals() {
   renderRadicalGrid();
   show('pgRadical');
   selectRadical(radicalIdx, true);
+  renderRadicalWritingRecords();
 }
 
 function renderRadicalGrid() {
@@ -1179,6 +1271,8 @@ function selectRadical(index, announce, scrollOnMobile) {
   document.getElementById('radicalPy').textContent = radical.pinyin;
   document.getElementById('radicalPosition').textContent = radical.position;
   document.getElementById('radicalMeaning').textContent = radical.meaning;
+  const writeButton = document.getElementById('radicalWriteToggleBtn');
+  if (writeButton) writeButton.textContent = `✍️ 写一写“${radical.glyph}”`;
 
   const examples = document.getElementById('radicalExamples');
   examples.innerHTML = '';
@@ -1192,6 +1286,7 @@ function selectRadical(index, announce, scrollOnMobile) {
     examples.appendChild(button);
   });
   renderRadicalBuild();
+  if (radicalWritingOpen) prepareRadicalWriting();
   if (announce) speakRadicalExamples(true);
   if (scrollOnMobile) scrollToRadicalMeaning();
 }
@@ -1242,6 +1337,147 @@ function speakRadicalBuild() {
   const radical = RADICALS[radicalIdx];
   const build = radical.builds[radicalBuildIdx];
   speak(`${build[0]}和${build[1]}组合成${build[2]}。${radical.glyph}叫${radical.name}，${radical.position}。`);
+}
+
+// 偏旁有独立字形和变体，参考图只用于描写，不把字体轮廓误作笔顺评分依据。
+function toggleRadicalWriting() {
+  radicalWritingOpen = !radicalWritingOpen;
+  const panel = document.getElementById('radicalWritePanel');
+  panel.hidden = !radicalWritingOpen;
+  if (!radicalWritingOpen) return;
+  if (!radicalWritingInited) { radicalWritingInited = true; initRadicalWritingCanvas(); }
+  prepareRadicalWriting();
+  renderRadicalWritingRecords();
+  requestAnimationFrame(() => panel.scrollIntoView({behavior:'smooth', block:'start'}));
+}
+
+function prepareRadicalWriting() {
+  const radical = RADICALS[radicalIdx];
+  document.getElementById('radicalWriteTitle').textContent = `✍️ 描写偏旁：${radical.glyph} ${radical.name}`;
+  document.getElementById('radicalWriteGlyph').textContent = radical.glyph;
+  document.getElementById('radicalWriteName').textContent = `${radical.name} · ${radical.position}`;
+  const canvas = document.getElementById('radicalGuideCanvas');
+  const ctx = canvas.getContext('2d'); const S = 280;
+  ctx.clearRect(0, 0, S, S); ctx.fillStyle = '#f5fffe'; ctx.fillRect(0, 0, S, S);
+  ctx.strokeStyle = '#9edbd3'; ctx.lineWidth = 2; ctx.strokeRect(5, 5, S - 10, S - 10);
+  ctx.strokeStyle = '#c9eee9'; ctx.lineWidth = 1; ctx.setLineDash([6,5]); ctx.beginPath();
+  ctx.moveTo(S / 2, 7); ctx.lineTo(S / 2, S - 7); ctx.moveTo(7, S / 2); ctx.lineTo(S - 7, S / 2); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255, 128, 171, .42)';
+  ctx.font = 'bold 190px "KaiTi","STKaiti","华文楷体",serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(radical.glyph, S / 2, S / 2 + 7);
+  clearRadicalWriting();
+  if (radicalStepOpen && !getRadicalStepGuide()) {
+    radicalStepOpen = false;
+    document.getElementById('radicalStepPanel').hidden = true;
+    document.getElementById('radicalStepToggleBtn').textContent = '✏️ 逐笔练习';
+  } else if (radicalStepOpen) {
+    resetRadicalStepPractice();
+  }
+}
+
+function initRadicalWritingCanvas() {
+  const canvas = document.getElementById('radicalTraceCanvas');
+  let drawing = false;
+  function point(event) { const rect = canvas.getBoundingClientRect(); return [(event.clientX - rect.left) * 280 / rect.width, (event.clientY - rect.top) * 280 / rect.height]; }
+  canvas.addEventListener('pointerdown', event => {
+    event.preventDefault(); drawing = true; try { canvas.setPointerCapture(event.pointerId); } catch (error) {}
+    const [x,y] = point(event); const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#1a237e'; ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(x,y);
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (!drawing) return; event.preventDefault(); const [x,y] = point(event); const ctx = canvas.getContext('2d');
+    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); radicalWritingHasInk = true;
+  });
+  function finish(event) {
+    if (!drawing) return; event.preventDefault(); drawing = false;
+    if (radicalWritingHasInk) document.getElementById('radicalWriteResult').textContent = '写完啦，检查一下后点击“写好了”保存记录。';
+  }
+  canvas.addEventListener('pointerup', finish); canvas.addEventListener('pointercancel', finish);
+}
+
+function clearRadicalWriting() {
+  const canvas = document.getElementById('radicalTraceCanvas');
+  if (canvas) canvas.getContext('2d').clearRect(0, 0, 280, 280);
+  radicalWritingHasInk = false;
+  const result = document.getElementById('radicalWriteResult'); if (result) result.textContent = '';
+}
+
+function getRadicalStepGuide() { return RADICAL_STEP_GUIDES[radicalIdx] || null; }
+
+function toggleRadicalStepPractice() {
+  const guide = getRadicalStepGuide();
+  if (!guide) { showToast('这个偏旁的逐笔引导正在补充，可以先整体描写。'); return; }
+  radicalStepOpen = !radicalStepOpen;
+  const panel = document.getElementById('radicalStepPanel');
+  const button = document.getElementById('radicalStepToggleBtn');
+  panel.hidden = !radicalStepOpen;
+  button.textContent = radicalStepOpen ? '✏️ 收起逐笔练习' : '✏️ 逐笔练习';
+  if (radicalStepOpen) resetRadicalStepPractice();
+}
+
+function drawRadicalStepGrid() {
+  const canvas = document.getElementById('radicalStepCanvas'); const ctx = canvas.getContext('2d'); const S = 280;
+  ctx.clearRect(0,0,S,S); ctx.fillStyle='#f5fffe'; ctx.fillRect(0,0,S,S);
+  ctx.strokeStyle='#9edbd3'; ctx.lineWidth=2; ctx.strokeRect(5,5,S-10,S-10);
+  ctx.strokeStyle='#c9eee9'; ctx.lineWidth=1; ctx.setLineDash([6,5]); ctx.beginPath();
+  ctx.moveTo(S/2,7);ctx.lineTo(S/2,S-7);ctx.moveTo(7,S/2);ctx.lineTo(S-7,S/2);ctx.stroke();ctx.setLineDash([]);
+}
+
+function resetRadicalStepPractice() {
+  clearTimeout(radicalStepTimer); radicalStepTimer=null; radicalStepAnimating=false; radicalStepIndex=0;
+  drawRadicalStepGrid(); updateRadicalStepLabel();
+}
+
+function updateRadicalStepLabel() {
+  const label=document.getElementById('radicalStepLabel'); const next=document.getElementById('radicalStepNextBtn'); const guide=getRadicalStepGuide();
+  if (!guide) { label.textContent='这个偏旁的逐笔引导正在补充。'; next.disabled=true; return; }
+  next.disabled=radicalStepAnimating||radicalStepIndex>=guide.length;
+  if (radicalStepIndex>=guide.length) label.textContent=`✓ 全部 ${guide.length} 笔看完啦，自己描一次吧！`;
+  else label.textContent=`第 ${radicalStepIndex+1} 笔 / 共 ${guide.length} 笔：点击“下一笔”看方向`;
+}
+
+function nextRadicalStepPractice() {
+  const guide=getRadicalStepGuide();
+  if (!guide || radicalStepAnimating || radicalStepIndex>=guide.length) return;
+  const path=guide[radicalStepIndex]; const canvas=document.getElementById('radicalStepCanvas'); const ctx=canvas.getContext('2d'); const S=280;
+  radicalStepAnimating=true; updateRadicalStepLabel();
+  ctx.fillStyle='rgba(46,125,50,.78)'; ctx.beginPath();ctx.arc(path[0][0]*S,path[0][1]*S,9,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('起',path[0][0]*S,path[0][1]*S);
+  let pointIndex=1;
+  ctx.strokeStyle='#6a1b9a';ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(path[0][0]*S,path[0][1]*S);
+  function drawPoint() {
+    if (pointIndex>=path.length) {
+      radicalStepIndex++; radicalStepAnimating=false; updateRadicalStepLabel();
+      if (radicalStepIndex>=guide.length) { tone(660,.2); document.getElementById('radicalWriteResult').textContent='逐笔看完啦！现在在上面的田字格里自己描一次。'; }
+      return;
+    }
+    ctx.lineTo(path[pointIndex][0]*S,path[pointIndex][1]*S);ctx.stroke();ctx.beginPath();ctx.moveTo(path[pointIndex][0]*S,path[pointIndex][1]*S);pointIndex++;
+    radicalStepTimer=setTimeout(drawPoint,150);
+  }
+  radicalStepTimer=setTimeout(drawPoint,150);
+}
+
+function completeRadicalWriting() {
+  if (!radicalWritingHasInk) { showToast('先在田字格里描写一次，再保存记录。'); return; }
+  const record = radicalWritingRecords.get(radicalIdx) || {completed:0}; record.completed++;
+  radicalWritingRecords.set(radicalIdx, record); saveRadicalWritingRecords(); renderRadicalWritingRecords();
+  document.getElementById('radicalWriteResult').textContent = `✓ 已记录第 ${record.completed} 次“${RADICALS[radicalIdx].glyph}”描写！`;
+  radicalWritingHasInk = false;
+  tone(660, .2);
+}
+
+function renderRadicalWritingRecords() {
+  const summary = document.getElementById('radicalWriteSummary'); const list = document.getElementById('radicalWriteList');
+  if (!summary || !list) return;
+  const entries = [...radicalWritingRecords.entries()].sort(([a],[b]) => a - b);
+  summary.textContent = `累计已练 ${entries.length} / ${RADICALS.length} 个偏旁，记录保存在本浏览器。`;
+  list.replaceChildren();
+  if (!entries.length) { const empty = document.createElement('div'); empty.className = 'radical-write-empty'; empty.textContent = '还没有描写记录，选一个偏旁开始写吧。'; list.appendChild(empty); return; }
+  entries.forEach(([index, record]) => { const item = document.createElement('div'); item.className = 'radical-write-item'; item.innerHTML = `<b>${RADICALS[index].glyph}</b> ${RADICALS[index].name}<span>完成描写 ${record.completed} 次</span>`; list.appendChild(item); });
+}
+
+function clearRadicalWritingRecords() {
+  radicalWritingRecords.clear(); try { localStorage.removeItem(RADICAL_WRITE_RECORD_KEY); } catch (error) {}
+  renderRadicalWritingRecords(); showToast('已清除偏旁描写记录');
 }
 
 // ─────────────────────────────────────────────────
@@ -2400,16 +2636,10 @@ function renderStrokePracticeRecords(){
   const practiced=records.length;
   const completed=records.filter(([,record])=>record.completed).length;
   const total=STROKE_DATA.length;
+  const unwritten=STROKE_DATA.map((_,idx)=>idx).filter(idx=>!strokePracticeRecords.has(idx));
   const completion=Math.round(completed/total*100);
-  summary.innerHTML=`累计已练 <b>${practiced}</b> 种，已完成 <b>${completed}</b> / ${total} 种，总完成度 <b>${completion}%</b>。记录保存在本浏览器；完成一笔：至少一次达到 65 分。`;
+  summary.innerHTML=`累计已练 <b>${practiced}</b> 种，未写 <b>${unwritten.length}</b> 种，已完成 <b>${completed}</b> / ${total} 种，总完成度 <b>${completion}%</b>。记录保存在本浏览器；完成一笔：至少一次达到 65 分。`;
   list.replaceChildren();
-  if(!practiced){
-    const empty=document.createElement('div');
-    empty.className='stroke-record-empty';
-    empty.textContent='还没有记录，选一个笔画开始描写吧。';
-    list.appendChild(empty);
-    return;
-  }
   records.sort(([a],[b])=>a-b).forEach(([idx,record])=>{
     const item=document.createElement('div'); item.className='stroke-record-item';
     const name=document.createElement('div'); name.className='stroke-record-name'; name.textContent=STROKE_DATA[idx].name;
@@ -2417,6 +2647,13 @@ function renderStrokePracticeRecords(){
     const state=document.createElement('div');
     state.className=`stroke-record-state ${record.completed?'done':'trying'}`;
     state.textContent=record.completed?`✓ 已完成（达标 ${record.passes} 次）`:'继续练习，争取达到 65 分';
+    item.append(name,meta,state); list.appendChild(item);
+  });
+  unwritten.forEach(idx=>{
+    const item=document.createElement('div'); item.className='stroke-record-item unwritten';
+    const name=document.createElement('div'); name.className='stroke-record-name'; name.textContent=STROKE_DATA[idx].name;
+    const meta=document.createElement('div'); meta.className='stroke-record-meta'; meta.textContent='还没有练习记录';
+    const state=document.createElement('div'); state.className='stroke-record-state unwritten'; state.textContent='○ 未写';
     item.append(name,meta,state); list.appendChild(item);
   });
 }
