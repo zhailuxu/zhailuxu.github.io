@@ -93,7 +93,8 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
 .pinyin-record-group-title{font-size:.76rem;font-weight:bold;color:#bf4b00;margin-bottom:5px;}
 .pinyin-record-items{display:flex;flex-wrap:wrap;gap:5px;}
 .pinyin-record-item{padding:3px 7px;border-radius:999px;background:#fff3e0;color:#795548;font-size:.75rem;font-weight:bold;}
-.pinyin-record-all-done{padding:10px;border-radius:11px;background:#e8f5e9;color:#2e7d32;text-align:center;font-size:.8rem;font-weight:bold;}
+.pinyin-record-item.learned{background:#e8f5e9;color:#2e7d32;box-shadow:inset 0 0 0 1px #a5d6a7;}
+.pinyin-record-item.unlearned{background:#fffaf4;color:#8d6e63;box-shadow:inset 0 0 0 1px #ffe0b2;}
 .pinyin-record-clear{border:1.5px solid #ffb74d;border-radius:13px;background:#fff;color:#bf4b00;padding:5px 9px;font:700 .75rem inherit;cursor:pointer;}
 .pinyin-record-clear:hover{background:#fff3e0;}
 @media(max-width:430px){.study-actions{grid-template-columns:1fr 1fr}.study-action.primary{grid-column:1/-1;grid-row:1}.study-path{gap:7px}.study-symbol{font-size:1.7rem}.study-example{font-size:1.45rem}}
@@ -244,7 +245,7 @@ body{font-family:"Comic Sans MS","华文圆体","微软雅黑",sans-serif;backgr
   <details class="pinyin-record" aria-labelledby="pinyinRecordTitle">
     <summary><span class="pinyin-record-title" id="pinyinRecordTitle">📋 拼音学习记录</span></summary>
     <div class="pinyin-record-head" style="margin-top:10px;">
-      <span class="pinyin-record-note">以下清单仅显示还没学的项目。</span>
+      <span class="pinyin-record-note">展示全部项目；绿色 ✓ 表示已学习，○ 表示未学习。</span>
       <button type="button" class="pinyin-record-clear" onclick="clearPinyinLearningRecords()">🧹 清除记录</button>
     </div>
     <p class="pinyin-record-note" id="pinyinRecordSummary" aria-live="polite"></p>
@@ -297,19 +298,15 @@ function recordPinyinPractice(kind,correct){
   savePinyinLearningRecords(); renderPinyinLearningRecords();
 }
 function setPinyinRecordText(id,text){const el=document.getElementById(id);if(el) el.textContent=text;}
-function getUnlearnedPinyinRecordGroups(){
-  const learned=pinyinLearningRecords.learned;
+function getPinyinRecordGroups(){
   const allItems=[
-    {kind:'initial',title:'未学声母',items:INITIALS.map(item=>item.py)},
-    {kind:'final',title:'未学韵母',items:FINAL_GROUPS.flatMap(group=>group.items.map(item=>item.py))},
-    {kind:'whole',title:'未学整体认读',items:WHOLE_SYLLABLES.map(item=>item.py)},
-    {kind:'alphabet',title:'未学字母歌',items:ALPHABET_SONG_ORDER},
-    {kind:'study',title:'未学拼读学习',items:getAllStudyItems().map(item=>`${item.kind}:${item.symbol}`)}
+    {kind:'initial',title:'声母',items:INITIALS.map(item=>item.py)},
+    {kind:'final',title:'韵母',items:FINAL_GROUPS.flatMap(group=>group.items.map(item=>item.py))},
+    {kind:'whole',title:'整体认读',items:WHOLE_SYLLABLES.map(item=>item.py)},
+    {kind:'alphabet',title:'字母歌',items:ALPHABET_SONG_ORDER},
+    {kind:'study',title:'拼读学习',items:getAllStudyItems().map(item=>`${item.kind}:${item.symbol}`)}
   ];
-  return allItems.map(group=>({
-    ...group,
-    items:group.items.filter(item=>!learned[group.kind].includes(item))
-  }));
+  return allItems;
 }
 function renderPinyinLearningRecords(){
   const learned=pinyinLearningRecords.learned, practice=pinyinLearningRecords.practice;
@@ -322,23 +319,22 @@ function renderPinyinLearningRecords(){
   setPinyinRecordText('recordTabBlend',`${practice.blend.correct}/${practice.blend.attempts}`);
   setPinyinRecordText('recordTabQuiz',`${practice.quiz.correct}/${practice.quiz.attempts}`);
   const list=document.getElementById('pinyinRecordList');
-  const groups=getUnlearnedPinyinRecordGroups();
-  const totalUnlearned=groups.reduce((total,group)=>total+group.items.length,0);
+  const groups=getPinyinRecordGroups();
+  const totalUnlearned=groups.reduce((total,group)=>total+group.items.filter(item=>!learned[group.kind].includes(item)).length,0);
   const summary=document.getElementById('pinyinRecordSummary');
   if(summary) summary.textContent=`点读进度：声母 ${learned.initial.length}/23，韵母 ${learned.final.length}/24，整体认读 ${learned.whole.length}/16，字母歌 ${learned.alphabet.length}/47，拼读学习 ${learned.study.length}/63；未学项目 ${totalUnlearned} 项（按模块分别统计）；答题：声调 ${practice.tone.correct}/${practice.tone.attempts}，拼读 ${practice.blend.correct}/${practice.blend.attempts}，综合 ${practice.quiz.correct}/${practice.quiz.attempts}。记录保存在本浏览器。`;
   if(!list) return;
   list.replaceChildren();
-  if(!totalUnlearned){
-    const done=document.createElement('div'); done.className='pinyin-record-all-done'; done.textContent='✓ 点读与拼读学习项目都学完啦！'; list.appendChild(done);
-    return;
-  }
-  groups.filter(group=>group.items.length).forEach(group=>{
+  groups.forEach(group=>{
     const section=document.createElement('div'); section.className='pinyin-record-group';
-    const title=document.createElement('div'); title.className='pinyin-record-group-title'; title.textContent=`${group.title}（${group.items.length}）`;
+    const learnedCount=group.items.filter(item=>learned[group.kind].includes(item)).length;
+    const title=document.createElement('div'); title.className='pinyin-record-group-title'; title.textContent=`${group.title}（已学 ${learnedCount}/${group.items.length}）`;
     const items=document.createElement('div'); items.className='pinyin-record-items';
     group.items.forEach(item=>{
-      const chip=document.createElement('span'); chip.className='pinyin-record-item';
-      chip.textContent=group.kind==='study'?item.replace(/^initial:/,'声母 ').replace(/^final:/,'韵母 ').replace(/^whole:/,'整体 ') : item;
+      const isLearned=learned[group.kind].includes(item);
+      const chip=document.createElement('span'); chip.className=`pinyin-record-item ${isLearned?'learned':'unlearned'}`;
+      const label=group.kind==='study'?item.replace(/^initial:/,'声母 ').replace(/^final:/,'韵母 ').replace(/^whole:/,'整体 ') : item;
+      chip.textContent=`${isLearned?'✓':'○'} ${label}`;
       items.appendChild(chip);
     });
     section.append(title,items); list.appendChild(section);
@@ -760,8 +756,11 @@ function checkQuizChoice(btn,choice,correct){
   document.getElementById('nextBtn').style.display='inline-block';
 }
 
-function switchTab(t){
-  Hpx.tabs.activate(t, ['initial','final','tone','whole','alphabet','study','blend','quiz']);
+const PINYIN_TAB_ANCHORS=['initial','final','tone','whole','alphabet','study','blend','quiz'];
+function switchTab(t,fromAnchor=false){
+  if(!PINYIN_TAB_ANCHORS.includes(t)) return;
+  if(!fromAnchor&&location.hash!==`#${t}`){ location.hash=t; return; }
+  Hpx.tabs.activate(t, PINYIN_TAB_ANCHORS);
   if(t==='initial') speak('声母：点一下听读音，认熟23个声母。');
   if(t==='final') speak('韵母：一共24个，分成单韵母、复韵母、前鼻韵母和后鼻韵母。');
   if(t==='tone') { speak('声调：同一个音，声调不同意思完全不同。'); nextTonePractice(); }
@@ -778,6 +777,12 @@ renderWhole();
 renderAlphabetSong();
 renderStudy();
 renderPinyinLearningRecords();
+function openPinyinTabFromAnchor(){
+  const anchor=location.hash.slice(1).toLowerCase().replace(/^tab-/,'');
+  switchTab(PINYIN_TAB_ANCHORS.includes(anchor)?anchor:'initial',true);
+}
+window.addEventListener('hashchange',openPinyinTabFromAnchor);
+openPinyinTabFromAnchor();
 speak('欢迎来到汉语拼音入门！我们先认声母和韵母，再学声调，最后学拼读。');
 </script>
 

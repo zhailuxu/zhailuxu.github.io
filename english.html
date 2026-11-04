@@ -45,6 +45,25 @@ body {
   font-size: .86rem; font-weight: 700; transform: translateX(-50%);
 }
 
+/* ── Learning record ── */
+.english-record{margin:18px 0;background:rgba(255,255,255,.94);border:1.5px solid var(--border);border-radius:16px;padding:12px 13px;box-shadow:var(--shadow);}
+.english-record>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;}
+.english-record>summary::-webkit-details-marker{display:none;}
+.english-record>summary::after{content:'展开 ▾';color:var(--teal);font-size:.76rem;font-weight:800;}
+.english-record[open]>summary::after{content:'收起 ▴';}
+.english-record-title{font-size:.94rem;font-weight:800;color:var(--teal);}
+.english-record-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.english-record-note{font-size:.76rem;color:var(--muted);line-height:1.55;margin-top:6px;}
+.english-record-clear{border:1.5px solid var(--border);border-radius:12px;background:#fff;color:var(--teal);padding:5px 9px;font:800 .75rem inherit;cursor:pointer;}
+.english-record-clear:hover{background:var(--teal-light);}
+.english-record-list{display:flex;flex-direction:column;gap:8px;max-height:310px;overflow:auto;margin-top:10px;padding-right:2px;}
+.english-record-group{padding:8px 9px;border:1px dashed var(--border);border-radius:11px;background:#f8feff;}
+.english-record-group-title{font-size:.77rem;font-weight:800;color:var(--teal);margin-bottom:5px;}
+.english-record-items{display:flex;flex-wrap:wrap;gap:5px;}
+.english-record-item{padding:3px 7px;border-radius:999px;background:var(--teal-light);color:var(--text);font-size:.75rem;font-weight:700;}
+.english-record-item.learned{background:#e5fbf4;color:#056449;box-shadow:inset 0 0 0 1px #9be3c9;}
+.english-record-item.unlearned{background:#f8feff;color:var(--muted);box-shadow:inset 0 0 0 1px #c5e9ed;}
+
 /* ── Header ── */
 .header { text-align: center; margin-bottom: 24px; }
 .header h1 {
@@ -557,6 +576,16 @@ input[type=range].speed-slider::-moz-range-thumb {
   </div>
 </div>
 
+<details class="english-record" aria-labelledby="englishRecordTitle">
+  <summary><span class="english-record-title" id="englishRecordTitle">📋 英语学习记录</span></summary>
+  <div class="english-record-head">
+    <span class="english-record-note">展示全部项目；绿色 ✓ 表示已学习，○ 表示未学习。</span>
+    <button type="button" class="english-record-clear" onclick="clearEnglishLearningRecords()">🧹 清除记录</button>
+  </div>
+  <p class="english-record-note" id="englishRecordSummary" aria-live="polite"></p>
+  <div class="english-record-list" id="englishRecordList" aria-live="polite"></div>
+</details>
+
 </div><!-- /container -->
 
 <script src="hpx-core.js?v=20260910-1"></script>
@@ -740,6 +769,68 @@ const CAT_META  = {
   grade6:`🏆 六年级（${WORDS.grade6?.length || 0}）`
 };
 
+// 学习记录仅保存在当前浏览器，用于显示已学和未学项目，不会上传或同步。
+const ENGLISH_RECORD_STORAGE_KEY='hpx-english-learning-record-v1';
+const englishLearningRecords=loadEnglishLearningRecords();
+function newEnglishLearningRecords(){
+  return {alpha:[],numbers:[],words:[],phonics:[],sentences:[]};
+}
+function loadEnglishLearningRecords(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(ENGLISH_RECORD_STORAGE_KEY)||'null');
+    const records=newEnglishLearningRecords();
+    if(!saved||typeof saved!=='object') return records;
+    Object.keys(records).forEach(kind=>{
+      if(Array.isArray(saved[kind])) records[kind]=[...new Set(saved[kind].filter(item=>typeof item==='string'||typeof item==='number'))];
+    });
+    return records;
+  }catch(error){ return newEnglishLearningRecords(); }
+}
+function saveEnglishLearningRecords(){
+  try{localStorage.setItem(ENGLISH_RECORD_STORAGE_KEY,JSON.stringify(englishLearningRecords));}catch(error){}
+}
+function markEnglishLearned(kind,key){
+  const records=englishLearningRecords[kind];
+  if(!records||records.includes(key)) return;
+  records.push(key); saveEnglishLearningRecords(); renderEnglishLearningRecords();
+}
+function getEnglishRecordGroups(){
+  const groups=[
+    {kind:'alpha',title:'字母',items:ALPHABET.map(item=>({key:item.l,label:item.l}))},
+    {kind:'numbers',title:'数字',items:NUMBERS_1_20.map(item=>({key:item.number,label:`${item.number} · ${item.word}`}))},
+    {kind:'words',title:'单词',items:ALL_WORDS.map(item=>({key:item.word,label:item.word}))},
+    {kind:'phonics',title:'自然拼读规律',items:PHONICS_RULES.map(item=>({key:item.id,label:item.label}))},
+    {kind:'sentences',title:'填空句型',items:FILL.map(item=>({key:item.full,label:item.full}))}
+  ];
+  return groups;
+}
+function renderEnglishLearningRecords(){
+  const list=document.getElementById('englishRecordList');
+  const summary=document.getElementById('englishRecordSummary');
+  const groups=getEnglishRecordGroups();
+  const learnedTotal=Object.values(englishLearningRecords).reduce((total,items)=>total+items.length,0);
+  const unlearnedTotal=groups.reduce((total,group)=>total+group.items.filter(item=>!englishLearningRecords[group.kind].includes(item.key)).length,0);
+  if(summary) summary.textContent=`已记录学习 ${learnedTotal} 项，未学 ${unlearnedTotal} 项（按模块分别统计）。单词在配图或拼写答对后计入；填空和自然拼读答对后计入。记录保存在本浏览器。`;
+  if(!list) return;
+  list.replaceChildren();
+  groups.forEach(group=>{
+    const section=document.createElement('div'); section.className='english-record-group';
+    const learnedCount=group.items.filter(item=>englishLearningRecords[group.kind].includes(item.key)).length;
+    const title=document.createElement('div'); title.className='english-record-group-title'; title.textContent=`${group.title}（已学 ${learnedCount}/${group.items.length}）`;
+    const items=document.createElement('div'); items.className='english-record-items';
+    group.items.forEach(item=>{
+      const isLearned=englishLearningRecords[group.kind].includes(item.key);
+      const chip=document.createElement('span'); chip.className=`english-record-item ${isLearned?'learned':'unlearned'}`; chip.textContent=`${isLearned?'✓':'○'} ${item.label}`; items.appendChild(chip);
+    });
+    section.append(title,items); list.appendChild(section);
+  });
+}
+function clearEnglishLearningRecords(){
+  Object.assign(englishLearningRecords,newEnglishLearningRecords());
+  try{localStorage.removeItem(ENGLISH_RECORD_STORAGE_KEY);}catch(error){}
+  renderEnglishLearningRecords();
+}
+
 // ══ SPEECH ════════════════════════════════════════════════
 let speechRate = 0.65;
 
@@ -780,8 +871,11 @@ function speakEn(text) {
 }
 
 // ══ TABS ══════════════════════════════════════════════════
-function switchTab(name) {
-  Hpx.tabs.activate(name,['alpha','numbers','match','spell','fill','phonics'],{activeClass:'active',hiddenClass:'hidden'});
+const ENGLISH_TAB_ANCHORS=['alpha','numbers','match','spell','fill','phonics'];
+function switchTab(name,fromAnchor=false) {
+  if(!ENGLISH_TAB_ANCHORS.includes(name)) return;
+  if(!fromAnchor&&location.hash!==`#${name}`){ location.hash=name; return; }
+  Hpx.tabs.activate(name,ENGLISH_TAB_ANCHORS,{activeClass:'active',hiddenClass:'hidden'});
   if (name === 'numbers' && !numberInited) initNumbers();
   if (name === 'match' && !matchInited) initMatch();
   if (name === 'spell' && !spellInited) { spellInited = true; nextSpell(); }
@@ -825,6 +919,7 @@ function buildAlpha() {
       document.querySelectorAll('.alpha-card.active').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       showPreview(item);
+      markEnglishLearned('alpha',item.l);
       speakEn(alphaSpeechText(item));
     };
     card.addEventListener('click', activate);
@@ -873,6 +968,7 @@ function initNumbers(){
 function speakNumberCard(number){
   const item=NUMBERS_1_20[number-1];
   document.querySelectorAll('.number-card').forEach(card=>card.classList.toggle('active',Number(card.dataset.number)===number));
+  markEnglishLearned('numbers',number);
   return speakEn(item.word);
 }
 
@@ -915,6 +1011,7 @@ function checkNumber(button,number){
   const fb=document.getElementById('numberFb');
   if(ok){
     numberCorrect++;numberStreak++;
+    markEnglishLearned('numbers',numberCurrent.number);
     fb.textContent=numberStreak>=3?`🎉 ${numberStreak} 连对！Great!`:'✅ Correct!';
     fb.className='match-fb fb-ok';playOk();
   }else{
@@ -1003,6 +1100,7 @@ function handleMatch(btn, chosen) {
 
   if (ok) {
     matchCorrect++; matchStreak++;
+    markEnglishLearned('words',matchCurrent.word);
     btn.classList.add('correct');
     const msg = matchStreak >= 5 ? `🔥 ${matchStreak} 连对！Amazing!` :
                 matchStreak >= 3 ? `🎉 ${matchStreak} 连对！Great!` : '✅ Correct!';
@@ -1100,6 +1198,7 @@ function handleSpellLetter(btn, letter, target) {
 
     if (ok) {
       spellCorrect++;
+      markEnglishLearned('words',spellCurrent.word);
       slots.forEach(s => { s.classList.remove('filled'); s.classList.add('correct'); });
       fb.textContent = '✅ Correct! 拼对啦！'; fb.style.color = 'var(--mint)';
       playOk(); speakEn(spellCurrent.word);
@@ -1236,6 +1335,7 @@ function handleFill(btn, chosen) {
 
   if (ok) {
     fillCorrect++; fillStreak++;
+    markEnglishLearned('sentences',fillCurrent.full);
     btn.classList.add('correct');
     senEl.innerHTML = renderSentence(fillCurrent.template, chosen, 'correct');
     document.getElementById('fillCn').textContent = fillCurrent.cn;
@@ -1295,6 +1395,7 @@ function initPhonics() {
 function setPhonicsFilter(ruleId) {
   phonicsRuleFilter=ruleId;
   phonicsLearnRule=ruleId;
+  if(ruleId!=='all') markEnglishLearned('phonics',ruleId);
   document.querySelectorAll('[data-phonics-rule]').forEach(button =>
     button.classList.toggle('active',button.dataset.phonicsRule===ruleId)
   );
@@ -1389,6 +1490,7 @@ function checkPhonics(button,ruleId) {
   const feedback=document.getElementById('phonicsFb');
   if (ok) {
     phonicsCorrect++; phonicsStreak++;
+    markEnglishLearned('phonics',correctRule.id);
     feedback.textContent=phonicsStreak>=3 ? `🎉 连对 ${phonicsStreak} 题！${correctRule.hint}` : `✅ 对啦！${correctRule.hint}`;
     feedback.className='match-fb fb-ok';
     playOk();
@@ -1411,9 +1513,16 @@ function updatePhonicsHud() {
 
 // ══ INIT ══════════════════════════════════════════════════
 buildAlpha();
+renderEnglishLearningRecords();
+function openEnglishTabFromAnchor(){
+  const anchor=location.hash.slice(1).toLowerCase().replace(/^tab-/,'');
+  if(ENGLISH_TAB_ANCHORS.includes(anchor)) switchTab(anchor,true);
+}
+window.addEventListener('hashchange',openEnglishTabFromAnchor);
 try {
   const requestedTab = new URLSearchParams(window.location.search).get('tab');
-  if (['alpha','numbers','match','spell','fill','phonics'].includes(requestedTab)) switchTab(requestedTab);
+  if(location.hash) openEnglishTabFromAnchor();
+  else if (ENGLISH_TAB_ANCHORS.includes(requestedTab)) switchTab(requestedTab,true);
 } catch (error) {}
 </script>
 <script>

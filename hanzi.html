@@ -367,8 +367,12 @@ body {
 #sGuideCanvas{display:block;width:100%;height:auto;}
 #sTraceCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;z-index:1;touch-action:none;}
 .stroke-record{margin-top:18px;background:rgba(255,255,255,.84);border:1.5px solid #ead8f0;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(106,27,154,.08);}
+.stroke-record>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;}
+.stroke-record>summary::-webkit-details-marker{display:none;}
+.stroke-record>summary::after{content:'展开 ▾';font-size:.78rem;font-weight:bold;color:#6a1b9a;}
+.stroke-record[open]>summary::after{content:'收起 ▴';}
 .stroke-record-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;}
-.stroke-record h2{font-size:1rem;color:#6a1b9a;}
+.stroke-record h2,.stroke-record-title{font-size:1rem;font-weight:bold;color:#6a1b9a;}
 .stroke-record-summary{font-size:.82rem;line-height:1.6;color:#666;}
 .stroke-record-summary b{color:#4a148c;}
 .stroke-record-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
@@ -684,14 +688,15 @@ body {
         </div>
       </section>
     </div>
-    <section class="stroke-record" aria-labelledby="strokeRecordTitle">
-      <div class="stroke-record-head">
-        <h2 id="strokeRecordTitle">📋 笔画练习记录</h2>
+    <details class="stroke-record" aria-labelledby="strokeRecordTitle">
+      <summary><span class="stroke-record-title" id="strokeRecordTitle">📋 笔画练习记录</span></summary>
+      <div class="stroke-record-head" style="margin-top:10px;">
+        <span class="stroke-record-summary">展开查看已练和未写笔画。</span>
         <button type="button" class="stroke-record-clear" onclick="clearStrokePracticeRecords()">🧹 清除记录</button>
       </div>
       <p class="stroke-record-summary" id="strokeRecordSummary" aria-live="polite"></p>
       <div class="stroke-record-list" id="strokeRecordList"></div>
-    </section>
+    </details>
   </div>
 </div>
 
@@ -1220,6 +1225,7 @@ function show(id) {
 }
 
 function goHome() {
+  if (location.hash) { location.hash = ''; return; }
   closeModal();
   renderHome();
   show('pgHome');
@@ -1234,7 +1240,8 @@ function goLevel() {
 // ─────────────────────────────────────────────────
 //  Radical learning
 // ─────────────────────────────────────────────────
-function startRadicals() {
+function startRadicals(fromAnchor=false) {
+  if (!fromAnchor && location.hash !== '#radical') { location.hash = 'radical'; return; }
   renderRadicalGrid();
   show('pgRadical');
   selectRadical(radicalIdx, true);
@@ -2675,7 +2682,8 @@ function clearStrokePracticeRecords(){
   showToast('已清除浏览器中的笔画练习记录');
 }
 
-function startStroke(){
+function startStroke(fromAnchor=false){
+  if(!fromAnchor && location.hash!=='#stroke'){ location.hash='stroke'; return; }
   show('pgStroke');
   if(!_sInited){ _sInited=true; initStrokeCanvas(); }
   // build buttons
@@ -2882,6 +2890,14 @@ function initStrokeCanvas(){
 //  Init
 // ─────────────────────────────────────────────────
 renderHome();
+function openFromAnchor(){
+  const anchor=location.hash.toLowerCase();
+  if(anchor==='#stroke'||anchor==='#pgstroke') startStroke(true);
+  else if(anchor==='#radical'||anchor==='#pgradical') startRadicals(true);
+  else { closeModal(); renderHome(); show('pgHome'); }
+}
+window.addEventListener('hashchange',openFromAnchor);
+openFromAnchor();
 </script>
 <a href="index.html" style="display:block;text-align:center;margin:14px 0 6px;color:#1565c0;text-decoration:none;font-size:.88rem;">← 返回慧陪学</a>
 <script src="feedback.js?v=20260906-2"></script>
