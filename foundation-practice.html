@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基础能力顺序练习</title>
+<style>
+:root{--ink:#19384b;--muted:#66808e;--blue:#147a9b;--blue-pale:#e7f7fb;--line:#c8e5ee;--ok:#16865e;--locked:#a5b7bf;}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:linear-gradient(145deg,#effbff,#fff8ef 58%,#f5efff);}
+.wrap{max-width:1080px;margin:auto;padding:24px 14px 42px}.hero{text-align:center;padding:8px 0 20px}.hero h1{margin:0;color:#0c637f;font-size:clamp(1.55rem,4vw,2.2rem)}.hero p{margin:8px auto 0;max-width:680px;color:var(--muted);font-size:.92rem;line-height:1.65}
+.path{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:8px;margin-bottom:16px}.step{position:relative;border:1.5px solid var(--line);border-radius:14px;padding:9px 7px;background:#fff;text-align:center;color:var(--locked);font-size:.78rem;font-weight:bold;transition:.2s}.step b{display:block;font-size:1rem;margin-bottom:2px}.step.active{border-color:var(--blue);background:var(--blue-pale);color:var(--blue);box-shadow:0 3px 10px rgba(20,122,155,.15)}.step.done{border-color:#8bd7bd;background:#effbf6;color:var(--ok)}.step.locked{opacity:.68}.step button{all:unset;cursor:pointer;display:block;width:100%;height:100%}.step.locked button{cursor:not-allowed}
+.panel{overflow:hidden;border:1.5px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 7px 24px rgba(20,80,100,.11)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 17px;background:#f7fdff;border-bottom:1px solid var(--line)}.panel-title{font-size:1.08rem;font-weight:bold;color:#075f7c}.panel-note{font-size:.8rem;color:var(--muted);line-height:1.5}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:0;border-radius:11px;padding:9px 12px;background:var(--blue);color:#fff;font:700 .82rem inherit;cursor:pointer}.btn:hover{filter:brightness(.96)}.btn.ghost{background:#fff;border:1.5px solid var(--line);color:#22647a;text-decoration:none}.frame-wrap{height:min(74vh,810px);min-height:580px;background:#fff}.frame-wrap iframe{display:block;border:0;width:100%;height:100%;background:#fff}.complete{padding:30px 20px;text-align:center}.complete .badge{font-size:3.3rem}.complete h2{color:var(--ok);margin:9px 0 5px}.complete p{color:var(--muted);margin:0;line-height:1.6}.footer{text-align:center;margin-top:16px}.footer a{color:#176b89;font-size:.84rem;text-decoration:none}
+@media(max-width:650px){.wrap{padding:16px 10px 30px}.path{grid-template-columns:repeat(2,1fr)}.path .step:last-child{grid-column:1/-1}.frame-wrap{height:72vh;min-height:530px}.panel-head{padding:12px}.actions{width:100%;justify-content:flex-end}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <h1>🌟 基础能力顺序练习</h1>
+    <p>按“笔画 → 手写 → 拼音 → 数字 → 英语”依次完成。每关答对或达标后，会自动解锁下一关。</p>
+  </header>
+  <nav class="path" id="path" aria-label="练习进度"></nav>
+  <section class="panel" aria-live="polite">
+    <div class="panel-head">
+      <div><div class="panel-title" id="stageTitle"></div><div class="panel-note" id="stageNote"></div></div>
+      <div class="actions"><a class="btn ghost" id="openLink" target="_blank" rel="noopener">新窗口打开</a><button class="btn" id="confirmBtn" type="button">完成本项，继续</button></div>
+    </div>
+    <div class="frame-wrap" id="frameWrap"><iframe id="practiceFrame" title="练习内容"></iframe></div>
+    <div class="complete" id="complete" hidden><div class="badge">🎉</div><h2>全部完成！</h2><p>今天的基础练习已经完成，继续保持这个节奏。</p></div>
+  </section>
+  <div class="footer"><button class="btn ghost" id="resetBtn" type="button">重新开始本轮练习</button>　<a href="index.html">← 返回慧陪学</a></div>
+</main>
+<script>
+const stages=[
+  {id:'hanzi-stroke',icon:'✏️',name:'笔画练习',note:'完成一笔达到 65 分后自动解锁下一项。',url:'hanzi.html#stroke'},
+  {id:'hanzi-write',icon:'✍️',name:'汉字手写',note:'完成一个汉字的手写达标后自动解锁下一项。',url:'hanzi.html#write'},
+  {id:'pinyin',icon:'🔤',name:'拼音练习',note:'综合练习答对一题后自动解锁下一项。',url:'pinyin.html#quiz'},
+  {id:'numbers',icon:'🔢',name:'数字练习',note:'找数字答对一题后自动解锁下一项。',url:'numbers.html#find'},
+  {id:'english',icon:'🇬🇧',name:'英语练习',note:'单词配图答对一题后自动完成。',url:'english.html#match'}
+];
+const storageKey='hpx-foundation-practice-flow-v1';
+let completed=loadProgress(),active=Math.min(completed.size,stages.length-1);
+const path=document.getElementById('path'),title=document.getElementById('stageTitle'),note=document.getElementById('stageNote'),frame=document.getElementById('practiceFrame'),openLink=document.getElementById('openLink'),confirmBtn=document.getElementById('confirmBtn'),frameWrap=document.getElementById('frameWrap'),complete=document.getElementById('complete');
+function loadProgress(){try{const saved=JSON.parse(localStorage.getItem(storageKey)||'[]');return new Set(Array.isArray(saved)?saved.filter(id=>stages.some(stage=>stage.id===id)):[])}catch(error){return new Set()}}
+function saveProgress(){try{localStorage.setItem(storageKey,JSON.stringify([...completed]))}catch(error){}}
+function render(){
+  path.replaceChildren();
+  stages.forEach((stage,index)=>{
+    const item=document.createElement('div');const unlocked=index<=completed.size;item.className=`step ${completed.has(stage.id)?'done':index===active?'active':'locked'}`;
+    const button=document.createElement('button');button.type='button';button.disabled=!unlocked;button.innerHTML=`<b>${stage.icon} ${index+1}</b>${stage.name}`;button.addEventListener('click',()=>{if(unlocked){active=index;render()}});item.appendChild(button);path.appendChild(item);
+  });
+  const done=completed.size===stages.length;frameWrap.hidden=done;complete.hidden=!done;confirmBtn.hidden=done;
+  if(done){title.textContent='今日顺序练习完成';note.textContent='可以重新开始，或回到首页选择其他练习。';return}
+  const stage=stages[active];title.textContent=`第 ${active+1} 项：${stage.name}`;note.textContent=stage.note;openLink.href=stage.url;frame.src=stage.url;
+}
+function finishCurrent(){
+  const stage=stages[active];if(!stage||completed.has(stage.id))return;
+  completed.add(stage.id);saveProgress();
+  if(completed.size<stages.length)active=completed.size;
+  render();
+}
+window.addEventListener('message',event=>{if(event.source!==frame.contentWindow)return;const data=event.data;if(data&&data.type==='hpx-sequential-practice-complete'&&data.practice===stages[active]?.id)finishCurrent()});
+confirmBtn.addEventListener('click',finishCurrent);
+document.getElementById('resetBtn').addEventListener('click',()=>{completed.clear();active=0;saveProgress();render()});
+render();
+</script>
+</body>
+</html>
