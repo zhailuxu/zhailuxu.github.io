@@ -1934,8 +1934,8 @@ function startWriteForModalChar(){
   const ch=curChars[modalIdx];
   const strokeData=window.HANZI_STROKE_DATA||{};
   if(!ch) return;
-  wList=[ch];
-  wIdx=0;
+  wList=[...curChars];
+  wIdx=modalIdx;
   closeModal();
   renderWrite();
   show('pgWrite');
